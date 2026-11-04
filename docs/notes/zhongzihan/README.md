@@ -19,6 +19,7 @@
 | 05 | 晒图预览 | `web/src/pages/share-preview/share-preview.vue` | `05-晒预览.md` | `feat/web-share-preview` |
 | 06 | 阶段记录 · 列表 | `web/src/pages/history/list.vue` | `06-阶段记录-列表.md` | `feat/web-history` |
 | 07 | 阶段记录 · 详情 | `web/src/pages/history/detail.vue` | `07-阶段记录-详情.md` | `feat/web-history` |
+| 08 | 测试入口 | `web/src/pages/test-intro/test-intro.vue` | [08-测试入口.md](./08-测试入口.md) | `feat/web-test-intro` |
 
 ## 写法约定
 

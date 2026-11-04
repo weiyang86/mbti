@@ -7,6 +7,12 @@
       }
     },
     {
+      "path": "pages/test-intro/test-intro",
+      "style": {
+        "navigationBarTitleText": "MBTI 趣味测试"
+      }
+    },
+    {
       "path": "pages/quiz/quiz",
       "style": {
         "navigationBarTitleText": "测一测"

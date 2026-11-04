@@ -55,7 +55,6 @@
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import type { ResultSnapshotSummary, TypeMeta } from '@/api/types'
-import { createQuizSession } from '@/api/quiz'
 import { listResults } from '@/api/results'
 import { listTypes } from '@/api/types-api'
 
@@ -90,13 +89,8 @@ const coverQuote = computed(() => {
   return `${source} · ${latest.value.submitted_at.slice(0, 10)}`
 })
 
-async function startQuiz() {
-  try {
-    const session = await createQuizSession()
-    uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${session.id}` })
-  } catch {
-    uni.showToast({ title: '无法开始测验', icon: 'none' })
-  }
+function startQuiz() {
+  uni.navigateTo({ url: '/pages/test-intro/test-intro' })
 }
 
 function goSelfSelect() {
