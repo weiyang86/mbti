@@ -1,0 +1,43 @@
+$mbti-bg: #f8f7f4;
+$mbti-accent: #7560df;
+$mbti-ink: #292630;
+$mbti-muted: #77727e;
+
+.page {
+  min-height: 100vh;
+  padding: 32rpx;
+  box-sizing: border-box;
+  background: $mbti-bg;
+  color: $mbti-ink;
+}
+
+.btn-primary {
+  background: $mbti-accent;
+  color: #fff;
+  border-radius: 999rpx;
+  padding: 24rpx 40rpx;
+  text-align: center;
+  font-size: 30rpx;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: $mbti-ink;
+  border: 2rpx solid #e9e5ed;
+  border-radius: 999rpx;
+  padding: 24rpx 40rpx;
+  text-align: center;
+  font-size: 30rpx;
+}
+
+.muted {
+  color: $mbti-muted;
+  font-size: 26rpx;
+}
+
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 12rpx 40rpx rgba(49, 33, 77, 0.06);
+}
