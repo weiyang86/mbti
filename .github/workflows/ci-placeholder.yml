@@ -1,0 +1,20 @@
+name: ci-placeholder
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+jobs:
+  scaffold-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify required paths
+        run: |
+          test -d UIhtml
+          test -d web
+          test -d admin
+          test -d aij-foundation
+          test -f README.md
+          test -f AGENTS.md
+          ls UIhtml/*.html

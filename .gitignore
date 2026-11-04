@@ -1,0 +1,43 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node / UniApp / HBuilder
+node_modules/
+dist/
+unpackage/
+.hbuilderx/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# Build / cache
+.cache/
+coverage/
+tmp/
+temp/
+*.local
+
+# Python (admin / foundation if used)
+__pycache__/
+.venv/
+venv/
+*.pyc
+
+# Mobile / native
+*.apk
+*.ipa
+*.aab
