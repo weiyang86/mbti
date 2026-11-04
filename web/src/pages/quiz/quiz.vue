@@ -9,6 +9,11 @@
     </view>
 
     <view v-else>
+      <view class="demo-strip">
+        <text>V0.4 · Mock 演示 · 不产生费用</text>
+        <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+      </view>
+
       <view class="head">
         <text class="head-label">选择更接近日常的你</text>
         <text class="head-count">{{ pad(currentIndex + 1) }} / {{ pad(questions.length) }}</text>
@@ -143,7 +148,11 @@ async function submitAll() {
         option_id: answers.value[q.id],
       })),
     )
-    const result = await submitQuizSession(sessionId.value, {})
+    const profile = readProfile()
+    const result = await submitQuizSession(sessionId.value, {
+      life_stage: profile.stage,
+      recent_status: profile.recent,
+    })
     uni.hideLoading()
     uni.redirectTo({ url: `/pages/result/result?id=${result.id}` })
   } catch (e) {
@@ -167,11 +176,48 @@ function prev() {
 function goHome() {
   uni.reLaunch({ url: '/pages/index/index' })
 }
+
+function showDemo() {
+  uni.showModal({
+    title: '演示状态',
+    content: '当前为 V0.4 Mock 演示：题目与结果来自本地 mock，不产生真实费用，也未连接真实后端。',
+    showCancel: false,
+    confirmText: '知道了',
+  })
+}
+
+/** 读取测试入口保存的阶段信息（与 web/src/store/profile.ts 使用同一存储键） */
+function readProfile(): { stage?: string; recent?: string } {
+  try {
+    const raw = uni.getStorageSync('mbti_test_profile_v1')
+    if (raw && typeof raw === 'object') {
+      return {
+        stage: typeof raw.stage === 'string' ? raw.stage : undefined,
+        recent: typeof raw.recent === 'string' ? raw.recent : undefined,
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  return {}
+}
 </script>
 
 <style scoped lang="scss">
 .quiz {
-  padding-top: 40rpx;
+  padding-top: 24rpx;
+}
+
+.demo-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20rpx;
+  color: #a398af;
+  margin-bottom: 28rpx;
+}
+.demo-link {
+  color: #7560df;
 }
 
 .state {
@@ -207,8 +253,8 @@ function goHome() {
 }
 
 .bar {
-  margin-top: 16rpx;
-  height: 10rpx;
+  margin-top: 14rpx;
+  height: 6rpx;
   border-radius: 999rpx;
   background: #ece8f3;
   overflow: hidden;
@@ -216,28 +262,30 @@ function goHome() {
 .bar-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #8b6cf6, #dfff8b);
+  background: #7560df;
   transition: width 0.25s ease;
 }
 
 .dim {
   display: block;
-  margin-top: 48rpx;
-  font-size: 36rpx;
+  margin-top: 56rpx;
+  font-size: 88rpx;
   font-weight: 800;
-  letter-spacing: 2rpx;
-  color: #292630;
+  letter-spacing: 6rpx;
+  color: #7559e8;
+  line-height: 1;
 }
 .slash {
-  color: #7560df;
-  font-weight: 400;
+  color: #d9cdf0;
+  font-weight: 300;
+  margin: 0 8rpx;
 }
 
 .prompt {
   display: block;
-  margin-top: 24rpx;
-  font-size: 44rpx;
-  font-weight: 700;
+  margin-top: 40rpx;
+  font-size: 48rpx;
+  font-weight: 800;
   line-height: 1.5;
   color: #292630;
 }
