@@ -5,7 +5,7 @@
         <view class="badge"><text>16</text><text class="plus">+</text></view>
         <text class="brand-name">MBTI搭子</text>
       </view>
-      <text class="chip">微信预览 ⌄</text>
+      <text class="chip" @click="showChannels">微信预览 ⌄</text>
     </view>
 
     <text class="kicker">MBTI TEST × PERSONALITY CARD</text>
@@ -54,49 +54,68 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import type { ResultSnapshotSummary, TypeMeta } from '@/api/types'
-import { createQuizSession } from '@/api/quiz'
+import type { ResultSnapshotSummary } from '@/api/types'
 import { listResults } from '@/api/results'
-import { listTypes } from '@/api/types-api'
+
+const TYPE_NAMES: Record<string, string> = {
+  INTJ: '独立构想者', INTP: '好奇研究员', ENTJ: '行动策划家', ENTP: '灵感实验家',
+  INFJ: '安静观察家', INFP: '理想收藏家', ENFJ: '温暖连接者', ENFP: '灵感漫游者',
+  ISTJ: '秩序守护者', ISFJ: '细节记录员', ESTJ: '计划推进者', ESFJ: '关系照料者',
+  ISTP: '动手探索家', ISFP: '感受艺术家', ESTP: '即时行动派', ESFP: '快乐分享家',
+}
+
+const DECLARATIONS: Record<string, string> = {
+  INTJ: '想得很远，也走得很稳。', INTP: '好奇心在线，脑洞不打烊。',
+  ENTJ: '有想法，也有把它落地的行动力。', ENTP: '给日常一点新可能。',
+  INFJ: '安静观察，也认真理解。', INFP: '温柔有自己的方向。',
+  ENFJ: '把温暖，留在每一次相遇里。', ENFP: '今天也想遇见有趣的世界。',
+  ISTJ: '把靠谱，藏进每一件小事。', ISFJ: '记得小事，也珍惜身边的人。',
+  ESTJ: '喜欢把事情，安排得明明白白。', ESFJ: '让每一次相处都有温度。',
+  ISTP: '与其想很久，不如亲手试一试。', ISFP: '把感受到的美，留在生活里。',
+  ESTP: '行动是我认识世界的方式。', ESFP: '把快乐，分享给今天的你。',
+}
+
+function profileName(): string {
+  try {
+    const raw = uni.getStorageSync('mbti_test_profile_v1')
+    if (raw && typeof raw === 'object' && typeof raw.name === 'string' && raw.name.trim()) {
+      return raw.name.trim()
+    }
+  } catch {
+    /* ignore */
+  }
+  return '小禾'
+}
 
 const latest = ref<ResultSnapshotSummary | null>(null)
-const metas = ref<TypeMeta[]>([])
 
 onShow(async () => {
   try {
-    const [res, types] = await Promise.all([listResults({ limit: 1 }), listTypes()])
+    const res = await listResults({ limit: 1 })
     latest.value = res.items[0] || null
-    metas.value = types.items
   } catch {
     latest.value = null
   }
 })
-
-const meta = computed(() =>
-  latest.value ? metas.value.find((t) => t.type_code === latest.value!.type_code) : undefined,
-)
 
 const coverIndex = computed(() => (latest.value ? '001' : '000'))
 
 const coverType = computed(() => latest.value?.type_code || '----')
 
 const coverName = computed(() =>
-  latest.value ? meta.value?.name_zh || 'MBTI' : '还没测过，先测一次',
+  latest.value
+    ? `${TYPE_NAMES[latest.value.type_code] || 'MBTI'} / ${profileName()}`
+    : '还没测过，先测一次',
 )
 
-const coverQuote = computed(() => {
-  if (!latest.value) return '测完这里会换成你的类型和一句话人设。'
-  const source = latest.value.source === 'self_select' ? '自行选择' : '趣味测试'
-  return `${source} · ${latest.value.submitted_at.slice(0, 10)}`
-})
+const coverQuote = computed(() =>
+  latest.value
+    ? DECLARATIONS[latest.value.type_code] || '四个字母之外，还有不一样的你。'
+    : '测完这里会换成你的类型和一句话人设。',
+)
 
-async function startQuiz() {
-  try {
-    const session = await createQuizSession()
-    uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${session.id}` })
-  } catch {
-    uni.showToast({ title: '无法开始测验', icon: 'none' })
-  }
+function startQuiz() {
+  uni.navigateTo({ url: '/pages/test-intro/test-intro' })
 }
 
 function goSelfSelect() {
@@ -113,6 +132,15 @@ function goShare() {
 
 function goDiscover() {
   uni.switchTab({ url: '/pages/discover/discover' })
+}
+
+function showChannels() {
+  uni.showModal({
+    title: '预览渠道',
+    content: '微信小程序 · 小红书小程序 · 抖音小程序 · 公众号 H5\n当前为演示版本，仅展示微信预览效果。',
+    showCancel: false,
+    confirmText: '知道了',
+  })
 }
 </script>
 
