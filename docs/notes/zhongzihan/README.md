@@ -8,15 +8,17 @@
 
 ## 索引
 
-| # | 页面 | 源文件 | 笔记 |
-|---|------|--------|------|
-| 01 | 首页 | `web/src/pages/index/index.vue` | [01-首页.md](./01-首页.md) |
-| 02 | 答题页 | `web/src/pages/quiz/quiz.vue` | [02-答题页.md](./02-答题页.md) |
-| 03 | 自选类型 | `web/src/pages/self-select/self-select.vue` | [03-自选类型.md](./03-自选类型.md) |
-| 04 | 结果页 | `web/src/pages/result/result.vue` | [04-结果页.md](./04-结果页.md) |
-| 05 | 晒图预览 | `web/src/pages/share-preview/share-preview.vue` | [05-晒预览.md](./05-晒预览.md) |
-| 06 | 阶段记录 · 列表 | `web/src/pages/history/list.vue` | [06-阶段记录-列表.md](./06-阶段记录-列表.md) |
-| 07 | 阶段记录 · 详情 | `web/src/pages/history/detail.vue` | [07-阶段记录-详情.md](./07-阶段记录-详情.md) |
+每页笔记随该页 PR 一起提交，避免多个分支重复创建同一文件。
+
+| # | 页面 | 源文件 | 笔记 | 分支 |
+|---|------|--------|------|------|
+| 01 | 首页 | `web/src/pages/index/index.vue` | [01-首页.md](./01-首页.md) | `feat/web-home` |
+| 02 | 答题页 | `web/src/pages/quiz/quiz.vue` | `02-答题页.md` | `feat/web-quiz` |
+| 03 | 自选类型 | `web/src/pages/self-select/self-select.vue` | `03-自选类型.md` | `feat/web-self-select` |
+| 04 | 结果页 | `web/src/pages/result/result.vue` | `04-结果页.md` | `feat/web-result` |
+| 05 | 晒图预览 | `web/src/pages/share-preview/share-preview.vue` | `05-晒预览.md` | `feat/web-share-preview` |
+| 06 | 阶段记录 · 列表 | `web/src/pages/history/list.vue` | `06-阶段记录-列表.md` | `feat/web-history` |
+| 07 | 阶段记录 · 详情 | `web/src/pages/history/detail.vue` | `07-阶段记录-详情.md` | `feat/web-history` |
 
 ## 写法约定
 
