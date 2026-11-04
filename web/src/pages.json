@@ -41,8 +41,54 @@
       "style": {
         "navigationBarTitleText": "记录详情"
       }
+    },
+    {
+      "path": "pages/discover/discover",
+      "style": {
+        "navigationBarTitleText": "换名片"
+      }
+    },
+    {
+      "path": "pages/card/card",
+      "style": {
+        "navigationBarTitleText": "我的名片"
+      }
+    },
+    {
+      "path": "pages/account/account",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
     }
   ],
+  "tabBar": {
+    "color": "#77727E",
+    "selectedColor": "#7560DF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "测一测"
+      },
+      {
+        "pagePath": "pages/history/list",
+        "text": "我的轨迹"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "换名片"
+      },
+      {
+        "pagePath": "pages/card/card",
+        "text": "我的名片"
+      },
+      {
+        "pagePath": "pages/account/account",
+        "text": "我的"
+      }
+    ]
+  },
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "MBTI搭子",
