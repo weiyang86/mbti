@@ -1,0 +1,52 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "MBTI搭子"
+      }
+    },
+    {
+      "path": "pages/quiz/quiz",
+      "style": {
+        "navigationBarTitleText": "测一测"
+      }
+    },
+    {
+      "path": "pages/self-select/self-select",
+      "style": {
+        "navigationBarTitleText": "自选类型"
+      }
+    },
+    {
+      "path": "pages/result/result",
+      "style": {
+        "navigationBarTitleText": "我的结果"
+      }
+    },
+    {
+      "path": "pages/share-preview/share-preview",
+      "style": {
+        "navigationBarTitleText": "晒图预览"
+      }
+    },
+    {
+      "path": "pages/history/list",
+      "style": {
+        "navigationBarTitleText": "阶段记录"
+      }
+    },
+    {
+      "path": "pages/history/detail",
+      "style": {
+        "navigationBarTitleText": "记录详情"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "MBTI搭子",
+    "navigationBarBackgroundColor": "#F8F7F4",
+    "backgroundColor": "#F8F7F4"
+  }
+}
