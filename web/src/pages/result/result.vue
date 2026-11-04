@@ -8,11 +8,16 @@
     </view>
 
     <view v-else>
+      <view class="demo-strip">
+        <text>V0.4 · Mock 演示 · 不产生费用</text>
+        <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+      </view>
+
       <view class="banner">
         <text class="banner-label">{{ sourceLabel }} · 免费查看</text>
         <text class="banner-type">{{ result.type_code }}</text>
-        <text class="banner-name">{{ meta?.name_zh || 'MBTI' }}</text>
-        <text class="banner-line">{{ meta?.tagline || '四个字母之外，还有不一样的你。' }}</text>
+        <text class="banner-name">{{ typeName }}</text>
+        <text class="banner-line">{{ declaration }}</text>
         <text class="banner-meta">{{ dateText }} · 版本 {{ result.question_bank_version }}</text>
       </view>
 
@@ -61,13 +66,30 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import type { ResultSnapshot, TypeMeta } from '@/api/types'
+import type { ResultSnapshot } from '@/api/types'
 import { getResult } from '@/api/results'
-import { listTypes } from '@/api/types-api'
+
+/** 与原型 NAMES / DECLARATIONS 一致 */
+const TYPE_NAMES: Record<string, string> = {
+  INTJ: '独立构想者', INTP: '好奇研究员', ENTJ: '行动策划家', ENTP: '灵感实验家',
+  INFJ: '安静观察家', INFP: '理想收藏家', ENFJ: '温暖连接者', ENFP: '灵感漫游者',
+  ISTJ: '秩序守护者', ISFJ: '细节记录员', ESTJ: '计划推进者', ESFJ: '关系照料者',
+  ISTP: '动手探索家', ISFP: '感受艺术家', ESTP: '即时行动派', ESFP: '快乐分享家',
+}
+
+const DECLARATIONS: Record<string, string> = {
+  INTJ: '想得很远，也走得很稳。', INTP: '好奇心在线，脑洞不打烊。',
+  ENTJ: '有想法，也有把它落地的行动力。', ENTP: '给日常一点新可能。',
+  INFJ: '安静观察，也认真理解。', INFP: '温柔有自己的方向。',
+  ENFJ: '把温暖，留在每一次相遇里。', ENFP: '今天也想遇见有趣的世界。',
+  ISTJ: '把靠谱，藏进每一件小事。', ISFJ: '记得小事，也珍惜身边的人。',
+  ESTJ: '喜欢把事情，安排得明明白白。', ESFJ: '让每一次相处都有温度。',
+  ISTP: '与其想很久，不如亲手试一试。', ISFP: '把感受到的美，留在生活里。',
+  ESTP: '行动是我认识世界的方式。', ESFP: '把快乐，分享给今天的你。',
+}
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
-const meta = ref<TypeMeta | null>(null)
 const loading = ref(true)
 
 onLoad((q) => {
@@ -80,18 +102,30 @@ onMounted(async () => {
     return
   }
   try {
-    const [snapshot, types] = await Promise.all([
-      getResult(resultId.value),
-      listTypes(),
-    ])
-    result.value = snapshot
-    meta.value = types.items.find((t) => t.type_code === snapshot.type_code) || null
+    result.value = await getResult(resultId.value)
   } catch {
     result.value = null
   } finally {
     loading.value = false
   }
 })
+
+const typeName = computed(() => TYPE_NAMES[result.value?.type_code || ''] || 'MBTI')
+
+const declaration = computed(
+  () =>
+    DECLARATIONS[result.value?.type_code || ''] ||
+    '四个字母之外，还有不一样的你。',
+)
+
+function showDemo() {
+  uni.showModal({
+    title: '演示状态',
+    content: '当前为 V0.4 Mock 演示：结果来自本地 mock，不产生真实费用，也未连接真实后端。',
+    showCancel: false,
+    confirmText: '知道了',
+  })
+}
 
 const sourceLabel = computed(() =>
   result.value?.source === 'self_select' ? '你的自选人格类型' : '你的趣味测试结果',
@@ -172,8 +206,20 @@ function goHome() {
 
 <style scoped lang="scss">
 .result-page {
-  padding-top: 40rpx;
+  padding-top: 24rpx;
   padding-bottom: 56rpx;
+}
+
+.demo-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20rpx;
+  color: #a398af;
+  margin-bottom: 24rpx;
+}
+.demo-link {
+  color: #7560df;
 }
 
 .state {
