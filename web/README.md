@@ -9,6 +9,31 @@ Vue 3 + Vite + uni-app 骨架，覆盖带教闭环：**测 → 结果 → 晒预
 
 API 契约见仓库 [`../docs/api/`](../docs/api/)（**draft / pending Remy 定稿**）。Agent 规则见 [`AGENTS.md`](./AGENTS.md)。
 
+## 开发 / 联调环境（腾讯云公司机）
+
+> `verification_status`: 本节「已核实」项经 2026-11-04 SSH 复核；**pending** 项随运维进度更新 README，合入以 Remy 确认为准。
+
+### 已核实（source: 公司云运维 2026-11-04 SSH 复核；合入以 Remy 确认为准）
+
+- 台账名：腾讯云公司机 / 主机名 `VM-0-3-centos`
+- 公网 IP：`101.43.150.46`
+- Tailscale：`100.77.82.14`（优先 SSH：`ssh root@100.77.82.14`；公网备选同 IP 端口 22）
+- 宝塔面板：端口 `20432`（勿写账号密码）
+- 与 Codex/Orca 常驻开发机：**同一台**
+- 已有：Docker 26.x、Nginx（宝塔）、Git；出网可经本机代理 `http://127.0.0.1:7890` 访问 GitHub
+- 仓库路径（Remy 确认）：`/www/wwwroot/mbti` → `git clone` `https://github.com/weiyang86/mbti.git`，日常分支 `dev`
+
+### pending / unknown
+
+- 系统级 Node/npm：运维安装中；装好前本机 H5 用开发者电脑 `npm run dev:h5` + mock；装好后在本机 `cd /www/wwwroot/mbti/web` 跑预览
+- MBTI 专用域名/证书：未配
+
+### 推荐测法
+
+- UI/mock：开发者本机
+- 真联调/常驻预览：腾讯云公司机 `/www/wwwroot/mbti`（Node 就绪后）
+- 生产：`main`（勿在联调机当生产）
+
 ## 安装与运行（CLI / Trae）
 
 ```bash
