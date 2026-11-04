@@ -19,6 +19,7 @@
 | 05 | 晒图预览 | `web/src/pages/share-preview/share-preview.vue` | `05-晒预览.md` | `feat/web-share-preview` |
 | 06 | 阶段记录 · 列表 | `web/src/pages/history/list.vue` | `06-阶段记录-列表.md` | `feat/web-history` |
 | 07 | 阶段记录 · 详情 | `web/src/pages/history/detail.vue` | `07-阶段记录-详情.md` | `feat/web-history` |
+| 09 | 换名片 / 我的名片 / 我的 | `web/src/pages/{discover,card,account}/*.vue` | [09-三个tab页.md](./09-三个tab页.md) | `feat/web-home` |
 
 ## 写法约定
 
