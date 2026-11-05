@@ -55,7 +55,7 @@
           <image class="feed-img" :src="assetUrl" mode="aspectFill" />
           <view class="feed-overlay">
             <text class="photo-type">{{ result.type_code }}</text>
-            <text class="photo-name">{{ meta?.name_zh || 'MBTI' }} / 匿名搭子</text>
+            <text class="photo-name">{{ meta?.name_zh || typeName }} / 匿名搭子</text>
           </view>
         </view>
         <text class="badge">AI 示例人物 · 本地渲染预览</text>
@@ -101,9 +101,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import type { ResultSnapshot } from '@/api/types'
+import type { ResultSnapshot, TypeMeta } from '@/api/types'
 import { getResult } from '@/api/results'
 import { createSharePreview } from '@/api/share'
+import { listTypes } from '@/api/types-api'
 
 /** 与原型 NAMES / DECLARATIONS 一致 */
 const TYPE_NAMES: Record<string, string> = {
@@ -158,6 +159,7 @@ const SCENES = [
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
+const meta = ref<TypeMeta | null>(null)
 const loading = ref(true)
 const scene = ref<'moments' | 'avatar' | 'meet_card'>('moments')
 const style = ref('illustration')
@@ -175,9 +177,16 @@ onMounted(async () => {
     return
   }
   try {
-    result.value = await getResult(resultId.value)
+    const [snapshot, types] = await Promise.all([
+      getResult(resultId.value),
+      listTypes().catch(() => null),
+    ])
+    result.value = snapshot
+    meta.value =
+      types?.items.find((t) => t.type_code === snapshot.type_code) || null
   } catch {
     result.value = null
+    meta.value = null
   } finally {
     loading.value = false
   }
