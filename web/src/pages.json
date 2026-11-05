@@ -69,23 +69,33 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "测一测"
+        "text": "测一测",
+        "iconPath": "static/tab/spark.png",
+        "selectedIconPath": "static/tab/spark-active.png"
       },
       {
         "pagePath": "pages/history/list",
-        "text": "我的轨迹"
+        "text": "我的轨迹",
+        "iconPath": "static/tab/trail.png",
+        "selectedIconPath": "static/tab/trail-active.png"
       },
       {
         "pagePath": "pages/discover/discover",
-        "text": "换名片"
+        "text": "换名片",
+        "iconPath": "static/tab/exchange.png",
+        "selectedIconPath": "static/tab/exchange-active.png"
       },
       {
         "pagePath": "pages/card/card",
-        "text": "我的名片"
+        "text": "我的名片",
+        "iconPath": "static/tab/card.png",
+        "selectedIconPath": "static/tab/card-active.png"
       },
       {
         "pagePath": "pages/account/account",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "static/tab/user.png",
+        "selectedIconPath": "static/tab/user-active.png"
       }
     ]
   },
