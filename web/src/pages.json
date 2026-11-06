@@ -71,6 +71,18 @@
       "style": {
         "navigationBarTitleText": "亮名片"
       }
+    },
+    {
+      "path": "pages/buddies/detail",
+      "style": {
+        "navigationBarTitleText": "搭子名片"
+      }
+    },
+    {
+      "path": "pages/exchanges/exchanges",
+      "style": {
+        "navigationBarTitleText": "名片夹"
+      }
     }
   ],
   "tabBar": {
