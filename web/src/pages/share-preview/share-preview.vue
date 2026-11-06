@@ -7,111 +7,312 @@
       <view class="btn-primary mt" @click="goHome">回首页测一次</view>
     </view>
 
+    <view v-else-if="!studio.hasCard" class="state-empty">
+      <text class="empty-mark">✦</text>
+      <text class="empty-title">先制作你的晒图套装</text>
+      <text class="empty-desc">成图准备好后，就能保存图片、头像和配文。</text>
+      <view class="btn-primary mt" @click="goCreate">
+        {{ studio.tier ? '制作我的 MBTI 形象' : '去看晒图套装' }}
+      </view>
+    </view>
+
     <view v-else>
       <view class="demo-strip">
         <text>V0.4 · Mock 演示 · 不产生费用</text>
         <text class="demo-link" @click="showDemo">演示状态 ↗</text>
       </view>
 
-      <text class="kicker">MY MBTI SHARE / 晒图预览</text>
-      <text class="title">这一面，<text class="hl">发出去。</text></text>
-      <text class="sub">先看效果，再决定晒哪一张；预览不包含任何原始答题。</text>
+      <text class="kicker">READY TO SHARE / 晒出我的 MBTI</text>
+      <text class="title">这条朋友圈，</text>
+      <text class="title"><text class="hl">我想发自己的主角卡。</text></text>
+      <text class="sub">先保存图片，再选择你想发布的平台。</text>
 
-      <view class="styles">
+      <view class="platform-tabs">
         <view
-          v-for="s in STYLES"
-          :key="s.key"
-          class="style-pill"
-          :class="{ active: style === s.key }"
-          @click="style = s.key"
+          v-for="p in PLATFORMS"
+          :key="p.key"
+          class="platform-tab"
+          :class="{ active: platform === p.key }"
+          @click="switchPlatform(p.key)"
         >
-          <text>{{ s.label }}</text>
+          <text>{{ p.label }}</text>
         </view>
       </view>
 
-      <view class="scene-tabs">
-        <view
-          v-for="s in SCENES"
-          :key="s.key"
-          class="scene-tab"
-          :class="{ active: scene === s.key }"
-          @click="switchScene(s.key)"
-        >
-          <text>{{ s.label }}</text>
-        </view>
-      </view>
-
-      <!-- 发朋友圈 -->
-      <view v-if="scene === 'moments'" class="preview moments">
-        <view class="feed-head">
-          <image class="feed-avatar" :src="assetUrl" mode="aspectFill" />
-          <view>
-            <text class="feed-name">{{ nickname }}</text>
-            <text class="feed-sub">朋友圈效果预览 · 未发布</text>
+      <view class="preview-card">
+        <view class="preview-media" :class="format">
+          <image class="preview-img" :src="assetUrl" mode="aspectFill" />
+          <view class="preview-shade" />
+          <view class="preview-overlay">
+            <text class="preview-type">{{ result.type_code }}</text>
+            <text class="preview-name">{{ typeName }} · {{ displayName }}</text>
           </view>
         </view>
-        <text class="feed-caption">同样是 {{ result.type_code }}，我也有自己的主角感。✦</text>
-        <view class="feed-photo">
-          <image class="feed-img" :src="assetUrl" mode="aspectFill" />
-          <view class="feed-overlay">
-            <text class="photo-type">{{ result.type_code }}</text>
-            <text class="photo-name">{{ meta?.name_zh || typeName }} / 匿名搭子</text>
+        <view class="preview-meta">
+          <text class="preview-title">{{ platformHint }}</text>
+          <text class="preview-desc">图片与文字可分别保存，发布由你决定。</text>
+        </view>
+      </view>
+
+      <view class="field">
+        <text class="label">分享图比例</text>
+        <view class="ratio-tabs">
+          <view
+            v-for="f in FORMATS"
+            :key="f.key"
+            class="ratio-tab"
+            :class="{ active: format === f.key }"
+            @click="switchFormat(f.key)"
+          >
+            <text>{{ f.label }}</text>
           </view>
         </view>
-        <text class="badge">AI 示例人物 · 本地渲染预览</text>
       </view>
 
-      <!-- 换同款头像 -->
-      <view v-else-if="scene === 'avatar'" class="preview avatar">
-        <view class="avatar-frame">
-          <image class="avatar-img" :src="assetUrl" mode="aspectFill" />
-          <view class="avatar-type"><text>{{ result.type_code }}</text></view>
-        </view>
-        <text class="avatar-title">头像也要有我的 MBTI 气质。</text>
-        <text class="avatar-desc">同款 1:1 头像，可单独下载。</text>
-        <text class="badge">AI 虚构人物样例 · 非真实人像</text>
+      <view v-if="platform === 'xhs'" class="field">
+        <text class="label">笔记标题</text>
+        <input
+          v-model="noteTitle"
+          class="input"
+          maxlength="30"
+          placeholder="同样是 INFP，我也有自己的主角感"
+        />
       </view>
 
-      <!-- 见面亮名片 -->
-      <view v-else class="preview meet">
-        <view class="pass">
-          <text class="pass-kicker">HELLO, I'M</text>
-          <text class="pass-type">{{ result.type_code }}</text>
-          <text class="pass-name">{{ typeName }} · {{ nickname }}</text>
-          <view class="pass-tags" v-if="interests.length">
-            <text class="pass-tag" v-for="i in interests" :key="i">{{ i }}</text>
-          </view>
-          <text class="pass-line">{{ declaration }}</text>
-        </view>
-        <text class="meet-desc">初次见面，亮一下我的 MBTI 名片。</text>
-        <text class="badge">不含联系方式 · 仅类型与名称</text>
+      <view class="field">
+        <text class="label">
+          {{ platform === 'douyin' ? '口播脚本' : '分享配文' }}
+          <text class="muted">仅本机编辑，未发布</text>
+        </text>
+        <textarea
+          v-model="caption"
+          class="input textarea"
+          maxlength="500"
+          placeholder="写一句想发的话"
+        />
       </view>
 
-      <text class="server-line">服务端预览任务：{{ previewStatus }}</text>
-
-      <view class="actions">
-        <view class="btn-secondary" @click="backResult">返回结果</view>
-        <view v-if="studio.hasCard" class="btn-secondary mt" @click="goVideo">预览 15 秒分镜（模拟）</view>
+      <view class="share-actions">
+        <view class="btn-secondary" @click="copyCaption">复制配文</view>
+        <template v-if="platform === 'xhs'">
+          <view class="btn-ghost mt" @click="saveNote">保存本机笔记草稿</view>
+          <text class="textbtn centered" @click="openDrafts">查看草稿</text>
+        </template>
+        <text v-if="platform === 'douyin'" class="textbtn centered" @click="goVideo">
+          预览 15 秒分镜（模拟）
+        </text>
       </view>
 
+      <text class="textbtn centered" @click="nativeShare">预览平台分享卡片（模拟）</text>
+
+      <view class="notice mt">
+        本页不发布动态或私信。图片可下载、文案可复制；平台分享能力尚未接入。联系方式不会放入图片。
+      </view>
+
+      <view class="btn-primary mt" @click="previewImage">预览成图，保存图片</view>
       <text class="foot">趣味倾向体验 · 分享图不含原始答题与联系方式</text>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
-import type { ResultSnapshot, TypeMeta } from '@/api/types'
+import { computed, onMounted, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import type { ResultSnapshot } from '@/api/types'
 import { getResult } from '@/api/results'
 import { createSharePreview } from '@/api/share'
-import { listTypes } from '@/api/types-api'
-import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
-import { studio } from '@/store/studio'
+import { TYPE_NAMES } from '@/constants/types'
+import { currentQuote, saveStudio, studio, styleAsset } from '@/store/studio'
+
+type PlatformKey = 'wechat' | 'xhs' | 'douyin' | 'mp'
+type FormatKey = 'portrait' | 'square' | 'story'
+
+interface NoteDraft {
+  title: string
+  text: string
+  at: string
+}
 
 interface LocalProfile {
   name?: string
   interests?: string[]
+}
+
+const PLATFORMS: { key: PlatformKey; label: string }[] = [
+  { key: 'wechat', label: '微信' },
+  { key: 'xhs', label: '小红书' },
+  { key: 'douyin', label: '抖音' },
+  { key: 'mp', label: '公众号' },
+]
+
+const FORMATS: { key: FormatKey; label: string }[] = [
+  { key: 'portrait', label: '3:4 · 主角图' },
+  { key: 'square', label: '1:1 · 方图' },
+  { key: 'story', label: '9:16 · 竖屏' },
+]
+
+const PLATFORM_HINTS: Record<PlatformKey, string> = {
+  wechat: '朋友圈图片 / 好友卡片',
+  xhs: '3:4 封面 / 笔记草稿',
+  douyin: '9:16 竖屏 / 分镜脚本',
+  mp: '网页摘要 / 名片图片',
+}
+
+const DRAFT_KEY = 'mbti_share_drafts_v1'
+const STYLE_KEYS = ['illustration', 'editorial', 'game']
+
+const resultId = ref('')
+const result = ref<ResultSnapshot | null>(null)
+const loading = ref(true)
+const platform = ref<PlatformKey>('wechat')
+const format = ref<FormatKey>('portrait')
+const captions = ref<Partial<Record<PlatformKey, string>>>({})
+const noteTitle = ref('')
+const drafts = ref<NoteDraft[]>(loadDrafts())
+const profile = ref<LocalProfile>(readProfile())
+
+onLoad((q) => {
+  resultId.value = (q?.id as string) || ''
+  const initialStyle = (q?.style as string) || ''
+  if (STYLE_KEYS.includes(initialStyle)) {
+    studio.style = initialStyle as typeof studio.style
+    saveStudio()
+  }
+})
+
+onShow(() => {
+  profile.value = readProfile()
+})
+
+onMounted(() => {
+  loadResult()
+})
+
+async function loadResult() {
+  if (!resultId.value) {
+    loading.value = false
+    return
+  }
+  try {
+    result.value = await getResult(resultId.value)
+  } catch {
+    result.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+const typeName = computed(() => TYPE_NAMES[result.value?.type_code || ''] || 'MBTI')
+
+const displayName = computed(() => (profile.value.name || studio.nickname || '').trim() || '小禾')
+
+const interests = computed(() => (profile.value.interests || []).slice(0, 3))
+
+const platformHint = computed(() => PLATFORM_HINTS[platform.value])
+
+const assetUrl = computed(() => styleAsset(studio.style))
+
+const caption = computed({
+  get: () => captions.value[platform.value] ?? defaultCaption(platform.value),
+  set: (value: string) => {
+    captions.value[platform.value] = value
+  },
+})
+
+function defaultCaption(k: PlatformKey) {
+  const t = result.value?.type_code || 'INFP'
+  const names = TYPE_NAMES[t] || 'MBTI'
+  const quote = currentQuote(t)
+  if (k === 'douyin') {
+    return `四个字母说不完我。\n${t} · ${names}\n${quote}\n晒出我的 MBTI 主角卡。#MBTI搭子 #MBTI\n画面为 AI 示例人物。`
+  }
+  const likes = interests.value.length ? interests.value.join('、') : '探索生活里的新鲜事'
+  return `同样是 ${t}，我也有自己的主角感。\n${quote}\n最近喜欢：${likes}。\n换了张 MBTI 名片，也换个方式认识我。\n#MBTI搭子 #MBTI #人格名片\n图片为 AI 示例，类型仅作趣味参考。`
+}
+
+function switchPlatform(key: PlatformKey) {
+  platform.value = key
+  format.value = key === 'douyin' ? 'story' : 'portrait'
+  requestPreview()
+}
+
+function switchFormat(key: FormatKey) {
+  format.value = key
+}
+
+async function requestPreview() {
+  if (!resultId.value) return
+  try {
+    await createSharePreview({ result_id: resultId.value, scene: 'moments' })
+  } catch {
+    /* 预览任务失败时仍可本机查看成图 */
+  }
+}
+
+function copyCaption() {
+  uni.setClipboardData({
+    data: caption.value,
+    success: () => uni.showToast({ title: '已复制', icon: 'none' }),
+    fail: () => uni.showToast({ title: '复制失败，请手动选择文本', icon: 'none' }),
+  })
+}
+
+function saveNote() {
+  const title = noteTitle.value.trim() || `同样是 ${result.value?.type_code || 'INFP'}，我也有自己的主角感`
+  drafts.value = [...drafts.value, { title, text: caption.value, at: new Date().toISOString() }].slice(-10)
+  persistDrafts()
+  uni.showToast({ title: '草稿已保存到本机，未发布', icon: 'none' })
+}
+
+function openDrafts() {
+  const list = drafts.value.slice(-6).reverse()
+  if (!list.length) {
+    uni.showToast({ title: '还没有本机草稿', icon: 'none' })
+    return
+  }
+  uni.showActionSheet({
+    itemList: list.map((d) => d.title.slice(0, 20)),
+    success: ({ tapIndex }) => {
+      const draft = list[tapIndex]
+      if (!draft) return
+      platform.value = 'xhs'
+      format.value = 'portrait'
+      noteTitle.value = draft.title
+      captions.value = { ...captions.value, xhs: draft.text }
+      uni.showToast({ title: '已载入草稿', icon: 'none' })
+    },
+  })
+}
+
+function previewImage() {
+  uni.previewImage({
+    urls: [assetUrl.value],
+    current: assetUrl.value,
+    fail: () => uni.showToast({ title: '图片暂时无法生成，请重试', icon: 'none' }),
+  })
+}
+
+function nativeShare() {
+  uni.showModal({
+    title: '平台分享卡片预览（模拟）',
+    content: `${displayName.value} 的 ${result.value?.type_code || 'MBTI'} 人格名片\nMBTI搭子 · 先换名片，再认识彼此\n\n未调用平台 SDK，不会真实发送。联系方式不进入分享内容。`,
+    showCancel: false,
+    confirmText: '返回继续编辑',
+  })
+}
+
+function goVideo() {
+  uni.navigateTo({ url: '/pages/video/video' })
+}
+
+function goCreate() {
+  uni.navigateTo({
+    url: studio.tier ? '/pages/create/create' : '/pages/pricing/pricing',
+  })
+}
+
+function goHome() {
+  uni.reLaunch({ url: '/pages/index/index' })
 }
 
 function readProfile(): LocalProfile {
@@ -129,67 +330,28 @@ function readProfile(): LocalProfile {
   return {}
 }
 
-const STYLES = [
-  { key: 'illustration', label: '梦境插画' },
-  { key: 'editorial', label: '日常杂志' },
-  { key: 'game', label: '未来角色' },
-]
-
-const SCENES: { key: 'moments' | 'avatar' | 'meet_card'; label: string }[] = [
-  { key: 'moments', label: '发朋友圈' },
-  { key: 'avatar', label: '换同款头像' },
-  { key: 'meet_card', label: '见面亮名片' },
-]
-
-const resultId = ref('')
-const result = ref<ResultSnapshot | null>(null)
-const meta = ref<TypeMeta | null>(null)
-const loading = ref(true)
-const scene = ref<'moments' | 'avatar' | 'meet_card'>('moments')
-const style = ref('illustration')
-const previewStatus = ref('本地预览')
-const profile = ref<LocalProfile>(readProfile())
-
-onLoad((q) => {
-  resultId.value = (q?.id as string) || ''
-  const initialStyle = (q?.style as string) || ''
-  if (['illustration', 'editorial', 'game'].includes(initialStyle)) {
-    style.value = initialStyle
-  }
-  profile.value = readProfile()
-})
-
-onMounted(async () => {
-  if (!resultId.value) {
-    loading.value = false
-    return
-  }
+function loadDrafts(): NoteDraft[] {
   try {
-    const [snapshot, types] = await Promise.all([
-      getResult(resultId.value),
-      listTypes().catch(() => null),
-    ])
-    result.value = snapshot
-    meta.value =
-      types?.items.find((t) => t.type_code === snapshot.type_code) || null
+    const raw = uni.getStorageSync(DRAFT_KEY)
+    if (Array.isArray(raw)) {
+      return raw.filter(
+        (item): item is NoteDraft =>
+          Boolean(item) && typeof item.title === 'string' && typeof item.text === 'string',
+      )
+    }
   } catch {
-    result.value = null
-    meta.value = null
-  } finally {
-    loading.value = false
+    /* ignore */
   }
-  requestPreview()
-})
+  return []
+}
 
-const typeName = computed(() => TYPE_NAMES[result.value?.type_code || ''] || 'MBTI')
-
-const declaration = computed(
-  () => DECLARATIONS[result.value?.type_code || ''] || '四个字母之外，还有不一样的你。',
-)
-
-const nickname = computed(() => (profile.value.name || '').trim() || '小禾')
-
-const interests = computed(() => (profile.value.interests || []).slice(0, 3))
+function persistDrafts() {
+  try {
+    uni.setStorageSync(DRAFT_KEY, drafts.value)
+  } catch {
+    /* ignore */
+  }
+}
 
 function showDemo() {
   uni.showModal({
@@ -198,41 +360,6 @@ function showDemo() {
     showCancel: false,
     confirmText: '知道了',
   })
-}
-
-const assetUrl = computed(() => `/static/share-style-${style.value}.webp`)
-
-watch(scene, () => {
-  requestPreview()
-})
-
-async function requestPreview() {
-  if (!resultId.value) return
-  try {
-    const res = await createSharePreview({
-      result_id: resultId.value,
-      scene: scene.value,
-    })
-    previewStatus.value = res.status || (res.preview_url ? 'ready' : 'pending')
-  } catch {
-    previewStatus.value = '本地渲染'
-  }
-}
-
-function switchScene(key: 'moments' | 'avatar' | 'meet_card') {
-  scene.value = key
-}
-
-function backResult() {
-  uni.navigateBack()
-}
-
-function goHome() {
-  uni.reLaunch({ url: '/pages/index/index' })
-}
-
-function goVideo() {
-  uni.navigateTo({ url: '/pages/video/video' })
 }
 </script>
 
@@ -264,6 +391,28 @@ function goVideo() {
   color: #77727e;
 }
 
+.state-empty {
+  padding: 180rpx 12rpx 40rpx;
+  text-align: center;
+}
+.empty-mark {
+  display: block;
+  font-size: 52rpx;
+  color: #b9a4da;
+}
+.empty-title {
+  display: block;
+  margin-top: 22rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.empty-desc {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 23rpx;
+  color: #77727e;
+}
+
 .kicker {
   display: block;
   font-size: 20rpx;
@@ -291,37 +440,15 @@ function goVideo() {
   line-height: 1.6;
 }
 
-.styles {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 36rpx;
-}
-.style-pill {
-  flex: 1;
-  text-align: center;
-  padding: 16rpx 0;
-  border-radius: 999rpx;
-  border: 2rpx solid #e9e5ed;
-  background: #fff;
-  font-size: 24rpx;
-  color: #77727e;
-}
-.style-pill.active {
-  border-color: #7560df;
-  background: #f6f2ff;
-  color: #7560df;
-  font-weight: 600;
-}
-
-.scene-tabs {
+.platform-tabs {
   display: flex;
   gap: 8rpx;
-  margin-top: 20rpx;
+  margin-top: 36rpx;
   padding: 8rpx;
   border-radius: 999rpx;
   background: #f1ecfb;
 }
-.scene-tab {
+.platform-tab {
   flex: 1;
   text-align: center;
   padding: 18rpx 0;
@@ -329,203 +456,174 @@ function goVideo() {
   font-size: 24rpx;
   color: #77727e;
 }
-.scene-tab.active {
+.platform-tab.active {
   background: #fff;
   color: #292630;
   font-weight: 700;
 }
 
-.preview {
-  margin-top: 32rpx;
+.preview-card {
+  margin-top: 28rpx;
   border-radius: 32rpx;
   background: #fff;
   border: 2rpx solid #e9e5ed;
-  padding: 28rpx;
+  padding: 24rpx;
 }
-
-/* 朋友圈 */
-.feed-head {
-  display: flex;
-  align-items: center;
-}
-.feed-avatar {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 12rpx;
-  margin-right: 16rpx;
-}
-.feed-name {
-  display: block;
-  font-size: 26rpx;
-  font-weight: 700;
-}
-.feed-sub {
-  display: block;
-  margin-top: 4rpx;
-  font-size: 20rpx;
-  color: #a398af;
-}
-.feed-caption {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 24rpx;
-  color: #292630;
-}
-.feed-photo {
+.preview-media {
   position: relative;
-  margin-top: 20rpx;
-  height: 560rpx;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   overflow: hidden;
+  transition: height 0.2s ease;
 }
-.feed-img {
+.preview-media.portrait {
+  height: 760rpx;
+}
+.preview-media.square {
+  height: 640rpx;
+}
+.preview-media.story {
+  height: 900rpx;
+}
+.preview-img {
   width: 100%;
   height: 100%;
 }
-.feed-overlay {
+.preview-shade {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 40rpx 28rpx 28rpx;
-  background: linear-gradient(180deg, rgba(20, 12, 40, 0) 0%, rgba(20, 12, 40, 0.8) 100%);
+  height: 50%;
+  background: linear-gradient(180deg, rgba(20, 12, 40, 0) 0%, rgba(20, 12, 40, 0.82) 100%);
 }
-.photo-type {
-  display: block;
-  font-size: 64rpx;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 3rpx;
-  line-height: 1;
-}
-.photo-name {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.86);
-}
-
-/* 头像 */
-.avatar {
-  text-align: center;
-}
-.avatar-frame {
-  position: relative;
-  width: 420rpx;
-  height: 420rpx;
-  margin: 0 auto;
-  border-radius: 28rpx;
-  overflow: hidden;
-}
-.avatar-img {
-  width: 100%;
-  height: 100%;
-}
-.avatar-type {
+.preview-overlay {
   position: absolute;
-  right: 16rpx;
-  bottom: 16rpx;
-  background: rgba(223, 255, 139, 0.92);
-  color: #4a3a86;
-  font-size: 22rpx;
-  font-weight: 700;
-  border-radius: 999rpx;
-  padding: 8rpx 18rpx;
+  left: 28rpx;
+  right: 28rpx;
+  bottom: 28rpx;
 }
-.avatar-title {
+.preview-type {
   display: block;
-  margin-top: 28rpx;
-  font-size: 32rpx;
-  font-weight: 700;
-}
-.avatar-desc {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  color: #77727e;
-}
-
-/* 名片 */
-.pass {
-  border-radius: 24rpx;
-  padding: 40rpx 32rpx;
-  background: linear-gradient(150deg, #2f2748, #4a3a86 60%, #6c53f5);
-  color: #fff;
-}
-.pass-kicker {
-  display: block;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: rgba(255, 255, 255, 0.7);
-}
-.pass-type {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 88rpx;
+  font-size: 72rpx;
   font-weight: 800;
   letter-spacing: 4rpx;
   line-height: 1;
-  color: #dfff8b;
+  color: #fff;
 }
-.pass-name {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 28rpx;
-}
-.pass-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 16rpx;
-}
-.pass-tag {
-  font-size: 20rpx;
-  color: #dfff8b;
-  border: 2rpx solid rgba(223, 255, 139, 0.4);
-  border-radius: 999rpx;
-  padding: 4rpx 14rpx;
-}
-.pass-line {
+.preview-name {
   display: block;
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.72);
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
 }
-.meet-desc {
-  display: block;
-  margin-top: 24rpx;
-  font-size: 24rpx;
-  color: #77727e;
-  text-align: center;
+.preview-meta {
+  padding: 22rpx 8rpx 6rpx;
 }
-
-.badge {
+.preview-title {
   display: block;
-  margin-top: 20rpx;
-  font-size: 20rpx;
-  color: #a398af;
-  text-align: center;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #292630;
 }
-
-.server-line {
+.preview-desc {
   display: block;
-  margin-top: 28rpx;
-  text-align: center;
-  font-size: 20rpx;
+  margin-top: 8rpx;
+  font-size: 22rpx;
   color: #a398af;
 }
 
-.actions {
-  margin-top: 40rpx;
-}
-.mt {
+.field {
   margin-top: 32rpx;
+}
+.label {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #292630;
+}
+.muted {
+  font-size: 20rpx;
+  color: #a398af;
+  font-weight: 400;
+}
+
+.ratio-tabs {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 16rpx;
+}
+.ratio-tab {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 999rpx;
+  border: 2rpx solid #e9e5ed;
+  background: #fff;
+  font-size: 22rpx;
+  color: #77727e;
+}
+.ratio-tab.active {
+  border-color: #7560df;
+  background: #f6f2ff;
+  color: #7560df;
+  font-weight: 600;
+}
+
+.input {
+  margin-top: 14rpx;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  border: 2rpx solid #ece8f3;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  color: #292630;
+  box-sizing: border-box;
+  width: 100%;
+}
+.textarea {
+  min-height: 300rpx;
+  line-height: 1.7;
+}
+
+.share-actions {
+  margin-top: 28rpx;
+}
+.btn-ghost {
+  background: #f5f2fa;
+  color: #5c4f73;
+  border: 2rpx solid #e8e1f2;
+  border-radius: 999rpx;
+  padding: 22rpx 40rpx;
+  text-align: center;
+  font-size: 28rpx;
+}
+.textbtn {
+  display: block;
+  font-size: 24rpx;
+  color: #7560df;
+  padding: 16rpx 0;
+}
+.textbtn.centered {
+  text-align: center;
+}
+
+.notice {
+  padding: 22rpx 26rpx;
+  border-radius: 20rpx;
+  background: #f5f3fa;
+  border: 2rpx solid #e9e3f3;
+  font-size: 22rpx;
+  color: #7c728b;
+  line-height: 1.7;
+}
+
+.mt {
+  margin-top: 24rpx;
 }
 
 .foot {
   display: block;
-  margin-top: 36rpx;
+  margin-top: 32rpx;
   text-align: center;
   font-size: 20rpx;
   color: #a398af;
