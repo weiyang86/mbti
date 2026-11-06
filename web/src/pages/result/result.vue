@@ -81,6 +81,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot } from '@/api/types'
 import { getResult } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
+import { buildManual } from '@/constants/manual'
 import { studio } from '@/store/studio'
 
 const resultId = ref('')
@@ -155,35 +156,7 @@ const dimRows = computed(() => {
   })
 })
 
-const manual = computed(() => {
-  const t = result.value?.type_code || 'INFP'
-  return [
-    {
-      no: '01',
-      title: '如何给我充电',
-      body:
-        t[0] === 'I'
-          ? '独处一会儿再出发，允许我慢慢恢复电量。'
-          : '和熟悉的人一起活动，可能更容易让我恢复电量。',
-    },
-    {
-      no: '02',
-      title: '怎样和我沟通',
-      body:
-        t[2] === 'F'
-          ? '先理解感受，再一起讨论下一步。'
-          : '把事实和需求说清楚，一起看可行的办法。',
-    },
-    {
-      no: '03',
-      title: '我在意的相处细节',
-      body:
-        t[3] === 'J'
-          ? '重要安排提前说，我更容易安心。'
-          : '留一点调整空间，我更容易投入。',
-    },
-  ]
-})
+const manual = computed(() => buildManual(result.value?.type_code || 'INFP'))
 
 function goShare() {
   if (!resultId.value) return

@@ -13,21 +13,38 @@
         <text class="demo-link" @click="showDemo">演示状态 ↗</text>
       </view>
 
-      <text class="kicker">PUBLIC CARD / 亮名片</text>
-      <text class="title">这是别人看到的</text>
-      <text class="title"><text class="hl">你的名片。</text></text>
-      <text class="sub">只包含你允许公开的字段，不含微信、QQ、电话。</text>
+      <text class="kicker">HELLO, THIS IS ME / 亮名片</text>
+      <text class="title">认识我，</text>
+      <text class="title"><text class="hl">从这张卡开始。</text></text>
 
-      <view class="basic-type-card">
-        <text class="card-kicker">TYPE CARD / 基础名片</text>
+      <!-- 形象名片：生成套装后替换基础名片 -->
+      <view v-if="hasVisual" class="portrait">
+        <image class="portrait-img" :src="styleAsset(card.style)" mode="aspectFill" />
+        <view class="portrait-shade" />
+        <view class="portrait-top">
+          <text>MBTI搭子 / MY TYPE</text>
+          <text>16 TYPES / 01 ME</text>
+        </view>
+        <view class="portrait-info">
+          <text class="portrait-type">{{ card.type_code }}</text>
+          <text class="portrait-name">{{ publicName }} · {{ card.type_name }}</text>
+          <text class="portrait-quote">{{ quoteText }}</text>
+          <view v-if="card.interests.length" class="tag-row portrait-tags">
+            <text v-for="i in card.interests" :key="i" class="interest">{{ i }}</text>
+          </view>
+          <text class="portrait-tiny">AI 示例人物 · 趣味人格探索</text>
+        </view>
+      </view>
+
+      <view v-else class="basic-type-card">
+        <text class="card-kicker">MBTI BUDDY / 基础名片</text>
         <text class="card-type">{{ card.type_code }}</text>
-        <text class="card-type-name">{{ card.type_name }}</text>
-        <text class="card-name">{{ card.nickname }} · {{ card.type_code }}</text>
-        <text v-if="card.declaration" class="card-declaration">{{ card.declaration }}</text>
+        <text class="card-name">{{ publicName }} · {{ card.type_name }}</text>
+        <text class="card-declaration">{{ quoteText }}</text>
         <view v-if="card.interests.length" class="tag-row">
           <text v-for="i in card.interests" :key="i" class="interest">{{ i }}</text>
         </view>
-        <text class="card-small">公开名片 · 不含联系方式</text>
+        <text class="card-small">联系方式仅在双方同意后单独交换</text>
       </view>
 
       <view v-if="card.manual" class="panel">
@@ -47,23 +64,27 @@
       </view>
 
       <view class="notice mt">
-        关闭的字段不会出现在这里。换名片只是获得对方公开名片，不等于获得联系方式。
+        这里只展示公开名片，不含联系方式。当前是本机公开页预览。
       </view>
 
-      <view class="btn-primary mt" @click="goDiscover">去换一张 MBTI 名片</view>
-      <view class="btn-ghost mt" @click="goCard">调整公开范围</view>
+      <view class="btn-primary mt" @click="goDiscover">去交换一张 MBTI 名片</view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import type { PublicCard } from '@/api/types-social'
 import { getPublicCard } from '@/api/cards'
+import { currentQuote, styleAsset, studio } from '@/store/studio'
 
 const card = ref<PublicCard | null>(null)
 const loading = ref(true)
+
+const hasVisual = computed(() => Boolean(studio.hasCard))
+const publicName = computed(() => card.value?.nickname || '匿名搭子')
+const quoteText = computed(() => card.value?.declaration || currentQuote(card.value?.type_code || 'INFP'))
 
 onShow(() => {
   load()
@@ -213,6 +234,77 @@ function showDemo() {
   margin-top: 28rpx;
   font-size: 18rpx;
   color: #7f6aa1;
+}
+
+.portrait {
+  position: relative;
+  margin-top: 36rpx;
+  border-radius: 34rpx;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: #2a2142;
+  box-shadow: 0 24rpx 48rpx rgba(42, 33, 66, 0.22);
+}
+.portrait-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.portrait-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 14, 34, 0.18) 0%, rgba(20, 14, 34, 0) 38%, rgba(20, 14, 34, 0.82) 100%);
+}
+.portrait-top {
+  position: absolute;
+  top: 26rpx;
+  left: 28rpx;
+  right: 28rpx;
+  display: flex;
+  justify-content: space-between;
+  font-size: 16rpx;
+  letter-spacing: 2rpx;
+  color: rgba(255, 255, 255, 0.78);
+}
+.portrait-info {
+  position: absolute;
+  left: 30rpx;
+  right: 30rpx;
+  bottom: 28rpx;
+}
+.portrait-type {
+  display: block;
+  font-size: 88rpx;
+  font-weight: 800;
+  letter-spacing: -2rpx;
+  line-height: 1.05;
+  color: #fff;
+}
+.portrait-name {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.portrait-quote {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+}
+.portrait-tags .interest {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.portrait-tiny {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 16rpx;
+  letter-spacing: 1rpx;
+  color: rgba(255, 255, 255, 0.52);
 }
 
 .panel {

@@ -10,18 +10,13 @@
         <text>V0.4 · Mock 演示 · 不产生费用</text>
         <text class="demo-link" @click="showDemo">演示状态 ↗</text>
       </view>
-      <text class="kicker">MY TYPE CARD / 我的名片</text>
-      <text class="title">还没有</text>
-      <text class="title"><text class="hl">可以分享的名片。</text></text>
-      <text class="sub">先做一次趣味测试，或用已有类型开始。</text>
+      <text class="kicker">MY MBTI CARD / 我的名片</text>
+      <text class="title">先选你的类型，</text>
+      <text class="title"><text class="hl">再亮名片。</text></text>
+      <text class="sub">测完基础类型免费查看，也可以直接使用已知 MBTI。</text>
 
-      <view class="empty">
-        <text class="empty-mark">□</text>
-        <text class="empty-title">名片从一次选择开始</text>
-        <text class="empty-desc">测试结果只用于生成名片和阶段记录，不含联系方式。</text>
-        <view class="btn-primary mt" @click="goTest">免费测测</view>
-        <view class="btn-ghost mt" @click="goSelfSelect">已有类型，直接选</view>
-      </view>
+      <view class="btn-primary mt" @click="goTest">免费测测我的 MBTI</view>
+      <view class="btn-ghost mt" @click="goSelfSelect">已有类型，直接选</view>
     </view>
 
     <view v-else>
@@ -30,36 +25,51 @@
         <text class="demo-link" @click="showDemo">演示状态 ↗</text>
       </view>
 
-      <text class="kicker">MY TYPE CARD / 我的名片</text>
-      <text class="title">一张不写联系方式的</text>
-      <text class="title"><text class="hl">MBTI 名片。</text></text>
-      <text class="sub">公开、换名片、晒图都使用这里展示的字段。</text>
+      <text class="kicker">MY CARD / 我的名片</text>
+      <text class="title">先认识我，</text>
+      <text class="title"><text class="hl">再交换联系。</text></text>
+      <text class="sub">
+        {{ hasVisual
+          ? '成图素材已准备好，随时保存或亮给朋友看。'
+          : '基础名片可以免费交换；想晒朋友圈，再制作视觉套装。' }}
+      </text>
 
-      <view class="basic-type-card">
-        <text class="card-kicker">TYPE CARD / 基础名片</text>
-        <text class="card-type">{{ card.type_code }}</text>
-        <text class="card-type-name">{{ card.type_name }}</text>
-        <text class="card-name">{{ card.nickname }} · {{ card.type_code }}</text>
-        <text class="card-declaration">{{ card.declaration || '还没有写介绍。' }}</text>
-        <view class="tag-row">
-          <text v-for="i in card.interests" :key="i" class="interest">{{ i }}</text>
-          <text v-if="!card.interests.length" class="interest muted">未填写兴趣</text>
+      <view v-if="hasVisual" class="portrait" @click="openAsset('poster')">
+        <image class="portrait-img" :src="styleAsset(card.style)" mode="aspectFill" />
+        <view class="portrait-shade" />
+        <view class="portrait-top">
+          <text>MBTI搭子 / MY TYPE</text>
+          <text>16 TYPES / 01 ME</text>
         </view>
-        <text class="card-small">只展示公开字段 · 不含联系方式</text>
+        <view class="portrait-info">
+          <text class="portrait-type">{{ card.type_code }}</text>
+          <text class="portrait-name">{{ publicName }} · {{ card.type_name }}</text>
+          <text class="portrait-quote">{{ quoteText }}</text>
+          <view
+            v-if="card.visibility.interests && card.interests.length"
+            class="tag-row portrait-tags"
+          >
+            <text v-for="i in card.interests" :key="i" class="interest">{{ i }}</text>
+          </view>
+          <text class="portrait-tiny">AI 示例人物 · 趣味人格探索</text>
+        </view>
       </view>
 
-      <view v-if="studio.hasCard" class="studio-ready" @click="goShare">
-        <view class="ready-body">
-          <text class="ready-kicker">LOOK READY / 形象套装</text>
-          <text class="ready-title">你的 MBTI 主角图已生成</text>
-          <text class="ready-desc">去晒图预览 →</text>
+      <!-- 基础名片 -->
+      <view v-else class="basic-type-card">
+        <text class="card-kicker">MBTI BUDDY / 基础名片</text>
+        <text class="card-type">{{ card.type_code }}</text>
+        <text class="card-name">{{ publicName }} · {{ card.type_name }}</text>
+        <text class="card-declaration">{{ quoteText }}</text>
+        <view v-if="card.visibility.interests && card.interests.length" class="tag-row">
+          <text v-for="i in card.interests" :key="i" class="interest">{{ i }}</text>
         </view>
-        <text class="ready-mark">↗</text>
+        <text class="card-small">联系方式仅在双方同意后单独交换</text>
       </view>
 
       <text class="fine centered mt">
         名片依据：最近一次结果 · 不含历史记录
-        <text class="link" @click="goHistory">看看不同阶段的我 →</text>
+        <text class="link" @click="goHistory">查看不同阶段的我 →</text>
       </text>
 
       <view class="card-quick-actions">
@@ -67,7 +77,7 @@
           <text class="quick-icon">◇</text>
           <text class="quick-label">亮名片</text>
         </view>
-        <view class="quick" @click="goShare">
+        <view class="quick" @click="goStudio">
           <text class="quick-icon">▧</text>
           <text class="quick-label">换形象</text>
         </view>
@@ -95,26 +105,74 @@
         <text class="fine">联系方式永远不在公开名片中展示。</text>
       </view>
 
-      <view class="btn-primary mt" @click="goShare">去晒成一张图</view>
-      <text class="fine centered">
-        使用最近一次结果生成朋友圈图；不含联系方式与原始答题。
-      </text>
+      <template v-if="hasVisual">
+        <view class="btnrow">
+          <view class="btn-secondary" @click="openAsset('poster')">保存主角图</view>
+          <view class="btn-primary" @click="goShare">晒出我的 MBTI ↗</view>
+        </view>
+        <view class="asset-downloads">
+          <view class="btn-secondary" @click="openAsset('avatar')">↓ 同款头像</view>
+          <view class="btn-secondary" @click="openAsset('manual')">↓ 相处卡</view>
+        </view>
+      </template>
+      <view v-else class="btn-primary mt" @click="goStudio">
+        {{ studio.tier ? '套装已解锁 · 去制作我的名片' : '¥9.9 · 把名片升级成主角图' }}
+      </view>
 
       <view class="contact-entries">
         <view class="contact-entry" @click="goContacts">
           <view class="entry-main">
             <text class="entry-title">我的联系方式</text>
-            <text class="entry-desc">{{ contactDesc }}</text>
+            <text class="entry-desc">微信 / QQ / 电话 · 交换时逐项授权</text>
           </view>
-          <text class="entry-arrow">↗</text>
+          <text class="entry-arrow">→</text>
         </view>
         <view class="contact-entry" @click="goExchanges">
           <view class="entry-main">
             <text class="entry-title">我的名片夹</text>
-            <text class="entry-desc">{{ exchangeDesc }}</text>
+            <text class="entry-desc">{{ exchangeCount }} 张已交换 · 查看申请与授权</text>
           </view>
-          <text class="entry-arrow">↗</text>
+          <text class="entry-arrow">→</text>
         </view>
+      </view>
+    </view>
+
+    <!-- 素材预览 -->
+    <view v-if="assetKind && card" class="asset-backdrop" @click="assetKind = null">
+      <view class="asset-sheet" @click.stop>
+        <view class="asset-head">
+          <text class="asset-title">{{ assetTitle }}</text>
+          <text class="asset-close" @click="assetKind = null">✕</text>
+        </view>
+        <text class="asset-desc">
+          {{ assetKind === 'manual' ? '手机可截屏保存这张相处卡。' : '手机可长按图片保存，也可以截屏保存 PNG。' }}
+        </text>
+
+        <view v-if="assetKind === 'manual'" class="manual-poster">
+          <text class="mp-kicker">MBTI搭子 / 我的相处卡</text>
+          <text class="mp-type">{{ card.type_code }}</text>
+          <text class="mp-name">{{ publicName }} · {{ card.type_name }}</text>
+          <view v-for="m in manual" :key="m.no" class="mp-item">
+            <text class="mp-item-title">{{ m.no }} / {{ m.title }}</text>
+            <text class="mp-item-body">{{ m.body }}</text>
+          </view>
+          <text class="mp-foot">类型模板建议 · 趣味参考 · 不含联系方式</text>
+        </view>
+
+        <view v-else class="asset-visual" :class="assetKind">
+          <image class="asset-img" :src="styleAsset(card.style)" mode="aspectFill" />
+          <view class="asset-shade" />
+          <text class="asset-brand">MBTI搭子 / MY TYPE</text>
+          <view class="asset-overlay">
+            <text class="asset-type">{{ card.type_code }}</text>
+            <text class="asset-name">{{ publicName }} · {{ card.type_name }}</text>
+            <text v-if="assetKind === 'poster'" class="asset-quote">{{ quoteText }}</text>
+            <text v-else class="asset-quote">AI 示例人物 · 趣味人格形象</text>
+          </view>
+        </view>
+
+        <text class="fine centered">不含联系方式 · 不含原始答题选项</text>
+        <view class="btn-primary mt" @click="assetKind = null">完成</view>
       </view>
     </view>
   </view>
@@ -126,17 +184,29 @@ import { onShow } from '@dcloudio/uni-app'
 import type { CardVisibility, MyCard } from '@/api/types-social'
 import { getMyCard, updateMyCard } from '@/api/cards'
 import { listCardExchanges } from '@/api/card-exchanges'
-import { getContacts } from '@/api/contacts'
-import { studio } from '@/store/studio'
+import { buildManual } from '@/constants/manual'
+import { currentQuote, styleAsset, studio } from '@/store/studio'
 
 type VisibilityKey = keyof CardVisibility
+type AssetKind = 'poster' | 'avatar' | 'manual'
 
 const card = ref<MyCard | null>(null)
 const loading = ref(true)
 const showVisibility = ref(false)
 const exchangeCount = ref(0)
-const exchangePending = ref(0)
-const contactCount = ref(0)
+const assetKind = ref<AssetKind | null>(null)
+
+const hasVisual = computed(() => Boolean(card.value?.has_visual_set || studio.hasCard))
+const publicName = computed(() =>
+  card.value?.visibility.name ? card.value.nickname : '匿名搭子',
+)
+const quoteText = computed(() => currentQuote(card.value?.type_code || 'INFP'))
+const manual = computed(() => buildManual(card.value?.type_code || 'INFP'))
+const assetTitle = computed(() => {
+  if (assetKind.value === 'poster') return '主角图 / 朋友圈'
+  if (assetKind.value === 'avatar') return '同款头像'
+  return '相处卡 / 相处小抄'
+})
 
 const visibilityRows: { key: VisibilityKey; label: string; desc: string }[] = [
   { key: 'name', label: '昵称', desc: '关闭后公开名片显示“匿名搭子”' },
@@ -145,16 +215,6 @@ const visibilityRows: { key: VisibilityKey; label: string; desc: string }[] = [
   { key: 'manual', label: '相处说明书', desc: '补充你的节奏与沟通偏好' },
 ]
 
-const contactDesc = computed(() =>
-  contactCount.value ? `已填写 ${contactCount.value} 项，仅授权后展示` : '还未填写，授权后才会展示',
-)
-
-const exchangeDesc = computed(() => {
-  if (!exchangeCount.value) return '还没有交换记录'
-  if (exchangePending.value) return `${exchangeCount.value} 张名片 · ${exchangePending.value} 个待回应`
-  return `${exchangeCount.value} 张名片`
-})
-
 onShow(() => {
   load()
 })
@@ -162,15 +222,9 @@ onShow(() => {
 async function load() {
   loading.value = !card.value
   try {
-    const [data, exchanges, contacts] = await Promise.all([
-      getMyCard(),
-      listCardExchanges(),
-      getContacts(),
-    ])
+    const [data, exchanges] = await Promise.all([getMyCard(), listCardExchanges()])
     card.value = data
     exchangeCount.value = exchanges.items.length
-    exchangePending.value = exchanges.items.filter((item) => item.status === 'pending').length
-    contactCount.value = (['wechat', 'qq', 'phone'] as const).filter((key) => contacts[key]).length
   } catch {
     card.value = null
   } finally {
@@ -220,6 +274,18 @@ function goShare() {
       studio.hasCard ? `&style=${studio.style}` : ''
     }`,
   })
+}
+
+function goStudio() {
+  uni.navigateTo({ url: studio.tier ? '/pages/create/create' : '/pages/pricing/pricing' })
+}
+
+function openAsset(kind: AssetKind) {
+  if (!hasVisual.value) {
+    uni.showToast({ title: '请先生成晒图套装', icon: 'none' })
+    return
+  }
+  assetKind.value = kind
 }
 
 function goContacts() {
@@ -572,6 +638,254 @@ function showDemo() {
 .entry-arrow {
   font-size: 30rpx;
   color: #baa7ca;
+}
+
+.portrait {
+  position: relative;
+  margin-top: 36rpx;
+  border-radius: 34rpx;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: #2a2142;
+  box-shadow: 0 24rpx 48rpx rgba(42, 33, 66, 0.22);
+}
+.portrait-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.portrait-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 14, 34, 0.18) 0%, rgba(20, 14, 34, 0) 38%, rgba(20, 14, 34, 0.82) 100%);
+}
+.portrait-top {
+  position: absolute;
+  top: 26rpx;
+  left: 28rpx;
+  right: 28rpx;
+  display: flex;
+  justify-content: space-between;
+  font-size: 16rpx;
+  letter-spacing: 2rpx;
+  color: rgba(255, 255, 255, 0.78);
+}
+.portrait-info {
+  position: absolute;
+  left: 30rpx;
+  right: 30rpx;
+  bottom: 28rpx;
+}
+.portrait-type {
+  display: block;
+  font-size: 88rpx;
+  font-weight: 800;
+  letter-spacing: -2rpx;
+  line-height: 1.05;
+  color: #fff;
+}
+.portrait-name {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.portrait-quote {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+}
+.portrait-tags .interest {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.portrait-tiny {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 16rpx;
+  letter-spacing: 1rpx;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.btnrow {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 28rpx;
+}
+.btnrow > view {
+  flex: 1;
+}
+.btn-secondary {
+  display: block;
+  text-align: center;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  background: #fff;
+  color: #4b3fa6;
+  border: 2rpx solid #dcd2f5;
+}
+.asset-downloads {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 18rpx;
+}
+.asset-downloads > view {
+  flex: 1;
+}
+
+.asset-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(24, 18, 38, 0.72);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.asset-sheet {
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #f7f4fb;
+  border-radius: 36rpx 36rpx 0 0;
+  padding: 32rpx 32rpx 48rpx;
+  box-sizing: border-box;
+}
+.asset-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.asset-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.asset-close {
+  font-size: 28rpx;
+  color: #a398af;
+  padding: 6rpx 10rpx;
+}
+.asset-desc {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: #a398af;
+}
+.asset-visual {
+  position: relative;
+  margin-top: 24rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: #2a2142;
+}
+.asset-visual.avatar {
+  aspect-ratio: 1 / 1;
+}
+.asset-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.asset-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 14, 34, 0.05) 30%, rgba(20, 14, 34, 0.82) 100%);
+}
+.asset-brand {
+  position: absolute;
+  top: 24rpx;
+  left: 24rpx;
+  font-size: 16rpx;
+  letter-spacing: 2rpx;
+  color: rgba(255, 255, 255, 0.76);
+}
+.asset-overlay {
+  position: absolute;
+  left: 26rpx;
+  right: 26rpx;
+  bottom: 24rpx;
+}
+.asset-type {
+  display: block;
+  font-size: 72rpx;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #fff;
+}
+.asset-name {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.asset-quote {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 21rpx;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.manual-poster {
+  margin-top: 24rpx;
+  padding: 40rpx 34rpx;
+  border-radius: 28rpx;
+  background: #2a2142;
+  color: #fff;
+}
+.mp-kicker {
+  display: block;
+  font-size: 17rpx;
+  letter-spacing: 3rpx;
+  color: rgba(255, 255, 255, 0.55);
+}
+.mp-type {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 76rpx;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #dfff8b;
+}
+.mp-name {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+.mp-item {
+  margin-top: 26rpx;
+  padding-top: 22rpx;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.12);
+}
+.mp-item-title {
+  display: block;
+  font-size: 19rpx;
+  letter-spacing: 1rpx;
+  color: #dfff8b;
+}
+.mp-item-body {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+}
+.mp-foot {
+  display: block;
+  margin-top: 28rpx;
+  font-size: 17rpx;
+  color: rgba(255, 255, 255, 0.42);
 }
 
 .mt {
