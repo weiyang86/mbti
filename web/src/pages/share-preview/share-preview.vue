@@ -133,7 +133,7 @@ const STYLES = [
   { key: 'game', label: '未来角色' },
 ]
 
-const SCENES = [
+const SCENES: { key: 'moments' | 'avatar' | 'meet_card'; label: string }[] = [
   { key: 'moments', label: '发朋友圈' },
   { key: 'avatar', label: '换同款头像' },
   { key: 'meet_card', label: '见面亮名片' },
