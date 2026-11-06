@@ -10,6 +10,15 @@
     <text class="title"><text class="hl">看看合不合拍。</text></text>
     <text class="sub">推荐依据是自选类型和兴趣。是否交换，由你们双方决定。</text>
 
+    <view class="radar-entry" @click="goRadar">
+      <view class="radar-entry-main">
+        <text class="radar-entry-title">同型雷达</text>
+        <text class="radar-entry-desc">看看周边有多少个同型的你</text>
+      </view>
+      <text class="radar-entry-tag">仅匿名人数</text>
+      <text class="radar-entry-arrow">↗</text>
+    </view>
+
     <view v-if="!myCard?.type_code" class="notice mt">
       <text>当前以 INFP 示例类型体验。</text>
       <text class="notice-link" @click="goSelfSelect">选择我的 MBTI →</text>
@@ -129,6 +138,10 @@ function goExchanges() {
   uni.navigateTo({ url: '/pages/exchanges/exchanges' })
 }
 
+function goRadar() {
+  uni.navigateTo({ url: '/pages/radar/radar' })
+}
+
 function goSelfSelect() {
   uni.navigateTo({ url: '/pages/self-select/self-select' })
 }
@@ -204,6 +217,44 @@ function showDemo() {
 }
 .mt {
   margin-top: 28rpx;
+}
+
+.radar-entry {
+  display: flex;
+  align-items: center;
+  background: #e7eddb;
+  border: 2rpx solid #dce6ca;
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-top: 28rpx;
+}
+.radar-entry-main {
+  flex: 1;
+  min-width: 0;
+}
+.radar-entry-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #3f5422;
+}
+.radar-entry-desc {
+  display: block;
+  font-size: 20rpx;
+  color: #6c7a4e;
+  margin-top: 4rpx;
+}
+.radar-entry-tag {
+  font-size: 18rpx;
+  color: #596d35;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 6rpx 12rpx;
+  border-radius: 12rpx;
+  margin-right: 12rpx;
+}
+.radar-entry-arrow {
+  font-size: 28rpx;
+  color: #596d35;
 }
 
 .buddy-tabs {

@@ -95,6 +95,12 @@
       "style": {
         "navigationBarTitleText": "双向确认"
       }
+    },
+    {
+      "path": "pages/radar/radar",
+      "style": {
+        "navigationBarTitleText": "同型雷达"
+      }
     }
   ],
   "tabBar": {
