@@ -73,6 +73,18 @@
       }
     },
     {
+      "path": "pages/compare/compare",
+      "style": {
+        "navigationBarTitleText": "前后对比"
+      }
+    },
+    {
+      "path": "pages/journey-share/journey-share",
+      "style": {
+        "navigationBarTitleText": "阶段分享"
+      }
+    },
+    {
       "path": "pages/discover/discover",
       "style": {
         "navigationBarTitleText": "换名片"
