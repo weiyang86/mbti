@@ -37,6 +37,30 @@
       }
     },
     {
+      "path": "pages/pricing/pricing",
+      "style": {
+        "navigationBarTitleText": "我的 MBTI 晒图套装"
+      }
+    },
+    {
+      "path": "pages/create/create",
+      "style": {
+        "navigationBarTitleText": "形象工作台"
+      }
+    },
+    {
+      "path": "pages/generating/generating",
+      "style": {
+        "navigationBarTitleText": "制作我的 MBTI 形象"
+      }
+    },
+    {
+      "path": "pages/video/video",
+      "style": {
+        "navigationBarTitleText": "视频分镜预览"
+      }
+    },
+    {
       "path": "pages/history/list",
       "style": {
         "navigationBarTitleText": "阶段记录"

@@ -26,12 +26,23 @@
     <view class="panel">
       <view class="panel-head">
         <text class="panel-title">模拟订单</text>
-        <text class="panel-note">本期不实现支付</text>
+        <text class="panel-note">模拟支付 · 不扣款</text>
       </view>
-      <text class="panel-text">
-        本批次只还原页面与接口占位，未接入购买、退款或订单查询。晒图与名片都免费体验。
+      <template v-if="studio.orders.length">
+        <view class="order-row" v-for="o in studio.orders" :key="o.id">
+          <view class="order-main">
+            <text class="order-name">{{ PLAN_NAMES[o.tier] }}</text>
+            <text class="order-meta">{{ o.id }} · {{ o.created_at.slice(0, 10) }}</text>
+          </view>
+          <text class="order-amount">{{ o.amount ? '¥' + o.amount : '体验码' }}</text>
+        </view>
+      </template>
+      <text v-else class="panel-text">
+        还没有订单。基础结果免费；晒图套装当前为模拟支付，仅保存在本机。
       </text>
-      <text class="textbtn" @click="goShare">去晒图预览 →</text>
+      <text class="textbtn" @click="goPricing">
+        {{ studio.tier ? '查看我的形象套装 →' : '去看晒图套装 →' }}
+      </text>
     </view>
 
     <view class="panel">
@@ -39,6 +50,10 @@
       <view class="tool-row" @click="goTest">
         <text class="tool-name">免费复测</text>
         <text class="tool-desc">再记录一个阶段</text>
+      </view>
+      <view class="tool-row" @click="goPricing">
+        <text class="tool-name">兑换体验码</text>
+        <text class="tool-desc">{{ tierName ? '已解锁 ' + tierName : '支持演示体验码' }}</text>
       </view>
       <view class="tool-row" @click="manageBlocked">
         <text class="tool-name">管理屏蔽列表</text>
@@ -71,6 +86,7 @@ import { listCardExchanges } from '@/api/card-exchanges'
 import { getContacts } from '@/api/contacts'
 import { listBlockedBuddies, unblockBuddy } from '@/api/buddies'
 import { resetDemoData } from '@/api/demo'
+import { PLAN_NAMES, studio } from '@/store/studio'
 
 type LinkKey = 'trail' | 'result' | 'card' | 'exchanges' | 'contacts' | 'privacy'
 
@@ -159,14 +175,10 @@ function goContacts() {
   uni.navigateTo({ url: '/pages/contacts/contacts' })
 }
 
-function goShare() {
-  if (!latestResultId.value) {
-    uni.showToast({ title: '先完成一次测试', icon: 'none' })
-    return
-  }
-  uni.navigateTo({
-    url: `/pages/share-preview/share-preview?id=${latestResultId.value}`,
-  })
+const tierName = computed(() => (studio.tier ? PLAN_NAMES[studio.tier] : ''))
+
+function goPricing() {
+  uni.navigateTo({ url: '/pages/pricing/pricing' })
 }
 
 async function manageBlocked() {
@@ -344,6 +356,34 @@ function showDemo() {
   font-size: 24rpx;
   color: #7560df;
   padding: 8rpx 0;
+}
+
+.order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid #f3eef7;
+}
+.order-main {
+  flex: 1;
+}
+.order-name {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+.order-meta {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 19rpx;
+  color: #a398af;
+}
+.order-amount {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #7560df;
 }
 
 .tool-row {

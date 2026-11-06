@@ -91,6 +91,7 @@
 
       <view class="actions">
         <view class="btn-secondary" @click="backResult">返回结果</view>
+        <view v-if="studio.hasCard" class="btn-secondary mt" @click="goVideo">预览 15 秒分镜（模拟）</view>
       </view>
 
       <text class="foot">趣味倾向体验 · 分享图不含原始答题与联系方式</text>
@@ -106,6 +107,7 @@ import { getResult } from '@/api/results'
 import { createSharePreview } from '@/api/share'
 import { listTypes } from '@/api/types-api'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
+import { studio } from '@/store/studio'
 
 interface LocalProfile {
   name?: string
@@ -150,6 +152,10 @@ const profile = ref<LocalProfile>(readProfile())
 
 onLoad((q) => {
   resultId.value = (q?.id as string) || ''
+  const initialStyle = (q?.style as string) || ''
+  if (['illustration', 'editorial', 'game'].includes(initialStyle)) {
+    style.value = initialStyle
+  }
   profile.value = readProfile()
 })
 
@@ -223,6 +229,10 @@ function backResult() {
 
 function goHome() {
   uni.reLaunch({ url: '/pages/index/index' })
+}
+
+function goVideo() {
+  uni.navigateTo({ url: '/pages/video/video' })
 }
 </script>
 

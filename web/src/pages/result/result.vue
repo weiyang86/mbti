@@ -53,9 +53,21 @@
         <text class="fine">依据当前类型的模板建议，可随真实相处调整</text>
       </view>
 
+      <view class="studio-panel">
+        <text class="studio-tag">{{ studio.hasCard ? '套装已准备好' : studio.tier ? '套装已解锁' : '晒图套装 · 示例预览' }}</text>
+        <text class="studio-title">把我的 MBTI，发成一条漂亮朋友圈。</text>
+        <text class="studio-desc">成图 + 头像 + 相处卡 + 配文，一次购买，无自动续费。</text>
+        <view class="studio-packs">
+          <text class="studio-pack">01 主角图</text>
+          <text class="studio-pack">02 头像</text>
+          <text class="studio-pack">03 相处卡</text>
+          <text class="studio-pack">04 配文</text>
+        </view>
+        <view class="btn-primary mt" @click="goStudio">{{ studioCta }}</view>
+      </view>
+
       <view class="actions">
-        <view class="btn-primary" @click="goShare">去晒成一张图</view>
-        <view class="btn-secondary mt" @click="goHistory">查看阶段记录</view>
+        <view class="btn-secondary" @click="goHistory">查看阶段记录</view>
       </view>
 
       <text class="foot">趣味倾向体验 · 非临床测评 · 不宣称官方量表效度</text>
@@ -69,6 +81,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot } from '@/api/types'
 import { getResult } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
+import { studio } from '@/store/studio'
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
@@ -175,6 +188,24 @@ const manual = computed(() => {
 function goShare() {
   if (!resultId.value) return
   uni.navigateTo({ url: `/pages/share-preview/share-preview?id=${resultId.value}` })
+}
+
+const studioCta = computed(() => {
+  if (!studio.tier) return '¥9.9 · 制作我的 MBTI 晒图套装'
+  if (studio.hasCard) return '去晒出我的名片 →'
+  return '去制作我的名片 →'
+})
+
+function goStudio() {
+  if (!studio.tier) {
+    uni.navigateTo({ url: '/pages/pricing/pricing' })
+    return
+  }
+  if (studio.hasCard) {
+    goShare()
+    return
+  }
+  uni.navigateTo({ url: '/pages/create/create' })
 }
 
 function goHistory() {
@@ -363,8 +394,51 @@ function goHome() {
   line-height: 1.6;
 }
 
+.studio-panel {
+  margin-top: 48rpx;
+  padding: 32rpx 28rpx;
+  border-radius: 26rpx;
+  background: linear-gradient(140deg, #f7f2ff, #efe8ff 55%, #e7f6ea);
+  border: 2rpx solid #e3d9f6;
+}
+.studio-tag {
+  display: inline-block;
+  font-size: 19rpx;
+  color: #6d58b2;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 999rpx;
+  padding: 6rpx 18rpx;
+}
+.studio-title {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 34rpx;
+  font-weight: 800;
+  line-height: 1.45;
+}
+.studio-desc {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #6f6880;
+  line-height: 1.7;
+}
+.studio-packs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+.studio-pack {
+  font-size: 20rpx;
+  color: #5b47a8;
+  background: #fff;
+  border-radius: 999rpx;
+  padding: 8rpx 18rpx;
+}
+
 .actions {
-  margin-top: 56rpx;
+  margin-top: 40rpx;
 }
 .btn-primary {
   font-weight: 700;

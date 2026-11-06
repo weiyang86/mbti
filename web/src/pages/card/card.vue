@@ -48,6 +48,15 @@
         <text class="card-small">只展示公开字段 · 不含联系方式</text>
       </view>
 
+      <view v-if="studio.hasCard" class="studio-ready" @click="goShare">
+        <view class="ready-body">
+          <text class="ready-kicker">LOOK READY / 形象套装</text>
+          <text class="ready-title">你的 MBTI 主角图已生成</text>
+          <text class="ready-desc">去晒图预览 →</text>
+        </view>
+        <text class="ready-mark">↗</text>
+      </view>
+
       <text class="fine centered mt">
         名片依据：最近一次结果 · 不含历史记录
         <text class="link" @click="goHistory">看看不同阶段的我 →</text>
@@ -118,6 +127,7 @@ import type { CardVisibility, MyCard } from '@/api/types-social'
 import { getMyCard, updateMyCard } from '@/api/cards'
 import { listCardExchanges } from '@/api/card-exchanges'
 import { getContacts } from '@/api/contacts'
+import { studio } from '@/store/studio'
 
 type VisibilityKey = keyof CardVisibility
 
@@ -206,7 +216,9 @@ function goShare() {
     return
   }
   uni.navigateTo({
-    url: `/pages/share-preview/share-preview?id=${card.value.latest_result_id}`,
+    url: `/pages/share-preview/share-preview?id=${card.value.latest_result_id}${
+      studio.hasCard ? `&style=${studio.style}` : ''
+    }`,
   })
 }
 
@@ -387,6 +399,43 @@ function showDemo() {
 .link {
   color: #7560df;
   margin-left: 6rpx;
+}
+
+.studio-ready {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 24rpx;
+  padding: 26rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(130deg, #2a2142, #443263 65%, #5a3f7d);
+  box-shadow: 0 16rpx 36rpx rgba(42, 33, 66, 0.2);
+}
+.ready-body {
+  flex: 1;
+}
+.ready-kicker {
+  display: block;
+  font-size: 17rpx;
+  letter-spacing: 3rpx;
+  color: rgba(255, 255, 255, 0.52);
+}
+.ready-title {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.ready-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: #dfff8b;
+}
+.ready-mark {
+  font-size: 30rpx;
+  color: #dfff8b;
 }
 
 .card-quick-actions {

@@ -35,16 +35,29 @@
     </view>
 
     <view class="scenes">
-      <view class="scene" @click="goShare">
+      <view class="scene" @click="goPricing">
         <text class="scene-mark">↗</text>
-        <text class="scene-title">晒成一张图</text>
-        <text class="scene-desc">用最近一次结果生成晒图预览</text>
+        <text class="scene-title">发漂亮朋友圈</text>
+        <text class="scene-desc">看 ¥9.9 晒图套装</text>
       </view>
       <view class="scene" @click="goDiscover">
         <text class="scene-mark">⇄</text>
         <text class="scene-title">交换 MBTI 名片</text>
         <text class="scene-desc">遇见相同与不同的你</text>
       </view>
+    </view>
+
+    <view class="journey-entry" @click="goHistory">
+      <view class="journey-main">
+        <text class="journey-kicker">MY MBTI JOURNEY</text>
+        <text class="journey-title">{{ resultCount ? '看看不同阶段的我' : '给现在的自己，留一个起点。' }}</text>
+        <text class="journey-desc">
+          {{ resultCount
+            ? '已留存 ' + resultCount + ' 次结果' + (latest ? ' · 最近 ' + latest.submitted_at.slice(0, 10) : '')
+            : '免费复测 · 私密记录 · 前后对比' }}
+        </text>
+      </view>
+      <text class="journey-arrow">↗</text>
     </view>
 
     <view class="mini-tools">
@@ -95,13 +108,16 @@ function profileName(): string {
 }
 
 const latest = ref<ResultSnapshotSummary | null>(null)
+const resultCount = ref(0)
 
 onShow(async () => {
   try {
-    const res = await listResults({ limit: 1 })
+    const res = await listResults({ limit: 50 })
+    resultCount.value = res.items.length
     latest.value = res.items[0] || null
   } catch {
     latest.value = null
+    resultCount.value = 0
   }
 })
 
@@ -133,12 +149,12 @@ function goSelfSelect() {
   uni.navigateTo({ url: '/pages/self-select/self-select' })
 }
 
-function goShare() {
-  if (!latest.value) {
-    uni.showToast({ title: '先测一次再晒图', icon: 'none' })
-    return
-  }
-  uni.navigateTo({ url: `/pages/share-preview/share-preview?id=${latest.value.id}` })
+function goPricing() {
+  uni.navigateTo({ url: '/pages/pricing/pricing' })
+}
+
+function goHistory() {
+  uni.switchTab({ url: '/pages/history/list' })
 }
 
 function goDiscover() {
@@ -363,6 +379,43 @@ function showChannels() {
   font-size: 22rpx;
   color: #77727e;
   line-height: 1.5;
+}
+
+.journey-entry {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 24rpx;
+  padding: 28rpx 26rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(120deg, #211a36, #3a2c58 60%, #4b3570);
+  box-shadow: 0 18rpx 40rpx rgba(33, 26, 54, 0.22);
+}
+.journey-main {
+  flex: 1;
+}
+.journey-kicker {
+  display: block;
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: rgba(255, 255, 255, 0.55);
+}
+.journey-title {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.journey-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: rgba(255, 255, 255, 0.66);
+}
+.journey-arrow {
+  font-size: 32rpx;
+  color: #dfff8b;
 }
 
 .mini-tools {
