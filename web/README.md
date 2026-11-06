@@ -7,7 +7,7 @@ Vue 3 + Vite + uni-app 骨架，覆盖带教闭环：**测 → 结果 → 晒预
 - Node.js 18+（推荐 LTS）
 - 可选：[HBuilderX](https://www.dcloud.io/hbuilderx.html) 导入本目录运行
 
-API 契约见仓库 [`../docs/api/`](../docs/api/)（**draft / pending Remy 定稿**）。Agent 规则见 [`AGENTS.md`](./AGENTS.md)。
+API 契约见仓库 [`../docs/api/`](../docs/api/)（**draft / pending Remy 定稿**）。**公网 P0 stub 已可联调**（2026-11-06）：见 [`../docs/api/联调教程.md`](../docs/api/联调教程.md)（Base `https://mbti-dev.bestshizhongyu.com/api/v1`，`VITE_USE_MOCK=false` + `VITE_GUEST_TOKEN`）。Agent 规则见 [`AGENTS.md`](./AGENTS.md)。
 
 ## 开发 / 联调环境（腾讯云公司机）
 
@@ -31,9 +31,12 @@ API 契约见仓库 [`../docs/api/`](../docs/api/)（**draft / pending Remy 定�
 
 ### 推荐测法
 
-- UI/mock：开发者本机 `npm run dev:h5` + mock
-- 真联调/常驻预览：联调机 `cd /www/wwwroot/mbti/web && npm install && npm run dev:h5`（需按 `.env.example` 配 mock）
+- UI/mock：开发者本机 `npm run dev:h5` + `VITE_USE_MOCK=true`（默认）
+- **公网 API 联调：** `VITE_USE_MOCK=false`，`VITE_API_BASE_URL=https://mbti-dev.bestshizhongyu.com/api/v1`，`VITE_GUEST_TOKEN=guest_dev_001` — 步骤见 [`../docs/api/联调教程.md`](../docs/api/联调教程.md)
+- 常驻预览（SSH 到公司机）：`cd /www/wwwroot/mbti/web && npm run dev:h5`（mock 或上述真实 Base 二选一）
 - 生产：`main`（勿在联调机当生产）
+
+> 公网 H5/API 域名 **bestshizhongyu**；旧 sslip / ganzijiantou 已弃用。腾讯云 IP 仅为开发机 SSH，**不是**对外 API。
 
 ## 安装与运行（CLI / Trae）
 
