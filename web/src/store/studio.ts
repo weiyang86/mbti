@@ -4,11 +4,13 @@ import { DECLARATIONS } from '@/constants/types'
 export type StyleKey = 'illustration' | 'editorial' | 'game'
 export type PlanTier = 1 | 2
 
+export type OrderStatus = 'paid' | 'failed' | 'refunded'
+
 export interface StudioOrder {
   id: string
   tier: PlanTier
   amount: number
-  status: 'paid'
+  status: OrderStatus
   created_at: string
 }
 
@@ -118,21 +120,35 @@ export function choosePlan(tier: PlanTier) {
   saveStudio()
 }
 
-/** 模拟下单：一次购买、无自动续费，不产生真实扣款 */
-export function purchasePlan(tier: PlanTier) {
+/** 模拟下单：一次购买、无自动续费，不产生真实扣款；失败订单只留档不解锁 */
+export function purchasePlan(tier: PlanTier, success = true) {
   const upgrade = studio.tier === 1 && tier === 2
   const amount = upgrade ? 10 : tier === 1 ? 9.9 : 19.9
   const order: StudioOrder = {
     id: `MOCK-${Date.now().toString(36).toUpperCase()}`,
     tier,
     amount,
-    status: 'paid',
+    status: success ? 'paid' : 'failed',
     created_at: new Date().toISOString(),
   }
   studio.orders.push(order)
-  studio.tier = studio.tier > tier ? studio.tier : tier
+  if (success) {
+    studio.tier = studio.tier > tier ? studio.tier : tier
+  }
   saveStudio()
   return order
+}
+
+/** 模拟售后：记录退款，并按剩余有效订单恢复权益 */
+export function refundOrder(id: string) {
+  const order = studio.orders.find((o) => o.id === id && o.status === 'paid')
+  if (!order) return false
+  order.status = 'refunded'
+  studio.tier = studio.orders
+    .filter((o) => o.status === 'paid')
+    .reduce<0 | PlanTier>((max, o) => (o.tier > max ? o.tier : max), 0)
+  saveStudio()
+  return true
 }
 
 export function redeemCode(input: string) {

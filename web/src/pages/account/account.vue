@@ -5,117 +5,159 @@
       <text class="demo-link" @click="showDemo">演示状态 ↗</text>
     </view>
 
-    <view class="profile-head">
-      <view class="profile-avatar"><text>{{ avatarText }}</text></view>
-      <view class="profile-body">
-        <text class="profile-name">{{ card?.nickname || '小禾' }}</text>
-        <text class="profile-meta">
-          {{ card?.type_code ? card.type_code + ' · ' + card.type_name : '还没有类型' }}
-        </text>
-        <text class="profile-badge">免费基础用户 · Mock 演示</text>
+    <view class="panel">
+      <view class="profile-head">
+        <image class="profile-avatar" :src="styleAsset(studio.style)" mode="aspectFill" />
+        <view class="profile-body">
+          <text class="profile-name">{{ displayName }}</text>
+          <text class="profile-meta">{{ typeLine }}</text>
+        </view>
       </view>
-    </view>
 
-    <view class="account-links">
-      <view v-for="link in links" :key="link.key" class="account-link" @click="onLink(link.key)">
-        <text class="link-title">{{ link.title }}</text>
-        <text class="link-desc">{{ link.desc }}</text>
+      <view class="account-links">
+        <view v-for="link in links" :key="link.key" class="account-link" @click="onLink(link.key)">
+          <text>{{ link.title }} →</text>
+        </view>
       </view>
     </view>
 
     <view class="panel">
-      <view class="panel-head">
-        <text class="panel-title">模拟订单</text>
-        <text class="panel-note">模拟支付 · 不扣款</text>
-      </view>
-      <template v-if="studio.orders.length">
-        <view class="order-row" v-for="o in studio.orders" :key="o.id">
-          <view class="order-main">
+      <text class="panel-title">我的模拟订单</text>
+      <text class="panel-fine">不会产生真实扣款，刷新后可在本机恢复。</text>
+      <template v-if="orders.length">
+        <view v-for="o in orders" :key="o.id" class="order">
+          <view class="order-info">
             <text class="order-name">{{ PLAN_NAMES[o.tier] }}</text>
-            <text class="order-meta">{{ o.id }} · {{ o.created_at.slice(0, 10) }}</text>
+            <text class="order-meta">{{ o.id }} · {{ statusText(o.status) }}</text>
           </view>
-          <text class="order-amount">{{ o.amount ? '¥' + o.amount : '体验码' }}</text>
+          <text class="order-amount">¥{{ o.amount.toFixed(1) }}</text>
+          <text v-if="o.status === 'paid'" class="textbtn" @click="confirmRefund(o.id)">模拟售后</text>
         </view>
       </template>
-      <text v-else class="panel-text">
-        还没有订单。基础结果免费；晒图套装当前为模拟支付，仅保存在本机。
-      </text>
-      <text class="textbtn" @click="goPricing">
-        {{ studio.tier ? '查看我的形象套装 →' : '去看晒图套装 →' }}
-      </text>
+      <template v-else>
+        <text class="panel-text">暂无模拟订单。</text>
+        <text class="textbtn" @click="goPricing">看看我的 MBTI 晒图套装 →</text>
+      </template>
     </view>
 
     <view class="panel">
       <text class="panel-title">资料与工具</text>
-      <view class="tool-row" @click="goTest">
-        <text class="tool-name">免费复测</text>
-        <text class="tool-desc">再记录一个阶段</text>
-      </view>
-      <view class="tool-row" @click="goPricing">
-        <text class="tool-name">兑换体验码</text>
-        <text class="tool-desc">{{ tierName ? '已解锁 ' + tierName : '支持演示体验码' }}</text>
-      </view>
-      <view class="tool-row" @click="manageBlocked">
-        <text class="tool-name">管理屏蔽列表</text>
-        <text class="tool-desc">{{ blockedCount ? blockedCount + ' 位搭子' : '暂无屏蔽' }}</text>
-      </view>
-      <view class="tool-row" @click="goContacts">
-        <text class="tool-name">交换设置</text>
-        <text class="tool-desc">{{ contactDesc }}</text>
-      </view>
-      <view class="tool-row" @click="resetDemo">
-        <text class="tool-name">清除本机演示数据</text>
-        <text class="tool-desc">名片交换与联系方式</text>
+      <view class="mini-list">
+        <view class="btn-secondary" @click="openPrivacy">管理公开范围</view>
+        <view class="btn-secondary" @click="manageBlocked">管理屏蔽列表（{{ blockedCount }}）</view>
+        <view class="btn-ghost" @click="goRetake">新增阶段记录 · 免费复测</view>
+        <view class="btn-ghost" @click="openRedeem">兑换体验码</view>
+        <view class="btn-ghost" @click="resetDemo">清除本机演示数据</view>
       </view>
     </view>
 
-    <view class="notice mt">
-      没有聊天、评论、自由发布动态或附近头像地图。附近雷达若后续开放，只提供匿名人数。
+    <text class="fine mt">
+      {{ storageOK ? '本机进度可保存。' : '本机存储不可用，刷新后进度会丢失。' }}
+      联系方式与照片仅保留在当前页面内存。
+    </text>
+
+    <!-- 公开范围 -->
+    <view v-if="privacyOpen" class="modal-backdrop" @click="privacyOpen = false">
+      <view class="modal-sheet" @click.stop>
+        <view class="modal-head">
+          <text class="modal-title">我的公开名片放什么？</text>
+          <text class="modal-close" @click="privacyOpen = false">✕</text>
+        </view>
+        <view v-for="row in privacyRows" :key="row.key" class="toggle-row">
+          <view class="toggle-text">
+            <text class="toggle-name">{{ row.label }}</text>
+            <text class="toggle-desc">{{ row.desc }}</text>
+          </view>
+          <view
+            class="switch"
+            :class="{ on: card?.visibility[row.key] }"
+            @click="togglePrivacy(row.key)"
+          >
+            <view class="knob" />
+          </view>
+        </view>
+        <text class="fine">设置仅控制应用内公开页与后续导出图。联系方式不在公开字段中。</text>
+      </view>
     </view>
 
-    <text class="version">MBTI 搭子 · V0.4 Mock · 虚构成年人资料</text>
+    <!-- 兑换体验码 -->
+    <view v-if="redeemOpen" class="modal-backdrop" @click="redeemOpen = false">
+      <view class="modal-sheet" @click.stop>
+        <view class="modal-head">
+          <text class="modal-title">兑换体验套装</text>
+          <text class="modal-close" @click="redeemOpen = false">✕</text>
+        </view>
+        <text class="field-label">体验码</text>
+        <input
+          v-model="redeemInput"
+          class="input"
+          placeholder="输入体验码"
+          maxlength="16"
+          @confirm="doRedeem"
+        />
+        <text class="fine">演示码：MBTI099A / MBTI199B</text>
+        <view class="btn-primary mt" @click="doRedeem">模拟兑换</view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import type { MyCard } from '@/api/types-social'
-import { getMyCard } from '@/api/cards'
-import { listCardExchanges } from '@/api/card-exchanges'
-import { getContacts } from '@/api/contacts'
+import type { CardVisibility, MyCard } from '@/api/types-social'
+import { getMyCard, updateMyCard } from '@/api/cards'
 import { listBlockedBuddies, unblockBuddy } from '@/api/buddies'
 import { resetDemoData } from '@/api/demo'
-import { PLAN_NAMES, studio } from '@/store/studio'
+import {
+  PLAN_NAMES,
+  refundOrder,
+  redeemCode,
+  studio,
+  styleAsset,
+} from '@/store/studio'
 
-type LinkKey = 'trail' | 'result' | 'card' | 'exchanges' | 'contacts' | 'privacy'
-
-interface LinkItem {
-  key: LinkKey
-  title: string
-  desc: string
-}
+type LinkKey = 'trail' | 'result' | 'card' | 'exchanges' | 'contacts'
+type VisibilityKey = keyof CardVisibility
 
 const card = ref<MyCard | null>(null)
 const latestResultId = ref('')
-const exchangeCount = ref(0)
-const contactCount = ref(0)
 const blockedCount = ref(0)
+const privacyOpen = ref(false)
+const redeemOpen = ref(false)
+const redeemInput = ref('')
+const storageOK = ref(true)
 
-const avatarText = computed(() => (card.value?.nickname || '小禾').slice(0, 1))
+try {
+  uni.setStorageSync('mbti_storage_probe', 1)
+  uni.removeStorageSync('mbti_storage_probe')
+} catch {
+  storageOK.value = false
+}
 
-const contactDesc = computed(() =>
-  contactCount.value ? `已填写 ${contactCount.value} 项` : '未填写',
-)
+const links: { key: LinkKey; title: string }[] = [
+  { key: 'trail', title: '我的轨迹' },
+  { key: 'result', title: '类型结果' },
+  { key: 'card', title: '我的名片' },
+  { key: 'exchanges', title: '名片夹' },
+  { key: 'contacts', title: '联系方式' },
+]
 
-const links = computed<LinkItem[]>(() => [
-  { key: 'trail', title: '我的轨迹', desc: '历史阶段与前后对比' },
-  { key: 'result', title: '类型结果', desc: latestResultId.value ? '查看最近一次结果' : '还没有结果' },
-  { key: 'card', title: '我的名片', desc: card.value?.type_code || '待生成' },
-  { key: 'exchanges', title: '名片夹', desc: exchangeCount.value ? `${exchangeCount.value} 张名片` : '还没有记录' },
-  { key: 'contacts', title: '交换设置', desc: contactDesc.value },
-  { key: 'privacy', title: '管理公开范围', desc: '公开名片可见字段' },
-])
+const privacyRows: { key: VisibilityKey; label: string; desc: string }[] = [
+  { key: 'name', label: '昵称', desc: '关闭后公开名片显示匿名搭子' },
+  { key: 'interests', label: '兴趣标签', desc: '用于名片展示与推荐' },
+  { key: 'manual', label: '相处小抄', desc: '只展示类型模板建议' },
+]
+
+const displayName = computed(() => card.value?.nickname || '小禾')
+
+const typeLine = computed(() => {
+  const type = card.value?.type_code || '尚未测试类型'
+  const plan = studio.tier ? PLAN_NAMES[studio.tier] : '免费基础用户'
+  return `${type} · ${plan}`
+})
+
+const orders = computed(() => studio.orders.slice().reverse())
 
 onShow(() => {
   load()
@@ -123,20 +165,19 @@ onShow(() => {
 
 async function load() {
   try {
-    const [myCard, exchanges, contacts, blocked] = await Promise.all([
-      getMyCard(),
-      listCardExchanges(),
-      getContacts(),
-      listBlockedBuddies(),
-    ])
+    const [myCard, blocked] = await Promise.all([getMyCard(), listBlockedBuddies()])
     card.value = myCard
     latestResultId.value = myCard.latest_result_id || ''
-    exchangeCount.value = exchanges.items.length
-    contactCount.value = (['wechat', 'qq', 'phone'] as const).filter((key) => contacts[key]).length
     blockedCount.value = blocked.items.length
   } catch {
     card.value = null
   }
+}
+
+function statusText(status: 'paid' | 'failed' | 'refunded') {
+  if (status === 'refunded') return '模拟已退款'
+  if (status === 'failed') return '模拟失败'
+  return '模拟已购'
 }
 
 function onLink(key: LinkKey) {
@@ -160,25 +201,62 @@ function onLink(key: LinkKey) {
     uni.navigateTo({ url: '/pages/exchanges/exchanges' })
     return
   }
-  if (key === 'contacts') {
-    uni.navigateTo({ url: '/pages/contacts/contacts' })
-    return
-  }
-  uni.switchTab({ url: '/pages/card/card' })
-}
-
-function goTest() {
-  uni.switchTab({ url: '/pages/index/index' })
-}
-
-function goContacts() {
   uni.navigateTo({ url: '/pages/contacts/contacts' })
 }
 
-const tierName = computed(() => (studio.tier ? PLAN_NAMES[studio.tier] : ''))
+function goRetake() {
+  uni.navigateTo({ url: '/pages/test-intro/test-intro' })
+}
 
 function goPricing() {
   uni.navigateTo({ url: '/pages/pricing/pricing' })
+}
+
+function confirmRefund(id: string) {
+  uni.showModal({
+    title: '模拟售后处理',
+    content: '确认后记录模拟退款，并按剩余有效订单恢复权益。不会发生真实资金交易。',
+    confirmText: '确认模拟退款',
+    cancelText: '取消',
+    success: (res) => {
+      if (!res.confirm) return
+      if (!refundOrder(id)) {
+        uni.showToast({ title: '这份订单暂不可退款', icon: 'none' })
+        return
+      }
+      uni.showToast({ title: '已记录模拟退款', icon: 'none' })
+    },
+  })
+}
+
+function openPrivacy() {
+  privacyOpen.value = true
+}
+
+async function togglePrivacy(key: VisibilityKey) {
+  if (!card.value) return
+  const next = !card.value.visibility[key]
+  try {
+    card.value = await updateMyCard({ visibility: { [key]: next } })
+  } catch {
+    uni.showToast({ title: '保存失败，请稍后再试', icon: 'none' })
+  }
+}
+
+function openRedeem() {
+  redeemInput.value = ''
+  redeemOpen.value = true
+}
+
+function doRedeem() {
+  const result = redeemCode(redeemInput.value)
+  if (!result.ok) {
+    uni.showToast({ title: result.message, icon: 'none' })
+    return
+  }
+  redeemOpen.value = false
+  redeemInput.value = ''
+  uni.showToast({ title: result.message, icon: 'none' })
 }
 
 async function manageBlocked() {
@@ -220,7 +298,7 @@ function resetDemo() {
 function showDemo() {
   uni.showModal({
     title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：所有社交数据保存在本机，不会与真实用户交换，也不产生费用。',
+    content: '当前为 V0.4 Mock 演示：所有社交数据与订单都保存在本机，不会与真实用户交换，也不产生费用。',
     showCancel: false,
     confirmText: '知道了',
   })
@@ -245,185 +323,266 @@ function showDemo() {
   color: #7560df;
 }
 
+.panel {
+  margin-top: 20rpx;
+  background: #fff;
+  border: 2rpx solid #ece7f1;
+  border-radius: 36rpx;
+  padding: 40rpx 36rpx;
+  box-sizing: border-box;
+}
+.panel:first-of-type {
+  margin-top: 0;
+}
+.panel-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.panel-fine {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #a398af;
+  line-height: 1.6;
+}
+.panel-text {
+  display: block;
+  font-size: 24rpx;
+  color: #77727e;
+  margin-top: 16rpx;
+}
+
 .profile-head {
   display: flex;
   align-items: center;
-  gap: 26rpx;
-  background: #fff;
-  border: 2rpx solid #e9e3f1;
-  border-radius: 34rpx;
-  padding: 34rpx 32rpx;
+  gap: 30rpx;
+  margin-bottom: 40rpx;
 }
 .profile-avatar {
-  width: 112rpx;
-  height: 112rpx;
-  border-radius: 36rpx;
-  background: linear-gradient(135deg, #d9cdff, #b9e9d1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 42rpx;
-  font-weight: 700;
-  color: #4b3b7a;
+  width: 130rpx;
+  height: 130rpx;
+  border-radius: 38rpx;
   flex-shrink: 0;
 }
 .profile-body {
   flex: 1;
+  min-width: 0;
 }
 .profile-name {
   display: block;
-  font-size: 34rpx;
+  font-size: 50rpx;
   font-weight: 800;
   color: #292630;
+  line-height: 1.2;
 }
 .profile-meta {
   display: block;
-  font-size: 22rpx;
-  color: #8b7a99;
   margin-top: 8rpx;
-}
-.profile-badge {
-  display: inline-block;
-  font-size: 18rpx;
-  color: #6d58b2;
-  background: #f0ebff;
-  padding: 8rpx 16rpx;
-  border-radius: 12rpx;
-  margin-top: 14rpx;
+  font-size: 24rpx;
+  color: #77727e;
 }
 
 .account-links {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 18rpx;
-  margin-top: 24rpx;
 }
 .account-link {
-  width: calc(50% - 9rpx);
+  background: #f1ecf8;
+  border-radius: 18rpx;
+  padding: 24rpx;
+  font-size: 24rpx;
+  color: #856899;
   box-sizing: border-box;
-  background: #fff;
-  border: 2rpx solid #ebe5f1;
-  border-radius: 28rpx;
-  padding: 28rpx;
 }
-.link-title {
+
+.order {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  padding: 30rpx 0;
+  border-bottom: 2rpx solid #f3eef7;
+}
+.order:last-child {
+  border-bottom: none;
+}
+.order-info {
+  flex: 1;
+  min-width: 260rpx;
+}
+.order-name {
   display: block;
   font-size: 26rpx;
   font-weight: 700;
   color: #292630;
 }
-.link-desc {
-  display: block;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-top: 8rpx;
-}
-
-.panel {
-  margin-top: 28rpx;
-  background: #fff;
-  border: 2rpx solid #e9e3f1;
-  border-radius: 30rpx;
-  padding: 32rpx;
-}
-.panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.panel-title {
-  display: block;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #292630;
-}
-.panel-note {
-  font-size: 18rpx;
-  color: #b06a6a;
-  background: #fbeaea;
-  padding: 6rpx 14rpx;
-  border-radius: 10rpx;
-}
-.panel-text {
-  display: block;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.7;
-  margin: 16rpx 0 8rpx;
-}
-.textbtn {
-  display: inline-block;
-  font-size: 24rpx;
-  color: #7560df;
-  padding: 8rpx 0;
-}
-
-.order-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20rpx;
-  padding: 18rpx 0;
-  border-bottom: 2rpx solid #f3eef7;
-}
-.order-main {
-  flex: 1;
-}
-.order-name {
-  display: block;
-  font-size: 24rpx;
-  font-weight: 700;
-}
 .order-meta {
   display: block;
-  margin-top: 4rpx;
-  font-size: 19rpx;
+  margin-top: 6rpx;
+  font-size: 20rpx;
   color: #a398af;
 }
 .order-amount {
   font-size: 26rpx;
   font-weight: 700;
-  color: #7560df;
-}
-
-.tool-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 22rpx 0;
-  border-bottom: 2rpx solid #f3eef7;
-}
-.tool-row:last-child {
-  border-bottom: none;
-}
-.tool-name {
-  font-size: 24rpx;
   color: #292630;
 }
-.tool-desc {
-  font-size: 20rpx;
-  color: #a398af;
+.textbtn {
+  font-size: 22rpx;
+  color: #7560df;
+  padding: 4rpx;
 }
 
-.notice {
+.mini-list {
+  display: grid;
+  gap: 20rpx;
+  margin-top: 28rpx;
+}
+.btn-secondary,
+.btn-ghost {
   display: block;
-  background: #f5f3fa;
-  border: 2rpx solid #e9e3f3;
-  padding: 26rpx 30rpx;
+  text-align: center;
   border-radius: 24rpx;
-  color: #7c728b;
-  font-size: 22rpx;
+  padding: 24rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+.btn-secondary {
+  background: #fff;
+  color: #292630;
+  border: 2rpx solid #ece7f1;
+}
+.btn-ghost {
+  background: transparent;
+  color: #77727e;
+  border: 2rpx solid #ece7f1;
+}
+.btn-primary {
+  display: block;
+  text-align: center;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  background: #6c4cf3;
+  color: #fff;
+}
+
+.fine {
+  display: block;
+  font-size: 20rpx;
+  color: #a398af;
   line-height: 1.7;
+  margin-top: 20rpx;
 }
 .mt {
   margin-top: 28rpx;
 }
 
-.version {
+.modal-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(43, 33, 51, 0.37);
+  display: flex;
+  align-items: flex-end;
+}
+.modal-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 36rpx 32rpx 48rpx;
+  box-sizing: border-box;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.modal-close {
+  font-size: 30rpx;
+  color: #a398af;
+  padding: 8rpx 12rpx;
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+  align-items: center;
+  padding: 28rpx 0;
+  border-bottom: 2rpx solid #f3eef7;
+}
+.toggle-text {
+  flex: 1;
+  min-width: 0;
+}
+.toggle-name {
   display: block;
-  text-align: center;
-  font-size: 18rpx;
-  color: #b6abbd;
-  margin-top: 40rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #292630;
+}
+.toggle-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #a398af;
+}
+.switch {
+  position: relative;
+  width: 80rpx;
+  height: 48rpx;
+  flex-shrink: 0;
+  background: #ddd6e6;
+  border-radius: 40rpx;
+}
+.switch.on {
+  background: #6c4cf3;
+}
+.knob {
+  position: absolute;
+  width: 36rpx;
+  height: 36rpx;
+  top: 6rpx;
+  left: 6rpx;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.2s;
+}
+.switch.on .knob {
+  left: 38rpx;
+}
+
+.field-label {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #292630;
+  margin-bottom: 14rpx;
+}
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2rpx solid #ece7f1;
+  border-radius: 24rpx;
+  background: #fff;
+  padding: 24rpx 28rpx;
+  min-height: 90rpx;
+  font-size: 30rpx;
+  color: #292630;
 }
 </style>

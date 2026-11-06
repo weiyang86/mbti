@@ -116,6 +116,35 @@
     </view>
 
     <text class="foot">一次购买 · 当前为模拟支付，不扣款 · 图片与文字仅本机演示</text>
+
+    <!-- 模拟支付确认 -->
+    <view v-if="showCheckout" class="modal-backdrop" @click="closeCheckout">
+      <view class="modal-card" @click.stop>
+        <view class="modal-head">
+          <text class="modal-title">这套 MBTI 形象，准备带走吗？</text>
+          <text class="modal-close" @click="closeCheckout">✕</text>
+        </view>
+        <view class="checkout">
+          <image class="checkout-img" :src="previewAsset" mode="aspectFill" />
+          <view class="checkout-info">
+            <text class="checkout-type">{{ checkoutLabel }}</text>
+            <text class="checkout-plan">{{ PLAN_NAMES[checkoutTier] }}</text>
+            <text class="checkout-price">¥{{ checkoutAmount.toFixed(1) }}</text>
+          </view>
+        </view>
+        <text class="checkout-desc">
+          {{ checkoutTier === 1
+            ? '海报 + 同款头像 + 相处卡 + 配文。'
+            : '包含晒图套装；照片功能目前仅本机预览，使用预置人物演示。' }}
+        </text>
+        <view class="checkout-notice">微信 · 模拟支付，不会扣款。一次购买，没有自动续费。</view>
+        <view class="btn-row mt">
+          <view class="btn-primary flex" @click="paySuccess">模拟支付成功</view>
+          <view class="btn-secondary flex" @click="payFail">模拟支付失败</view>
+        </view>
+        <text class="checkout-cancel" @click="closeCheckout">先不买，再看看</text>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -124,7 +153,7 @@ import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
-import type { StyleKey } from '@/store/studio'
+import type { PlanTier, StyleKey } from '@/store/studio'
 import {
   STUDIO_STYLES,
   PLAN_NAMES,
@@ -154,6 +183,9 @@ const PLANS = [
 const latestType = ref('')
 const showRedeem = ref(false)
 const redeemInput = ref('')
+const showCheckout = ref(false)
+const checkoutTier = ref<PlanTier>(1)
+const checkoutAmount = ref(9.9)
 
 onShow(async () => {
   try {
@@ -178,6 +210,12 @@ const previewQuote = computed(
 const needUpgrade = computed(() => studio.tier === 1 && studio.plan === 2)
 const unlocked = computed(() => studio.tier >= studio.plan)
 
+const checkoutLabel = computed(() =>
+  latestType.value
+    ? `${latestType.value} · ${TYPE_NAMES[latestType.value] || 'MBTI'}`
+    : '待测试 · 示例样式',
+)
+
 const primaryLabel = computed(() => {
   if (unlocked.value) return '套装已解锁，开始制作 →'
   if (needUpgrade.value) return '补 ¥10 升级'
@@ -194,9 +232,39 @@ function primaryAction() {
     goCreate()
     return
   }
-  purchasePlan(studio.plan)
-  uni.showToast({ title: '模拟购买成功', icon: 'none' })
+  openCheckout()
+}
+
+function openCheckout() {
+  const tier = studio.plan
+  checkoutTier.value = tier
+  checkoutAmount.value = studio.tier === 1 && tier === 2 ? 10 : tier === 1 ? 9.9 : 19.9
+  showCheckout.value = true
+}
+
+function closeCheckout() {
+  showCheckout.value = false
+}
+
+function paySuccess() {
+  purchasePlan(checkoutTier.value, true)
+  showCheckout.value = false
+  uni.showToast({ title: '模拟购买成功，套装已解锁', icon: 'none' })
   setTimeout(goCreate, 400)
+}
+
+function payFail() {
+  purchasePlan(checkoutTier.value, false)
+  showCheckout.value = false
+  uni.showModal({
+    title: '本次模拟支付未完成',
+    content: '没有扣款，已保留失败记录。',
+    confirmText: '重新模拟购买',
+    cancelText: '稍后再说',
+    success: (res) => {
+      if (res.confirm) openCheckout()
+    },
+  })
 }
 
 function goCreate() {
@@ -525,5 +593,128 @@ function showDemo() {
   font-size: 20rpx;
   color: #a398af;
   line-height: 1.6;
+}
+
+.modal-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(43, 33, 51, 0.37);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+}
+.modal-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 36rpx 32rpx;
+  box-sizing: border-box;
+}
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+.modal-title {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #292630;
+}
+.modal-close {
+  font-size: 30rpx;
+  color: #a398af;
+  padding: 4rpx 8rpx;
+}
+.checkout {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-top: 28rpx;
+}
+.checkout-img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 22rpx;
+  flex-shrink: 0;
+}
+.checkout-info {
+  flex: 1;
+  min-width: 0;
+}
+.checkout-type {
+  display: block;
+  font-size: 22rpx;
+  color: #8b8099;
+}
+.checkout-plan {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.checkout-price {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #7560df;
+}
+.checkout-desc {
+  display: block;
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: #77727e;
+  line-height: 1.7;
+}
+.checkout-notice {
+  margin-top: 20rpx;
+  padding: 22rpx 24rpx;
+  border-radius: 18rpx;
+  background: #f3f0f8;
+  font-size: 21rpx;
+  color: #77727e;
+  line-height: 1.7;
+}
+.btn-row {
+  display: flex;
+  gap: 18rpx;
+}
+.btn-row .btn-primary,
+.btn-row .btn-secondary {
+  flex: 1;
+  margin-top: 0;
+  text-align: center;
+  border-radius: 24rpx;
+  padding: 24rpx 0;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.btn-row .btn-primary {
+  background: #6c4cf3;
+  color: #fff;
+}
+.btn-row .btn-secondary {
+  background: #fff;
+  color: #292630;
+  border: 2rpx solid #ece7f1;
+}
+.checkout-cancel {
+  display: block;
+  margin-top: 24rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #8b8099;
+}
+.mt {
+  margin-top: 28rpx;
 }
 </style>
