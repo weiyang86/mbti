@@ -6,6 +6,19 @@ export const TYPE_NAMES: Record<string, string> = {
   ISTP: '动手探索家', ISFP: '感受艺术家', ESTP: '即时行动派', ESFP: '快乐分享家',
 }
 
+/** 16 型按原型分组，供类型选择器使用 */
+export interface TypeGroup {
+  label: string
+  types: string[]
+}
+
+export const TYPE_GROUPS: TypeGroup[] = [
+  { label: '分析家', types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'] },
+  { label: '外交家', types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'] },
+  { label: '守护者', types: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'] },
+  { label: '探险家', types: ['ISTP', 'ISFP', 'ESTP', 'ESFP'] },
+]
+
 /** 16 型一句话人设，与产品原型 DECLARATIONS 保持一致 */
 export const DECLARATIONS: Record<string, string> = {
   INTJ: '想得很远，也走得很稳。', INTP: '好奇心在线，脑洞不打烊。',

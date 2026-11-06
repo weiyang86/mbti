@@ -43,7 +43,30 @@
       <view class="scene" @click="goDiscover">
         <text class="scene-mark">⇄</text>
         <text class="scene-title">交换 MBTI 名片</text>
-        <text class="scene-desc">遇见相同与不同的你（本期占位）</text>
+        <text class="scene-desc">遇见相同与不同的你</text>
+      </view>
+    </view>
+
+    <view class="mini-tools">
+      <view class="mini-tools-head">
+        <text class="mini-tools-title">MBTI 的另一种打开方式</text>
+        <text class="tag">小应用</text>
+      </view>
+      <view class="tool-grid">
+        <view class="tool-tile radar-tile" @click="goRadar">
+          <text class="tool-icon">◎</text>
+          <text class="tool-name">同型雷达</text>
+          <text class="tool-desc">周边 500 米</text>
+          <text class="tool-desc">有多少同型搭子？</text>
+          <text class="tool-note">人数为模拟数据 ↗</text>
+        </view>
+        <view class="tool-tile" @click="goCompat">
+          <text class="tool-icon">✧</text>
+          <text class="tool-name">相处小抄</text>
+          <text class="tool-desc">{{ compatTileLine }}</text>
+          <text class="tool-desc">找个舒服的相处方式</text>
+          <text class="tool-note">趣味建议，无配对分数 ↗</text>
+        </view>
       </view>
     </view>
 
@@ -57,6 +80,7 @@ import { onShow } from '@dcloudio/uni-app'
 import type { ResultSnapshotSummary } from '@/api/types'
 import { listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
+import { DEFAULT_COMPARE_TYPE } from '@/constants/compat'
 
 function profileName(): string {
   try {
@@ -97,6 +121,10 @@ const coverQuote = computed(() =>
     : '测完这里会换成你的类型和一句话人设。',
 )
 
+const compatTileLine = computed(() =>
+  latest.value ? `${latest.value.type_code} × ${DEFAULT_COMPARE_TYPE}` : '和不同 MBTI',
+)
+
 function startQuiz() {
   uni.navigateTo({ url: '/pages/test-intro/test-intro' })
 }
@@ -115,6 +143,14 @@ function goShare() {
 
 function goDiscover() {
   uni.switchTab({ url: '/pages/discover/discover' })
+}
+
+function goRadar() {
+  uni.navigateTo({ url: '/pages/radar/radar' })
+}
+
+function goCompat() {
+  uni.navigateTo({ url: '/pages/compat/compat' })
 }
 
 function showChannels() {
@@ -327,6 +363,71 @@ function showChannels() {
   font-size: 22rpx;
   color: #77727e;
   line-height: 1.5;
+}
+
+.mini-tools {
+  margin-top: 60rpx;
+}
+.mini-tools-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+.mini-tools-title {
+  font-size: 36rpx;
+  font-weight: 800;
+}
+.tag {
+  margin-left: auto;
+  font-size: 20rpx;
+  color: #8b8099;
+  background: #efeaf4;
+  border-radius: 999rpx;
+  padding: 6rpx 18rpx;
+}
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+}
+.tool-tile {
+  display: flex;
+  flex-direction: column;
+  min-height: 390rpx;
+  box-sizing: border-box;
+  border: 2rpx solid #e9e0f5;
+  border-radius: 42rpx;
+  padding: 38rpx;
+  background: #eee8fa;
+}
+.tool-icon {
+  font-size: 64rpx;
+  color: #7654b7;
+  line-height: 1.1;
+}
+.tool-name {
+  margin: 10rpx 0;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.tool-desc {
+  font-size: 24rpx;
+  color: #77698a;
+  line-height: 1.5;
+}
+.tool-note {
+  margin-top: 28rpx;
+  font-size: 20rpx;
+  color: #94869e;
+}
+.radar-tile {
+  background: #e7eddb;
+  border-color: #dce6ca;
+}
+.radar-tile .tool-icon,
+.radar-tile .tool-name {
+  color: #596d35;
 }
 
 .foot {

@@ -101,6 +101,12 @@
       "style": {
         "navigationBarTitleText": "同型雷达"
       }
+    },
+    {
+      "path": "pages/compat/compat",
+      "style": {
+        "navigationBarTitleText": "MBTI 相处小抄"
+      }
     }
   ],
   "tabBar": {
