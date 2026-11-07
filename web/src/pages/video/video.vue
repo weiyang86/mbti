@@ -50,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: 待 Remy 确认接口路径和字段（视频分镜生成接口未定义，当前为本地静态分镜演示）
 import { computed, ref } from 'vue'
 import { onShow, onUnload } from '@dcloudio/uni-app'
 import { listResults } from '@/api/results'

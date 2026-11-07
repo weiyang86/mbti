@@ -32,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: 待 Remy 确认接口路径和字段（AI 形象生成任务接口未定义，当前为本地进度模拟，未上传照片）
 import { onLoad, onUnload } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import { markCardReady, studio } from '@/store/studio'

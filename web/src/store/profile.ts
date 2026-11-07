@@ -1,3 +1,4 @@
+// TODO: 待 Remy 确认接口路径和字段（用户资料接口未定义，当前仅保存在本机 storage）
 export interface TestProfile {
   name: string
   interests: string[]
