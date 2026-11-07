@@ -41,6 +41,25 @@
         自选类型没有答题分布。想看到四维得分，可以完成一次 12 题趣味测试。
       </view>
 
+      <view v-if="result.source === 'quiz'" class="result-saved">
+        <text class="saved-badge">✓ 这次结果已新增到我的轨迹</text>
+        <text class="saved-title">{{ savedTitle }}</text>
+        <text class="saved-meta">
+          {{ dateLabel(result.submitted_at) }} · {{ result.life_stage || '日常生活' }} · 历史不会被本次测试覆盖
+        </text>
+        <view v-if="previous" class="btn-secondary mt" @click="goCompare">查看这两次的变化</view>
+        <text v-else class="saved-link" @click="goHistory">查看我的轨迹 →</text>
+      </view>
+
+      <view v-else class="journey-entry" @click="goHistory">
+        <view class="journey-main">
+          <text class="journey-kicker">MY MBTI JOURNEY</text>
+          <text class="journey-title">看看不同阶段的我</text>
+          <text class="journey-desc">免费复测 · 私密记录 · 前后对比</text>
+        </view>
+        <text class="journey-arrow">↗</text>
+      </view>
+
       <view class="manual">
         <text class="section">我的相处小抄</text>
         <view class="manual-card" v-for="m in manual" :key="m.no">
@@ -66,8 +85,12 @@
         <view class="btn-primary mt" @click="goStudio">{{ studioCta }}</view>
       </view>
 
-      <view class="actions">
-        <view class="btn-secondary" @click="goHistory">查看阶段记录</view>
+      <view class="discovery-card" @click="goDiscover">
+        <view class="discovery-main">
+          <text class="discovery-title">先去看看我的同型搭子</text>
+          <text class="discovery-desc">基础名片交换免费，联系方式由双方决定。</text>
+        </view>
+        <text class="discovery-arrow">⇄</text>
       </view>
 
       <text class="foot">趣味倾向体验 · 非临床测评 · 不宣称官方量表效度</text>
@@ -79,13 +102,15 @@
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot } from '@/api/types'
-import { getResult } from '@/api/results'
+import { getResult, listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
 import { buildManual } from '@/constants/manual'
+import { dateLabel, summaryText } from '@/constants/journey'
 import { studio } from '@/store/studio'
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
+const previous = ref<ResultSnapshot | null>(null)
 const loading = ref(true)
 
 onLoad((q) => {
@@ -104,7 +129,48 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+  if (result.value?.source === 'quiz') {
+    await loadPrevious()
+  }
 })
+
+/** 查找同版本、时间更早的上一份测验记录，用于结果页的「查看变化」入口 */
+async function loadPrevious() {
+  const current = result.value
+  if (!current) return
+  try {
+    const res = await listResults({ limit: 50 })
+    const older = res.items
+      .filter(
+        (i) =>
+          i.source === 'quiz' &&
+          i.question_bank_version === current.question_bank_version &&
+          i.id !== current.id &&
+          i.submitted_at < current.submitted_at,
+      )
+      .sort((a, b) => b.submitted_at.localeCompare(a.submitted_at))[0]
+    if (older) previous.value = await getResult(older.id)
+  } catch {
+    previous.value = null
+  }
+}
+
+const savedTitle = computed(() =>
+  previous.value && result.value
+    ? summaryText(previous.value, result.value)
+    : '第一份基线，已经留好。',
+)
+
+function goCompare() {
+  if (!previous.value || !result.value) return
+  uni.navigateTo({
+    url: `/pages/compare/compare?baseline=${previous.value.id}&target=${result.value.id}`,
+  })
+}
+
+function goDiscover() {
+  uni.switchTab({ url: '/pages/discover/discover' })
+}
 
 const typeName = computed(() => TYPE_NAMES[result.value?.type_code || ''] || 'MBTI')
 
@@ -410,8 +476,110 @@ function goHome() {
   padding: 8rpx 18rpx;
 }
 
-.actions {
+.result-saved {
   margin-top: 40rpx;
+  padding: 30rpx 28rpx;
+  border-radius: 26rpx;
+  background: linear-gradient(140deg, #f2f7ec, #eef4e4 60%, #f8f6f0);
+  border: 2rpx solid #e2ecd3;
+}
+.saved-badge {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #4f6b2c;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 999rpx;
+  padding: 6rpx 16rpx;
+}
+.saved-title {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #2f3524;
+}
+.saved-meta {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 21rpx;
+  color: #7c8670;
+  line-height: 1.6;
+}
+.saved-link {
+  display: inline-block;
+  margin-top: 18rpx;
+  font-size: 24rpx;
+  color: #5a7a3a;
+}
+
+.journey-entry {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 40rpx;
+  padding: 28rpx 26rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(120deg, #211a36, #3a2c58 60%, #4b3570);
+  box-shadow: 0 18rpx 40rpx rgba(33, 26, 54, 0.22);
+}
+.journey-main {
+  flex: 1;
+}
+.journey-kicker {
+  display: block;
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: rgba(255, 255, 255, 0.55);
+}
+.journey-title {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.journey-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: rgba(255, 255, 255, 0.66);
+}
+.journey-arrow {
+  font-size: 32rpx;
+  color: #dfff8b;
+}
+
+.discovery-card {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 40rpx;
+  min-height: 160rpx;
+  padding: 28rpx 26rpx;
+  border-radius: 26rpx;
+  background: #fff;
+  border: 2rpx solid #e9e5ed;
+}
+.discovery-main {
+  flex: 1;
+}
+.discovery-title {
+  display: block;
+  font-size: 29rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.discovery-desc {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 21rpx;
+  color: #77727e;
+  line-height: 1.6;
+}
+.discovery-arrow {
+  font-size: 34rpx;
+  color: #7560df;
 }
 .btn-primary {
   font-weight: 700;
