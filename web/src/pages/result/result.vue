@@ -60,29 +60,87 @@
         <text class="journey-arrow">↗</text>
       </view>
 
-      <view class="manual">
-        <text class="section">我的相处小抄</text>
-        <view class="manual-card" v-for="m in manual" :key="m.no">
-          <text class="no">{{ m.no }}</text>
-          <view class="manual-body">
-            <text class="m-title">{{ m.title }}</text>
-            <text class="m-text">{{ m.body }}</text>
+      <!-- 已购套餐：解锁面板 + 相处小抄 -->
+      <template v-if="studio.tier">
+        <view class="unlock-panel">
+          <text class="unlock-tag">套装已解锁</text>
+          <text class="unlock-title">你的 MBTI 形象，随时可以换。</text>
+          <text class="unlock-desc">选择风格、制作海报、保存头像和相处卡。</text>
+          <view class="btn-primary mt" @click="goCreate">去制作我的名片</view>
+        </view>
+
+        <view class="manual">
+          <text class="section">我的相处小抄</text>
+          <view class="manual-card" v-for="m in manual" :key="m.no">
+            <text class="no">{{ m.no }}</text>
+            <view class="manual-body">
+              <text class="m-title">{{ m.title }}</text>
+              <text class="m-text">{{ m.body }}</text>
+            </view>
+          </view>
+          <text class="fine">依据当前类型的模板建议，可随真实相处调整</text>
+        </view>
+      </template>
+
+      <!-- 未购套餐：晒图套装引导 -->
+      <view v-else class="offer">
+        <text class="offer-tag">为 {{ result.type_code }} 的你准备</text>
+        <text class="offer-title" v-for="(line, i) in sceneLines" :key="i">{{ line }}</text>
+        <text class="offer-desc">你专享的是一整套能晒、能留、能展示的专属素材。</text>
+
+        <view class="scene-tabs">
+          <view
+            v-for="s in SCENE_TABS"
+            :key="s.key"
+            class="scene-tab"
+            :class="{ active: sceneTab === s.key }"
+            @click="sceneTab = s.key"
+          >
+            <text>{{ s.label }}</text>
           </view>
         </view>
-        <text class="fine">依据当前类型的模板建议，可随真实相处调整</text>
-      </view>
 
-      <view class="studio-panel">
-        <text class="studio-tag">{{ studio.hasCard ? '套装已准备好' : studio.tier ? '套装已解锁' : '晒图套装 · 示例预览' }}</text>
-        <text class="studio-title">把我的 MBTI，发成一条漂亮朋友圈。</text>
-        <text class="studio-desc">成图 + 头像 + 相处卡 + 配文，一次购买，无自动续费。</text>
-        <view class="studio-packs">
-          <text class="studio-pack">01 主角图</text>
-          <text class="studio-pack">02 头像</text>
-          <text class="studio-pack">03 相处卡</text>
-          <text class="studio-pack">04 配文</text>
+        <view class="preview-card">
+          <view class="pv-head">
+            <image class="pv-avatar" :src="previewAsset" mode="aspectFill" />
+            <view class="pv-head-main">
+              <text class="pv-name">{{ nickname }}</text>
+              <text class="pv-mock">虚拟形象 · 示例</text>
+            </view>
+          </view>
+          <text class="pv-quote">同样是 {{ result.type_code }}，我也有自己的主角感。</text>
+          <view class="pv-img-wrap">
+            <image class="pv-img" :src="previewAsset" mode="aspectFill" />
+            <view class="pv-overlay">
+              <text class="pv-type">{{ result.type_code }}</text>
+              <text class="pv-type-name">{{ nickname }} / {{ typeName }}</text>
+            </view>
+          </view>
+          <text class="pv-note">AI 示例人物</text>
         </view>
-        <view class="btn-primary mt" @click="goStudio">{{ studioCta }}</view>
+
+        <view class="format-tabs">
+          <view
+            v-for="f in FORMAT_TABS"
+            :key="f"
+            class="format-tab"
+            :class="{ active: formatTab === f }"
+            @click="formatTab = f"
+          >
+            <text>{{ f }}</text>
+          </view>
+        </view>
+
+        <view class="pack-grid">
+          <view v-for="p in PACKS" :key="p.no" class="pack-item">
+            <text class="pack-cat">{{ p.no }} / {{ p.cat }}</text>
+            <text class="pack-title">{{ p.title }}</text>
+            <text class="pack-desc">{{ p.desc }}</text>
+          </view>
+        </view>
+
+        <view class="btn-primary offer-cta" @click="goCheckout('studio_tier_1')">¥9.9 · 制作我的 MBTI 晒图套装 →</view>
+        <text class="fine centered">一次购买 · 无订阅 · 当前为模拟支付</text>
       </view>
 
       <view class="discovery-card" @click="goDiscover">
@@ -106,7 +164,7 @@ import { getResult, listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
 import { buildManual } from '@/constants/manual'
 import { dateLabel, summaryText } from '@/constants/journey'
-import { studio } from '@/store/studio'
+import { studio, styleAsset } from '@/store/studio'
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
@@ -224,27 +282,35 @@ const dimRows = computed(() => {
 
 const manual = computed(() => buildManual(result.value?.type_code || 'INFP'))
 
-function goShare() {
-  if (!resultId.value) return
-  uni.navigateTo({ url: `/pages/share-preview/share-preview?id=${resultId.value}` })
+const sceneTab = ref<'moments' | 'avatar' | 'meet'>('moments')
+const formatTab = ref('朋友圈图')
+const SCENE_TABS = [
+  { key: 'moments', label: '发朋友圈', lines: ['把我的 MBTI，', '发成一条漂亮朋友圈。'] },
+  { key: 'avatar', label: '换同款头像', lines: ['换个头像，', '让我的 MBTI 有点辨识度。'] },
+  { key: 'meet', label: '见面亮名片', lines: ['认识新朋友，', '先亮出我的 MBTI 名片。'] },
+] as const
+const FORMAT_TABS = ['日常海报', '朋友圈图', '未来滤镜']
+const PACKS = [
+  { no: '01', cat: '主角图', title: '朋友圈 MBTI 海报', desc: '3 种风格 · 3 种比例' },
+  { no: '02', cat: '头像', title: '同款人格头像', desc: '1:1 PNG 独立保存' },
+  { no: '03', cat: '相处卡', title: '我的相处小抄', desc: '充电 · 沟通 · 在意' },
+  { no: '04', cat: '配文', title: '发圈文案准备好', desc: '改一句就能复制' },
+]
+
+const sceneLines = computed(
+  () => SCENE_TABS.find((s) => s.key === sceneTab.value)?.lines || SCENE_TABS[0].lines,
+)
+const previewAsset = computed(() => styleAsset(studio.style))
+const nickname = computed(() => studio.nickname || '小禾')
+
+function goCreate() {
+  uni.navigateTo({ url: '/pages/create/create' })
 }
 
-const studioCta = computed(() => {
-  if (!studio.tier) return '¥9.9 · 制作我的 MBTI 晒图套装'
-  if (studio.hasCard) return '去晒出我的名片 →'
-  return '去制作我的名片 →'
-})
-
-function goStudio() {
-  if (!studio.tier) {
-    uni.navigateTo({ url: '/pages/pricing/pricing' })
-    return
-  }
-  if (studio.hasCard) {
-    goShare()
-    return
-  }
-  uni.navigateTo({ url: '/pages/create/create' })
+function goCheckout(productCode: string) {
+  const id = resultId.value
+  const suffix = id ? `&result_id=${encodeURIComponent(id)}` : ''
+  uni.navigateTo({ url: `/pages/unlock/unlock?product_code=${productCode}${suffix}` })
 }
 
 function goHistory() {
@@ -433,47 +499,208 @@ function goHome() {
   line-height: 1.6;
 }
 
-.studio-panel {
-  margin-top: 48rpx;
+/* 已购：解锁面板 */
+.unlock-panel {
+  margin-top: 40rpx;
   padding: 32rpx 28rpx;
   border-radius: 26rpx;
-  background: linear-gradient(140deg, #f7f2ff, #efe8ff 55%, #e7f6ea);
-  border: 2rpx solid #e3d9f6;
+  background: linear-gradient(140deg, #f2f7ec, #eef4e4 60%, #f8f6f0);
+  border: 2rpx solid #e2ecd3;
 }
-.studio-tag {
+.unlock-tag {
   display: inline-block;
   font-size: 19rpx;
-  color: #6d58b2;
-  background: rgba(255, 255, 255, 0.75);
+  color: #4f6b2c;
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 999rpx;
   padding: 6rpx 18rpx;
 }
-.studio-title {
+.unlock-title {
   display: block;
   margin-top: 16rpx;
   font-size: 34rpx;
   font-weight: 800;
   line-height: 1.45;
+  color: #2f3524;
 }
-.studio-desc {
+.unlock-desc {
   display: block;
   margin-top: 10rpx;
-  font-size: 22rpx;
+  font-size: 23rpx;
+  color: #7c8670;
+  line-height: 1.7;
+}
+
+/* 未购：晒图引导 */
+.offer {
+  display: block;
+  margin-top: 44rpx;
+  padding: 34rpx 28rpx 30rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(150deg, #f6f1ff, #efe8ff 55%, #f2f7ec);
+  border: 2rpx solid #e3d9f6;
+}
+.offer-tag {
+  display: inline-block;
+  font-size: 19rpx;
+  color: #6d58b2;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 999rpx;
+  padding: 6rpx 18rpx;
+}
+.offer-title {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 1.45;
+  color: #2c2550;
+}
+.offer-desc {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 23rpx;
   color: #6f6880;
   line-height: 1.7;
 }
-.studio-packs {
+
+.scene-tabs,
+.format-tabs {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 24rpx;
+}
+.scene-tab,
+.format-tab {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 8rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.7);
+  color: #7c6f96;
+  font-size: 22rpx;
+  border: 2rpx solid transparent;
+}
+.scene-tab.active,
+.format-tab.active {
+  background: #6c4cf3;
+  color: #fff;
+}
+
+.preview-card {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-radius: 26rpx;
+  background: #fff;
+  border: 2rpx solid #e9e3f1;
+}
+.pv-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.pv-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  flex: none;
+}
+.pv-head-main {
+  display: flex;
+  flex-direction: column;
+}
+.pv-name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.pv-mock {
+  font-size: 19rpx;
+  color: #a398af;
+  margin-top: 2rpx;
+}
+.pv-quote {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #3f3552;
+  line-height: 1.6;
+}
+.pv-img-wrap {
+  position: relative;
+  margin-top: 16rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+.pv-img {
+  width: 100%;
+  height: 420rpx;
+  display: block;
+}
+.pv-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx;
+  background: linear-gradient(180deg, rgba(36, 22, 62, 0), rgba(36, 22, 62, 0.85));
+  display: flex;
+  flex-direction: column;
+}
+.pv-type {
+  font-size: 64rpx;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+.pv-type-name {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.9);
+}
+.pv-note {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 18rpx;
+  color: #a398af;
+}
+
+.pack-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 18rpx;
+  gap: 16rpx;
+  margin-top: 20rpx;
 }
-.studio-pack {
-  font-size: 20rpx;
-  color: #5b47a8;
-  background: #fff;
-  border-radius: 999rpx;
-  padding: 8rpx 18rpx;
+.pack-item {
+  width: calc(50% - 8rpx);
+  box-sizing: border-box;
+  padding: 22rpx 20rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.78);
+  border: 2rpx solid #ece5f6;
+}
+.pack-cat {
+  display: block;
+  font-size: 18rpx;
+  color: #8f7bb0;
+  letter-spacing: 1rpx;
+}
+.pack-title {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #2c2550;
+}
+.pack-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 19rpx;
+  color: #8b8099;
+}
+
+.offer-cta {
+  margin-top: 26rpx;
 }
 
 .result-saved {

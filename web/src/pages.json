@@ -143,6 +143,18 @@
       "style": {
         "navigationBarTitleText": "MBTI 相处小抄"
       }
+    },
+    {
+      "path": "pages/unlock/unlock",
+      "style": {
+        "navigationBarTitleText": "解锁我的套装"
+      }
+    },
+    {
+      "path": "pages/order-status/order-status",
+      "style": {
+        "navigationBarTitleText": "支付结果"
+      }
     }
   ],
   "tabBar": {

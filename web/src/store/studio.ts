@@ -8,10 +8,11 @@ export type OrderStatus = 'paid' | 'failed' | 'refunded'
 
 export interface StudioOrder {
   id: string
-  tier: PlanTier
+  tier: PlanTier | 0
   amount: number
   status: OrderStatus
   created_at: string
+  product_code?: string
 }
 
 export interface StudioState {
@@ -137,6 +138,30 @@ export function purchasePlan(tier: PlanTier, success = true) {
   }
   saveStudio()
   return order
+}
+
+/** 支付成功回调：订单并入 studio 订单，并按商品提升套餐 */
+export function applyPaidOrder(input: {
+  id: string
+  product_code: string
+  tier: PlanTier
+  amountYuan: number
+  paid_at?: string
+}) {
+  if (!studio.orders.some((o) => o.id === input.id)) {
+    studio.orders.push({
+      id: input.id,
+      tier: input.tier,
+      amount: input.amountYuan,
+      status: 'paid',
+      created_at: input.paid_at || new Date().toISOString(),
+      product_code: input.product_code,
+    })
+  }
+  if (input.tier > studio.tier) {
+    studio.tier = input.tier
+  }
+  saveStudio()
 }
 
 /** 模拟售后：记录退款，并按剩余有效订单恢复权益 */

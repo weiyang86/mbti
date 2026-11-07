@@ -27,7 +27,7 @@
       <template v-if="orders.length">
         <view v-for="o in orders" :key="o.id" class="order">
           <view class="order-info">
-            <text class="order-name">{{ PLAN_NAMES[o.tier] }}</text>
+            <text class="order-name">{{ orderName(o) }}</text>
             <text class="order-meta">{{ o.id }} · {{ statusText(o.status) }}</text>
           </view>
           <text class="order-amount">¥{{ o.amount.toFixed(1) }}</text>
@@ -116,6 +116,7 @@ import {
   studio,
   styleAsset,
 } from '@/store/studio'
+import type { StudioOrder } from '@/store/studio'
 
 type LinkKey = 'trail' | 'result' | 'card' | 'exchanges' | 'contacts'
 type VisibilityKey = keyof CardVisibility
@@ -158,6 +159,10 @@ const typeLine = computed(() => {
 })
 
 const orders = computed(() => studio.orders.slice().reverse())
+
+function orderName(o: StudioOrder) {
+  return o.tier ? PLAN_NAMES[o.tier] : 'MBTI 套装'
+}
 
 onShow(() => {
   load()

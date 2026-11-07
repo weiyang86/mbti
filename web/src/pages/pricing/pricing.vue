@@ -116,35 +116,6 @@
     </view>
 
     <text class="foot">一次购买 · 当前为模拟支付，不扣款 · 图片与文字仅本机演示</text>
-
-    <!-- 模拟支付确认 -->
-    <view v-if="showCheckout" class="modal-backdrop" @click="closeCheckout">
-      <view class="modal-card" @click.stop>
-        <view class="modal-head">
-          <text class="modal-title">这套 MBTI 形象，准备带走吗？</text>
-          <text class="modal-close" @click="closeCheckout">✕</text>
-        </view>
-        <view class="checkout">
-          <image class="checkout-img" :src="previewAsset" mode="aspectFill" />
-          <view class="checkout-info">
-            <text class="checkout-type">{{ checkoutLabel }}</text>
-            <text class="checkout-plan">{{ PLAN_NAMES[checkoutTier] }}</text>
-            <text class="checkout-price">¥{{ checkoutAmount.toFixed(1) }}</text>
-          </view>
-        </view>
-        <text class="checkout-desc">
-          {{ checkoutTier === 1
-            ? '海报 + 同款头像 + 相处卡 + 配文。'
-            : '包含晒图套装；照片功能目前仅本机预览，使用预置人物演示。' }}
-        </text>
-        <view class="checkout-notice">微信 · 模拟支付，不会扣款。一次购买，没有自动续费。</view>
-        <view class="btn-row mt">
-          <view class="btn-primary flex" @click="paySuccess">模拟支付成功</view>
-          <view class="btn-secondary flex" @click="payFail">模拟支付失败</view>
-        </view>
-        <text class="checkout-cancel" @click="closeCheckout">先不买，再看看</text>
-      </view>
-    </view>
   </view>
 </template>
 
@@ -153,12 +124,11 @@ import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
-import type { PlanTier, StyleKey } from '@/store/studio'
+import type { StyleKey } from '@/store/studio'
 import {
   STUDIO_STYLES,
   PLAN_NAMES,
   choosePlan,
-  purchasePlan,
   redeemCode,
   saveStudio,
   studio,
@@ -181,18 +151,18 @@ const PLANS = [
 ]
 
 const latestType = ref('')
+const latestResultId = ref('')
 const showRedeem = ref(false)
 const redeemInput = ref('')
-const showCheckout = ref(false)
-const checkoutTier = ref<PlanTier>(1)
-const checkoutAmount = ref(9.9)
 
 onShow(async () => {
   try {
     const res = await listResults({ limit: 1 })
     latestType.value = res.items[0]?.type_code || ''
+    latestResultId.value = res.items[0]?.id || ''
   } catch {
     latestType.value = ''
+    latestResultId.value = ''
   }
 })
 
@@ -210,12 +180,6 @@ const previewQuote = computed(
 const needUpgrade = computed(() => studio.tier === 1 && studio.plan === 2)
 const unlocked = computed(() => studio.tier >= studio.plan)
 
-const checkoutLabel = computed(() =>
-  latestType.value
-    ? `${latestType.value} · ${TYPE_NAMES[latestType.value] || 'MBTI'}`
-    : '待测试 · 示例样式',
-)
-
 const primaryLabel = computed(() => {
   if (unlocked.value) return '套装已解锁，开始制作 →'
   if (needUpgrade.value) return '补 ¥10 升级'
@@ -232,39 +196,14 @@ function primaryAction() {
     goCreate()
     return
   }
-  openCheckout()
+  goCheckout()
 }
 
-function openCheckout() {
-  const tier = studio.plan
-  checkoutTier.value = tier
-  checkoutAmount.value = studio.tier === 1 && tier === 2 ? 10 : tier === 1 ? 9.9 : 19.9
-  showCheckout.value = true
-}
-
-function closeCheckout() {
-  showCheckout.value = false
-}
-
-function paySuccess() {
-  purchasePlan(checkoutTier.value, true)
-  showCheckout.value = false
-  uni.showToast({ title: '模拟购买成功，套装已解锁', icon: 'none' })
-  setTimeout(goCreate, 400)
-}
-
-function payFail() {
-  purchasePlan(checkoutTier.value, false)
-  showCheckout.value = false
-  uni.showModal({
-    title: '本次模拟支付未完成',
-    content: '没有扣款，已保留失败记录。',
-    confirmText: '重新模拟购买',
-    cancelText: '稍后再说',
-    success: (res) => {
-      if (res.confirm) openCheckout()
-    },
-  })
+function goCheckout() {
+  const code = studio.plan === 2 ? 'studio_tier_2' : 'studio_tier_1'
+  // 下单契约要求 result_id：带上最近一次结果，保证订单可追溯到对应报告
+  const suffix = latestResultId.value ? `&result_id=${encodeURIComponent(latestResultId.value)}` : ''
+  uni.navigateTo({ url: `/pages/unlock/unlock?product_code=${code}${suffix}` })
 }
 
 function goCreate() {
