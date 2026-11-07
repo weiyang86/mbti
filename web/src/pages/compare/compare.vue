@@ -113,8 +113,32 @@
         </view>
       </view>
       <text class="fine">
-        每个维度只有 3 道题，圆点表示选到右侧偏好的题数，不是人格强度、准确率或成长分数。当前接口只返回四维计数，不回放原始作答。
+        每个维度只有 3 道题，圆点表示选到右侧偏好的题数，不是人格强度、准确率或成长分数。
       </text>
+
+      <!-- TODO: 待 Remy 确认「历史作答回放」服务端接口；当前仅回放本机保存的作答 -->
+      <view v-if="answerDiff" class="answer-replay">
+        <view class="replay-head" @click="showAnswerDiff = !showAnswerDiff">
+          <text class="replay-title">查看 {{ localChangedCount }} 道不同的回答</text>
+          <text class="replay-toggle">{{ showAnswerDiff ? '收起 ⌃' : '展开 ⌄' }}</text>
+        </view>
+        <text class="replay-hint">仅自己可见 · 不会出现在分享图或名片中</text>
+        <view v-if="showAnswerDiff" class="replay-list">
+          <view
+            v-for="item in answerDiff.filter((d) => d.changed)"
+            :key="item.no"
+            class="replay-item"
+          >
+            <text class="replay-no">{{ String(item.no).padStart(2, '0') }} / 12</text>
+            <text class="replay-question">{{ item.question }}</text>
+            <text class="replay-before">之前：{{ item.before }}</text>
+            <text class="replay-after">这次：{{ item.after }}</text>
+          </view>
+          <text v-if="localChangedCount === 0" class="replay-same">
+            12 道题的选择完全相同。稳定也是这次记录的一部分。
+          </text>
+        </view>
+      </view>
 
       <view v-if="notes.length" class="notes">
         <text v-for="(note, i) in notes" :key="i" class="note-line">· {{ note }}</text>
@@ -154,6 +178,7 @@ import type {
   ResultSnapshotSummary,
 } from '@/api/types'
 import { compareResults, getResult, listResults } from '@/api/results'
+import { getLocalAnswers, type LocalAnswerRecord } from '@/store/local-answers'
 import {
   DEMO_RECORDS,
   DIM_LIST,
@@ -179,6 +204,9 @@ const a = ref<ResultSnapshot | null>(null)
 const b = ref<ResultSnapshot | null>(null)
 const compare = ref<CompareResult | null>(null)
 const options = ref<PickRow[]>([])
+const localA = ref<LocalAnswerRecord | null>(null)
+const localB = ref<LocalAnswerRecord | null>(null)
+const showAnswerDiff = ref(false)
 
 onLoad((q) => {
   baselineId.value = (q?.baseline as string) || ''
@@ -203,8 +231,29 @@ const dimRows = computed(() =>
 )
 const changedDims = computed(() => dimRows.value.filter((d) => d.delta !== 0))
 
+// TODO: 待 Remy 确认「历史作答回放」服务端接口；当前仅回放本机保存的作答
+const answerDiff = computed(() => {
+  const left = localA.value?.items
+  const right = localB.value?.items
+  if (!left || !right || left.length !== right.length) return null
+  return left.map((item, i) => ({
+    no: i + 1,
+    question: item.question,
+    before: item.answer,
+    after: right[i].answer,
+    changed: item.answer !== right[i].answer,
+  }))
+})
+
+const localChangedCount = computed(
+  () => answerDiff.value?.filter((item) => item.changed).length ?? null,
+)
+
 const changeLine = computed(() => {
   if (!a.value || !b.value) return ''
+  if (localChangedCount.value !== null) {
+    return `${localChangedCount.value} / 12 题选择不同`
+  }
   const changed = changedAnswerCount(a.value, b.value)
   if (changed !== null) return `${changed} / 12 题选择不同`
   if (changedDims.value.length === 0) return '四维计数一致'
@@ -250,6 +299,8 @@ async function load() {
       const [from, to] = pickPair(DEMO_RECORDS, baselineId.value, targetId.value)
       a.value = from
       b.value = to
+      localA.value = null
+      localB.value = null
       compare.value = from && to ? localCompare(from, to) : null
       if (from && to) {
         baselineId.value = from.id
@@ -264,6 +315,8 @@ async function load() {
       if (!pair[0] || !pair[1]) {
         a.value = null
         b.value = null
+        localA.value = null
+        localB.value = null
         compare.value = null
       } else {
         const [from, to] = await Promise.all([
@@ -272,6 +325,8 @@ async function load() {
         ])
         a.value = from
         b.value = to
+        localA.value = getLocalAnswers(from.id)
+        localB.value = getLocalAnswers(to.id)
         baselineId.value = from.id
         targetId.value = to.id
         compare.value = await compareResults(from.id, to.id)
@@ -586,6 +641,74 @@ function openDemo() {
   border-radius: 20rpx;
   background: #fff;
   border: 2rpx solid #e9e5ed;
+}
+.answer-replay {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  border: 2rpx solid #e9e5ed;
+}
+.replay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.replay-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #292630;
+}
+.replay-toggle {
+  font-size: 20rpx;
+  color: #7560df;
+}
+.replay-hint {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: #a398af;
+}
+.replay-list {
+  margin-top: 16rpx;
+}
+.replay-item {
+  padding: 18rpx 0;
+  border-top: 2rpx solid #f1edf6;
+}
+.replay-no {
+  display: block;
+  font-size: 20rpx;
+  color: #b49aca;
+}
+.replay-question {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #5d5568;
+  line-height: 1.6;
+}
+.replay-before {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #8f8298;
+  line-height: 1.6;
+}
+.replay-after {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #292630;
+  line-height: 1.6;
+}
+.replay-same {
+  display: block;
+  padding-top: 16rpx;
+  border-top: 2rpx solid #f1edf6;
+  font-size: 22rpx;
+  color: #77727e;
+  line-height: 1.7;
 }
 .note-line {
   display: block;

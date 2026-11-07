@@ -17,6 +17,11 @@
 
     <view v-if="loading" class="state"><text class="state-text">正在读取记录…</text></view>
 
+    <view v-else-if="loadError" class="state">
+      <text class="state-text">轨迹读取失败</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+
     <template v-else>
       <template v-if="rows.length">
         <view class="journey-summary">
@@ -125,7 +130,7 @@
           >
             <view class="record-node"><text>{{ pad(rows.length - i) }}</text></view>
             <view class="record-body">
-              <text class="record-date">{{ dateLabel(item.submitted_at) }}</text>
+              <text class="record-date">{{ recordDate(item) }}</text>
               <view class="record-head">
                 <text class="record-type">{{ item.type_code }}</text>
                 <text class="record-stage">{{ recordTitle(item) }}</text>
@@ -224,6 +229,7 @@ const REVIEW_KEY = 'mbti_journey_review_v1'
 const summaries = ref<ResultSnapshotSummary[]>([])
 const details = ref<JourneyRecord[]>([])
 const loading = ref(true)
+const loadError = ref(false)
 const demo = ref(false)
 const chartDim = ref<DimKey>('EI')
 const showChartTable = ref(false)
@@ -311,6 +317,7 @@ onShow(() => {
 
 async function load() {
   if (!summaries.value.length) loading.value = true
+  loadError.value = false
   try {
     const res = await listResults({ limit: 50 })
     summaries.value = res.items
@@ -326,6 +333,7 @@ async function load() {
   } catch {
     summaries.value = []
     details.value = []
+    loadError.value = true
   } finally {
     loading.value = false
   }
@@ -349,9 +357,14 @@ function recordTitle(row: TimelineRow): string {
 }
 
 function recordNote(row: TimelineRow): string {
+  if (!row.submitted_at) return '保留旧结果，不补造日期或曲线'
   if (row.source === 'self_select') return '自行选择类型 · 不做四维比较'
   if (row.recent_status) return `${row.recent_status} · 仅作为回看背景`
-  return `题库版本 ${row.question_bank_version}`
+  return '近期状态未记录'
+}
+
+function recordDate(row: TimelineRow): string {
+  return row.submitted_at ? dateLabel(row.submitted_at) : '测试日期未知 · 旧版导入'
 }
 
 function pad(n: number) {

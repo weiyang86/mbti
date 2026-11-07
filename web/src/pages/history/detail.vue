@@ -2,8 +2,16 @@
   <view class="page detail-page">
     <view v-if="loading" class="state"><text class="state-text">正在读取这份记录…</text></view>
 
+    <view v-else-if="loadError" class="state">
+      <text class="state-text">读取这份记录失败</text>
+      <text class="state-sub">请检查网络后再试一次。</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+      <text class="state-link" @click="backList">回到我的轨迹</text>
+    </view>
+
     <view v-else-if="!result" class="state">
       <text class="state-text">这份记录已不可用</text>
+      <text class="state-sub">请返回轨迹查看仍然保留的记录。</text>
       <view class="btn-secondary mt" @click="backList">回到我的轨迹</view>
     </view>
 
@@ -14,10 +22,11 @@
 
       <view class="private-card">
         <text class="private-badge">🔒 阶段信息仅自己可见</text>
-        <text class="private-title">{{ result.type_code }} 这一章</text>
-        <text class="private-line" v-if="result.life_stage">阶段：{{ result.life_stage }}</text>
-        <text class="private-line" v-if="result.recent_status">最近状态：{{ result.recent_status }}</text>
-        <text class="private-fine">回顾最近四周 · 固定 12 题 · {{ result.question_bank_version }}</text>
+        <text class="private-title">{{ stageTitle }}</text>
+        <text class="private-line" v-if="result.recent_status">
+          最近状态：{{ result.recent_status }}。这些信息不用于自动判断变化原因。
+        </text>
+        <text class="private-fine">{{ privateFine }}</text>
       </view>
 
       <view class="dims" v-if="result.dimension_counts">
@@ -30,10 +39,28 @@
           </view>
           <view class="track"><view class="fill" :style="{ width: d.pct }" /></view>
         </view>
-        <text class="fine">只展示计数分布，不展示原始答题选项。</text>
+        <text class="fine">只展示计数分布，不代表人格强弱。</text>
       </view>
 
-      <view class="compare">
+      <!-- TODO: 待 Remy 确认「历史作答回放」服务端接口；当前仅回放本机保存的作答 -->
+      <view v-if="result.source === 'quiz' && answerRecord" class="answers">
+        <view class="answers-head" @click="showAnswers = !showAnswers">
+          <text class="section">回看当时的 12 个选择</text>
+          <text class="answers-toggle">{{ showAnswers ? '收起 ⌃' : '展开 ⌄' }}</text>
+        </view>
+        <text class="answers-hint">仅自己可见 · 不会出现在分享图或名片中</text>
+        <view v-if="showAnswers" class="answer-list">
+          <view v-for="(item, i) in answerRecord.items" :key="i" class="answer-item">
+            <text class="answer-no">{{ String(i + 1).padStart(2, '0') }}</text>
+            <view class="answer-body">
+              <text class="answer-question">{{ item.question }}</text>
+              <text class="answer-choice">{{ item.answer }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view v-if="result.source === 'quiz'" class="compare">
         <text class="section">与上一次同版本记录比较</text>
 
         <view v-if="compare" class="compare-result">
@@ -76,6 +103,7 @@ import {
 import { updateMyCard } from '@/api/cards'
 import { DECLARATIONS } from '@/constants/types'
 import { listTypes } from '@/api/types-api'
+import { getLocalAnswers, type LocalAnswerRecord } from '@/store/local-answers'
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
@@ -83,16 +111,23 @@ const meta = ref<TypeMeta | null>(null)
 const older = ref<ResultSnapshotSummary | null>(null)
 const compare = ref<CompareResult | null>(null)
 const loading = ref(true)
+const loadError = ref(false)
+const answerRecord = ref<LocalAnswerRecord | null>(null)
+const showAnswers = ref(false)
 
 onLoad((q) => {
   resultId.value = (q?.id as string) || ''
 })
 
-onMounted(async () => {
+onMounted(load)
+
+async function load() {
   if (!resultId.value) {
     loading.value = false
     return
   }
+  loading.value = true
+  loadError.value = false
   try {
     const [snapshot, types, list] = await Promise.all([
       getResult(resultId.value),
@@ -100,30 +135,56 @@ onMounted(async () => {
       listResults({ limit: 50 }),
     ])
     result.value = snapshot
+    answerRecord.value = getLocalAnswers(resultId.value)
     meta.value = types.items.find((t) => t.type_code === snapshot.type_code) || null
     older.value =
-      list.items
-        .filter(
-          (i) =>
-            i.id !== resultId.value &&
-            i.question_bank_version === snapshot.question_bank_version &&
-            i.submitted_at < snapshot.submitted_at,
-        )
-        .sort((a, b) => (a.submitted_at < b.submitted_at ? 1 : -1))[0] || null
+      snapshot.source === 'quiz'
+        ? list.items
+            .filter(
+              (i) =>
+                i.id !== resultId.value &&
+                i.source === 'quiz' &&
+                i.question_bank_version === snapshot.question_bank_version &&
+                i.submitted_at < snapshot.submitted_at,
+            )
+            .sort((a, b) => (a.submitted_at < b.submitted_at ? 1 : -1))[0] || null
+        : null
   } catch {
     result.value = null
+    loadError.value = true
   } finally {
     loading.value = false
   }
-})
+}
 
 const sourceLabel = computed(() =>
   result.value?.source === 'self_select' ? '自行选择' : '趣味测试',
 )
 
-const dateText = computed(() =>
-  result.value ? result.value.submitted_at.replace('T', ' ').slice(0, 16) : '',
-)
+const stageTitle = computed(() => {
+  if (!result.value) return ''
+  return (
+    result.value.life_stage ||
+    (result.value.source === 'self_select' ? '自行选择' : '日常生活')
+  )
+})
+
+const privateFine = computed(() => {
+  if (!result.value) return ''
+  if (!result.value.submitted_at) {
+    return '旧版未固定回顾时间窗，不与新版直接比较。'
+  }
+  if (result.value.source === 'self_select') {
+    return '自行选择类型 · 无答题分布，不参与同版本对比'
+  }
+  return `回顾最近四周 · 固定 12 题 · ${result.value.question_bank_version}`
+})
+
+const dateText = computed(() => {
+  if (!result.value) return ''
+  if (!result.value.submitted_at) return '旧版导入 · 测试日期未知'
+  return result.value.submitted_at.replace('T', ' ').slice(0, 16)
+})
 
 const DIM_LABELS: [string, string, string][] = [
   ['EI', '外向 E', '内向 I'],
@@ -224,6 +285,19 @@ function backList() {
   font-size: 26rpx;
   color: #77727e;
 }
+.state-sub {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #a398af;
+  line-height: 1.6;
+}
+.state-link {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 22rpx;
+  color: #8b8099;
+}
 
 .kicker {
   display: block;
@@ -319,6 +393,62 @@ function backList() {
   margin-top: 14rpx;
   font-size: 20rpx;
   color: #a398af;
+  line-height: 1.6;
+}
+
+.answers-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.answers-toggle {
+  margin-top: 44rpx;
+  font-size: 22rpx;
+  color: #7560df;
+}
+.answers-hint {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: #a398af;
+}
+.answer-list {
+  margin-top: 18rpx;
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+  background: #fff;
+  border: 2rpx solid #e9e5ed;
+}
+.answer-item {
+  display: flex;
+  gap: 18rpx;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f1edf6;
+}
+.answer-item:last-child {
+  border-bottom: none;
+}
+.answer-no {
+  flex: none;
+  font-size: 20rpx;
+  color: #b49aca;
+  line-height: 1.6;
+}
+.answer-body {
+  flex: 1;
+  min-width: 0;
+}
+.answer-question {
+  display: block;
+  font-size: 23rpx;
+  color: #5d5568;
+  line-height: 1.6;
+}
+.answer-choice {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #292630;
   line-height: 1.6;
 }
 
