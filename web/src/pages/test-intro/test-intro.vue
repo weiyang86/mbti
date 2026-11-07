@@ -77,6 +77,7 @@
 
     <view class="footer">
       <view class="btn-primary" :class="{ disabled: submitting }" @click="start">免费开始 · 12 道选择题</view>
+      <text class="quick-link" @click="goSelfSelect">已经知道类型？直接做专属名片 →</text>
       <text class="foot-note">趣味版非官方量表 · 基础结果免费</text>
     </view>
   </view>
@@ -123,6 +124,10 @@ function toggleInterest(value: string) {
     return
   }
   list.push(value)
+}
+
+function goSelfSelect() {
+  uni.navigateTo({ url: '/pages/self-select/self-select' })
 }
 
 function showDemo() {
@@ -195,7 +200,7 @@ async function beginNewTest() {
 <style scoped lang="scss">
 .intro-page {
   padding-top: 24rpx;
-  padding-bottom: 220rpx;
+  padding-bottom: 280rpx;
 }
 
 .demo-strip {
@@ -350,9 +355,17 @@ async function beginNewTest() {
 .footer .btn-primary.disabled {
   opacity: 0.6;
 }
+.quick-link {
+  display: block;
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #7560df;
+  padding: 8rpx 0;
+}
 .foot-note {
   display: block;
-  margin-top: 12rpx;
+  margin-top: 8rpx;
   text-align: center;
   font-size: 20rpx;
   color: #a398af;

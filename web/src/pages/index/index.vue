@@ -83,6 +83,7 @@
       </view>
     </view>
 
+    <text class="demo-fine">V0.4 交互原型 · 人物、订单、推荐与附近人数均为示例</text>
     <text class="foot">MBTI搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
@@ -483,9 +484,18 @@ function showChannels() {
   color: #596d35;
 }
 
-.foot {
+.demo-fine {
   display: block;
   margin-top: 48rpx;
+  text-align: center;
+  font-size: 19rpx;
+  color: #b3a9be;
+  line-height: 1.6;
+}
+
+.foot {
+  display: block;
+  margin-top: 12rpx;
   text-align: center;
   font-size: 20rpx;
   color: #a398af;

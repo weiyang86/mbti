@@ -61,6 +61,7 @@ import {
   loadQuizDraft,
   saveQuizDraft,
 } from '@/store/quiz-draft'
+import { saveLocalAnswers } from '@/store/local-answers'
 
 const DIM_LABELS: Record<Question['dimension'], [string, string]> = {
   EI: ['E', 'I'],
@@ -182,6 +183,14 @@ async function submitAll() {
       life_stage: profile.stage,
       recent_status: profile.recent,
     })
+    saveLocalAnswers(
+      result.id,
+      result.question_bank_version,
+      questions.value.map((q) => ({
+        question: q.prompt,
+        answer: q.options.find((o) => o.id === answers.value[q.id])?.label || '未作答',
+      })),
+    )
     uni.hideLoading()
     clearQuizDraft()
     uni.redirectTo({ url: `/pages/result/result?id=${result.id}` })
