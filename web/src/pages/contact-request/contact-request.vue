@@ -2,6 +2,12 @@
   <view class="page request-page">
     <view v-if="loading" class="state"><text class="state-text">正在读取交换状态…</text></view>
 
+    <view v-else-if="loadError" class="state">
+      <text class="state-text">交换状态读取失败</text>
+      <text class="state-sub">请检查网络后重试。</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+
     <view v-else-if="!buddy || !cardAccepted" class="state">
       <text class="state-text">先互换名片，再决定联系方式</text>
       <text class="state-sub">双方同意交换基础名片后，才开放联系方式申请。</text>
@@ -137,6 +143,7 @@ const granted = ref<GrantedChannel[]>([])
 const selected = ref<ContactChannel[]>([])
 const consent = ref(false)
 const loading = ref(true)
+const loadError = ref(false)
 const busy = ref(false)
 
 onLoad((q) => {
@@ -159,6 +166,7 @@ async function load() {
     return
   }
   loading.value = !buddy.value
+  loadError.value = false
   try {
     const [detail, exchanges, requests, myContacts] = await Promise.all([
       getBuddy(buddyId.value),
@@ -178,6 +186,7 @@ async function load() {
     }
   } catch {
     buddy.value = null
+    loadError.value = true
   } finally {
     loading.value = false
   }

@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'
 import { TYPE_GROUPS, TYPE_NAMES } from '@/constants/types'
 import {
@@ -132,6 +132,11 @@ const introText = computed(() =>
 const tagline = computed(
   () => `${isSame.value ? '同型组合' : '跨型组合'} · ${scene.value} · 按具体维度生成`,
 )
+
+onLoad((q) => {
+  const type = String(q?.type || '').toUpperCase()
+  if (TYPE_NAMES[type]) compareType.value = type
+})
 
 onShow(async () => {
   try {

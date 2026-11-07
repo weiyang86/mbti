@@ -40,8 +40,13 @@
 
     <view v-if="loading" class="state"><text class="state-text">正在找搭子…</text></view>
 
+    <view v-else-if="loadError" class="state">
+      <text class="state-text">搭子列表加载失败</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+
     <view v-else-if="items.length === 0" class="notice">
-      {{ mode === 'same' ? '暂时没有同型的示例搭子，试试推荐搭子。' : '示例搭子都已屏蔽，可以在“我的”中管理屏蔽列表。' }}
+      {{ mode === 'same' ? '暂时没有同型的示例搭子，试试推荐搭子。' : '这一组示例搭子已被屏蔽，可以在“我的”中管理屏蔽列表。' }}
     </view>
 
     <view v-else>
@@ -77,10 +82,14 @@ const myCard = ref<MyCard | null>(null)
 const items = ref<BuddySummary[]>([])
 const mode = ref<'recommend' | 'same'>('recommend')
 const loading = ref(true)
+const loadError = ref(false)
 const pendingCount = ref(0)
 
-onShow(async () => {
+onShow(load)
+
+async function load() {
   loading.value = !items.value.length
+  loadError.value = false
   try {
     myCard.value = await getMyCard()
     const [list, exchanges] = await Promise.all([
@@ -95,15 +104,18 @@ onShow(async () => {
     pendingCount.value = exchanges.items.filter((item) => item.status === 'pending').length
   } catch {
     items.value = []
+    pendingCount.value = 0
+    loadError.value = true
   } finally {
     loading.value = false
   }
-})
+}
 
 async function switchMode(next: 'recommend' | 'same') {
   if (mode.value === next) return
   mode.value = next
   loading.value = true
+  loadError.value = false
   try {
     const list = await listBuddies({
       mode: next,
@@ -113,6 +125,7 @@ async function switchMode(next: 'recommend' | 'same') {
     items.value = list.items
   } catch {
     items.value = []
+    loadError.value = true
   } finally {
     loading.value = false
   }

@@ -2,6 +2,11 @@
   <view class="page public-page">
     <view v-if="loading" class="state"><text class="state-text">正在生成公开预览…</text></view>
 
+    <view v-else-if="loadError" class="state">
+      <text class="state-text">公开名片读取失败</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+
     <view v-else-if="!card || !card.type_code" class="state">
       <text class="state-text">还没有可以公开的名片</text>
       <view class="btn-primary mt" @click="goCard">先去生成名片</view>
@@ -81,6 +86,7 @@ import { currentQuote, styleAsset, studio } from '@/store/studio'
 
 const card = ref<PublicCard | null>(null)
 const loading = ref(true)
+const loadError = ref(false)
 
 const hasVisual = computed(() => Boolean(studio.hasCard))
 const publicName = computed(() => card.value?.nickname || '匿名搭子')
@@ -92,10 +98,12 @@ onShow(() => {
 
 async function load() {
   loading.value = !card.value
+  loadError.value = false
   try {
     card.value = await getPublicCard('card_me')
   } catch {
     card.value = null
+    loadError.value = true
   } finally {
     loading.value = false
   }

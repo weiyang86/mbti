@@ -7,6 +7,11 @@
 
     <view v-if="loading" class="state"><text class="state-text">正在雷达扫描…</text></view>
 
+    <view v-else-if="loadError" class="state">
+      <text class="state-text">同型雷达读取失败</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+
     <template v-else>
       <text class="kicker">SAME TYPE RADAR / 同型雷达</text>
       <text class="title">周边 {{ radiusLabel }}，</text>
@@ -84,6 +89,7 @@ const radius = ref<number>(500)
 const enrolled = ref(false)
 const count = ref<number | null>(null)
 const loading = ref(true)
+const loadError = ref(false)
 
 const radiusLabel = computed(() => radiusText(radius.value))
 
@@ -103,6 +109,7 @@ onShow(() => load())
 
 async function load() {
   loading.value = true
+  loadError.value = false
   try {
     const [card, participation] = await Promise.all([getMyCard(), getRadarParticipation()])
     typeCode.value = card.type_code || 'INFP'
@@ -112,6 +119,7 @@ async function load() {
   } catch {
     enrolled.value = false
     count.value = null
+    loadError.value = true
   } finally {
     loading.value = false
   }

@@ -121,6 +121,7 @@
 
       <view class="contact-entries">
         <view class="contact-entry" @click="goContacts">
+          <text class="entry-icon">⇄</text>
           <view class="entry-main">
             <text class="entry-title">我的联系方式</text>
             <text class="entry-desc">微信 / QQ / 电话 · 交换时逐项授权</text>
@@ -128,6 +129,7 @@
           <text class="entry-arrow">→</text>
         </view>
         <view class="contact-entry" @click="goExchanges">
+          <text class="entry-icon">▣</text>
           <view class="entry-main">
             <text class="entry-title">我的名片夹</text>
             <text class="entry-desc">{{ exchangeCount }} 张已交换 · 查看申请与授权</text>
@@ -224,7 +226,7 @@ async function load() {
   try {
     const [data, exchanges] = await Promise.all([getMyCard(), listCardExchanges()])
     card.value = data
-    exchangeCount.value = exchanges.items.length
+    exchangeCount.value = exchanges.items.filter((item) => item.status === 'accepted').length
   } catch {
     card.value = null
   } finally {
@@ -619,6 +621,11 @@ function showDemo() {
   border-radius: 28rpx;
   padding: 30rpx 32rpx;
   margin-bottom: 20rpx;
+}
+.entry-icon {
+  width: 52rpx;
+  font-size: 28rpx;
+  color: #7560df;
 }
 .entry-main {
   flex: 1;

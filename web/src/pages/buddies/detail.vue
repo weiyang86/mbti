@@ -31,6 +31,9 @@
       <view class="panel">
         <text class="panel-title">{{ buddy.compatibility_hint }}</text>
         <text class="panel-text">{{ hintText }}</text>
+        <text class="textbtn block mt" @click="goCompat">
+          看看 {{ myType }} × {{ buddy.type_code }} 的相处小抄
+        </text>
       </view>
 
       <view class="panel">
@@ -79,6 +82,7 @@ import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import type { BuddyDetail, CardExchange } from '@/api/types-social'
 import { blockBuddy, getBuddy } from '@/api/buddies'
+import { getMyCard } from '@/api/cards'
 import {
   createCardExchange,
   listCardExchanges,
@@ -87,6 +91,7 @@ import {
 } from '@/api/card-exchanges'
 
 const buddyId = ref('')
+const myType = ref('INFP')
 const buddy = ref<BuddyDetail | null>(null)
 const exchange = ref<CardExchange | null>(null)
 const loading = ref(true)
@@ -123,6 +128,12 @@ async function load() {
     ])
     buddy.value = detail
     exchange.value = list.items.find((item) => item.buddy_id === buddyId.value) || null
+    try {
+      const card = await getMyCard()
+      myType.value = card.type_code || detail.type_code
+    } catch {
+      myType.value = detail.type_code
+    }
   } catch {
     buddy.value = null
   } finally {
@@ -179,6 +190,13 @@ function revokeCard() {
 
 function goContactRequest() {
   uni.navigateTo({ url: `/pages/contact-request/contact-request?id=${buddyId.value}` })
+}
+
+function goCompat() {
+  if (!buddy.value) return
+  uni.navigateTo({
+    url: `/pages/compat/compat?type=${buddy.value.type_code}`,
+  })
 }
 
 function report() {

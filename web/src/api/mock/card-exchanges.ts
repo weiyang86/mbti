@@ -17,7 +17,9 @@ async function exchangeWithBuddy(exchange: CardExchange): Promise<CardExchange> 
 export async function listCardExchanges(): Promise<{ items: CardExchange[] }> {
   const items = await Promise.all(
     getSocial()
-      .exchanges.filter((item) => item.status !== 'revoked')
+      .exchanges.filter(
+        (item) => item.status !== 'revoked' && !getSocial().blocked.includes(item.buddy_id),
+      )
       .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
       .map((item) => exchangeWithBuddy(item)),
   )
@@ -30,7 +32,11 @@ export async function createCardExchange(body: { buddy_id: string }): Promise<Ca
     return Promise.reject({ code: 'not_found', message: 'buddy not found' })
   }
   const existing = latestExchange(body.buddy_id)
-  if (existing) return exchangeWithBuddy(existing)
+  if (existing && (existing.status === 'pending' || existing.status === 'accepted')) {
+    return exchangeWithBuddy(existing)
+  }
+  const social = getSocial()
+  social.exchanges = social.exchanges.filter((item) => item.buddy_id !== body.buddy_id)
   const exchange: CardExchange = {
     id: uid('ex'),
     buddy_id: body.buddy_id,

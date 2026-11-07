@@ -14,6 +14,11 @@
       为便于演示，建议填写虚构内容。这些资料只保存在本机 mock 存储中。
     </view>
 
+    <view v-if="loadError" class="notice mt">
+      读取已保存的联系方式失败，当前显示空白表单。请重试后再保存，避免覆盖已有资料。
+    </view>
+    <view v-if="loadError" class="btn-secondary mt" @click="load">重新读取</view>
+
     <view class="contact-form">
       <view class="field">
         <text class="label">微信号 <text class="muted">选填</text></text>
@@ -65,25 +70,33 @@ import { clearContacts, getContacts, updateContacts } from '@/api/contacts'
 
 const returnId = ref('')
 const saving = ref(false)
+const loadError = ref(false)
 const form = reactive<MyContacts>({ wechat: '', qq: '', phone: '' })
 
 onLoad((q) => {
   returnId.value = (q?.id as string) || ''
 })
 
-onShow(async () => {
+onShow(load)
+
+async function load() {
+  loadError.value = false
   try {
     const data = await getContacts()
     form.wechat = data.wechat || ''
     form.qq = data.qq || ''
     form.phone = data.phone || ''
   } catch {
-    /* ignore */
+    loadError.value = true
   }
-})
+}
 
 async function save() {
   if (saving.value) return
+  if (loadError.value) {
+    uni.showToast({ title: '请先重新读取已有资料', icon: 'none' })
+    return
+  }
   saving.value = true
   try {
     await updateContacts({ wechat: form.wechat, qq: form.qq, phone: form.phone })

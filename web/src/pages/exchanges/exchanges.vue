@@ -12,6 +12,11 @@
 
     <view v-if="loading" class="state"><text class="state-text">正在读名片夹…</text></view>
 
+    <view v-else-if="loadError" class="state">
+      <text class="state-text">名片夹加载失败</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+
     <view v-else-if="items.length === 0" class="empty">
       <text class="empty-mark">▣</text>
       <text class="empty-title">名片夹还空着</text>
@@ -46,9 +51,13 @@ import { listContactRequests } from '@/api/contacts'
 const items = ref<CardExchange[]>([])
 const acceptedContactIds = ref<string[]>([])
 const loading = ref(true)
+const loadError = ref(false)
 
-onShow(async () => {
+onShow(load)
+
+async function load() {
   loading.value = !items.value.length
+  loadError.value = false
   try {
     const [exchanges, requests] = await Promise.all([listCardExchanges(), listContactRequests()])
     items.value = exchanges.items
@@ -57,10 +66,12 @@ onShow(async () => {
       .map((item) => item.buddy_id)
   } catch {
     items.value = []
+    acceptedContactIds.value = []
+    loadError.value = true
   } finally {
     loading.value = false
   }
-})
+}
 
 function statusLabel(status: CardExchange['status']) {
   if (status === 'accepted') return '已互换名片'
