@@ -2,6 +2,13 @@
   <view class="page create-page">
     <view v-if="loading" class="state"><text class="state-text">正在读取你的类型…</text></view>
 
+    <view v-else-if="loadError" class="state-empty">
+      <text class="empty-mark">!</text>
+      <text class="empty-title">类型读取失败</text>
+      <text class="empty-desc">请检查网络后重试。</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+
     <view v-else-if="!latestType" class="state-empty">
       <text class="empty-mark">◇</text>
       <text class="empty-title">先有一个 MBTI 类型</text>
@@ -142,21 +149,26 @@ import {
 } from '@/store/studio'
 
 const loading = ref(true)
+const loadError = ref(false)
 const latestType = ref('')
 const photoPath = ref('')
 const photoConsent = ref(false)
 
-onShow(async () => {
+onShow(load)
+
+async function load() {
   loading.value = !latestType.value
+  loadError.value = false
   try {
     const res = await listResults({ limit: 1 })
     latestType.value = res.items[0]?.type_code || ''
   } catch {
     latestType.value = ''
+    loadError.value = true
   } finally {
     loading.value = false
   }
-})
+}
 
 const quoteList = computed(() => quoteOptions(latestType.value))
 const quoteText = computed(() => currentQuote(latestType.value))

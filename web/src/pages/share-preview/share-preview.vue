@@ -195,6 +195,9 @@ async function loadResult() {
   }
   try {
     result.value = await getResult(resultId.value)
+    if (!noteTitle.value) {
+      noteTitle.value = `同样是 ${result.value.type_code}，我也有自己的主角感`
+    }
   } catch {
     result.value = null
   } finally {
