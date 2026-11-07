@@ -73,6 +73,10 @@ const saving = ref(false)
 const loadError = ref(false)
 const form = reactive<MyContacts>({ wechat: '', qq: '', phone: '' })
 
+const WECHAT_RE = /^[a-zA-Z][a-zA-Z0-9_-]{5,19}$/
+const QQ_RE = /^[1-9]\d{4,11}$/
+const PHONE_RE = /^1[3-9]\d{9}$/
+
 onLoad((q) => {
   returnId.value = (q?.id as string) || ''
 })
@@ -91,15 +95,40 @@ async function load() {
   }
 }
 
+function validate(): string {
+  const wechat = (form.wechat || '').trim()
+  const qq = (form.qq || '').trim()
+  const phone = (form.phone || '').trim()
+  if (wechat && !WECHAT_RE.test(wechat)) {
+    return '微信号请填写 6–20 位字母、数字、下划线或短横线，以字母开头'
+  }
+  if (qq && !QQ_RE.test(qq)) {
+    return 'QQ 请填写 5–12 位数字，首位不为 0'
+  }
+  if (phone && !PHONE_RE.test(phone)) {
+    return '请填写 11 位手机号'
+  }
+  return ''
+}
+
 async function save() {
   if (saving.value) return
   if (loadError.value) {
     uni.showToast({ title: '请先重新读取已有资料', icon: 'none' })
     return
   }
+  const error = validate()
+  if (error) {
+    uni.showToast({ title: error, icon: 'none' })
+    return
+  }
   saving.value = true
   try {
-    await updateContacts({ wechat: form.wechat, qq: form.qq, phone: form.phone })
+    await updateContacts({
+      wechat: (form.wechat || '').trim(),
+      qq: (form.qq || '').trim(),
+      phone: (form.phone || '').trim(),
+    })
     uni.showToast({ title: '已保存', icon: 'success' })
     if (returnId.value) {
       setTimeout(() => uni.navigateBack(), 500)
