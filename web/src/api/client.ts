@@ -23,7 +23,7 @@ export class HttpError extends Error {
 
 export async function request<T>(
   path: string,
-  options: UniApp.RequestOptions & { method?: UniApp.RequestOptions['method'] } = {},
+  options: Omit<UniApp.RequestOptions, 'url'> = {},
 ): Promise<T> {
   const url = `${baseURL.replace(/\/$/, '')}${path.startsWith('/') ? path : `/${path}`}`
 
