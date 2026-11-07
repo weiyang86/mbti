@@ -173,7 +173,7 @@
             {{ reviewDate ? '本机计划已保存，不会自动发送提醒。' : '可以隔一段时间或生活阶段变化后再来。' }}
           </text>
           <view class="review-actions">
-            <text class="review-btn" @click="pickReviewPlan">
+            <text class="review-btn" @click="openReviewPlan">
               {{ reviewDate ? '修改计划' : '设定复测计划' }}
             </text>
             <text v-if="reviewDate" class="review-link" @click="exportCalendar">导出日历事项</text>
@@ -191,6 +191,44 @@
         <text class="textbtn" @click="exportHistory">导出我的记录 JSON</text>
       </view>
     </template>
+
+    <!-- 设定复测计划 -->
+    <view v-if="planOpen" class="modal-backdrop" @click="planOpen = false">
+      <view class="plan-sheet" @click.stop>
+        <view class="sheet-handle" />
+        <text class="sheet-close" @click="planOpen = false">✕</text>
+        <text class="sheet-kicker">— MBTI搭子 / V0.4</text>
+        <text class="sheet-title">下一次，什么时候回来？</text>
+        <text class="sheet-desc">
+          可以按阶段回访。时间间隔只是个人安排，不是判断人格变化的科学阈值。
+        </text>
+
+        <view class="plan-chips">
+          <view class="plan-chip" :class="{ active: planChoice === 30 }" @click="choosePreset(30)">
+            <text>30 天后</text>
+          </view>
+          <view class="plan-chip" :class="{ active: planChoice === 90 }" @click="choosePreset(90)">
+            <text>90 天后</text>
+          </view>
+        </view>
+
+        <text class="plan-label">自己选一天</text>
+        <picker mode="date" :value="planDate" :start="planMinDate" @change="onPickDate">
+          <view class="date-row">
+            <text class="date-value">{{ planDateText }}</text>
+            <view class="cal-icon">
+              <view class="cal-dot" />
+              <view class="cal-dot" />
+              <view class="cal-dot" />
+              <view class="cal-dot" />
+            </view>
+          </view>
+        </picker>
+
+        <view class="btn-primary plan-save" @click="saveReviewPlan">保存本机计划</view>
+        <text class="plan-foot">不会发送短信、微信或系统通知；保存后可导出日历事项。</text>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -234,10 +272,16 @@ const demo = ref(false)
 const chartDim = ref<DimKey>('EI')
 const showChartTable = ref(false)
 const reviewDate = ref('')
+const planOpen = ref(false)
+const planChoice = ref<0 | 30 | 90>(0)
+const planDate = ref('')
+const planMinDate = ref('')
 
 const rows = computed<TimelineRow[]>(() =>
   demo.value ? DEMO_RECORDS.slice().reverse() : summaries.value,
 )
+
+const planDateText = computed(() => planDate.value.replaceAll('-', '/'))
 
 const ownVersion = computed(
   () => summaries.value.find((i) => i.source === 'quiz')?.question_bank_version || '',
@@ -404,20 +448,49 @@ function goQuiz() {
   uni.reLaunch({ url: '/pages/index/index' })
 }
 
-function pickReviewPlan() {
-  uni.showActionSheet({
-    itemList: ['30 天后', '90 天后'],
-    success: (res) => {
-      const days = res.tapIndex === 0 ? 30 : 90
-      const target = new Date(Date.now() + days * 86400000)
-      const y = target.getFullYear()
-      const m = String(target.getMonth() + 1).padStart(2, '0')
-      const d = String(target.getDate()).padStart(2, '0')
-      reviewDate.value = `${y}-${m}-${d}`
-      uni.setStorageSync(REVIEW_KEY, reviewDate.value)
-      uni.showToast({ title: '已保存本机计划', icon: 'none' })
-    },
-  })
+function dateToStr(date: Date) {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+function presetOf(date: string): 0 | 30 | 90 {
+  const target = new Date(`${date}T00:00:00`).getTime()
+  const today = new Date(`${dateToStr(new Date())}T00:00:00`).getTime()
+  const days = Math.round((target - today) / 86400000)
+  if (days === 30) return 30
+  if (days === 90) return 90
+  return 0
+}
+
+function openReviewPlan() {
+  planMinDate.value = dateToStr(new Date())
+  if (reviewDate.value) {
+    planDate.value = reviewDate.value
+    planChoice.value = presetOf(reviewDate.value)
+  } else {
+    planDate.value = planMinDate.value
+    planChoice.value = 0
+  }
+  planOpen.value = true
+}
+
+function choosePreset(days: 30 | 90) {
+  planChoice.value = days
+  planDate.value = dateToStr(new Date(Date.now() + days * 86400000))
+}
+
+function onPickDate(e: { detail: { value: number | string } }) {
+  const value = String(e.detail.value || '')
+  if (!value) return
+  planDate.value = value
+  planChoice.value = 0
+}
+
+function saveReviewPlan() {
+  if (!planDate.value) return
+  reviewDate.value = planDate.value
+  uni.setStorageSync(REVIEW_KEY, reviewDate.value)
+  planOpen.value = false
+  uni.showToast({ title: '已保存本机计划', icon: 'none' })
 }
 
 function clearReviewPlan() {
@@ -1023,5 +1096,146 @@ function downloadOrCopy(text: string, filename: string, mime: string) {
 
 .mt {
   margin-top: 36rpx;
+}
+
+.modal-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(43, 33, 51, 0.37);
+  display: flex;
+  align-items: flex-end;
+}
+.plan-sheet {
+  position: relative;
+  width: 100%;
+  background: #f8f7f4;
+  border-radius: 36rpx 36rpx 0 0;
+  padding: 20rpx 36rpx 48rpx;
+  box-sizing: border-box;
+}
+.sheet-handle {
+  width: 64rpx;
+  height: 6rpx;
+  border-radius: 999rpx;
+  background: #d9d2dd;
+  margin: 0 auto 28rpx;
+}
+.sheet-close {
+  position: absolute;
+  top: 28rpx;
+  right: 32rpx;
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #efeaf0;
+  font-size: 26rpx;
+  color: #77727e;
+}
+.sheet-kicker {
+  display: block;
+  font-size: 20rpx;
+  letter-spacing: 2rpx;
+  color: #7560df;
+}
+.sheet-title {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 44rpx;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -1rpx;
+  color: #17141c;
+}
+.sheet-desc {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: #77727e;
+}
+.plan-chips {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 32rpx;
+}
+.plan-chip {
+  flex: 1;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20rpx;
+  border: 2rpx solid #ece7f1;
+  background: #fff;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #292630;
+  box-sizing: border-box;
+}
+.plan-chip.active {
+  border-color: #7560df;
+  background: #f4f0ff;
+  color: #7560df;
+}
+.plan-label {
+  display: block;
+  margin-top: 32rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #292630;
+}
+.date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 96rpx;
+  margin-top: 16rpx;
+  padding: 0 28rpx;
+  border-radius: 20rpx;
+  border: 2rpx solid #ece7f1;
+  background: #fff;
+  box-sizing: border-box;
+}
+.date-value {
+  font-size: 30rpx;
+  color: #292630;
+}
+.cal-icon {
+  width: 34rpx;
+  height: 34rpx;
+  border: 2rpx solid #292630;
+  border-radius: 6rpx;
+  padding: 11rpx 7rpx 5rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-between;
+  justify-content: space-between;
+}
+.cal-dot {
+  width: 4rpx;
+  height: 4rpx;
+  border-radius: 1rpx;
+  background: #292630;
+}
+.plan-save {
+  margin-top: 36rpx;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.plan-foot {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 20rpx;
+  line-height: 1.7;
+  color: #a398af;
 }
 </style>
