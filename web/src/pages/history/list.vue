@@ -1104,7 +1104,7 @@ function downloadOrCopy(text: string, filename: string, mime: string) {
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 1000;
   background: rgba(43, 33, 51, 0.37);
   display: flex;
   align-items: flex-end;
@@ -1114,7 +1114,7 @@ function downloadOrCopy(text: string, filename: string, mime: string) {
   width: 100%;
   background: #f8f7f4;
   border-radius: 36rpx 36rpx 0 0;
-  padding: 20rpx 36rpx 48rpx;
+  padding: 20rpx 36rpx calc(48rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 .sheet-handle {

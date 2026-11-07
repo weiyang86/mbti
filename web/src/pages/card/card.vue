@@ -749,7 +749,7 @@ function showDemo() {
 .asset-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 99;
+  z-index: 1000;
   background: rgba(24, 18, 38, 0.72);
   display: flex;
   align-items: flex-end;
@@ -761,7 +761,7 @@ function showDemo() {
   overflow-y: auto;
   background: #f7f4fb;
   border-radius: 36rpx 36rpx 0 0;
-  padding: 32rpx 32rpx 48rpx;
+  padding: 32rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 .asset-head {
@@ -801,6 +801,10 @@ function showDemo() {
   inset: 0;
   width: 100%;
   height: 100%;
+
+  :deep(div) {
+    background-position: 50% 10% !important;
+  }
 }
 .asset-shade {
   position: absolute;

@@ -494,7 +494,7 @@ function showDemo() {
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 1000;
   background: rgba(43, 33, 51, 0.37);
   display: flex;
   align-items: flex-end;
@@ -503,7 +503,7 @@ function showDemo() {
   width: 100%;
   background: #fff;
   border-radius: 32rpx 32rpx 0 0;
-  padding: 36rpx 32rpx 48rpx;
+  padding: 36rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 .modal-head {
