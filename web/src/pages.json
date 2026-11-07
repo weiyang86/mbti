@@ -7,6 +7,12 @@
       }
     },
     {
+      "path": "pages/test-intro/test-intro",
+      "style": {
+        "navigationBarTitleText": "MBTI 趣味测试"
+      }
+    },
+    {
       "path": "pages/quiz/quiz",
       "style": {
         "navigationBarTitleText": "测一测"
@@ -41,8 +47,106 @@
       "style": {
         "navigationBarTitleText": "记录详情"
       }
+    },
+    {
+      "path": "pages/discover/discover",
+      "style": {
+        "navigationBarTitleText": "换名片"
+      }
+    },
+    {
+      "path": "pages/card/card",
+      "style": {
+        "navigationBarTitleText": "我的名片"
+      }
+    },
+    {
+      "path": "pages/account/account",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages/card/public",
+      "style": {
+        "navigationBarTitleText": "亮名片"
+      }
+    },
+    {
+      "path": "pages/buddies/detail",
+      "style": {
+        "navigationBarTitleText": "搭子名片"
+      }
+    },
+    {
+      "path": "pages/exchanges/exchanges",
+      "style": {
+        "navigationBarTitleText": "名片夹"
+      }
+    },
+    {
+      "path": "pages/contacts/contacts",
+      "style": {
+        "navigationBarTitleText": "交换设置"
+      }
+    },
+    {
+      "path": "pages/contact-request/contact-request",
+      "style": {
+        "navigationBarTitleText": "双向确认"
+      }
+    },
+    {
+      "path": "pages/radar/radar",
+      "style": {
+        "navigationBarTitleText": "同型雷达"
+      }
+    },
+    {
+      "path": "pages/compat/compat",
+      "style": {
+        "navigationBarTitleText": "MBTI 相处小抄"
+      }
     }
   ],
+  "tabBar": {
+    "color": "#77727E",
+    "selectedColor": "#7560DF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "测一测",
+        "iconPath": "static/tab/spark.png",
+        "selectedIconPath": "static/tab/spark-active.png"
+      },
+      {
+        "pagePath": "pages/history/list",
+        "text": "我的轨迹",
+        "iconPath": "static/tab/trail.png",
+        "selectedIconPath": "static/tab/trail-active.png"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "换名片",
+        "iconPath": "static/tab/exchange.png",
+        "selectedIconPath": "static/tab/exchange-active.png"
+      },
+      {
+        "pagePath": "pages/card/card",
+        "text": "我的名片",
+        "iconPath": "static/tab/card.png",
+        "selectedIconPath": "static/tab/card-active.png"
+      },
+      {
+        "pagePath": "pages/account/account",
+        "text": "我的",
+        "iconPath": "static/tab/user.png",
+        "selectedIconPath": "static/tab/user-active.png"
+      }
+    ]
+  },
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "MBTI搭子",
