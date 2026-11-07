@@ -92,5 +92,5 @@ export interface CompareResult {
 export interface SharePreviewResponse {
   preview_url?: string
   job_id?: string
-  status?: 'ready' | 'pending'
+  status: 'ready' | 'pending'
 }

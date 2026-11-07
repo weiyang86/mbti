@@ -19,7 +19,7 @@ export function createQuizSession(body?: { question_bank_version?: string }) {
 
 export function updateQuizSessionAnswers(sessionId: string, answers: Answer[]) {
   if (useMock()) return mock.updateQuizSessionAnswers(sessionId, answers)
-  return request<QuizSession>(`/quiz/sessions/${sessionId}/answers`, {
+  return request<QuizSession>(`/quiz/sessions/${encodeURIComponent(sessionId)}/answers`, {
     method: 'PUT',
     data: { answers },
   })
@@ -30,7 +30,7 @@ export function submitQuizSession(
   body?: { life_stage?: string; recent_status?: string },
 ) {
   if (useMock()) return mock.submitQuizSession(sessionId, body)
-  return request<ResultSnapshot>(`/quiz/sessions/${sessionId}/submit`, {
+  return request<ResultSnapshot>(`/quiz/sessions/${encodeURIComponent(sessionId)}/submit`, {
     method: 'POST',
     data: body,
   })
