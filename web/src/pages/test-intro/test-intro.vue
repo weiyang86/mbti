@@ -70,6 +70,11 @@
       按日常倾向选择即可，偏好会随情境变化。这是原创趣味问卷，不是官方 MBTI 测评或心理诊断。
     </view>
 
+    <view v-if="draftCount" class="draft-card" @click="continueDraft()">
+      <text class="draft-title">已保存 {{ draftCount }} / 12 题，可以继续。</text>
+      <text class="draft-link">继续上次答题 →</text>
+    </view>
+
     <view class="footer">
       <view class="btn-primary" :class="{ disabled: submitting }" @click="start">免费开始 · 12 道选择题</view>
       <text class="foot-note">趣味版非官方量表 · 基础结果免费</text>
@@ -78,8 +83,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { computed, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { createQuizSession } from '@/api/quiz'
 import {
   INTERESTS,
@@ -88,12 +93,22 @@ import {
   loadProfile,
   saveProfile,
 } from '@/store/profile'
+import {
+  clearQuizDraft,
+  loadQuizDraft,
+  quizDraftAnswerCount,
+  saveQuizDraft,
+  type QuizDraft,
+} from '@/store/quiz-draft'
 
 const profile = ref(loadProfile())
 const submitting = ref(false)
+const draft = ref<QuizDraft | null>(null)
+const draftCount = computed(() => quizDraftAnswerCount(draft.value))
 
-onLoad(() => {
+onShow(() => {
   profile.value = loadProfile()
+  draft.value = loadQuizDraft()
 })
 
 function toggleInterest(value: string) {
@@ -119,12 +134,55 @@ function showDemo() {
   })
 }
 
-async function start() {
+function start() {
+  if (submitting.value) return
+  const current = loadQuizDraft()
+  if (current && quizDraftAnswerCount(current) > 0) {
+    uni.showModal({
+      title: '还有一份没完成的记录',
+      content: `已选 ${quizDraftAnswerCount(current)} / 12 题。既有历史仍保留。`,
+      confirmText: '继续这次测试',
+      cancelText: '放弃并重新开始',
+      success: (res) => {
+        if (res.confirm) continueDraft(current)
+        else if (res.cancel) discardDraft()
+      },
+    })
+    return
+  }
+  beginNewTest()
+}
+
+/** 继续本机保存的草稿会话，不新建 session */
+function continueDraft(target?: QuizDraft | null) {
+  const current = target || draft.value
+  if (!current) return
+  saveProfile({ ...profile.value })
+  uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${current.sessionId}` })
+}
+
+/** 放弃未完成进度，重新开一场 */
+function discardDraft() {
+  clearQuizDraft()
+  draft.value = null
+  beginNewTest()
+}
+
+async function beginNewTest() {
   if (submitting.value) return
   submitting.value = true
   saveProfile({ ...profile.value })
   try {
     const session = await createQuizSession()
+    clearQuizDraft()
+    saveQuizDraft({
+      sessionId: session.id,
+      questionBankVersion: session.question_bank_version,
+      answers: {},
+      index: 0,
+      updatedAt: new Date().toISOString(),
+    })
+    draft.value = loadQuizDraft()
     uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${session.id}` })
   } catch {
     uni.showToast({ title: '无法开始测验', icon: 'none' })
@@ -255,6 +313,26 @@ async function start() {
   font-size: 22rpx;
   color: #77727e;
   line-height: 1.6;
+}
+
+.draft-card {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid #d9cef5;
+  background: #f7f3ff;
+}
+.draft-title {
+  display: block;
+  font-size: 24rpx;
+  color: #4b3d77;
+}
+.draft-link {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #7560df;
 }
 
 .footer {

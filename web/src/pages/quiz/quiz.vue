@@ -56,6 +56,11 @@ import {
   updateQuizSessionAnswers,
 } from '@/api/quiz'
 import { HttpError } from '@/api/client'
+import {
+  clearQuizDraft,
+  loadQuizDraft,
+  saveQuizDraft,
+} from '@/store/quiz-draft'
 
 const DIM_LABELS: Record<Question['dimension'], [string, string]> = {
   EI: ['E', 'I'],
@@ -65,6 +70,7 @@ const DIM_LABELS: Record<Question['dimension'], [string, string]> = {
 }
 
 const sessionId = ref('')
+const version = ref('')
 const questions = ref<Question[]>([])
 const currentIndex = ref(0)
 const answers = ref<Record<string, string>>({})
@@ -83,12 +89,34 @@ async function load() {
   loading.value = true
   try {
     const payload = await getCurrentQuizVersion()
+    version.value = payload.question_bank_version
     questions.value = payload.questions
+    restoreDraft()
   } catch {
     questions.value = []
   } finally {
     loading.value = false
   }
+}
+
+/** 同一 session 的本地草稿：恢复已答题目与当前题号 */
+function restoreDraft() {
+  const draft = loadQuizDraft()
+  if (!draft || draft.sessionId !== sessionId.value) return
+  answers.value = { ...draft.answers }
+  const max = Math.max(questions.value.length - 1, 0)
+  currentIndex.value = Math.min(Math.max(draft.index, 0), max)
+}
+
+function persistDraft(index: number) {
+  if (!sessionId.value) return
+  saveQuizDraft({
+    sessionId: sessionId.value,
+    questionBankVersion: version.value,
+    answers: { ...answers.value },
+    index,
+    updatedAt: new Date().toISOString(),
+  })
 }
 
 const question = computed<Question | undefined>(() => questions.value[currentIndex.value])
@@ -114,6 +142,7 @@ function pick(optionId: string) {
   answers.value[qid] = optionId
 
   const isLast = currentIndex.value === questions.value.length - 1
+  persistDraft(isLast ? currentIndex.value : currentIndex.value + 1)
   if (!isLast) {
     currentIndex.value += 1
     persistOne(qid, optionId)
@@ -154,10 +183,12 @@ async function submitAll() {
       recent_status: profile.recent,
     })
     uni.hideLoading()
+    clearQuizDraft()
     uni.redirectTo({ url: `/pages/result/result?id=${result.id}` })
   } catch (e) {
     uni.hideLoading()
     if (e instanceof HttpError && e.status === 409) {
+      clearQuizDraft()
       uni.showToast({ title: '这场测验已提交，去记录里看', icon: 'none' })
       setTimeout(() => uni.reLaunch({ url: '/pages/history/list' }), 800)
       return
@@ -171,6 +202,7 @@ async function submitAll() {
 function prev() {
   if (submitting.value || currentIndex.value === 0) return
   currentIndex.value -= 1
+  persistDraft(currentIndex.value)
 }
 
 function goHome() {

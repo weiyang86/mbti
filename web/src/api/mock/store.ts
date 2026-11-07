@@ -26,7 +26,7 @@ function loadState(): MockState {
     const raw = uni.getStorageSync(STORAGE_KEY)
     if (raw && typeof raw === 'object') {
       return {
-        sessions: {},
+        sessions: raw.sessions && typeof raw.sessions === 'object' ? raw.sessions : {},
         results: Array.isArray(raw.results) ? raw.results : [],
       }
     }
@@ -36,8 +36,15 @@ function loadState(): MockState {
   return { sessions: {}, results: [] }
 }
 
-function saveResults(results: ResultSnapshot[]) {
-  uni.setStorageSync(STORAGE_KEY, { results })
+function saveState() {
+  try {
+    uni.setStorageSync(STORAGE_KEY, {
+      sessions: state.sessions,
+      results: state.results,
+    })
+  } catch {
+    /* ignore */
+  }
 }
 
 let state = loadState()
@@ -68,6 +75,7 @@ export function createQuizSession(body?: { question_bank_version?: string }): Pr
     updated_at: new Date().toISOString(),
   }
   state.sessions[session.id] = session
+  saveState()
   return Promise.resolve({ ...session })
 }
 
@@ -86,6 +94,7 @@ export function updateQuizSessionAnswers(
   answers.forEach((a) => map.set(a.question_id, a))
   session.answers = Array.from(map.values())
   session.updated_at = new Date().toISOString()
+  saveState()
   return Promise.resolve({ ...session })
 }
 
@@ -122,7 +131,7 @@ export function submitQuizSession(
     session_id: session.id,
   }
   state.results = [snapshot, ...state.results]
-  saveResults(state.results)
+  saveState()
   return Promise.resolve({ ...snapshot })
 }
 
@@ -149,7 +158,7 @@ export function getResult(id: string) {
 
 export function deleteResult(id: string) {
   state.results = state.results.filter((r) => r.id !== id)
-  saveResults(state.results)
+  saveState()
   return Promise.resolve(undefined)
 }
 
@@ -200,7 +209,7 @@ export function createSelfSelectResult(body: {
     recent_status: body.recent_status,
   }
   state.results = [snapshot, ...state.results]
-  saveResults(state.results)
+  saveState()
   return Promise.resolve({ ...snapshot })
 }
 
