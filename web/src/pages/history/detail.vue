@@ -54,6 +54,7 @@
 
       <view class="actions">
         <view class="btn-primary" @click="goShare">去晒成一张图</view>
+        <view class="btn-secondary mt" @click="confirmUseRecord">用这次类型更新名片</view>
         <view class="btn-secondary mt danger" @click="confirmDelete">删除这份记录</view>
       </view>
 
@@ -72,6 +73,8 @@ import {
   getResult,
   listResults,
 } from '@/api/results'
+import { updateMyCard } from '@/api/cards'
+import { DECLARATIONS } from '@/constants/types'
 import { listTypes } from '@/api/types-api'
 
 const resultId = ref('')
@@ -153,6 +156,28 @@ async function runCompare() {
   } catch {
     uni.showToast({ title: '对比失败，请稍后再试', icon: 'none' })
   }
+}
+
+function confirmUseRecord() {
+  if (!result.value) return
+  uni.showModal({
+    title: '把这次类型用于名片？',
+    content: `名片类型将更新为 ${result.value.type_code}。不会公开你的历史、阶段标签、近期状态或具体回答。`,
+    confirmText: '确认更新类型',
+    success: async (res) => {
+      if (!res.confirm || !result.value) return
+      try {
+        await updateMyCard({
+          type_code: result.value.type_code,
+          declaration: DECLARATIONS[result.value.type_code],
+        })
+        uni.showToast({ title: '已更新名片类型', icon: 'none' })
+        setTimeout(() => uni.switchTab({ url: '/pages/card/card' }), 600)
+      } catch {
+        uni.showToast({ title: '更新失败，请稍后再试', icon: 'none' })
+      }
+    },
+  })
 }
 
 function confirmDelete() {

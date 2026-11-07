@@ -4,9 +4,15 @@
     <text class="title">把四个字母，<text class="hl">做成你的专属形象。</text></text>
     <text class="sub">选好类型，就能看你的朋友圈成图效果。这里使用你自选的类型，不会伪造测评成绩。</text>
 
+    <view class="field">
+      <text class="label">名片昵称</text>
+      <input class="input" v-model="profile.name" maxlength="12" placeholder="例如：小禾" />
+    </view>
+
     <view v-if="loading" class="state"><text class="state-text">正在加载 16 型…</text></view>
 
     <view v-else>
+      <text class="label type-label">我的 MBTI 类型</text>
       <view v-for="g in groups" :key="g.label" class="group">
         <text class="group-label">{{ g.label }}</text>
         <view class="grid">
@@ -19,6 +25,21 @@
           >
             <text class="code">{{ t.type_code }}</text>
             <text class="name">{{ t.name_zh }}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="field">
+        <text class="label">最近喜欢什么？ <text class="muted">选填 · 最多 3 项</text></text>
+        <view class="chips">
+          <view
+            v-for="i in INTERESTS"
+            :key="i"
+            class="chip"
+            :class="{ sel: profile.interests.includes(i) }"
+            @click="toggleInterest(i)"
+          >
+            <text>{{ i }}</text>
           </view>
         </view>
       </view>
@@ -38,6 +59,7 @@ import { onMounted, ref } from 'vue'
 import type { TypeMeta } from '@/api/types'
 import { listTypes } from '@/api/types-api'
 import { createSelfSelectResult } from '@/api/results'
+import { INTERESTS, loadProfile, saveProfile } from '@/store/profile'
 
 const GROUP_DEFS: { label: string; codes: string[] }[] = [
   { label: '分析家', codes: ['INTJ', 'INTP', 'ENTJ', 'ENTP'] },
@@ -49,8 +71,23 @@ const GROUP_DEFS: { label: string; codes: string[] }[] = [
 const metas = ref<TypeMeta[]>([])
 const groups = ref<{ label: string; items: TypeMeta[] }[]>([])
 const selected = ref('INFP')
+const profile = ref(loadProfile())
 const loading = ref(true)
 const submitting = ref(false)
+
+function toggleInterest(value: string) {
+  const list = profile.value.interests
+  const idx = list.indexOf(value)
+  if (idx >= 0) {
+    list.splice(idx, 1)
+    return
+  }
+  if (list.length >= 3) {
+    uni.showToast({ title: '最多选 3 项', icon: 'none' })
+    return
+  }
+  list.push(value)
+}
 
 onMounted(async () => {
   try {
@@ -72,6 +109,7 @@ onMounted(async () => {
 async function confirm() {
   if (submitting.value) return
   submitting.value = true
+  saveProfile({ ...profile.value })
   try {
     const snapshot = await createSelfSelectResult({
       type_code: selected.value,
@@ -120,6 +158,54 @@ function goHome() {
   font-size: 24rpx;
   color: #77727e;
   line-height: 1.6;
+}
+
+.field {
+  margin-top: 36rpx;
+}
+.label {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #292630;
+}
+.type-label {
+  margin-top: 44rpx;
+}
+.muted {
+  font-size: 20rpx;
+  color: #a398af;
+  font-weight: 400;
+}
+.input {
+  margin-top: 16rpx;
+  height: 88rpx;
+  background: #fff;
+  border: 2rpx solid #ece8f3;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #292630;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+.chip {
+  padding: 14rpx 26rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #ece8f3;
+  background: #fff;
+  font-size: 24rpx;
+  color: #77727e;
+}
+.chip.sel {
+  border-color: #7560df;
+  background: #f1ecfb;
+  color: #7560df;
+  font-weight: 600;
 }
 
 .state {
