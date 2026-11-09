@@ -110,6 +110,7 @@ try {
   const reverse=await create("B","A",["qq"]);await absent("B",reverse.id,"reverse not autoaccepted");await respond("A",reverse.id);g=await grant("B",reverse.id);ok("reverse exact QQ grant independent",g.channels.length===1&&g.channels[0].channel==="qq"&&g.channels[0].value===s.contacts.A.qq);
   await revoke("B",p.id);await revoke("A",p.id);await absent("A",p.id,"recipient revoke immediate");await grant("B",reverse.id);await revoke("B",reverse.id);
   p=await create("A","B");await revoke("A",p.id);await revoke("B",p.id);await absent("A",p.id,"sender pending cancel");
+  p=await create("A","B");await revoke("B",p.id);await revoke("B",p.id);await absent("A",p.id,"recipient pending revoke");
   p=await create("A","B");await respond("B",p.id,"decline");await absent("A",p.id,"declined no grant");await revoke("A",p.id,409);s.invalid.push(p.id);
   p=await accepted();await revoke("A",p);await absent("A",p,"sender accepted revoke");s.invalid.push(p);
   const parallel=await Promise.all(Array.from({length:8},()=>req("A","POST","/contact-requests",{buddy_id:s.cards.B,channels:["phone","wechat"]},[200,201],"parallel directed create")));

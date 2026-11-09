@@ -34,3 +34,9 @@ F4 canonical pair advisory transaction lock 原实现保留并供 F5 共用。F5
 ## 发布前仍待审核
 
 候选格式范围、渠道命名、本人替换语义、撤回范围、公开名片作为授权前置、guest 到期后的资料留存、孤立对象 GC 与正式 HTTP 发布仍需负责人审核。本轮内部选择已授权执行，不据此阻塞验证。跨物理设备、微信、生产多实例负载和真实联系渠道均不是本后端 Worker 的验收范围；Web GUI 证据由另一 Writer 提供。
+
+## test 预览布局兼容
+
+最初 READY 的短暂预览使用适配器 flat objects；Web 已在该布局通过原 A/B 保存合成渠道。切换 owner namespace 前，在总控确认 Web 无 in-flight 的窗口执行 `scripts/mbti/migrate-f5-test-storage.mjs`：testContext 核验 owner/container/marker/55437，在相同 owner advisory 锁内读取当前引用，复用原适配器校验原文件权限/无 symlink/长度/checksum，复制到 owner namespace。已存在目标只校验不覆盖；引用、epoch、时间及原文件不变，失败不清引用、不删除原对象。该脚本仅支持受保护 test，不是 dev/生产迁移命令。
+
+本轮实际兼容结果：copied=2、already_compatible=0、references_unchanged=true、all_integrity_passed=true、original_objects_retained=true；不输出内部 key 或渠道值。Web 原 profile 的本人同值、C 空与旧授权拒绝由总控复核。
