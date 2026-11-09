@@ -1786,6 +1786,7 @@ model MbtiGuest {
   results   MbtiResult[]
   orders    MbtiOrder[]
   card      MbtiCard?
+  radarParticipation MbtiRadarParticipation?
   contacts MbtiPrivateContacts?
   contactRequestsSent MbtiContactRequest[] @relation("MbtiContactSender")
   contactRequestsReceived MbtiContactRequest[] @relation("MbtiContactRecipient")
@@ -1943,6 +1944,15 @@ model MbtiPrivateContacts {
   objectKey String? @unique
   checksum String?
   size Int @default(0)
+  updatedAt DateTime @updatedAt
+  owner MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+}
+
+// F6 internal candidate: current choice only; no location, type, block or contact copy.
+model MbtiRadarParticipation {
+  ownerId String @id
+  enrolled Boolean @default(false)
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   owner MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
 }

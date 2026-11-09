@@ -10,6 +10,8 @@ import { MbtiOrdersService } from "./mbti-orders.service";
 import { MbtiOrdersAdminController, MbtiOrdersController } from "./mbti-orders.controller";
 import { MbtiSocialController } from "./mbti-social.controller";
 import { MbtiSocialService } from "./mbti-social.service";
+import { MbtiRadarController } from "./mbti-radar.controller";
+import { MbtiRadarService } from "./mbti-radar.service";
 import { RbacModule } from "../rbac/rbac.module";
 import { AuthModule } from "../auth/auth.module";
 import { loadRuntimeEnvironment, readApplicationEnvironment } from "../../../../scripts/runtime-environment.cjs";
@@ -35,9 +37,9 @@ export class MbtiModule {
     }
     return { module: MbtiModule,
       imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule] : []), ...(secret ? [PluginRuntimeAccessModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController] : []),
+      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiSocialService, MbtiContactsService, MbtiContactStorage, ...(secret ? [
+      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },
         { provide: PAYMENT_CREDENTIAL_RESOLVER, useValue: { async resolve(reference: string) {
           if (reference !== "test-only:mbti-f3-payment") throw new Error("Controlled fixture credential rejected");
