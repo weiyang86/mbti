@@ -13,6 +13,10 @@
       <view class="btn-secondary mt" @click="goHistory">阶段记录</view>
       <view class="btn-secondary mt" @click="goCatalog">商品目录</view>
       <view class="btn-secondary mt" @click="goOrders">我的订单与权益</view>
+      <view class="btn-secondary mt" @click="goCard">我的名片</view>
+      <view class="btn-secondary mt" @click="goDiscover">发现搭子</view>
+      <view class="btn-secondary mt" @click="goExchanges">我的名片夹</view>
+      <view class="btn-secondary mt" @click="goBlocked">屏蔽管理</view>
     </view>
 
     <text v-if="latest" class="muted foot">最近结果：{{ latest.type_code }}</text>
@@ -123,6 +127,10 @@ function goHistory() {
 
 function goCatalog() { uni.navigateTo({ url: '/pages/pricing/pricing' }) }
 function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
+function goCard() { uni.navigateTo({ url: '/pages/card/card' }) }
+function goDiscover() { uni.navigateTo({ url: '/pages/discover/discover' }) }
+function goExchanges() { uni.navigateTo({ url: '/pages/exchanges/exchanges' }) }
+function goBlocked() { uni.navigateTo({ url: '/pages/buddies/blocked' }) }
 </script>
 
 <style scoped lang="scss">

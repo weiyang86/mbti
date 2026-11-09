@@ -1,0 +1,23 @@
+.social-page {
+  .heading { display: block; font-size: 40rpx; font-weight: 700; margin-bottom: 20rpx; }
+  .section { display: block; font-size: 30rpx; font-weight: 600; margin: 28rpx 0 16rpx; }
+  .line { display: block; line-height: 1.7; margin-top: 12rpx; overflow-wrap: anywhere; white-space: pre-wrap; }
+  .notice { display: block; color: #77727e; font-size: 24rpx; line-height: 1.7; margin: 20rpx 0; }
+  .error { display: block; color: #a43b3b; line-height: 1.7; margin: 20rpx 0; }
+  .success { display: block; color: #286747; margin: 20rpx 0; }
+  .mt { margin-top: 24rpx; }
+  .row { display: flex; align-items: center; gap: 16rpx; flex-wrap: wrap; }
+  .row > button { flex: 1; min-width: 180rpx; }
+  .field { display: block; margin: 24rpx 0 12rpx; font-weight: 600; }
+  input, textarea { box-sizing: border-box; width: 100%; background: white; border: 1px solid #dcd2f5; border-radius: 16rpx; padding: 20rpx; font-size: 28rpx; }
+  input { height: 88rpx; }
+  textarea { min-height: 160rpx; }
+  .type-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12rpx; }
+  .type-grid button { padding: 16rpx 4rpx; font-size: 24rpx; }
+  .type-code { display: block; font-size: 64rpx; color: #7560df; font-weight: 700; }
+  .tag { display: inline-block; padding: 8rpx 14rpx; border-radius: 12rpx; background: #eee9ff; margin: 12rpx 12rpx 0 0; font-size: 24rpx; }
+  .card { margin-top: 24rpx; }
+  button { width: 100%; line-height: 1.5; margin-left: 0; margin-right: 0; }
+  button::after { border: 0; }
+  button[disabled] { opacity: .6; }
+}
