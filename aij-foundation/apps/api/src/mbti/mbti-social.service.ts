@@ -222,6 +222,11 @@ export class MbtiSocialService {
         const target = await this.cardById(tx, body.buddy_id as string);
         await this.pairLock(tx, ownerId, target.ownerId);
         await this.requireVisible(tx, ownerId, await this.cardById(tx, target.id));
+        // Both participants must be readable before any new/retried pending is returned.
+        // Do not lazily create a sender here: opting in is an explicit cards/me action.
+        const sender = await tx.mbtiCard.findUnique({ where: { ownerId } });
+        if (!sender) missing();
+        await this.requireVisible(tx, target.ownerId, sender);
         if (target.ownerId === ownerId) invalid();
         const active = await tx.mbtiCardExchange.findFirst({ where: { pairKey: pairKey(ownerId, target.ownerId), status: { in: ["pending", "accepted"] } } });
         if (active) {

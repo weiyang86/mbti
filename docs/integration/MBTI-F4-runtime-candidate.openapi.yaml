@@ -20,7 +20,8 @@
     "U10: either active block hides public/detail/discovery/exchange lists and denies new/respond/revoke with 404. Block revokes pending/accepted atomically. Unblock does not revive. Active/history lastBlockedAt retained internally. Management block/unblock uses known public card ID without sensitive projection and can handle reverse-blocked/private target; self=422/unknown=404. Block=200 true, unblock=204 idempotent. Own active blocked list contains only safe ID + anonymous management label; type/name/interests not exposed.",
     "U11: F5/F6 not implemented; no contacts/grants/location/fake counts. Expired guest retention and final release policy remain needs_human_review.",
     "U12: candidate statuses 200 GET/PUT/block/respond, 201 first exchange/200 retry, 204 DELETE; 401 auth, 404 unknown/invisible/third, 409 role/state, 422 input, parser 400. Bare objects + existing {code,message}; ISO UTC timestamps; no-store. Queries other than documented keys rejected. Bodyless operations reject nonempty body.",
-    "PublicCard/Buddy/Exchange embed target only if discoverable and no bidirectional block, even when observer is target owner. Exchanges list only participants. No Prisma serialization, owners/credentials/private results never public."
+    "PublicCard/Buddy/Exchange embed target only if discoverable and no bidirectional block, even when observer is target owner. Exchanges list only participants. No Prisma serialization, owners/credentials/private results never public.",
+    "Coordinator follow-up: create/retry requires BOTH sender and target to already have a legal type and discoverable=true, rechecked under the canonical pair lock. Missing sender card, empty type or private sender returns the same visibility 404 and creates no pending. Explicit publish then allows 201/200; a hidden sender cannot create an unreachable incoming request."
   ],
   "servers": [
     {
@@ -811,7 +812,8 @@
               }
             }
           }
-        }
+        },
+        "description": "Both participants require an existing legal typed, discoverable card under the pair lock; unknown/private/untyped sender or target returns 404, without creating an unreachable pending."
       }
     },
     "/card-exchanges/{id}/respond": {
