@@ -7,8 +7,8 @@
   },
   "servers": [
     {
-      "url": "http://192.168.0.200:4056/api/v1",
-      "description": "实际开发环境；局域网地址，跨设备可达性待验证"
+      "url": "https://mbti-dev.bestshizhongyu.com/api/v1",
+      "description": "HTTPS 公网开发联调环境"
     }
   ],
   "tags": [

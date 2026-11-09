@@ -6,16 +6,16 @@
 
 | 项目 | 实际地址/版本 |
 | --- | --- |
-| 完整 API 基址 | **http://192.168.0.200:4056/api/v1** |
-| H5 首页 | **http://192.168.0.200:5173/#/** |
-| HTML 接口文档 | **http://192.168.0.200:5173/api-docs/**；[离线文件与构建说明](../api-reference/README.md) |
-| 汇总 OpenAPI | http://192.168.0.200:5173/api-docs/openapi.json；[仓内文件](../api-reference/openapi.json) |
-| 业务探活 | http://192.168.0.200:4056/api/v1/health |
-| 宿主含数据库就绪 | http://192.168.0.200:4056/api/ready |
+| 完整 API 基址 | **https://mbti-dev.bestshizhongyu.com/api/v1** |
+| H5 首页 | **https://mbti-dev.bestshizhongyu.com/#/** |
+| HTML 接口文档 | **https://mbti-dev.bestshizhongyu.com/api-docs/**；[离线文件与构建说明](../api-reference/README.md) |
+| 汇总 OpenAPI | https://mbti-dev.bestshizhongyu.com/api-docs/openapi.json；[仓内文件](../api-reference/openapi.json) |
+| 业务探活 | https://mbti-dev.bestshizhongyu.com/api/v1/health |
+| 宿主含数据库就绪 | https://mbti-dev.bestshizhongyu.com/api/ready |
 | 题库 | `qb-v0.4-prototype-1`，12题、四维各3题；旧教学版本保留 |
-| Web 配置 | `VITE_USE_MOCK=false`，`VITE_API_BASE_URL=http://192.168.0.200:4056/api/v1` |
+| Web 配置 | `VITE_USE_MOCK=false`，`VITE_API_BASE_URL=https://mbti-dev.bestshizhongyu.com/api/v1`；同源可用 `/api/v1` |
 
-开发主机通过 LAN 地址实测，API/H5 监听 `0.0.0.0`；实习生另一物理设备和微信端仍待验证，设备须能路由到开发主机。本轮未建立公网入口。主机、专用 PostgreSQL 和 H5 服务保持在线。
+联调统一使用上述HTTPS域名，公网服务器已部署本批API/H5；`/api-docs/`由Nginx直接提供，避免H5回退成首页。公网服务器与本机LAN使用独立数据库及游客身份，旧LAN凭证和结果ID不能混用；各浏览器在域名环境领取自己的凭证。域名专项实测见 [域名交付](MBTI-DOMAIN-ACCESS-DELIVERY.md)，实习生另一物理设备与微信端仍待实际反馈。此前LAN验收和原身份重启证据保留于各批回执，供历史复核。
 
 首次调用 `POST /auth/guest`，201 返回 `{guest_token,expires_at}`；后续带 `X-Guest-Token`。每个浏览器独立持有并刷新复用，当前请求层会合并并发初始化；401 明确处理失效，不静默换号或重放写操作。响应为裸业务对象，错误为 `{code,message}`。当前 H5 可从首页直接完成测评、自选、历史/分享、订单、名片/交换、联系方式授权和参与选择。
 
@@ -32,11 +32,11 @@ HTML 文档覆盖下方41个操作，支持按模块/方法/可用状态筛选�
 在仓根复测（专用开发库，脚本会新建合成游客/结果）：
 
 ```sh
-python3 docs/integration/fastlane/smoke.py --base http://192.168.0.200:4056/api/v1 --phase F1
-python3 docs/integration/fastlane/smoke.py --base http://192.168.0.200:4056/api/v1 --phase F2
+python3 docs/integration/fastlane/smoke.py --base https://mbti-dev.bestshizhongyu.com/api/v1 --phase F1
+python3 docs/integration/fastlane/smoke.py --base https://mbti-dev.bestshizhongyu.com/api/v1 --phase F2
 ```
 
-F2 包含 F1。总控在实际开发地址运行原输入包的同字节脚本已通过；最终 F2 两结果为 `63b760eb-e3a4-4193-bfa2-678dc65a511f` / `3ff6ceca-d4c5-4a89-bf71-2a509c2e5743`，B列表为空、跨用户404、并发交卷201/409，真实分享图片和比较/删除通过。原 H5 两次 ESTJ/INFP 结果在历次 API 重启后仍可读，详见 F1/F6 回执。
+F2 包含 F1。此前LAN实测的最终 F2 两结果为 `63b760eb-e3a4-4193-bfa2-678dc65a511f` / `3ff6ceca-d4c5-4a89-bf71-2a509c2e5743`，B列表为空、跨用户404、并发交卷201/409，真实分享图片和比较/删除通过。原LAN H5 两次 ESTJ/INFP 结果在历次 API 重启后仍可读，详见 F1/F6 回执；不把这些ID当作公网服务器的验收证据。
 
 ## 批次验收与边界
 
@@ -56,7 +56,7 @@ F2 包含 F1。总控在实际开发地址运行原输入包的同字节脚本�
 
 F3 同号测试订单 **`MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804`**：990 CNY分、pending、未解锁。运营通过现有 Foundation 登录/RBAC 读取 `/api/admin/mbti/orders/{id}` 为200；匿名/游客401、无权限管理员403、他人游客业务订单404，dev合成支付入口404。运营凭证只在开发主机忽略的私密配置，未放入仓库或交接包。
 
-## 运行和后续输入
+## 本机LAN保留环境和后续输入
 
 当前源码/独立构建树：`/Users/lei/orca/workspaces/mbti/mbti-web-api-fast-integration`。专用 PG/秘密 owner：`/Users/lei/orca/workspaces/mbti/mbti-web-api-f1/aij-foundation`；dev仅回环55436、test仅回环55437，容器/卷/角色/marker分别隔离。不要清理该owner及持久卷来重建环境。当前dev已有43个迁移。
 
