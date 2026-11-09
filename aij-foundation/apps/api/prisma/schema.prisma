@@ -1774,3 +1774,59 @@ model AiPersonalDocumentRunOrigin {
   @@index([documentId,documentRevision,runId],map:"document_run_origin_document_idx")
   @@map("ai_personal_document_run_origin")
 }
+
+// MBTI business identities are independent guests; opaque credentials are stored only as digests.
+model MbtiGuest {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  sessions  MbtiQuizSession[]
+  results   MbtiResult[]
+}
+
+model MbtiQuestionBank {
+  version   String @id
+  payload   Json
+  scoring   Json
+  createdAt DateTime @default(now())
+  sessions  MbtiQuizSession[]
+}
+
+model MbtiQuizSession {
+  id          String @id @default(uuid())
+  ownerId     String
+  bankVersion String
+  status      String @default("in_progress")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  owner       MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  bank        MbtiQuestionBank @relation(fields: [bankVersion], references: [version], onDelete: NoAction, onUpdate: NoAction)
+  answers     MbtiAnswer[]
+  result      MbtiResult?
+  @@index([ownerId, createdAt, id])
+}
+
+model MbtiAnswer {
+  sessionId  String
+  questionId String
+  optionId   String
+  session    MbtiQuizSession @relation(fields: [sessionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  @@id([sessionId, questionId])
+}
+
+model MbtiResult {
+  id              String @id @default(uuid())
+  ownerId         String
+  sessionId       String? @unique
+  source          String
+  typeCode        String
+  bankVersion     String
+  dimensionCounts Json?
+  lifeStage       String?
+  recentStatus    String?
+  submittedAt     DateTime @default(now())
+  owner           MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  session         MbtiQuizSession? @relation(fields: [sessionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  @@index([ownerId, submittedAt(sort: Desc), id(sort: Desc)])
+}
