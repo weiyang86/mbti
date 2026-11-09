@@ -39,33 +39,35 @@ VITE_USE_MOCK=false VITE_API_BASE_URL=http://127.0.0.1:4156/api/v1 npm run dev:h
 
 ## 真实 HTTP 与页面证据
 
-**F3 真实页面验收：NOT_RUN。** 收尾时尚未收到总控的 F3 路由 ready 通知；按总控指令先交可审查候选，后续由总控接续。没有 F3 成功订单号或真实拒绝状态可报告，22 项测试是隔离请求测试，不能作为真实交易链路成功证据。
+**F3 五项真实页面链路已验。** 代码先按总控要求提交为 `5049150bae8719f5fb9398bef943d9818d33fa3e`；收尾期间收到明确 F3 ready 后继续原 Task，完成以下实际页面验收。本次后续提交只补证据文档，22 项隔离测试与真实 HTTP 证据分开记录。
 
 | 实际验收项 | 状态 |
 | --- | --- |
-| 商品目录 200 与两个 SKU 的真实页面展示 | NOT_RUN |
-| 页面 POST orders 201、服务端金额/币种、持久订单号 | NOT_RUN |
-| 网络丢失响应后刷新/重试同意图 201 原单 | NOT_RUN（隔离测试通过） |
-| 页面同号 GET 状态 200、pending/unlocked=false、无可用支付通道 | NOT_RUN |
-| 本人订单列表/权益状态 200，另一游客空列表及跨人订单 404 | NOT_RUN |
-| 真实 401 不换号、不重放，409/422/503 可见拒绝 | NOT_RUN（隔离测试通过） |
-| 最终 LAN HTTP 源的键生成与请求预检、手机尺寸截图 | NOT_RUN（无 randomUUID/无 crypto 的键格式已由隔离测试覆盖） |
+| 商品目录 200 与两个 SKU 的真实页面展示 | 从 A 结果页实际点击进入商品，GET products 与 results 200；tier1 显示 CNY 9.90，可创建测试单；tier2 显示 CNY 19.90 及 FULFILLMENT_UNCONFIGURED，按钮禁用。价格均来自响应 |
+| 页面 POST orders 201、服务端金额/币种、持久订单号 | 实际点击确认/创建，POST 201；订单 `MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7`，金额 990 分 CNY，pricing_mode=controlled_test_fixture；真实列表响应无 pay_params/paid_at |
+| 同意图再次下单、刷新 | 从同一 A profile 重新打开相同结果/商品确认页并再次点击创建，第二次 POST 仍 201 原单；A GET orders 仅一单。状态页刷新与“重新查询同一订单”均真实 GET 200，订单号不变 |
+| 页面同号 GET 状态 200 | 显示 pending、未解锁、支付通道未配置/暂不可发起支付，没有调用支付或本地解锁 |
+| 本人订单/权益 200 与跨人隔离 | A 从状态页实际点击本人记录页，订单与权益两个 GET 200；金额 CNY 9.90，服务端权益空。B 独立 profile 订单/权益均空；直接打开 A 订单的状态页真实 GET 404，页面显示“资源不存在” |
+| 真实 401 不换号、不重放 | B 完成隔离检查后，明确将其测试凭证替换为无效串，调用原请求封装 GET entitlements/me 得到真实 401；随后 createOrder 在本地被失效身份阻止，刷新状态页仍提示失效。B 捕获仅一次 auth/guest、零次 POST orders，没有重新领号或重放写操作；B 当前保留失效测试态 |
+| 4156 重启后的本单读取 | 总控收到可短重启窗口后完成测试 API 重启并通知恢复；A 原游客再次在页面查询本单、打开本人记录，GET 状态/列表/权益均 200，仍为同 ID、990 CNY、pending/unlocked=false、一单/空权益。未重放写操作 |
+| 手机尺寸截图 | 已查看 390×844 商品、状态与本人记录截图，订单号折行、金额和错误/不可支付说明可读，无横向溢出；截图仅本机临时产物 |
+| 真实网络丢失响应、真实 409/422/503 UI 故障 | NOT_RUN；网络失败后同键与拒绝不回退由隔离测试覆盖，不等同于真实故障注入 |
+| 最终 LAN HTTP 源的键生成与请求预检 | NOT_RUN；127.0.0.1 页面为安全上下文，真实下单 OPTIONS 204。无 randomUUID/无 crypto 的键格式由隔离测试覆盖，最终 LAN 非安全源需总控集成后复验 |
 
-此前在仍运行 F2 的 4156 上，仅通过真实页面为本轮 A/B 独立游客初始化并创建 A 自选结果 `ef9d96f7-ea95-4b23-aefd-754155dfff55`；这不作为 F3 路由通过证据。临时源首页、结果页已实际打开；未提交网络文件、凭证或浏览器存储。
+本单关联 A 自选结果 `ef9d96f7-ea95-4b23-aefd-754155dfff55`（创建于切换 F3 前的同一测试库）。F3 ready 后全部交易调用均真实经过 Nest/Prisma/PostgreSQL API，不以 mock、SQL 或本机旧缓存代替服务端成功；未读取任何运营/支付 fixture 或后台鉴权材料。
 
 浏览器 A profile `4085febb-ff65-4743-8425-5dbc33c59a61` / page `42385d40-5e58-4f24-a3fc-4eb91d8ccae3`；B profile `1004d434-97a9-4809-9d2a-8c490ec1ad1d` / page `fefeb536-0ee8-4b27-9633-fdf9af318512`，均为独立隔离 profile。凭证只保存在浏览器，不写入报告或提交。
 
-## 后端 ready 后建议接续
+去敏 Network 元数据仅留本机 `/tmp/mbti-f3-web-A-network.json`（73 条 API 请求/预检）及 `/tmp/mbti-f3-web-B-network.json`（27 条），均 `truncated=false`；字段仅 method/url/status/mimeType/timestamp，无请求头、token、请求体或真实用户数据。A 两次 POST orders 均 201，A/B 各只有一次初始化领号；A 控制台只有 Vite 调试消息。一次 Orca 文本定位等待超时后以新 snapshot 的元素 ref 重试点击成功，未将该自动化等待误报为 API 故障。
 
-1. 总控确认 4156 为 F3/test55437 后，复用 A 原 profile，打开 `http://127.0.0.1:4155/#/pages/pricing/pricing?result_id=ef9d96f7-ea95-4b23-aefd-754155dfff55`。保留原游客；若该测试结果未保留，通过首页自选入口新建本人结果后进入商品。
-2. 观察真实 `GET /products` 与 `GET /results`，tier1 测试价格/币种来自响应，tier2 按 `saleable=false` 禁用。点击 tier1 → 确认页 → 创建测试订单，记录 POST 201 的 `id/amount/currency/status/unlocked/payment_availability`，不得从旧本地订单补值。
-3. 打开 `pages/order-status/order-status?order_id=<真实id>`，刷新和手动查询仍使用同一订单号。点击“查看金额、本人订单与权益”，核验真实 GET orders 与 entitlements/me；pending 时权益应为空、页面不可发起支付。
-4. 返回相同结果/商品的确认页再创建，核验原幂等键与原订单号。可在浏览器受控丢弃一次真实响应后刷新重试；须区分“真实后端已写入 + 客户端故障注入”和隔离测试，记录同号及列表只落一单。
-5. B 打开本人订单/权益入口应为空；将 A 的真实订单号带入 B 状态页应真实 404。用独立无效游客验证一次 401 后后续请求本地阻止、无新 auth/guest/写重放；不要将运营凭证放进浏览器。
-6. 由总控在最终 LAN H5 源验证 `window.isSecureContext=false` 时键生成（`getRandomValues` 路径）与包含 Idempotency-Key 的浏览器预检，并查看 390px 页面截图；仅保存去敏方法/URL/状态码与业务测试订单号，不保存请求头或 token。
+## 集成后接续入口
+
+- 保留 A 原 profile，可直接打开 `http://127.0.0.1:4155/#/pages/order-status/order-status?order_id=MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7` 与 `http://127.0.0.1:4155/#/pages/orders/orders`；相同结果/商品确认页为 `pages/unlock/unlock?result_id=ef9d96f7-ea95-4b23-aefd-754155dfff55&product_code=studio_tier_1`。不要替换 A 身份或清理其购买意图；B 当前是明确的失效凭证测试态。
+- 总控在最终 LAN H5 源验证 `window.isSecureContext=false` 时键生成（`getRandomValues` 路径）及包含 Idempotency-Key 的预检；当前临时 H5 只绑定 127.0.0.1，test API 当前只授权该源，不擅自改后端 CORS 或已交付服务。
+- 若补真实丢失响应重试，须区分“后端已真实写入 + 客户端故障注入”和隔离测试，核验相同 key/订单 ID 与列表只落一单；不得通过伪造响应宣称成功。真实 409/422/503、跨物理设备、微信与支付授予继续单列。
 
 候选 SHA 以本次 worker_done 回执为准；候选代码与文档提交后停止写入，由总控审阅/集成 dev。
 
 ## unknowns / needs_human_review
 
-生产 SKU/价格、真实支付通道、正式履约/退款、可找回账号绑定和跨设备恢复由后端候选列为外部待定；本轮仅受控测试单。最终 LAN HTTP 源的集成页面、跨物理设备、微信端、真实收费/支付回调/付费权益授予及后端重启持久性均须分开记录，不以隔离测试或本机缓存冒充。
+生产 SKU/价格、真实支付通道、正式履约/退款、可找回账号绑定和跨设备恢复由后端候选列为外部待定；本轮仅受控测试单。最终 LAN HTTP 源的集成页面、跨物理设备、微信端、真实收费/支付回调/付费权益授予未验；后端自己的受控权益/运营持久性由其报告负责，本 Worker 只见证本人的 pending 单重启后 GET。未推断生产发布或正式商业履约已完成。
