@@ -2,8 +2,8 @@
 
 打开 [index.html](index.html) 即可查看，不依赖 CDN、外部字体或浏览器取数。单独复制这一个 HTML 文件也可以离线使用。GitHub 的 HTML 源码页不会直接渲染，可下载后打开，或使用开发环境发布地址。
 
-- 开发环境预览：**http://192.168.0.200:5173/api-docs/**（局域网，跨设备可达性待验证）。
-- API 基址：`http://192.168.0.200:4056/api/v1`；H5 首页：`http://192.168.0.200:5173/#/`。
+- HTTPS 文档：**https://mbti-dev.bestshizhongyu.com/api-docs/**。
+- API 基址：`https://mbti-dev.bestshizhongyu.com/api/v1`；H5 首页：`https://mbti-dev.bestshizhongyu.com/#/`。
 - [openapi.json](openapi.json)：汇总的 OpenAPI 3.1.1 内部候选，可导入 Apifox/Postman；HTML 也能直接下载此数据。
 - 覆盖 F1–F6 共41个操作：40项可联调，#46只有明确不可用分支，真实位置人数仍 blocked_external。
 
@@ -42,6 +42,8 @@ npm run check
 python3 -m http.server 5184 --bind 127.0.0.1 --directory docs/api-reference
 ```
 
-当前5173由既有H5静态服务提供，已将验收后的HTML和JSON发布到其公共根目录的 `api-docs/`，上方地址已从开发主机经LAN地址检查为200。更新时仅替换这两个生成文件，不要发布构建工具的 `node_modules`、凭证或私有运行目录。此次仅增加静态文档，无需重启API或变更数据库。
+公网开发服务器的 Nginx 直接提供 `api-docs/` 下的HTML和JSON，避免该路径被H5的SPA回退吞掉。实际位置为 `/www/wwwroot/mbti-dev-szy/api-docs`，指向只含这两个文件的版本目录；[Nginx location配置](deploy/nginx-api-docs.conf) 独立放在该域名的 extension include 中。更新时先上传新版本并校验摘要，再原子切换软链接；首次加配置必须 `nginx -t` 成功后再 reload。无需重启API、H5或变更数据库。
+
+接口、H5和文档都使用同一个HTTPS域名。公网服务器与本机LAN是两个独立开发环境，数据及游客凭证不互通，不能沿用本机LAN结果ID验证公网身份。原局域网验收记录保留作历史证据，最新入口与实测见 [域名交付](../execution/MBTI-DOMAIN-ACCESS-DELIVERY.md)。不要发布构建工具的 `node_modules`、凭证或私有运行目录。
 
 构建依据：[YAML官方解析API](https://eemeli.org/yaml/)、[OpenAPI3.1.1规范](https://spec.openapis.org/oas/v3.1.1.html)。页面始终保留 `candidate / needs_human_review`：真实支付配置、位置来源/授权/距离/小样本口径以及正式业务规则仍待补齐。

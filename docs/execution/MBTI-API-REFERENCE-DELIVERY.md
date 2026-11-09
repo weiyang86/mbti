@@ -1,5 +1,7 @@
 # HTML 联调接口文档交付
 
+> 更新：实习生入口现为 **https://mbti-dev.bestshizhongyu.com/api-docs/**，API/H5同域；见 [域名交付与实测](MBTI-DOMAIN-ACCESS-DELIVERY.md)。下文保留最初LAN发布时的原始地址与检查证据。
+
 2026-11-09。基于最新 `origin/dev` 的 `81279efd6f4c085060b7ab237236c16ec5a700ba`，在独立 Orca 工作树 `mbti-api-reference` 完成；此次只增加文档、生成工具及导航，不修改 API/Web 业务代码或五份原始候选。
 
 ## 使用

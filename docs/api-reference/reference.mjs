@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { parse } from 'yaml'
 
-export const BASE = 'http://192.168.0.200:4056/api/v1'
+export const BASE = 'https://mbti-dev.bestshizhongyu.com/api/v1'
 export const API_BASELINE = '81279efd6f4c085060b7ab237236c16ec5a700ba'
 export const GROUPS = [
   { id: 'F1', title: '基础与测评', description: '从独立游客到两次测评结果', count: 8 },
@@ -147,7 +147,7 @@ export function assemble(sources) {
       version: '0.4.0-reference-candidate.1',
       description: '内部候选 / needs_human_review。40项可联调，#46仅提供明确不可用分支；真实支付与真实位置统计未开放。此文件汇总现有候选，不替代docs/api正式契约。',
     },
-    servers: [{ url: BASE, description: '实际开发环境；局域网地址，跨设备可达性待验证' }],
+    servers: [{ url: BASE, description: 'HTTPS 公网开发联调环境' }],
     tags: GROUPS.map(group => ({ name: group.id, description: `${group.title} · ${group.description}` })),
     'x-status': 'candidate / needs_human_review',
     'x-api-validated-revision': API_BASELINE,

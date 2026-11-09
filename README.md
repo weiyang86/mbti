@@ -11,7 +11,7 @@
 
 总后台源码已导入，安装、配置及业务接入边界见 [Foundation 说明](aij-foundation/README.md)。该目录使用独立 pnpm 工作区。MBTI Web API 的 F1–F6 已交付内部联调候选：40项可联调，另1项同型统计仅返回明确不可用状态；正式契约仍待 Remy 定稿。
 
-联调入口：[HTML 接口文档](docs/api-reference/README.md) · [汇总 OpenAPI](docs/api-reference/openapi.json) · [实测与环境交接](docs/execution/MBTI-WEB-API-FAST-HANDOFF.md)。开发环境可直接打开 **http://192.168.0.200:5173/api-docs/**（局域网，跨设备可达性待验证），也可下载 `docs/api-reference/index.html` 离线打开。
+联调入口：[HTML 接口文档](docs/api-reference/README.md) · [汇总 OpenAPI](docs/api-reference/openapi.json) · [实测与环境交接](docs/execution/MBTI-WEB-API-FAST-HANDOFF.md)。开发环境直接打开 **https://mbti-dev.bestshizhongyu.com/api-docs/**，也可下载 `docs/api-reference/index.html` 离线打开。H5 为 **https://mbti-dev.bestshizhongyu.com/#/**，API 基址为 **https://mbti-dev.bestshizhongyu.com/api/v1**。
 
 ## 分支
 
