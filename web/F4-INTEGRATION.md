@@ -87,7 +87,8 @@ F4 复用原 `request`/共享初始化游客 client，未改游客、交易意�
 
 ## 重启、回归与未验
 
-- **总控追加发现，F4 最终验收暂缓**：`d0bdaa9` 的私密且无类型游客可通过直接 HTTP 创建 201 隐藏 pending，接收方不能列出或回应。后端 Writer 正增加发起方合法类型 + discoverable 检查与拒绝不落 pending 的验收；新候选 READY/SHA 后原三 profile 复验 `NOT_RUN`。上面的成功证据是实际已执行范围，不代表此缺陷通过或 F4 最终放行。Web 现有详情会提示本人未公开，按钮 disabled 且 create 函数检查 discoverable，未公开本人不会从页面发送申请；服务端仍必须兜底拒绝。
+- **总控追加发现，F4 最终验收暂缓**：`d0bdaa9` 的私密且无类型游客可通过直接 HTTP 创建 201 隐藏 pending，接收方不能列出或回应。后端 Writer 正增加发起方合法类型 + discoverable 检查与拒绝不落 pending 的验收；新候选 READY/SHA 后原三 profile 复验 `NOT_RUN`。上面的成功证据是实际已执行范围，不代表此缺陷通过或 F4 最终放行。Web 的 [detail.vue:29](src/pages/buddies/detail.vue#L29) 提示先公开，第 30 行禁用未公开本人的申请按钮，第 78 行 create 函数再次检查 discoverable，未公开本人不会从页面发送申请；服务端仍必须兜底拒绝。
+- 总控最新派工明确：本轮交可审查 **Web 候选**，由总控接续后端修复用例及新 fix SHA 下原 profile 的只读复验；不把 `d0bdaa9` 称为最终后端通过。Web Writer 完成本轮一次 worker_done 后停止写入，保留 4155、三 profile 与现有数据，未重开任务或触碰 4056/5173。
 - 已按总控指定窗口停止 Web 写请求；收到后端 stop/start 后 READY 与候选 SHA 后，用原三 profile 刷新并只读复验通过。没有重新领号或清记录：A/B/C 的凭证摘要、card ID、类型、公开状态不变，B 四项隐藏保留，A/B 五条关系（四 revoked、一 declined）方向/对方和终态保留，C 无私密关系；三人的本人 blocked 列表仍空。公开页与内嵌 buddy 仍匿名且无 B canary；已接受后 block 的原 ID 仍 revoked。
 - F1/F3 真实只读回归通过：C 原身份 GET 当前题库 200，`qb-v0.4-prototype-1`、12 题；本人结果 200 空列表；商品 200 与页面一致（990 分可售、1990 分未开放），本人订单/权益均 200 空列表，页面没有假购买/解锁。没有创建新订单或测试会话；交易意图与原题库恢复代码未改，原有 22 项隔离测试仍通过。
 - 浏览器实际缺 token `GET /cards/me` 401 `GUEST_UNAUTHORIZED`；有 token `GET /card-exchanges` 200，实际 `Cache-Control: no-store`。并发 pair 锁/唯一约束、双向同时 block/respond 由后端 Writer 主验，本 Web 未把后端专属测试计为自身通过。
@@ -106,3 +107,5 @@ VITE_USE_MOCK=false VITE_API_BASE_URL=http://127.0.0.1:4156/api/v1 npm run dev:h
 ```
 
 API/数据库恢复交总控与后端 Writer，owner 仍是 F1 的 aij-foundation，测试 55437 与开发 55436 分开；本树未执行迁移或运营初始化。三个浏览器页面 A `92bc839e-77b2-4283-bf03-5fbf71a80d44`、B `ecd6f026-15d0-4be8-9ef3-24df73d82a58`、C `24707ecb-da64-4746-a930-011fe28dd3fa` 可在上述 profile 继续只读复验。
+
+最终精确核对：`git diff 42dc92b6bbbdda716c980b3f0ed0a6a3067a01ff HEAD --check` 退出 0，范围仅 `web/` 17 文件；逐名核对无 `.env`、密钥、日志、构建、真实用户数据、`._*`、后端/Prisma/权威 `docs/api` 或 `UIhtml`。本地仅文档补证有后续提交，已通过的实现代码与 25 项测试/构建/三身份 12 操作时保持一致；没有因后端发现而重写或掩盖既有证据。
