@@ -9,7 +9,9 @@
 | `admin/` | 业务后台工程 |
 | `aij-foundation/` | 总后台能力输出（本仓内的 foundation 层；与独立仓 `weiyang86/aij-foundation` 区分） |
 
-总后台源码已导入，安装、配置及业务接入边界见 [Foundation 说明](aij-foundation/README.md)。该目录使用独立 pnpm 工作区；业务 API 草案仍待 Remy 定稿，源码导入不代表 MBTI 接口已实现。
+总后台源码已导入，安装、配置及业务接入边界见 [Foundation 说明](aij-foundation/README.md)。该目录使用独立 pnpm 工作区。MBTI Web API 的 F1–F6 已交付内部联调候选：40项可联调，另1项同型统计仅返回明确不可用状态；正式契约仍待 Remy 定稿。
+
+联调入口：[HTML 接口文档](docs/api-reference/README.md) · [汇总 OpenAPI](docs/api-reference/openapi.json) · [实测与环境交接](docs/execution/MBTI-WEB-API-FAST-HANDOFF.md)。开发环境可直接打开 **http://192.168.0.200:5173/api-docs/**（局域网，跨设备可达性待验证），也可下载 `docs/api-reference/index.html` 离线打开。
 
 ## 分支
 
