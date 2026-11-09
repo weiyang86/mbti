@@ -74,6 +74,8 @@ try {
     await get("Y", "/contact-requests/" + s.contactRequest + "/granted", 404);
     await get("C", "/contact-requests/" + s.contactRequest + "/granted", 404);
     ok("new-cohort F5 own private value survives restart", (await get("Y", "/contacts/me")).wechat === s.contact);
+    ok("new-cohort F4 accepted exchange survives restart", (await get("X", "/card-exchanges")).items.some(item => item.buddy_id === s.cards.Y && item.status === "accepted"));
+    ok("new-cohort F5 accepted request survives restart", (await get("Y", "/contact-requests")).items.some(item => item.id === s.contactRequest && item.status === "accepted"));
   } else {
     for (const a of ["A", "B", "C"]) { await guest(a); await enrolled(a, false); await noLazy(a); }
     for (const a of ["A", "B"]) {

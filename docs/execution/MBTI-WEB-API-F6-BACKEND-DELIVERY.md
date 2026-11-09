@@ -34,7 +34,7 @@ PUT 仅一个必填 boolean enrolled，无 query，未知身份/类型/位置/�
 | #46 GET /radar/same-type unavailable | 通过 | P014即使query/最新结果合法、无名片仍TYPE_REQUIRED且不懒建；P074–094 query/半径/数组/重复/类型枚举422先于缺类型；P095缺类型优先、P096本人不一致优先；P097–108省略/三档/本人类型均200 null+unavailable，A来源未配置/B未参与；P109–112本人type变更后旧query422，新type/省略正常；P138/141/144/147凭证401 |
 | 参与/退出/两方向block/半径组合的不可用与隐私 | 通过（仅fallback） | P113–132本轮合成A→B、B→A block与解除、参与true/false及三档，全部仍只有null/unavailable和正确reason；没有把此证据称为真实聚合过滤通过 |
 | F4/F5 注册与读取回归 | 通过 | P148–168独立新X/Y cohort建立真实F4 accepted和F5单向微信grant；X参与/退出后exact grant仍200，Y/C404，Y私密引用/epoch/时间不变，F4 accepted及F5列表仍可读；所有值仅私有状态内比较。另跑现有F4 sender隐私回归55HTTP/23断言通过，缺卡/空类型/私密发起404且无新pending |
-| #44/#45 原身份重启持久化 | 待明确窗口复验 | 已安排Atrue、B先true后false、C默认false，并保留原凭证与A/B原卡快照；一次同源码同库重启后运行restart阶段即可同时证明参与与退出，不用换号或重复重启 |
+| #44/#45 原身份重启持久化 | 通过 | 总控msg_39474dea63f7确认Web暂停、三profile in-flight=0后，owner check/stop/start均0，同008455bb dist READY；R001–003复用原A/B/C凭证读回true/false/false，A/B原卡/历史/联系人元数据同值，C仍无卡/无参与行；R004/005维持正确unavailable，R006–011本轮X/Y单向grant200、Y/C404、私密本人值同值，F4 accepted及F5 accepted列表保留；最终只读restart阶段11HTTP/30断言/退出0 |
 | 真实参与/退出人数影响 | blocked_external / not_available | 缺自愿位置cohort、位置授权与实际计算政策；布尔持久化不是人数变化证据 |
 | 真实半径/边界、双向block在聚合计数前过滤 | blocked_external / not_available | 缺位置来源、可用距离算法、中心/精度/时效/边界；F4 block回归与null响应不代替计数过滤 |
 | 真实小样本/位置授权撤回 | blocked_external / not_available | 缺经确认k与隐私/差分口径、位置授权/撤回数据；low_sample/available分支未启用 |
@@ -58,6 +58,8 @@ PUT 仅一个必填 boolean enrolled，无 query，未知身份/类型/位置/�
 | `node scripts/mbti-local.mjs migrate test` | 0，仅新增F6附加表，43总迁移 |
 | `node scripts/mbti-local.mjs stop test` / `start test` | 各0，授权首接管窗口，READY4156；启动设置MBTI_F3_TEST_FIXTURE=1、LAN公共源及精确两4155 CORS源 |
 | `node scripts/mbti/verify-f6.mjs prepare` | 最终0，171/451；见下述验证脚本初轮失败记录 |
+| `node scripts/mbti-local.mjs check test` / `stop test` / `start test`（最终窗口） | 各0，同dist/test配置，READY4156，未操作Web主体 |
+| `node scripts/mbti/verify-f6.mjs restart` | 0，最终只读11HTTP/30断言；R001–011，持久化参与/退出与F4/F5读取通过 |
 | `node scripts/mbti/verify-f4-sender-visibility.mjs` | 0，55HTTP/23断言 |
 | `python3 <输入包>/smoke.py --base http://192.168.0.200:4156/api/v1 --phase F2` | 0，含F1；qb-v0.4-prototype-1；A两结果ae9657e3-e2c7-4b2f-abf2-ba66d90386b3 / 82427834-a3ae-44e5-8e52-b3baa8ddd4c5，B404、submit201/409、分享/比较/删除通过 |
 | Python去敏扫描、`git diff --check`、精确路径暂存检查 | 0；无token、owner ID、合成渠道值或私密引用输出/提交 |
@@ -68,7 +70,7 @@ PUT 仅一个必填 boolean enrolled，无 query，未知身份/类型/位置/�
 
 ## test恢复和后续输入
 
-首接管已READY通知总控；Web开始后，任何重启必须收到总控明确窗口。最终原凭证重启复验尚待窗口，本节不预报通过。恢复只适用test，不适用4056/dev；不需要清库、改原值、重跑运营初始化或复制别树fixture。
+首接管及最终重启均已READY通知总控（最终msg_d5a12cac1fe1）；最终窗口授权msg_39474dea63f7后只执行一次stop/start。最初只读restart阶段9HTTP/26断言通过，随后补两条F4/F5列表读取，最终11HTTP/30断言通过；期间未再重启、写cohort或操作Web主体。去敏重启证据在本树`aij-foundation/.artifacts/mbti-f6-restart-evidence.json`，原凭证仍ignored0600；正式运行dist与配置不变。服务最终保留4156，之后恢复仍须新明确窗口，只适用test，不适用4056/dev；不需要清库、改原值、重跑运营初始化或复制别树fixture。
 
 ```sh
 cd /Users/lei/orca/workspaces/mbti/mbti-web-api-f6/aij-foundation
