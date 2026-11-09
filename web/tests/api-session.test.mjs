@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 import vm from 'node:vm'
 import { buildSync } from 'esbuild'
 
@@ -8,7 +9,7 @@ const guestKey = `mbti_guest_v1:${api}`
 const future = '2099-01-01T00:00:00.000Z'
 const env = { VITE_API_BASE_URL: api, VITE_USE_MOCK: 'false' }
 const compile = (entry) => buildSync({
-  entryPoints: [new URL(entry, import.meta.url).pathname],
+  entryPoints: [fileURLToPath(new URL(entry, import.meta.url))],
   bundle: true, write: false, platform: 'node', format: 'cjs',
   define: { 'import.meta.env': JSON.stringify(env) },
 }).outputFiles[0].text
