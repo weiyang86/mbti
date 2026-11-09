@@ -12,7 +12,7 @@
       <text class="identifier">商品：{{ product.code }}</text>
       <text class="line">结果类型：{{ result.type_code }}</text>
       <text class="identifier">结果编号：{{ result.id }}</text>
-      <text v-if="!product.saleable" class="notice">暂不可售{{ product.unavailable_reason ? `（${product.unavailable_reason}）` : '' }}</text>
+      <text v-if="!product.saleable" class="notice">该商品暂未开放，暂不可创建测试订单。</text>
       <button class="btn-primary mt" :disabled="creating || loading || !product.saleable || !intentReady" @click="create">{{ creating ? '正在创建订单…' : '创建待支付测试订单' }}</button>
       <text class="notice">网络失败后可点击重试或刷新；同一购买意图会复用订单号。</text>
     </view>

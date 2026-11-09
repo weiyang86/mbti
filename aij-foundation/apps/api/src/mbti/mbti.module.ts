@@ -1,5 +1,4 @@
 import { DynamicModule, Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { MbtiController } from "./mbti.controller";
 import { MbtiGuestGuard } from "./mbti.http";
 import { MbtiService } from "./mbti.service";

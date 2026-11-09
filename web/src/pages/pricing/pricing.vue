@@ -26,7 +26,7 @@
       <text class="price">{{ formatMoney(product.amount, product.currency) }}</text>
       <text class="notice">受控测试价格</text>
       <text v-for="highlight in product.highlights" :key="highlight" class="line">{{ highlight }}</text>
-      <text v-if="!product.saleable" class="notice">暂不可售{{ product.unavailable_reason ? `（${product.unavailable_reason}）` : '' }}</text>
+      <text v-if="!product.saleable" class="notice">该商品暂未开放，暂不可创建测试订单。</text>
       <button class="btn-primary mt" :disabled="!product.saleable || !selectedResult || !!resultsError" @click="checkout(product)">{{ product.saleable ? '查看并创建测试订单' : '暂不可售' }}</button>
     </view>
     <button class="btn-secondary mt" :disabled="loading || resultsLoading" @click="load">刷新商品与结果</button>

@@ -1,6 +1,6 @@
 // Controlled protocol fixture only. This module is never registered outside an explicitly
 // enabled NODE_ENV=APP_ENV=test runtime and uses the existing Foundation payment owner.
-import { Controller, Get, Header, HttpCode, Injectable, Param, Post, Req, SetMetadata, UseFilters, UseGuards } from "@nestjs/common";
+import { Controller, Header, HttpCode, Injectable, Param, Post, Req, SetMetadata, UseFilters, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../prisma/prisma.service";
 import { MbtiOrdersService } from "./mbti-orders.service";
