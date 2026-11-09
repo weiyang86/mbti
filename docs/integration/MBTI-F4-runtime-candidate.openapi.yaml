@@ -13,7 +13,7 @@
     "U02: lazy card, discoverable=false, empty nickname/declaration/interests, four visibility=false, illustration. Empty type unless latest own result at creation. Public type is disclosed only on explicit discovery opt-in; empty type cannot opt in.",
     "U03: persisted card type never silently overwritten. PUT selects legal 16 type; type_name from TYPE_METAS. latest_result_id only when current latest own result matches card type. has_visual_set=false until delivered visual fact exists.",
     "U04: recommend orders updatedAt/id descending; same uses server card type, missing/mismatched query=422; recommend type_code is a public filter. Visibility/block filtering precedes limit.",
-    "U05: strict top-level and visibility whitelist; trim/codepoint length nickname<=40/declaration<=160, interests<=10 each<=24 trim/dedupe. Wrong types/null/unknown keys=422. Partial visibility keys merge under owner transaction lock.",
+    "U05: strict top-level and visibility whitelist; trim/codepoint length nickname<=40/declaration<=160, interests<=10 each<=24 trim/dedupe. Wrong object-field types/null/unknown keys=422; top-level primitive null is rejected by the existing strict JSON parser with 400. Partial visibility keys merge under owner transaction lock.",
     "U06: hidden nickname/declaration => empty string; interests/shared_interests => []; manual omitted. Avatar/type tagline only public type or neutral static. No private cached derived copy. Real is_demo=false/simulated=false.",
     "U07/U08: observer direction incoming/outgoing, buddy is other card; recipient pending accept/decline, sender pending/accepted revoke. No contact grant.",
     "U09: same pending retry=200 same ID; reverse pending/active accepted=409; first create=201. declined/revoked creates new ID; respond terminal replay=409; own revoked DELETE=204. Canonical pair transaction lock + partial unique pending/accepted. Lists latest createdAt/id descending; summary most recent relation.",
@@ -136,6 +136,16 @@
           },
           "422": {
             "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
             "content": {
               "application/json": {
                 "schema": {
@@ -545,6 +555,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "parameters": [
@@ -604,6 +624,16 @@
           },
           "204": {
             "description": "No body, including idempotent own retry"
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "parameters": [
@@ -750,6 +780,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -821,6 +861,16 @@
           },
           "422": {
             "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
             "content": {
               "application/json": {
                 "schema": {
@@ -912,6 +962,16 @@
           },
           "204": {
             "description": "No body, including idempotent own retry"
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "parameters": [
