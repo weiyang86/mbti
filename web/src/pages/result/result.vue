@@ -6,13 +6,14 @@
       <text class="muted small">question_bank_version: {{ result.question_bank_version }}</text>
     </view>
 
-    <view class="card mt" v-if="result.dimension_counts">
+    <view class="card mt" v-if="result.source === 'quiz' && result.dimension_counts">
       <text class="section">四维计数（题数）</text>
       <text>E/I {{ result.dimension_counts.E }}/{{ result.dimension_counts.I }}</text>
       <text>S/N {{ result.dimension_counts.S }}/{{ result.dimension_counts.N }}</text>
       <text>T/F {{ result.dimension_counts.T }}/{{ result.dimension_counts.F }}</text>
       <text>J/P {{ result.dimension_counts.J }}/{{ result.dimension_counts.P }}</text>
     </view>
+    <text v-if="result.source === 'self_select'" class="muted small">自行选择类型，无答题分布，不参与测评对比。</text>
 
     <view class="btn-primary mt" @click="goShare">生成晒图预览</view>
     <view class="btn-secondary mt" @click="goHistory">查看阶段记录</view>

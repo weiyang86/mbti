@@ -1828,5 +1828,16 @@ model MbtiResult {
   submittedAt     DateTime @default(now())
   owner           MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   session         MbtiQuizSession? @relation(fields: [sessionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shareAssets     MbtiShareAsset[]
   @@index([ownerId, submittedAt(sort: Desc), id(sort: Desc)])
+}
+
+// Only explicitly rendered share images are accessible through the anonymous asset route.
+model MbtiShareAsset {
+  key       String @id
+  resultId  String
+  bytes     Bytes
+  createdAt DateTime @default(now())
+  result    MbtiResult @relation(fields: [resultId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@index([resultId])
 }

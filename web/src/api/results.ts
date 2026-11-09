@@ -15,12 +15,12 @@ export function listResults(params?: { limit?: number; cursor?: string }) {
 
 export function getResult(id: string) {
   if (useMock()) return mock.getResult(id)
-  return request<ResultSnapshot>(`/results/${id}`)
+  return request<ResultSnapshot>(`/results/${encodeURIComponent(id)}`)
 }
 
 export function deleteResult(id: string) {
   if (useMock()) return mock.deleteResult(id)
-  return request<void>(`/results/${id}`, { method: 'DELETE' })
+  return request<void>(`/results/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export function compareResults(baselineId: string, targetId: string) {
