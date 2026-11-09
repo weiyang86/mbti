@@ -1,0 +1,42 @@
+{
+  "wave": "W21",
+  "scope": "Frozen governance-only inputs, not product proof",
+  "files": [
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-216.md",
+      "sha256": "4f7f004550ef4770d222907e221ad93da4f53a031bf7cb1d00b49d11aee359d3"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-217.md",
+      "sha256": "011b814fe9672f3d73a23e46e24b2690da11491dfec72adfda2c870c4a986f18"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-218.md",
+      "sha256": "632018ef1de4cfe8031ba4934dfef396e9b3958954af5fd1a570c2657c62c11a"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/WAVE-21.md",
+      "sha256": "e9d3ca1af4b8050548827b0485783bd18b51ca04a8c11658ff60bc5734327d0c"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W21/CONTRACT.md",
+      "sha256": "038af86823af97bd7650f8d3dd3cf91b55d04d4f84c38eacadac954924829614"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W21/SOURCE_BOOTSTRAP.json",
+      "sha256": "b17b864c7587471a2ed98507429f0c019d4f0f9ef70502d54fd71939745a82b5"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W21/PROGRESS_BASELINE.json",
+      "sha256": "3bfb7cd5ca99c1cd40b2f70f899d0420a52284fd877a7a2efa2bd59dee5fdc9c"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W21/AF-203-RESUMPTION.md",
+      "sha256": "4c3a1307af8cd38b4831d3cdc1fcd0a53677cd83ab801030db1044585dc6555b"
+    },
+    {
+      "path": "scripts/verification/w21-governance-prerequisite.mjs",
+      "sha256": "cd108f3f48344e2b275bb9add4d766ba79362d6cf64c5eb3289a250172ca3b5d"
+    }
+  ]
+}

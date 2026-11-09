@@ -9,6 +9,8 @@
 | `admin/` | 业务后台工程 |
 | `aij-foundation/` | 总后台能力输出（本仓内的 foundation 层；与独立仓 `weiyang86/aij-foundation` 区分） |
 
+总后台源码已导入，安装、配置及业务接入边界见 [Foundation 说明](aij-foundation/README.md)。该目录使用独立 pnpm 工作区；业务 API 草案仍待 Remy 定稿，源码导入不代表 MBTI 接口已实现。
+
 ## 分支
 
 - `main`：生产 / 部署分支

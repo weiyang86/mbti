@@ -1,0 +1,6 @@
+// Root-only additive fragment for the existing AiKnowledgeDocument model.
+// No generator, datasource, new model, relation or existing column changes.
+sourceUrl               String? @map("source_url") @db.VarChar(2048)
+sourceFinalUrl          String? @map("source_final_url") @db.VarChar(2048)
+sourceTextChecksum      String? @map("source_text_checksum") @db.Char(64)
+sourceExtractionVersion String? @map("source_extraction_version") @db.VarChar(64)

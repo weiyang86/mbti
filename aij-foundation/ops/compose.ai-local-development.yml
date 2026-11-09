@@ -1,0 +1,44 @@
+# AF-220: persistent independent local AI database; lifecycle is owned by ai:local.
+name: aij-ai-local
+services:
+  postgres:
+    container_name: aij-ai-local-postgres
+    image: postgres:16-alpine@sha256:e013e867e712fec275706a6c51c966f0bb0c93cfa8f51000f85a15f9865a28cb
+    network_mode: bridge
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aij_ai_local_development
+      POSTGRES_USER: aij_ai_local_development
+      POSTGRES_PASSWORD: "${AIJ_AI_LOCAL_DB_PASSWORD:?Use ai:local init}"
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    ports:
+      - "127.0.0.1:55435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    labels:
+      io.aij.owner: aij-foundation
+      io.aij.project: aij-ai-local
+      io.aij.environment: development
+      io.aij.instance: "${AIJ_AI_LOCAL_INSTANCE_ID:?Use ai:local init}"
+      io.aij.repository: "${AIJ_AI_LOCAL_REPOSITORY:?Use ai:local init}"
+      io.aij.uid: "${AIJ_AI_LOCAL_UID:?Use ai:local init}"
+      io.aij.machine: "${AIJ_AI_LOCAL_MACHINE:?Use ai:local init}"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "aij_ai_local_development", "-d", "aij_ai_local_development"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 3s
+    stop_grace_period: 20s
+volumes:
+  postgres_data:
+    name: aij-ai-local_postgres_data
+    labels:
+      io.aij.owner: aij-foundation
+      io.aij.project: aij-ai-local
+      io.aij.environment: development
+      io.aij.instance: "${AIJ_AI_LOCAL_INSTANCE_ID:?Use ai:local init}"
+      io.aij.repository: "${AIJ_AI_LOCAL_REPOSITORY:?Use ai:local init}"
+      io.aij.uid: "${AIJ_AI_LOCAL_UID:?Use ai:local init}"
+      io.aij.machine: "${AIJ_AI_LOCAL_MACHINE:?Use ai:local init}"

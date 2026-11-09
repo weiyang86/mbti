@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "OWNER-W22-20261108",
+  "status": "ACCEPTED_BY_OWNER",
+  "acceptedAt": "2026-11-08T13:04:10.578024+00:00",
+  "sourceKind": "CURRENT_OWNER_CHAT",
+  "sourceQuote": "已经验收完成，请自动开启下一批，快速完成所有的开发工作",
+  "scopeMeaning": "Only the latest W22 four delivered cards, not historical failures, full40 targets or publication",
+  "cards": [
+    {
+      "formalTaskId": "AF-219",
+      "title": "登记本地集成与文档恢复验收批次",
+      "commit": "22e9043236278bd05de24601310692a27e4691fa",
+      "report": ".artifacts/verification/AF-219/run-f53dK3/report.json",
+      "integrationTaskId": "task_180f373a05bc"
+    },
+    {
+      "formalTaskId": "AF-220",
+      "title": "提供独立AI本地集成运行配置",
+      "commit": "95b34d45ec6861d39060d08607c3f3ad8f886021",
+      "report": ".artifacts/verification/AF-220/run-jNP6g9/report.json",
+      "integrationTaskId": "task_82ce15ffbe95"
+    },
+    {
+      "formalTaskId": "AF-221",
+      "title": "提供个人文档历史恢复为新版本",
+      "commit": "cc2be35ace71e7a03e28b34258e7f17b28c66ae4",
+      "report": ".artifacts/verification/AF-221/run-4tYwSQ/report.json",
+      "integrationTaskId": "task_a89f862fbff4"
+    },
+    {
+      "formalTaskId": "AF-191",
+      "title": "完成当前工作台与独立SDK前端的任务目标验收",
+      "commit": "5289bd1eabff8d2c8891ba0baeab7f1bf323c8d2",
+      "report": ".artifacts/verification/AF-191/run-bkQU68/report.json",
+      "integrationTaskId": "task_1f770e22492a"
+    }
+  ],
+  "continuation": {
+    "automaticBoundedWaves": true,
+    "maxCardsPerWave": 4,
+    "maxEffectiveHoursPerWave": 12,
+    "maxHoursPerCard": 4,
+    "ownerAcceptanceOfFutureWaves": "PENDING_UNTIL_EXPLICIT_OWNER_REVIEW",
+    "noPushOrExternalAuthorizationInferred": true
+  }
+}

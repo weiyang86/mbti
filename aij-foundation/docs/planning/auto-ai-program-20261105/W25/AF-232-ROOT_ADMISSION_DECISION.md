@@ -1,0 +1,7 @@
+# AF232 root 基于实际权限入口的接线补充
+
+冻结CONTRACT不改写。root只读核实原ai-personal-agent-run-previews.controller.ts的GET run-preview需要ai.execute+ai.assets.read，其原service也在同事务强制aiExecute。因此只读3权限场景不能无条件调用该旧预览，否则会将合法的文档来源preview/read用户误清为403。
+
+本卡新接线仍使用原Agent.GET、publication.get与原model-options检查当前自有enabled/发布/依赖/两字段text模型；有ai.execute时额外使用旧run-preview。只读角色通过原read-capable model-options核验，最终完整来源报价始终由W24 generation.preview在原owner同事务重新验证；未增加权限定义或修改旧controller/service。原modelExecutionConfigured只取生成预览事实，未配置不阻止查看来源报价，但不能确认执行。没有自动创建发布、成本或授权客户端真值。
+
+buildDocumentGenerationSource只为原SDK已解码document/index构造RAM pin，异步hash前固定副本，最终controller仍完整核验原文/索引/边界/hash。root composition后续必须在hash前后检验当前来源/完整auth/active与epoch，不把helper返回值当权限。

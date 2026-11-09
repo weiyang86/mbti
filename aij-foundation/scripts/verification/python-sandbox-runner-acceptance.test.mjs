@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+const receipt=JSON.parse(readFileSync('.artifacts/auto-ai-program-20261105/AF-175/image-receipt.json'));
+assert.match(receipt.approvedImage,/^docker\.io\/library\/python@sha256:[a-f0-9]{64}$/);
+assert.equal(receipt.cli,'/usr/local/bin/docker');assert.equal(receipt.os,'linux');assert.equal(receipt.architecture,'arm64');
+process.env.AIJ_PYTHON_SANDBOX_LIVE_ACK='OWNED_CONTAINERS_ONLY';
+process.env.AIJ_PYTHON_SANDBOX_DOCKER_CLI=receipt.cli;process.env.AIJ_PYTHON_SANDBOX_IMAGE=receipt.approvedImage;
+process.env.AIJ_AF175_COMPILED_API_DIR=resolve('apps/api/dist');
+await import('./python-sandbox-runner-live.test.mjs');

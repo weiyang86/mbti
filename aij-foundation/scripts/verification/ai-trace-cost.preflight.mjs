@@ -1,0 +1,23 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { schemaInvocation } from "../prisma-schema.mjs";
+import { repositoryRoot } from "../database/connection.mjs";
+
+assert.equal(process.versions.node.split(".")[0], "24", "repository Node major is 24");
+schemaInvocation(["validate"]);
+const queue = JSON.parse(readFileSync(new URL("../../docs/planning/CODING_QUEUE.json", import.meta.url), "utf8"));
+assert.equal(queue.nextCardCandidate?.formalTaskId, "AF-093");
+assert.equal(queue.nextCardCandidate?.alias, "G15-03");
+assert.equal(queue.formalTaskIdAssignments?.ids?.["G15-03"], "AF-093");
+assert.ok(queue.formalTaskIdAssignmentsHistory?.some(entry => entry.ids?.["G15-03"] === "AF-093"));
+const current = queue.taskExecutions?.find(entry => entry.formalTaskId === "AF-093");
+const provider = queue.taskExecutions?.find(entry => entry.formalTaskId === "AF-091");
+const runtime = queue.taskExecutions?.find(entry => entry.formalTaskId === "AF-092");
+assert.ok(["IN_PROGRESS", "CODE_VERIFIED"].includes(current?.status));
+assert.equal(provider?.status, "CODE_VERIFIED");
+assert.equal(provider?.git?.status, "COMMITTED_AND_PUSHED");
+assert.equal(runtime?.status, "CODE_VERIFIED");
+assert.equal(runtime?.git?.status, "COMMITTED_AND_PUSHED");
+assert.equal(current?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK");
+assert.equal(repositoryRoot, process.cwd(), "verification is running from this repository root");
+console.log("AF-093 preflight: unique assignment, G15-01/G15-02 pushed code dependencies and Node/Prisma schema verified");

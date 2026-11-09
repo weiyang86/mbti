@@ -1,0 +1,124 @@
+{
+  "task": "AF-214",
+  "candidateCommit": "5d7d993954ada0ef51eb879c107c69cf26340669",
+  "candidateStop": "msg_50c5f58f8401",
+  "purpose": "Frozen actual root implementation inputs; not an acceptance result. Candidate controller/UI/SDK loader/wording integrated with original owners.",
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge-citations.controller.ts",
+      "sha256": "e30d4401564ab2b8e9e08f0e783a8be7a9d1396dd37325abb8b94f818a2b22a6"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/knowledge-citation.ts",
+      "sha256": "e7476262936547ee37701d1c2516cdb757f0108294fd4c7523bdcaf4d163d43e"
+    },
+    {
+      "path": "packages/sdk/src/knowledge-citations.ts",
+      "sha256": "31b1183c721ed2889a7c7bc1bcb054053e48da4c02a32d5372d04a25fbbc870a"
+    },
+    {
+      "path": "apps/web/app/components/client-knowledge-citation.tsx",
+      "sha256": "72119e76706d9f38bdf16ac7cd2707827c3761e2081365a6bea39e2f63b099c0"
+    },
+    {
+      "path": "scripts/verification/knowledge-citations.test.mjs",
+      "sha256": "e12f1f61b6b6cf5d42c2e513a7a6a2ddfc4535b4e5a08a1b3e5f3d9003b42778"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W20/AF-214-ROOT_WIRING.md",
+      "sha256": "aa210629c3083e929f863327a09dcef0b87709a6d3c45b73cf26e2d25a789579"
+    },
+    {
+      "path": "docs/execution/AF-214-candidate.md",
+      "sha256": "0dfd2b9882f34460065e950323726f24e892dba9ca74fa8ffbdf5f4c94687e2f"
+    },
+    {
+      "path": "apps/api/src/bootstrap.ts",
+      "sha256": "0077671ebf4fca7d24fbb7ff6adb654f519dec7ab541ed504f9c5e7afe644c10"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge.service.ts",
+      "sha256": "ee3b98d906efd6686e59d2d98dc41a3ab21fba48bcda6ad8b9cb612392b4549f"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "7e3b1072947a29bf98c96b916a816fe8a673a15f9d993e43da41cbfeaceacbb8"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "sha256": "f40ac9b53753d83212e73a2949276ebdefbe1c8af3cb5133ec7519c004651fd0"
+    },
+    {
+      "path": "apps/web/app/components/client-knowledge-questions-page.tsx",
+      "sha256": "67a8e94d2f2ace239a1f72e023e119532a08fea6ed6e724a855016883a0949a0"
+    },
+    {
+      "path": "scripts/verification/knowledge-citations-acceptance.mjs",
+      "sha256": "9fc3fbc38fb602d19169a10c179fbf67f1e8d8553a68b48de0b0844cfc72a093"
+    },
+    {
+      "path": "scripts/verification/knowledge-citations-live.test.mjs",
+      "sha256": "94381c418a6616eacf15267d2fbd4348ee8d42b3214e955c20296ef220074597"
+    },
+    {
+      "path": "scripts/verification/knowledge-citations-browser.mjs",
+      "sha256": "7051c6c793c648c90a3d0813c25e262bd108af7ee8afd130d83a1f6f81916daf"
+    },
+    {
+      "path": "scripts/verification/knowledge-citations-prerequisite.mjs",
+      "sha256": "6731ff10ecbf7fc0e73efe830696ef4e4bdc0060c81e5750492176c8d063b303"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "9efca8d733e6361cdecf371b3d7f1ae713a7c1d0d410c08907c8d4325ae488c3"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "6d15192a804b47f93f78d5d644804f52c43618dc4c1f3d5a4e02decb4c89e2fe"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "93e5be6ca2607521e2df901e62d594bdbb6a34db95e0dd0f9e8f23cf29640e75"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "a78223eea7095f13521e551d450bde81944531408ee0cd3f1a07ba4153b7207c"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "a5bb038df632f512a1f28b759263984e10a5eccdc35bdb6f467884905618b15b"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "92616311295066ef74dcc0cad4d4d7a0955df0ee41d8309bef679d64b0d3c532"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "8637913223d82cafb7d8608d88d8bf51a0c19700af255da30d1784727195f3e8"
+    },
+    {
+      "path": "scripts/verification/web-build-isolated.mjs",
+      "sha256": "431f116482a6f71bad93dfc0ba05d36667834a22b929050dd228273ed7a0a571"
+    },
+    {
+      "path": "scripts/verification/personal-skills.test.mjs",
+      "sha256": "585b996ed7f91e7d7e2063630f92b4b988ce35f35ed462fdcbf54d32538ac118"
+    },
+    {
+      "path": "scripts/verification/personal-agents.test.mjs",
+      "sha256": "62ddb0540be35157cd7f170183b9661e6ecdb33e0e2a4bc9fb710a6673ffb2be"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W20/AF-214-UI_REVIEW.md",
+      "sha256": "c18f8020c139d3bc2e1ad5d7f2ec214b6cff6113d5828643342d91308fdf1a63"
+    },
+    {
+      "path": "scripts/verification/g19-knowledge-document-lifecycle-http-db.test.mjs",
+      "sha256": "78ba535f61ad2e3899181431f214ce68dbb9837d806c87bf3a894106a5cf65d1"
+    },
+    {
+      "path": "scripts/verification/g19-knowledge-question-http-db.test.mjs",
+      "sha256": "512e0a83ff7fcc2fbb9b652a497f818066d18e9f7a5ce0d46ec2722d5a8351c3"
+    }
+  ]
+}

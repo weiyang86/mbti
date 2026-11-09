@@ -1,0 +1,136 @@
+{
+  "governanceTaskId": "task_934be74b6ad9",
+  "cards": [
+    {
+      "id": "AF-227",
+      "title": "提供个人文档章节生成事务源门与持久来源结构",
+      "hours": 3.25,
+      "allowPaths": [
+        "apps/api/src/documents/personal-document-run-source.ts",
+        "apps/api/test/personal-document-run-source.test.ts",
+        "docs/planning/auto-ai-program-20261105/W24/AF-227-ORIGIN_SCHEMA.sql",
+        "docs/execution/AF-227-candidate.md",
+        "docs/planning/auto-ai-program-20261105/W24/AF-227-ROOT_WIRING.md"
+      ],
+      "workerHoursLimit": 1.5,
+      "spec": "docs/planning/auto-ai-program-20261105/AF-227.md",
+      "status": "READY_AFTER_GOVERNANCE",
+      "requirements": [
+        "REQ-022",
+        "REQ-037",
+        "REQ-040"
+      ],
+      "scopeBaseVerifiedEqual": true,
+      "bootstrap": [],
+      "bootstrapManifest": {
+        "path": "docs/planning/auto-ai-program-20261105/W24/SOURCE_BOOTSTRAP.json",
+        "sha256": "ccc1f0f9fa3c950debb65ed2eb0954ebf57523d07281b8aef191c736fbc088db",
+        "sourceCommit": "165338eb41eca99d3b779964a7e9f73f402a0d23"
+      },
+      "plannedWorktreeName": "AIJ-W24-AF227",
+      "model": "inherited-default",
+      "effort": "inherited-default",
+      "codeDeps": [
+        "task_934be74b6ad9",
+        "task_f09046b94694",
+        "task_3c0cca5be140",
+        "task_21a29f8ab349"
+      ],
+      "candidateTaskId": "task_c9ae4da812e3",
+      "integrationDeps": [
+        "task_934be74b6ad9",
+        "task_c9ae4da812e3",
+        "task_21a29f8ab349"
+      ],
+      "integrationTaskId": "task_2e4970206b58"
+    },
+    {
+      "id": "AF-228",
+      "title": "接入章节生成与原运行时任务来源绑定",
+      "hours": 3.75,
+      "allowPaths": [
+        "apps/api/src/plugins/aij-ai/ai-personal-document-run-origin.service.ts",
+        "apps/api/test/personal-document-run-origin.test.ts",
+        "docs/execution/AF-228-candidate.md",
+        "docs/planning/auto-ai-program-20261105/W24/AF-228-ROOT_WIRING.md"
+      ],
+      "workerHoursLimit": 1.5,
+      "spec": "docs/planning/auto-ai-program-20261105/AF-228.md",
+      "status": "READY_AFTER_GOVERNANCE",
+      "requirements": [
+        "REQ-022",
+        "REQ-037",
+        "REQ-040"
+      ],
+      "scopeBaseVerifiedEqual": true,
+      "bootstrap": [],
+      "bootstrapManifest": {
+        "path": "docs/planning/auto-ai-program-20261105/W24/SOURCE_BOOTSTRAP.json",
+        "sha256": "ccc1f0f9fa3c950debb65ed2eb0954ebf57523d07281b8aef191c736fbc088db",
+        "sourceCommit": "165338eb41eca99d3b779964a7e9f73f402a0d23"
+      },
+      "plannedWorktreeName": "AIJ-W24-AF228",
+      "model": "inherited-default",
+      "effort": "inherited-default",
+      "codeDeps": [
+        "task_934be74b6ad9",
+        "task_f09046b94694",
+        "task_3c0cca5be140",
+        "task_21a29f8ab349"
+      ],
+      "candidateTaskId": "task_8f375db3b184",
+      "integrationDeps": [
+        "task_934be74b6ad9",
+        "task_8f375db3b184",
+        "task_2e4970206b58"
+      ],
+      "integrationTaskId": "task_30adea22acfe"
+    },
+    {
+      "id": "AF-229",
+      "title": "提供章节生成预览任务API与公共SDK",
+      "hours": 3.75,
+      "allowPaths": [
+        "apps/api/src/plugins/aij-ai/ai-personal-document-generation.dto.ts",
+        "apps/api/src/plugins/aij-ai/ai-personal-document-generation.controller.ts",
+        "apps/api/src/plugins/aij-ai/ai-personal-document-generation.service.ts",
+        "apps/api/test/personal-document-generation.test.ts",
+        "packages/sdk/src/personal-document-generation.ts",
+        "scripts/verification/personal-document-generation-sdk.test.mjs",
+        "docs/execution/AF-229-candidate.md",
+        "docs/planning/auto-ai-program-20261105/W24/AF-229-ROOT_WIRING.md"
+      ],
+      "workerHoursLimit": 1.5,
+      "spec": "docs/planning/auto-ai-program-20261105/AF-229.md",
+      "status": "READY_AFTER_GOVERNANCE",
+      "requirements": [
+        "REQ-022",
+        "REQ-037",
+        "REQ-040"
+      ],
+      "scopeBaseVerifiedEqual": true,
+      "bootstrap": [],
+      "bootstrapManifest": {
+        "path": "docs/planning/auto-ai-program-20261105/W24/SOURCE_BOOTSTRAP.json",
+        "sha256": "ccc1f0f9fa3c950debb65ed2eb0954ebf57523d07281b8aef191c736fbc088db",
+        "sourceCommit": "165338eb41eca99d3b779964a7e9f73f402a0d23"
+      },
+      "plannedWorktreeName": "AIJ-W24-AF229",
+      "model": "inherited-default",
+      "effort": "inherited-default",
+      "codeDeps": [
+        "task_934be74b6ad9",
+        "task_f09046b94694",
+        "task_3c0cca5be140",
+        "task_21a29f8ab349"
+      ],
+      "candidateTaskId": "task_64c7d5d018e8",
+      "integrationDeps": [
+        "task_934be74b6ad9",
+        "task_64c7d5d018e8",
+        "task_30adea22acfe"
+      ],
+      "integrationTaskId": "task_4d76852ccaad"
+    }
+  ]
+}

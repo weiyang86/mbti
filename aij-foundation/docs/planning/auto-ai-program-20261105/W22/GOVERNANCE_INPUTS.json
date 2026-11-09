@@ -1,0 +1,29 @@
+{
+  "task": "AF-219",
+  "files": [
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-219.md",
+      "sha256": "2ee623c0afe89dd689cd751c81238711b96640e4e00accc51adf18f8effa86b8"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-220.md",
+      "sha256": "d9ed5626086c0d9cd6fcc4dc11e57e6a2609da124a450313d216c530835d4a52"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-221.md",
+      "sha256": "4107b6b08bc9bc52e46c8bf8a414b3afc5e19756163ad48a082ab7f0ff709da1"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W22/CONTRACT.md",
+      "sha256": "1d023b18d6918dd9f060a6d1d8ce527a9efc9a99d70b808e0222ca84fa012aff"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W22/SOURCE_BOOTSTRAP.json",
+      "sha256": "1396522f0782f4e9fa5478786ea67d78cde328ec745de2725a85decff978eea3"
+    },
+    {
+      "path": "docs/planning/owner-handoff-20261108/NEXT_WORK_PLAN.md",
+      "sha256": "c9fddedc0c9b66b28a34b67d99309fb301e264c768fba6e75e6bdf0b41d6af40"
+    }
+  ]
+}

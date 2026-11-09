@@ -1,0 +1,30 @@
+{
+  "name": "@aij/web",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=10.0.0 <11"
+  },
+  "scripts": {
+    "dev": "node ../../scripts/run-app.mjs web dev",
+    "build": "node ../../scripts/run-app.mjs web build",
+    "start": "node ../../scripts/run-app.mjs web start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aij/sdk": "workspace:*",
+    "@aij/ui": "workspace:*",
+    "antd": "6.3.7",
+    "next": "16.4.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "@aij/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.18",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,34 @@
+import type { ClientApi, createPersonalMemoriesClient, createPersonalAgentsClient, PersonalMemory, PersonalMemorySummary, PersonalMemoryKind } from "@aij/sdk";
+export type MemoryDraft = { code: string; title: string; content: string; kind: PersonalMemoryKind; enabled: boolean; agentIds: string[] };
+export type AgentChoice = { id: string; name: string; code: string; enabled: boolean };
+export type GrantStatus = Partial<AgentChoice> & { available: boolean };
+export type MemoryLibraryState = {
+  phase: "loading" | "ready"; principal: { id: string; nickname: string; email: string | null } | null;
+  workspaces: { workspace: { id: string; name: string }; role: { name: string } }[];
+  workspaceId: string; context: { workspaceId: string; workspaceName: string; permissions: string[] } | null;
+  busy: boolean; items: PersonalMemorySummary[]; nextCursor: string | null; detail: PersonalMemory | null;
+  editor: "create" | "edit" | null; draft: MemoryDraft; confirmation: "create" | "update" | "delete" | null;
+  agents: AgentChoice[]; agentCursor: string | null; grants: Record<string, GrantStatus>; optionsLoaded: boolean;
+  issue: { kind: string; status: number; message: string } | null; notice: string;
+};
+export declare function validMemoryDraft(draft: MemoryDraft, creating?: boolean): boolean;
+export declare function memoryIssue(error: unknown, operation?: string): { kind: string; status: number; message: string };
+declare function libraryConfigured(): boolean;
+declare function librarySnapshot(): MemoryLibraryState;
+declare function librarySubscribe(listener: VoidFunction): VoidFunction;
+declare function libraryStart(preferredId?: string): Promise<void>;
+declare function libraryScope(workspaceId: string): Promise<void>;
+declare function libraryAsync(): Promise<void>;
+declare function libraryDetail(memoryId: string): Promise<void>;
+declare function libraryPage(next?: boolean): Promise<void>;
+declare function librarySetDraft<K extends "code" | "title" | "content" | "kind" | "enabled">(field: K, value: MemoryDraft[K]): void;
+declare function libraryGrant(agentId: string): void;
+type MemoryLibraryStore = {
+  getSnapshot: typeof librarySnapshot; subscribe: typeof librarySubscribe;
+  start: typeof libraryStart; selectWorkspace: typeof libraryScope; refresh: typeof libraryAsync;
+  nextPage: typeof libraryAsync; openDetail: typeof libraryDetail; openCreate: typeof libraryAsync; openEdit: typeof libraryAsync;
+  loadAgents: typeof libraryPage; setDraft: typeof librarySetDraft; addGrant: typeof libraryGrant; removeGrant: typeof libraryGrant;
+  readyToSave: typeof libraryConfigured; requestSave: VoidFunction; requestDelete: VoidFunction; confirmMutation: typeof libraryAsync;
+  cancelConfirmation: VoidFunction; closeDetail: VoidFunction; signOut: typeof libraryAsync; dispose: VoidFunction;
+};
+export declare function createMemoryLibrary(options: { request: ClientApi; memoriesClientFactory: typeof createPersonalMemoriesClient; agentsClientFactory: typeof createPersonalAgentsClient; configured?: typeof libraryConfigured; onUnauthorized?: VoidFunction; timeoutMs?: number }): MemoryLibraryStore;

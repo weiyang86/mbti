@@ -1,0 +1,686 @@
+{
+  "date": "2026-11-04",
+  "branch": "dev",
+  "baseline": "d77120dc3ebf8fa038129682ead214d1c04051c5",
+  "ownerReview": "PENDING_UNIFIED_OWNER_CHECK",
+  "ownerAcceptanceRecordsUnchanged": true,
+  "liveProviderCalls": 0,
+  "realCustomerDataUsed": false,
+  "sharedOrProductionDatabaseMigration": false,
+  "reports": [
+    {
+      "taskId": "AF-116",
+      "sourceReport": ".artifacts/verification/AF-116/run-WjeNMK/report.json",
+      "sha256": "3016f9533d749159a23462b1655824ab6415a5f9dec25c88ada7d7cdec505ca6",
+      "status": "PASS",
+      "exitCode": 0,
+      "prerequisiteCount": 1,
+      "steps": [
+        {
+          "id": "prisma-validate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:validate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "prisma-generate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:generate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "api-build",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "build"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "evaluation-budget",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/ai-evaluation-budget.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "repository-lint",
+          "command": [
+            "pnpm",
+            "run",
+            "lint"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "workspace-typecheck",
+          "command": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "diff-check",
+          "command": [
+            "git",
+            "--no-optional-locks",
+            "diff",
+            "--check"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "taskId": "AF-117",
+      "sourceReport": ".artifacts/verification/AF-117/run-nk3GOF/report.json",
+      "sha256": "0cfe179df6b3a180036715d50d1890bbfb451439e3309af4d944562c29bce424",
+      "status": "PASS",
+      "exitCode": 0,
+      "prerequisiteCount": 1,
+      "steps": [
+        {
+          "id": "api-build",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "build"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "deepseek-offline-http",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/deepseek-provider.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 5,
+            "failed": 0,
+            "passed": 5,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "evaluation-budget",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/ai-evaluation-budget.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "repository-lint",
+          "command": [
+            "pnpm",
+            "run",
+            "lint"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "workspace-typecheck",
+          "command": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "diff-check",
+          "command": [
+            "git",
+            "--no-optional-locks",
+            "diff",
+            "--check"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "taskId": "AF-118",
+      "sourceReport": ".artifacts/verification/AF-118/run-YHQgqR/report.json",
+      "sha256": "9ce9193b85cebf6501c38b863a0ccd79147813d4ceb184657c618e0aadc59508",
+      "status": "PASS",
+      "exitCode": 0,
+      "prerequisiteCount": 1,
+      "steps": [
+        {
+          "id": "prisma-validate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:validate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "prisma-generate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:generate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "api-build",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "build"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "evaluation-retention-http-db",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/ai-evaluation-retention.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "repository-lint",
+          "command": [
+            "pnpm",
+            "run",
+            "lint"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "workspace-typecheck",
+          "command": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "diff-check",
+          "command": [
+            "git",
+            "--no-optional-locks",
+            "diff",
+            "--check"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "taskId": "AF-119",
+      "sourceReport": ".artifacts/verification/AF-119/run-coa2Cz/report.json",
+      "sha256": "f76b0bd7a7bbcbff549b5c660e7c8750dd953097c4fa279ac005a08a717c9b88",
+      "status": "PASS",
+      "exitCode": 0,
+      "prerequisiteCount": 1,
+      "steps": [
+        {
+          "id": "prisma-validate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:validate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "prisma-generate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:generate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "api-build",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "build"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "sdk-build",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/sdk",
+            "build"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "knowledge-import-http-db",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/ai-knowledge-import.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "web-build",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "scripts/verification/web-build-isolated.mjs",
+            "AF-119"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "repository-lint",
+          "command": [
+            "pnpm",
+            "run",
+            "lint"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "workspace-typecheck",
+          "command": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "diff-check",
+          "command": [
+            "git",
+            "--no-optional-locks",
+            "diff",
+            "--check"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "taskId": "AF-120",
+      "sourceReport": ".artifacts/verification/AF-120/run-WOnxza/report.json",
+      "sha256": "b5d4a32ad10876f5debed93a8382973d4f23f330fd57481b381b0136427520d5",
+      "status": "PASS",
+      "exitCode": 0,
+      "prerequisiteCount": 1,
+      "steps": [
+        {
+          "id": "prisma-validate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:validate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "prisma-generate",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "prisma:generate"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "api-build",
+          "command": [
+            "pnpm",
+            "--filter",
+            "@aij/api",
+            "build"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "repository-default-tests",
+          "command": [
+            "pnpm",
+            "test"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "regression-ai-evaluation-budget",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/ai-evaluation-budget.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "regression-deepseek-provider",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/deepseek-provider.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 5,
+            "failed": 0,
+            "passed": 5,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "regression-ai-evaluation-retention",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/ai-evaluation-retention.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "regression-ai-knowledge-import",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/ai-knowledge-import.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "regression-remaining-delivery-integration",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/remaining-delivery.integration.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 5,
+            "failed": 0,
+            "passed": 5,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "regression-g19-question-retention-http-db",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/g19-question-retention-http-db.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "regression-g19-knowledge-evaluation-http-db",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/g19-knowledge-evaluation-http-db.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 5,
+            "failed": 0,
+            "passed": 5,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "base-source-pack-consumer",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/base-consumer-pack.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 6,
+            "failed": 0,
+            "passed": 6,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 2,
+            "suites": 0
+          }
+        },
+        {
+          "id": "packed-sdk-consumer",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "--test",
+            "--test-reporter=/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation/scripts/verification/reporter.mjs",
+            "scripts/verification/package-pack-smoke.test.mjs"
+          ],
+          "exitCode": 0,
+          "tests": {
+            "tests": 5,
+            "failed": 0,
+            "passed": 5,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 1,
+            "suites": 0
+          }
+        },
+        {
+          "id": "web-build",
+          "command": [
+            "/Users/lei/.nvm/versions/node/v24.21.0/bin/node",
+            "scripts/verification/web-build-isolated.mjs",
+            "AF-120"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "repository-lint",
+          "command": [
+            "pnpm",
+            "run",
+            "lint"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "workspace-typecheck",
+          "command": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ],
+          "exitCode": 0
+        },
+        {
+          "id": "diff-check",
+          "command": [
+            "git",
+            "--no-optional-locks",
+            "diff",
+            "--check"
+          ],
+          "exitCode": 0
+        }
+      ]
+    }
+  ],
+  "additionalChecks": {
+    "pluginManifestTests": {
+      "command": "node --test scripts/verification/plugin-manifest.test.mjs",
+      "passed": 15,
+      "failed": 0,
+      "exitCode": 0
+    }
+  },
+  "limitations": [
+    "Live DeepSeek evaluation gated on prior upstream confirmation, real local SecretRef and fixed FX/price policy",
+    "Browser owner review remains pending",
+    "License/public channels/supported platform/production deployment require owner decisions"
+  ],
+  "finalStructuredTests": {
+    "tests": 50,
+    "passed": 50,
+    "failed": 0,
+    "skipped": 0,
+    "todo": 0,
+    "includesParentTests": true
+  },
+  "defaultTests": {
+    "root": 84,
+    "api": 8,
+    "failed": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "offlineEvaluation": {
+    "cases": 20,
+    "answerablePassed": 18,
+    "answerableTotal": 18,
+    "unsupportedRefused": 2,
+    "unsupportedTotal": 2,
+    "crossWorkspaceCitationLeaks": 0,
+    "provider": "offline-knowledge",
+    "representsLiveDeepSeekQuality": false
+  }
+}

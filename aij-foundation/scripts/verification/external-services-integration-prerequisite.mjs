@@ -1,0 +1,24 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+
+const folder = "docs/planning/auto-ai-program-20261105/";
+const program = JSON.parse(readFileSync(folder + "program.json", "utf8"));
+const row = program.nextWaves.find(w => w.id === "W15").cards.find(c => c.id === "AF-193");
+const git = (...args) => execFileSync("git", args);
+const hash = b => createHash("sha256").update(b).digest("hex");
+assert.equal(git("branch", "--show-current").toString().trim(), "dev");
+assert.equal(row.candidateStopped, true);
+assert.equal(row.candidateReceipt, "msg_00c805fe97f0");
+assert.equal(row.candidateCommit, "87fbbd7ee0429d6f3b981fa14014047da6057b80");
+assert.equal(row.bootstrapCommit, "599c9b79d14d03892294b2d8b2fec3e62bb785f3");
+const manifest = JSON.parse(readFileSync(row.bootstrapManifest.path, "utf8"));
+assert.equal(hash(readFileSync(row.bootstrapManifest.path)), row.bootstrapManifest.sha256);
+for (const f of manifest.files) assert.equal(hash(git("show", row.bootstrapCommit + ":" + f.path)), f.sha256);
+const delta = git("diff", "--name-only", row.bootstrapCommit, row.candidateCommit).toString().trim().split("\n").sort();
+assert.deepEqual(delta, [...row.allowPaths].sort());
+for (const p of delta) assert.deepEqual(readFileSync(p), git("show", row.candidateCommit + ":" + p), p);
+for (const p of ["package.json", "apps/api/package.json", "apps/web/package.json", "pnpm-lock.yaml", "apps/api/prisma/schema.prisma"]) assert.deepEqual(readFileSync(p), git("show", manifest.sourceCommit + ":" + p));
+assert.equal(program.ownerExecutionDirectives.find(d => d.id === "OWNER_BLANK_CREDENTIALS_20261106").externalAcceptance, "DEFERRED_NOT_PASSED");
+console.log(JSON.stringify({ status: "PASS", task: "AF-193", candidate: row.candidateCommit, bootstrapFiles: manifest.files.length, integration: "STOPPED_SOURCE_ONLY", vendorAcceptance: "DEFERRED_NOT_PASSED" }));

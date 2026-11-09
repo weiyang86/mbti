@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';import{readFileSync}from'node:fs';import{execFileSync}from'node:child_process';
+const read=p=>readFileSync(p,'utf8');execFileSync('git',['merge-base','--is-ancestor','133e36c24d44a19b5b6544197f2e5ae9aad883d2','HEAD']);
+const q=JSON.parse(read('docs/planning/CODING_QUEUE.json')),c=q.taskExecutions.find(c=>c.formalTaskId==='AF-163');assert.equal(c.candidateStopped,true);assert.equal(c.candidateCommit,'6854e67c0e01c2ff727c26cb3a5992150e6df1fd');assert.equal(c.bootstrapCommit,'c045c239a750fbeead83a3efa41b2af535908294');
+for(const id of ['AF-154','AF-159','AF-161','AF-162']){const r=q.taskExecutions.find(c=>c.formalTaskId===id);assert.equal(r.status,'CODE_VERIFIED');assert.equal(JSON.parse(read(r.report)).status,'PASS');}
+const schema=read('apps/api/prisma/schema.prisma'),proposal=read('docs/execution/AF-163-schema.prisma');const workflowStart=schema.indexOf('model AiPersonalWorkflow {');assert.equal(schema.slice(schema.indexOf('model AiPersonalMemory {'),workflowStart<0?undefined:workflowStart).trim(),proposal.slice(proposal.indexOf('model AiPersonalMemory {')).trim());
+for(const [name,line]of [['MemberUser','personalAiMemories AiPersonalMemory[]'],['ClientWorkspace','personalAiMemories AiPersonalMemory[]'],['AiPersonalAgent','personalMemoryGrants AiPersonalMemoryAgentGrant[]']])assert.ok(schema.match(new RegExp('model '+name+' \\{([\\s\\S]*?)\\n\\}'))?.[1].includes(line));
+for(const p of ['scripts/runtime-environment.cjs','scripts/database/migration.mjs','scripts/database/seed.mjs','scripts/verification/auth-support.mjs','scripts/verification/client-auth-fixture.mjs'])assert.equal(read(p).split('"AF-163"').length-1,p.endsWith('auth-support.mjs')?3:1);
+const module=read('apps/api/src/plugins/aij-ai/ai-runtime.module.ts');for(const n of ['AiPersonalMemoriesController','AiPersonalMemoriesService','PersonalMemoryNoStoreGuard'])assert.ok(module.includes(n));
+assert.ok(read('apps/api/src/bootstrap.ts').includes('app.use("/api/client/ai/personal-memories", personalMemoryNoStore)'));assert.ok(read('packages/sdk/src/index.ts').includes('export * from "./personal-memories.js";'));
+await import('./personal-agent-integration-prerequisite.mjs');await import('./personal-agent-run-integration-prerequisite.mjs');
+console.log(JSON.stringify({task:'AF-163',status:'PASS',kind:'integration-prerequisite-only'}));

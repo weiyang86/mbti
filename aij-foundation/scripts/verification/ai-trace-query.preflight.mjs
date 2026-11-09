@@ -1,0 +1,21 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+
+const queue = JSON.parse(readFileSync("docs/planning/CODING_QUEUE.json", "utf8"));
+const baseline = JSON.parse(readFileSync(".artifacts/continuous/2026-11-01-to-G19/AF-096-baseline.json", "utf8"));
+const task = queue.taskExecutions.find(item => item.formalTaskId === "AF-096");
+assert.equal(queue.formalTaskIdAssignments.ids["G16-02"], "AF-096");
+assert.equal(task?.alias, "G16-02");
+assert.equal(task?.status, "IN_PROGRESS");
+assert.equal(task?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK");
+const dependency = queue.taskExecutions.find(item => item.formalTaskId === "AF-095");
+assert.equal(dependency?.status, "CODE_VERIFIED");
+assert.equal(dependency?.git?.status, "COMMITTED_AND_PUSHED");
+assert.equal(baseline.head, "f29f90bf22bd5de72c83cea2033f8ccced9e5d26");
+assert.equal(baseline.originDevTrackingRef, baseline.head);
+assert.equal(baseline.branch, "dev");
+assert.equal(baseline.collision.executionFile, false);
+assert.equal(execFileSync("git", ["--no-optional-locks", "branch", "--show-current"], { encoding: "utf8" }).trim(), "dev");
+assert.equal(execFileSync("git", ["--no-optional-locks", "rev-parse", "HEAD"], { encoding: "utf8" }).trim(), baseline.head);
+console.log("AF-096 assignment, AF-095 dependency, frozen queue scope and clean commit baseline are consistent");

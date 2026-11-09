@@ -1,0 +1,62 @@
+// PROPOSAL ONLY: append models after root accepts STOPPED handoff.
+// Exactly three backrelations in existing models (all other fields remain byte-identical):
+// ClientWorkspace: personalWorkflows AiPersonalWorkflow[]
+// MemberUser: personalWorkflows AiPersonalWorkflow[]
+// AiPersonalAgentVersion: personalWorkflowBindings AiPersonalWorkflowAgentBinding[]
+// Membership/session activity is revalidated and locked by the shared server services.
+model AiPersonalWorkflow {
+  id String @id @default(cuid())
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  code String @db.VarChar(63)
+  name String @db.VarChar(100)
+  graph Json
+  graphDigest String @db.VarChar(64) @map("graph_digest")
+  contentDigest String @db.VarChar(64) @map("content_digest")
+  initialDigest String @db.VarChar(64) @map("initial_digest")
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  versions AiPersonalWorkflowVersion[]
+  @@unique([id, workspaceId, memberId], map: "ai_personal_workflow_id_scope_key")
+  @@unique([workspaceId, memberId, code], map: "ai_personal_workflow_owner_code_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_workflow_owner_page_idx")
+  @@index([memberId], map: "ai_personal_workflow_member_idx")
+  @@map("ai_personal_workflow")
+}
+model AiPersonalWorkflowVersion {
+  id String @id @default(cuid())
+  workflowId String @map("workflow_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  code String @db.VarChar(63)
+  name String @db.VarChar(100)
+  graph Json
+  graphDigest String @db.VarChar(64) @map("graph_digest")
+  contentDigest String @db.VarChar(64) @map("content_digest")
+  revision Int
+  createdAt DateTime @default(now()) @map("created_at")
+  agentBindingCount Int @db.SmallInt @map("agent_binding_count")
+  workflow AiPersonalWorkflow @relation(fields: [workflowId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_workflow_version_owner_fkey")
+  agentBindings AiPersonalWorkflowAgentBinding[]
+  @@unique([id, workspaceId, memberId], map: "ai_personal_workflow_version_id_scope_key")
+  @@unique([workflowId, revision], map: "ai_personal_workflow_version_revision_key")
+  @@index([workspaceId, memberId, workflowId, revision], map: "ai_personal_workflow_version_owner_idx")
+  @@map("ai_personal_workflow_version")
+}
+model AiPersonalWorkflowAgentBinding {
+  id String @id @default(cuid())
+  workflowVersionId String @map("workflow_version_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  nodeId String @db.VarChar(48) @map("node_id")
+  agentVersionId String @map("agent_version_id")
+  workflowVersion AiPersonalWorkflowVersion @relation(fields: [workflowVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_workflow_binding_owner_fkey")
+  agentVersion AiPersonalAgentVersion @relation(fields: [agentVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_workflow_binding_agent_fkey")
+  @@unique([workflowVersionId, nodeId], map: "ai_personal_workflow_binding_node_key")
+  @@index([agentVersionId, workspaceId, memberId], map: "ai_personal_workflow_binding_agent_idx")
+  @@map("ai_personal_workflow_agent_binding")
+}
