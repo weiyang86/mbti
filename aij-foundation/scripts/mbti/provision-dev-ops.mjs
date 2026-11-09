@@ -18,6 +18,7 @@ const bcrypt = require("bcryptjs");
 function privateFile(path) {
   const info = lstatSync(path);
   assert.ok(info.isFile() && !info.isSymbolicLink() && !(info.mode & 0o077), "Expected private regular file");
+  if (process.getuid) assert.equal(info.uid, process.getuid(), "Local secret file owner mismatch");
 }
 
 async function main() {
@@ -63,13 +64,17 @@ async function main() {
   const prisma = new PrismaClient({ datasources: { db: { url: env.DATABASE_URL } } });
   try {
     await prisma.$transaction(async tx => {
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('mbti-development-ops-bootstrap'))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('aij-admin-users-write'))`;
       const identity = (await tx.$queryRaw`SELECT current_database() AS db,current_user AS role`)[0];
       assert.deepEqual(identity, { db: "mbti_foundation_development", role: "mbti_foundation_development" });
       const marker = (await tx.$queryRaw`SELECT project,environment,root FROM mbti_local_control."_mbti_project_identity" WHERE singleton=true`)[0];
       assert.deepEqual(marker, { project: "mbti-foundation", environment: "development", root: ownerRoot });
       const permission = await tx.sysPermission.findUniqueOrThrow({ where: { permissionCode: "mbti:orders:read" } });
       assert.equal(permission.status, "active");
+      assert.equal(permission.module, "mbti");
+      assert.equal(permission.action, "read");
+      assert.equal(permission.resourceType, "api");
+      assert.equal(permission.apiPath, "/api/admin/mbti/orders/:id");
       const foundRole = await tx.sysRole.findUnique({ where: { id: credentials.roleId }, include: { permissions: true, userRoles: true } });
       if (foundRole) {
         assert.equal(foundRole.roleCode, credentials.roleCode);
