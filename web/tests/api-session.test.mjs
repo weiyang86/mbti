@@ -14,6 +14,7 @@ const compile = (entry) => buildSync({
 }).outputFiles[0].text
 const clientCode = compile('../src/api/client.ts')
 const draftCode = compile('../src/store/quiz-draft.ts')
+const apiCode = compile('../src/api/index.ts')
 
 function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: { items: [], next_cursor: null } })) {
   const calls = []
@@ -29,7 +30,7 @@ function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: 
     },
   }
   const load = (code) => {
-    const context = { module: { exports: {} }, uni }
+    const context = { module: { exports: {} }, uni, URLSearchParams }
     vm.runInNewContext(code, context)
     return context.module.exports
   }
@@ -101,6 +102,56 @@ test('409 and other API errors preserve the server message and status', async ()
   await assert.rejects(b.client.request('/quiz/sessions/s/submit', { method: 'POST' }),
     (e) => e.status === 409 && e.body.code === 'already_submitted' && e.message === 'already submitted')
   assert.equal(b.calls.length, 1)
+})
+
+test('F2 detail, metadata and list share one guest during concurrent first visit', async () => {
+  const b = browser()
+  const calls = b.load(apiCode)
+  await Promise.all([calls.getResult('owned'), calls.listTypes(), calls.listResults({ limit: 50 })])
+  assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  assert.deepEqual(b.calls.slice(1).map((c) => c.url.slice(api.length)).sort(),
+    ['/results/owned', '/results?limit=50', '/types'])
+  assert.ok(b.calls.slice(1).every((c) => c.header['X-Guest-Token'] === 'synthetic-guest'))
+})
+
+test('F2 writes return bare self-select and empty 204; share uses the server asset URL', async () => {
+  const snapshot = { id: 'self-1', source: 'self_select', type_code: 'INFP', question_bank_version: 'self-select', submitted_at: future }
+  const preview = { status: 'ready', preview_url: 'https://assets.invalid/share.svg' }
+  const b = browser(new Map(), (options) => options.method === 'DELETE'
+    ? { statusCode: 204, data: '' }
+    : options.url.endsWith('/share/preview') ? { statusCode: 200, data: preview }
+      : { statusCode: 201, data: snapshot })
+  const calls = b.load(apiCode)
+  const result = await calls.createSelfSelectResult({ type_code: 'INFP', source: 'self_select' })
+  assert.equal(result.id, snapshot.id)
+  assert.equal(result.source, 'self_select')
+  assert.equal('dimension_counts' in result, false)
+  assert.deepEqual(await calls.createSharePreview({ result_id: result.id, scene: 'moments' }), preview)
+  await calls.deleteResult(result.id)
+  assert.deepEqual(b.calls.slice(1).map((c) => [c.method, c.url.slice(api.length)]),
+    [['POST', '/results'], ['POST', '/share/preview'], ['DELETE', '/results/self-1']])
+  assert.deepEqual(JSON.parse(JSON.stringify(b.calls[1].data)), { type_code: 'INFP', source: 'self_select' })
+})
+
+test('F2 compare uses static route; 404/422/503 remain failures with no fallback or replay', async () => {
+  for (const status of [404, 422, 503]) {
+    const b = browser(new Map(), () => ({ statusCode: status, data: { code: 'rejected', message: `拒绝 ${status}` } }))
+    const calls = b.load(apiCode)
+    await assert.rejects(calls.compareResults('older /', 'newer?'), (e) => e.status === status && e.message === `拒绝 ${status}`)
+    await assert.rejects(calls.createSharePreview({ result_id: 'owned' }), (e) => e.status === status)
+    await assert.rejects(calls.deleteResult('owned'), (e) => e.status === status)
+    assert.equal(b.calls.length, 4)
+    assert.equal(b.calls[1].url, `${api}/results/compare?baseline_id=older%20%2F&target_id=newer%3F`)
+  }
+})
+
+test('F2 synchronous share rejects pending jobs, missing URLs and local placeholders', async () => {
+  for (const response of [{ status: 'pending', job_id: 'job' }, { status: 'ready' }, { status: 'ready', preview_url: '/static/share-mock.png' }]) {
+    const b = browser(new Map(), () => ({ statusCode: 200, data: response }))
+    const calls = b.load(apiCode)
+    await assert.rejects(calls.createSharePreview({ result_id: 'owned' }), /分享预览未就绪/)
+    assert.equal(b.calls.length, 2)
+  }
 })
 
 const bank = {

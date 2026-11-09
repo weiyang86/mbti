@@ -1,6 +1,11 @@
 <template>
   <view class="page">
-    <view v-if="items.length === 0" class="muted">暂无记录，先去测一测吧。</view>
+    <view v-if="loading" class="muted">正在读取阶段记录…</view>
+    <view v-else-if="loadError" class="card">
+      <text>{{ loadError }}</text>
+      <view class="btn-secondary mt" @click="load">重试</view>
+    </view>
+    <view v-else-if="items.length === 0" class="muted">暂无记录，先去测一测吧。</view>
     <view
       v-for="item in items"
       :key="item.id"
@@ -25,13 +30,22 @@ import { listResults } from '@/api/results'
 import { requestErrorMessage } from '@/api/client'
 
 const items = ref<ResultSnapshotSummary[]>([])
+const loading = ref(false)
+const loadError = ref('')
 
 async function load() {
+  if (loading.value) return
+  loading.value = true
+  loadError.value = ''
+  items.value = []
   try {
     const res = await listResults({ limit: 50 })
     items.value = res.items
   } catch (error) {
-    uni.showToast({ title: requestErrorMessage(error, '读取阶段记录失败，请重试'), icon: 'none' })
+    loadError.value = requestErrorMessage(error, '读取阶段记录失败，请重试')
+    uni.showToast({ title: loadError.value, icon: 'none' })
+  } finally {
+    loading.value = false
   }
 }
 
