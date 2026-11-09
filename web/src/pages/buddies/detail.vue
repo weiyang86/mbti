@@ -28,7 +28,8 @@
         </template>
         <text v-if="myCard && !myCard.discoverable" class="notice">请先公开自己的名片，再发起交换。</text>
         <button v-if="relationsLoaded && (!exchange || ['declined', 'revoked'].includes(exchange.status))" class="btn-primary mt" :disabled="busy || !myCard?.discoverable" @click="create">申请交换名片</button>
-        <text class="notice">接受交换只确认名片关系，不授予任何联系方式。联系方式功能尚未开放。</text>
+        <button v-if="relationsLoaded && exchange?.status === 'accepted'" class="btn-secondary mt" :disabled="busy || loading" @click="go(`/pages/contact-request/contact-request?id=${encodeURIComponent(buddy.id)}`)">申请对方联系方式</button>
+        <text class="notice">接受交换只确认名片关系，不授予任何联系方式。请另选渠道并由对方本人批准。</text>
       </view>
       <button class="btn-secondary mt" :disabled="busy" @click="block">屏蔽这位搭子</button>
     </template>

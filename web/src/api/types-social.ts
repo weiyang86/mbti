@@ -50,3 +50,18 @@ export interface CardExchange {
   responded_at?: string
   simulated: boolean
 }
+
+// F5 internal candidate / needs_human_review; never a public card projection.
+export type ContactChannel = 'wechat' | 'qq' | 'phone'
+export interface MyContacts { wechat?: string; qq?: string; phone?: string }
+export interface ContactRequest {
+  id: string
+  buddy_id: string
+  direction: 'incoming' | 'outgoing'
+  status: 'pending' | 'accepted' | 'declined' | 'revoked'
+  channels: ContactChannel[]
+  created_at: string
+  responded_at?: string
+  simulated: false
+}
+export interface GrantedChannel { channel: ContactChannel; value: string }

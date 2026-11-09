@@ -17,6 +17,8 @@
       <view class="btn-secondary mt" @click="goDiscover">发现搭子</view>
       <view class="btn-secondary mt" @click="goExchanges">我的名片夹</view>
       <view class="btn-secondary mt" @click="goBlocked">屏蔽管理</view>
+      <view class="btn-secondary mt" @click="goContacts">本人联系方式</view>
+      <view class="btn-secondary mt" @click="goContactRequests">联系方式请求</view>
     </view>
 
     <text v-if="latest" class="muted foot">最近结果：{{ latest.type_code }}</text>
@@ -131,6 +133,8 @@ function goCard() { uni.navigateTo({ url: '/pages/card/card' }) }
 function goDiscover() { uni.navigateTo({ url: '/pages/discover/discover' }) }
 function goExchanges() { uni.navigateTo({ url: '/pages/exchanges/exchanges' }) }
 function goBlocked() { uni.navigateTo({ url: '/pages/buddies/blocked' }) }
+function goContacts() { uni.navigateTo({ url: '/pages/contacts/contacts' }) }
+function goContactRequests() { uni.navigateTo({ url: '/pages/contact-request/contact-request' }) }
 </script>
 
 <style scoped lang="scss">

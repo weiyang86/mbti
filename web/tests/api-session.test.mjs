@@ -16,6 +16,8 @@ const clientCode = compile('../src/api/client.ts')
 const draftCode = compile('../src/store/quiz-draft.ts')
 const apiCode = compile('../src/api/index.ts')
 const socialDisplayCode = compile('../src/utils/social-display.ts')
+const contactDisplayCode = compile('../src/utils/contact-display.ts')
+const privateScopeCode = compile('../src/utils/private-page.ts')
 
 function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: { items: [], next_cursor: null } }), globals = {}) {
   const calls = []
@@ -300,6 +302,84 @@ test('F4 action visibility follows incoming/outgoing and pending/accepted state,
       assert.equal(display.canRevoke({ direction, status }), direction === 'outgoing' && ['pending', 'accepted'].includes(status))
     }
   }
+})
+
+test('F5 all eight operations share one identity; values never enter persistent storage', async () => {
+  const b = browser(new Map(), (o) => ({ statusCode: o.method === 'DELETE' ? 204 : 200, data: o.method === 'DELETE' ? '' : {} }))
+  const calls = b.load(apiCode)
+  await Promise.all([calls.getContacts(), calls.listContactRequests('card /?')])
+  await calls.updateContacts({ wechat: 'synthetic_private' })
+  await calls.clearContacts()
+  await calls.createContactRequest({ buddy_id: 'card /?', channels: ['wechat'] })
+  await calls.respondContactRequest('request /?', 'accept')
+  await calls.revokeContactRequest('request /?')
+  await calls.getGrantedContacts('request /?')
+  assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  assert.deepEqual(b.calls.slice(1).map((c) => [c.method, c.url.slice(api.length)]), [
+    ['GET', '/contacts/me'], ['GET', '/contact-requests?buddy_id=card%20%2F%3F'],
+    ['PUT', '/contacts/me'], ['DELETE', '/contacts/me'], ['POST', '/contact-requests'],
+    ['POST', '/contact-requests/request%20%2F%3F/respond'], ['DELETE', '/contact-requests/request%20%2F%3F'],
+    ['GET', '/contact-requests/request%20%2F%3F/granted'],
+  ])
+  assert.deepEqual([...b.storage.keys()], [guestKey])
+  assert.equal(JSON.stringify([...b.storage]).includes('synthetic_private'), false)
+  assert.ok(b.calls.every((c) => !c.url.includes('synthetic_private')))
+})
+
+test('F5 revoked/unapproved/input/conflict failures never read a stored grant or replay writes', async () => {
+  for (const status of [401, 404, 409, 422, 503]) {
+    const b = browser(new Map([['mbti_mock_contacts', { wechat: 'stale_private' }]]),
+      () => ({ statusCode: status, data: { code: 'denied', message: 'server denial' } }))
+    const calls = b.load(apiCode)
+    await assert.rejects(calls.getGrantedContacts('old'), (e) => e.status === status)
+    await assert.rejects(calls.updateContacts({}), (e) => e.status === status)
+    assert.equal(b.calls.length, status === 401 ? 2 : 3)
+    assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  }
+})
+
+test('F5 recipient alone responds, both participants can revoke active requests, incoming is never mutual grant', () => {
+  const display = browser().load(contactDisplayCode)
+  for (const direction of ['incoming', 'outgoing', undefined]) {
+    for (const status of ['pending', 'accepted', 'declined', 'revoked']) {
+      assert.equal(display.canRespondContact({ direction, status }), direction === 'incoming' && status === 'pending')
+      assert.equal(display.canRevokeContact({ direction, status }), !!direction && ['pending', 'accepted'].includes(status))
+    }
+  }
+})
+
+test('F5 leaving or refreshing invalidates a delayed private response, including after reentry', () => {
+  let value = 'visible-private-value'
+  const scope = browser().load(privateScopeCode).createPrivateScope(() => { value = '' })
+  scope.enter()
+  assert.equal(value, '')
+  const slowRead = scope.begin()
+  assert.equal(scope.current(slowRead), true)
+  value = 'new-value'
+  const refresh = scope.begin()
+  assert.equal(value, '')
+  assert.equal(scope.current(slowRead), false)
+  scope.leave()
+  assert.equal(scope.current(refresh), false)
+  scope.enter()
+  assert.equal(scope.current(refresh), false)
+  assert.equal(value, '')
+})
+
+test('F5 errors never interpolate private response details; candidate format validates trimmed full form', () => {
+  const b = browser()
+  const display = b.load(contactDisplayCode)
+  // Compile together so instanceof uses the same HttpError constructor.
+  const code = buildSync({ stdin: { contents: `export { HttpError } from './src/api/client'; export { contactErrorMessage } from './src/utils/contact-display'`, resolveDir: new URL('..', import.meta.url).pathname }, bundle: true, write: false, platform: 'node', format: 'cjs', define: { 'import.meta.env': JSON.stringify(env) } }).outputFiles[0].text
+  const combined = b.load(code)
+  for (const status of [401, 404, 409, 422, 503]) {
+    const message = combined.contactErrorMessage(new combined.HttpError(status, { message: 'private-canary' }), '读取失败')
+    assert.equal(message.includes('private-canary'), false)
+  }
+  assert.equal(display.validateContacts({ wechat: ' synthetic_ok ', qq: '', phone: '' }), '')
+  assert.ok(display.validateContacts({ wechat: '1bad' }))
+  assert.ok(display.validateContacts({ qq: '01234' }))
+  assert.ok(display.validateContacts({ phone: '123' }))
 })
 
 const bank = {
