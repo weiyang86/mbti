@@ -1,0 +1,87 @@
+{
+  "task": "AF-218",
+  "sourceBaseline": "f0e12d76b0c2c5dccf4d1c56369019e979e52902",
+  "candidate": "6497a87e52270e67e55040e830c894eadccbae6c",
+  "files": [
+    {
+      "path": "apps/web/app/components/client-agent-version-restore-panel.tsx",
+      "sha256": "1e4703ee0453d28bcff8ce8d5d1ee8eeb8acfd2ceb84ed8b9cb485036899023d"
+    },
+    {
+      "path": "apps/web/app/components/client-agent-version-restore-state.mjs",
+      "sha256": "b07a8198076347324886accc0501a999044538a0eeac56564b7d7efef10f3774"
+    },
+    {
+      "path": "apps/web/app/components/client-agent-version-restore-state.d.mts",
+      "sha256": "a8c6ff95e3403ca54d8e6da2bc3f4b74011db03feab3827a691cf2002dfc5692"
+    },
+    {
+      "path": "scripts/verification/client-agent-version-restore-state.test.mjs",
+      "sha256": "290cab70b9814eeaf0c2ded01f92054ab806e28bb102105457426b1d74083998"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W21/AF-218-ROOT_WIRING.md",
+      "sha256": "3e2b3e03f74baba377a1548c5858335c4b27796f5b7f43bbe8bd19040c6e4a2a"
+    },
+    {
+      "path": "docs/execution/AF-218-candidate.md",
+      "sha256": "0e5db8df8ff2a0a8e4365fd464162c6b8096f74bc47970274695ab7a6a6e99f8"
+    },
+    {
+      "path": "apps/web/app/components/client-agent-library.tsx",
+      "sha256": "868f76ac1115a7118ac688d52e5c1210fa04c62b417cca3e1aad12e481166371"
+    },
+    {
+      "path": "scripts/verification/w21-ui-host.mjs",
+      "sha256": "9f6920f45f401c7872d88130582c8bdc23493b9d24831da5121c44bf67a8095f"
+    },
+    {
+      "path": "scripts/verification/w21-native-browser.mjs",
+      "sha256": "1ebb5ba42f6b6136b190fe92ab4e4879d8dbcc7ff3ebb90bd2a35e461acf0a71"
+    },
+    {
+      "path": "scripts/verification/w21-candidate-prerequisite.mjs",
+      "sha256": "e44a098d620a04f9cf5019cc10cd652f67b5e39fc34cb8cab9dc8daa13fb012a"
+    },
+    {
+      "path": "scripts/verification/client-agent-version-restore-live.test.mjs",
+      "sha256": "c6507d2927bce30c90df794fa8a2e60faaff4830f50d1ed62880e79280aa5245"
+    },
+    {
+      "path": "scripts/verification/client-agent-version-restore-acceptance.mjs",
+      "sha256": "daba43f38bb5139660b08756f10663e49623e4f37b0b11029a26ebedb560b52e"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "55c22939a6095454ca0b030aa1e0ff5ae811ab7b3de3a8123706a4668211d42b"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "90171e91b9f0c48589fff4bd49fe8f9951956d61fc3119beeab4a61b1cecc5eb"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "27445cab35010668ef612c5cc0ec3acbb805b4239224be62b5e33823895f66ef"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "bbbc240c8ee9552d5cde1240b28188f5e312e3f6c96722c822b80f0be9d5b47b"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "99c21bca163a1c9ddd24eeda1a6fe6a972b4d3c3a64f247d34d116a8e3c40b8d"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "ac11bb50457e4179bd48097f4f081e829ea119b225cda0673ded8f08fcc72e18"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "ecb4f94b0a3a68c588c694e64ed61a1d465fae15e5ad005368b050a89dbe6058"
+    },
+    {
+      "path": "scripts/verification/web-build-isolated.mjs",
+      "sha256": "a3ee2a1d1629635646393366b7fd3033387b09e55d62c745b5251cf211446bb0"
+    }
+  ]
+}

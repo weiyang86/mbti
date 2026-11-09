@@ -1,0 +1,111 @@
+{
+  "card": "AF-209",
+  "candidate": "947a8c3fa85bdcfe0373de1ba438b1de4dc62afd",
+  "actualG208Commit": "1629c56793e6142d492ec0a435cd61d49182e8cb",
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-script-skill.dto.ts",
+      "sha256": "23c0588415663822dbce5e47a5a64b5cd2667ed7c237f8dcc1a1562b0ebbe1de"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-script-skill.service.ts",
+      "sha256": "aaa7fcabb65cf09615a134541f56332a53f72b8806e85f7b4b09d321b6c50b57"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-script-skill-contract.ts",
+      "sha256": "a70eb1ef69c9c8c9d7931a1e43b1d0b613d39bbac6387433671a0893fb634604"
+    },
+    {
+      "path": "scripts/verification/personal-script-skill-assets.test.mjs",
+      "sha256": "8cbcca736fb8c6bc3eeea6612303d3aa8561d27b442753a004803d0d46538dfd"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W19/AF-209-ROOT_WIRING.md",
+      "sha256": "109adc57691a067890badf5d1d6954f3b5b2b6cf9dd373a77fba2f00fd8e5159"
+    },
+    {
+      "path": "docs/execution/AF-209-candidate.md",
+      "sha256": "911c54349dc5c2b4d0c9c29c74fe8343b769a616d6b7361cbc389c01b649dffe"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-skills.service.ts",
+      "sha256": "92640c86919b8abf3f1be7cd891d9c725472e1761564d9c228de47d8e55754df"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-agents.service.ts",
+      "sha256": "4c843cc1a71777cf4589d2d8522ed5cc7cf5d793820f6ab1427e848c3e833848"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-agent-snapshots.service.ts",
+      "sha256": "f6ed22f08319f17a06f45740d389e0cc121241b3131af01143b51fde50965c7b"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace-permissions.ts",
+      "sha256": "c54d85a2fbb8d7a791caf3325e3b43047ad3f98206977f8090fd539da804dd12"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "35f1721dd643600001c10858a937b6a613d7b8ba74e286953dd5596b29471004"
+    },
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "0d0971a18569ebdbfc4d5a19d95e8986b4bf52d2fbd277c3310b7c7c0cd928ce"
+    },
+    {
+      "path": "apps/api/prisma/migrations/20261107040000_personal_script_versions/migration.sql",
+      "sha256": "5cfb3bfe15b4417205cf6385498e23a736ef003f2af7c8e63538fda39f888a43"
+    },
+    {
+      "path": "scripts/verification/personal-script-skill-live.test.mjs",
+      "sha256": "b1e6caf29f8926401d21a31d1e481571617bd797e762cf3071ada9a4359645d9"
+    },
+    {
+      "path": "scripts/verification/personal-script-skill-acceptance.mjs",
+      "sha256": "e6d1fc92355a56a07d9ae1661451da7e85688fbe8c024cb8ace40b6ee04547e2"
+    },
+    {
+      "path": "scripts/verification/personal-script-skill-prerequisite.mjs",
+      "sha256": "62683f48167a3735efb073ad27a28f143fa871a8ffe105fbf96c19092d7f8cd6"
+    },
+    {
+      "path": "scripts/verification/registry.mjs",
+      "sha256": "97ae962821bbaf07a0180ec911c03f468d5523537db0d24199db55cbc5896a8f"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "1b641adf93e60c8f4a8b10c2d94d2ead09f40e1e40a9ea3b15cf54952875e7a9"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "0621e5dc71b5b4d46cec6a5085a6d927e604ad253469570eaa2b6d2034c2f2ee"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "a09edff08902ecca425585f549ac42a1cc82950efb315d11cd9d32caa1ac1f4e"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "9af414320792e96c88590f21bf14ee85e3b10c3bb6c623c30a61caf1a0ff67ba"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "c520eaf22efa2f5126c3f5bac3bba857cb5f2a306b6902b29d25b4ddb2414bca"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "6ad5564919c0117411c8a785168147e25a0920329abc47d9733f2781d48cbcb0"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "d2b5163fdc4765ff7bc89c19622614bcdd7e2f0b6e31a7e2f41f2b7360408412"
+    },
+    {
+      "path": "scripts/verification/personal-skills.test.mjs",
+      "sha256": "659f8bcd2b469678354cfd3cd398f5ca837e3ad1765ee5e699dd4497ea721ecd"
+    },
+    {
+      "path": "scripts/verification/personal-agents.test.mjs",
+      "sha256": "887f8a16d895320b5c5ac2f9b22c8e63faf57b040249bb0e5d973763f8d054cc"
+    }
+  ]
+}

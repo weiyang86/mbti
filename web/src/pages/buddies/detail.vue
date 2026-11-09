@@ -1,450 +1,99 @@
 <template>
-  <view class="page buddy-page">
-    <view v-if="loading" class="state"><text class="state-text">正在读取名片…</text></view>
-
-    <view v-else-if="!buddy" class="state">
-      <text class="state-text">这张名片当前不可查看</text>
-      <view class="btn-secondary mt" @click="backDiscover">返回换名片</view>
-    </view>
-
-    <view v-else>
-      <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+  <view class="page social-page">
+    <text class="heading">搭子详情</text>
+    <text v-if="error" class="error" role="alert">{{ error }}</text>
+    <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
+    <button class="btn-secondary" :disabled="loading || busy" @click="load">刷新搭子与关系</button>
+    <text v-if="loading" class="notice">正在读取名片与交换状态…</text>
+    <template v-if="buddy">
+      <view class="card">
+        <text class="type-code">{{ buddy.type_code }}</text>
+        <text class="section">{{ buddy.nickname || '匿名搭子' }} · {{ buddy.type_name }}</text>
+        <text v-if="buddy.tagline" class="line">{{ buddy.tagline }}</text>
+        <view><text v-for="interest in buddy.interests" :key="interest" class="tag">{{ interest }}</text></view>
+        <text v-if="buddy.shared_interests.length" class="line">共同兴趣：{{ buddy.shared_interests.join('、') }}</text>
+        <text v-if="buddy.compatibility_hint" class="notice">{{ buddy.compatibility_hint }}</text>
+        <button class="btn-secondary mt" @click="go(`/pages/card/public?id=${encodeURIComponent(buddy.id)}`)">查看公开名片</button>
       </view>
-
-      <view class="buddy-profile">
-        <view class="buddy-avatar large" :style="{ background: buddy.avatar_color }">
-          <text>{{ buddy.avatar_text }}</text>
-        </view>
-        <text class="tag">虚构成年人资料</text>
-        <text class="profile-name">
-          {{ buddy.nickname }}
-          <text class="profile-type">{{ buddy.type_code }}</text>
-        </text>
-        <text class="profile-line">{{ buddy.tagline }}</text>
-        <view class="tag-row">
-          <text v-for="i in buddy.interests" :key="i" class="interest">{{ i }}</text>
-        </view>
-      </view>
-
-      <view class="panel">
-        <text class="panel-title">{{ buddy.compatibility_hint }}</text>
-        <text class="panel-text">{{ hintText }}</text>
-        <text class="textbtn block mt" @click="goCompat">
-          看看 {{ myType }} × {{ buddy.type_code }} 的相处小抄
-        </text>
-      </view>
-
-      <view class="panel">
-        <!-- 已互换名片 -->
-        <view v-if="status === 'accepted'">
-          <view class="notice green">✓ 已互换基础名片（模拟）</view>
-          <view class="btn-primary mt" @click="goContactRequest">申请交换联系方式</view>
-          <text class="textbtn block mt" @click="revokeCard">撤销名片交换</text>
-        </view>
-
-        <!-- 等待回应 -->
-        <view v-else-if="status === 'pending'">
-          <view class="notice">名片申请待回应，当前看不到任何联系方式。</view>
-          <view class="demo-reply">
-            <text class="demo-label">仅供演示：模拟对方操作</text>
-            <view class="demo-actions">
-              <view class="btn-secondary small" @click="respond('accept')">模拟对方同意</view>
-              <view class="btn-ghost small" @click="respond('decline')">模拟对方拒绝</view>
-            </view>
+      <view class="card">
+        <text class="section">{{ exchangeStatusLabel(exchange?.status || buddy.exchange_status) }}</text>
+        <template v-if="exchange">
+          <text class="line">{{ exchange.direction === 'incoming' ? '收到的申请' : '发出的申请' }}</text>
+          <view v-if="canRespond(exchange)" class="row mt">
+            <button class="btn-primary" :disabled="busy || !relationsLoaded" @click="respond('accept')">接受名片交换</button>
+            <button class="btn-secondary" :disabled="busy || !relationsLoaded" @click="respond('decline')">拒绝名片交换</button>
           </view>
-          <text class="textbtn block" @click="revokeCard">取消申请</text>
-        </view>
-
-        <!-- 已拒绝 / 未申请 -->
-        <view v-else>
-          <text v-if="status === 'declined'" class="fine">
-            对方已拒绝这次模拟申请，你可以再次发起。
-          </text>
-          <view class="btn-primary" :class="{ mt: status === 'declined' }" @click="requestCard">
-            免费申请交换名片
-          </view>
-          <text class="fine centered mt">只交换公开名片，微信 / QQ / 电话另行授权。</text>
-        </view>
+          <button v-if="canRevoke(exchange)" class="btn-secondary mt" :disabled="busy || !relationsLoaded" @click="revoke">{{ exchange.status === 'accepted' ? '撤回已接受的交换' : '撤回申请' }}</button>
+          <text v-if="exchange.status === 'pending' && exchange.direction === 'outgoing'" class="notice">请等待对方本人回应。</text>
+        </template>
+        <text v-if="myCard && !myCard.discoverable" class="notice">请先公开自己的名片，再发起交换。</text>
+        <button v-if="relationsLoaded && (!exchange || ['declined', 'revoked'].includes(exchange.status))" class="btn-primary mt" :disabled="busy || !myCard?.discoverable" @click="create">申请交换名片</button>
+        <text class="notice">接受交换只确认名片关系，不授予任何联系方式。联系方式功能尚未开放。</text>
       </view>
-
-      <view class="btnrow mt">
-        <text class="textbtn" @click="report">举报示例资料</text>
-        <text class="textbtn" @click="block">屏蔽这位搭子</text>
-      </view>
-    </view>
+      <button class="btn-secondary mt" :disabled="busy" @click="block">屏蔽这位搭子</button>
+    </template>
+    <button class="btn-secondary mt" @click="go('/pages/discover/discover')">返回发现搭子</button>
+    <button class="btn-secondary mt" @click="go('/pages/exchanges/exchanges')">我的名片夹</button>
+    <button class="btn-secondary mt" @click="go('/pages/buddies/blocked')">屏蔽管理</button>
   </view>
 </template>
-
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import type { BuddyDetail, CardExchange } from '@/api/types-social'
-import { blockBuddy, getBuddy } from '@/api/buddies'
+import { getBuddy, blockBuddy } from '@/api/buddies'
 import { getMyCard } from '@/api/cards'
-import {
-  createCardExchange,
-  listCardExchanges,
-  respondCardExchange,
-  revokeCardExchange,
-} from '@/api/card-exchanges'
-
-const buddyId = ref('')
-const myType = ref('INFP')
+import { listCardExchanges, createCardExchange, respondCardExchange, revokeCardExchange } from '@/api/card-exchanges'
+import type { BuddyDetail, CardExchange, MyCard } from '@/api/types-social'
+import { canRespond, canRevoke, exchangeStatusLabel, socialErrorMessage } from '@/utils/social-display'
+const id = ref('')
 const buddy = ref<BuddyDetail | null>(null)
+const myCard = ref<MyCard | null>(null)
 const exchange = ref<CardExchange | null>(null)
-const loading = ref(true)
+const loading = ref(false)
 const busy = ref(false)
-
-onLoad((q) => {
-  buddyId.value = (q?.id as string) || ''
-})
-
-onShow(() => {
-  load()
-})
-
-const status = computed(() => exchange.value?.status || buddy.value?.exchange_status || 'none')
-
-const hintText = computed(() => {
-  if (!buddy.value) return ''
-  if (buddy.value.shared_interests.length) {
-    return `你们都选了 ${buddy.value.shared_interests.join('、')}，可以作为认识彼此的起点。`
-  }
-  return '可以先交换名片，再决定是否愿意进一步联系。'
-})
-
+const relationsLoaded = ref(false)
+const error = ref('')
+const actionError = ref('')
+onLoad((query) => { id.value = typeof query?.id === 'string' ? query.id : '' })
+onShow(() => { actionError.value = ''; load() })
 async function load() {
-  if (!buddyId.value) {
-    loading.value = false
-    return
-  }
-  loading.value = !buddy.value
+  if (loading.value) return
+  loading.value = true; buddy.value = null; exchange.value = null; myCard.value = null; relationsLoaded.value = false; error.value = ''
+  if (!id.value) { error.value = '缺少搭子编号，请从发现或名片夹进入'; loading.value = false; return }
   try {
-    const [detail, list] = await Promise.all([
-      getBuddy(buddyId.value),
-      listCardExchanges(),
-    ])
-    buddy.value = detail
-    exchange.value = list.items.find((item) => item.buddy_id === buddyId.value) || null
-    try {
-      const card = await getMyCard()
-      myType.value = card.type_code || detail.type_code
-    } catch {
-      myType.value = detail.type_code
-    }
-  } catch {
-    buddy.value = null
-  } finally {
-    loading.value = false
-  }
+    const [detail, list, card] = await Promise.all([getBuddy(id.value), listCardExchanges(), getMyCard()])
+    buddy.value = detail; myCard.value = card
+    exchange.value = list.items.find((item) => item.buddy_id === id.value) || null
+    relationsLoaded.value = true
+  } catch (e) { error.value = socialErrorMessage(e, '搭子或关系读取失败，请重试') }
+  finally { loading.value = false }
 }
-
-async function requestCard() {
-  if (busy.value || !buddy.value) return
-  busy.value = true
-  try {
-    exchange.value = await createCardExchange({ buddy_id: buddy.value.id })
-    await load()
-    uni.showToast({ title: '名片申请已发出', icon: 'none' })
-  } catch {
-    uni.showToast({ title: '发送失败，请稍后再试', icon: 'none' })
-  } finally {
-    busy.value = false
-  }
+async function act(operation: () => Promise<unknown>) {
+  if (busy.value || loading.value) return
+  busy.value = true; actionError.value = ''
+  try { await operation(); await load() }
+  catch (e) { actionError.value = socialErrorMessage(e, '操作失败，请重试'); await load() }
+  finally { busy.value = false }
 }
-
-async function respond(action: 'accept' | 'decline') {
-  if (busy.value || !exchange.value) return
-  busy.value = true
-  try {
-    exchange.value = await respondCardExchange(exchange.value.id, action)
-    await load()
-  } catch {
-    uni.showToast({ title: '操作失败，请稍后再试', icon: 'none' })
-  } finally {
-    busy.value = false
-  }
+function create() { if (buddy.value && relationsLoaded.value && myCard.value?.discoverable) act(() => createCardExchange({ buddy_id: id.value })) }
+function respond(action: 'accept' | 'decline') {
+  const item = exchange.value
+  if (item && canRespond(item) && relationsLoaded.value) act(() => respondCardExchange(item.id, action))
 }
-
-function revokeCard() {
-  if (!exchange.value) return
-  uni.showModal({
-    title: '撤销这次名片交换？',
-    content: '撤销后应用内不再展示这张名片，但无法收回对方已保存的内容。',
-    confirmText: '撤销',
-    success: async (res) => {
-      if (!res.confirm || !exchange.value) return
-      try {
-        await revokeCardExchange(exchange.value.id)
-        exchange.value = null
-        await load()
-        uni.showToast({ title: '已撤销', icon: 'none' })
-      } catch {
-        uni.showToast({ title: '撤销失败，请稍后再试', icon: 'none' })
-      }
-    },
-  })
+function revoke() {
+  const item = exchange.value
+  if (item && canRevoke(item) && relationsLoaded.value) act(() => revokeCardExchange(item.id))
 }
-
-function goContactRequest() {
-  uni.navigateTo({ url: `/pages/contact-request/contact-request?id=${buddyId.value}` })
-}
-
-function goCompat() {
-  if (!buddy.value) return
-  uni.navigateTo({
-    url: `/pages/compat/compat?type=${buddy.value.type_code}`,
-  })
-}
-
-function report() {
-  uni.showModal({
-    title: '已记录（演示）',
-    content: '这是虚构示例资料，举报不会发送到真实平台。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
-
 function block() {
-  uni.showModal({
-    title: '屏蔽这位搭子？',
-    content: '屏蔽后不再出现在推荐与名片夹中，可在“我的”里解除。',
-    confirmText: '屏蔽',
-    success: async (res) => {
-      if (!res.confirm) return
-      try {
-        await blockBuddy(buddyId.value)
-        uni.showToast({ title: '已屏蔽', icon: 'none' })
-        setTimeout(backDiscover, 500)
-      } catch {
-        uni.showToast({ title: '操作失败，请稍后再试', icon: 'none' })
-      }
-    },
-  })
+  if (busy.value || !buddy.value) return
+  uni.showModal({ title: '屏蔽这位搭子？', content: '双方将无法查看彼此的公开名片；待回应或已接受的交换会撤回，解除屏蔽不会恢复旧关系。', confirmText: '屏蔽', success: async (response) => {
+    if (!response.confirm || busy.value) return
+    busy.value = true; actionError.value = ''
+    try { await blockBuddy(id.value); buddy.value = null; exchange.value = null; uni.redirectTo({ url: '/pages/buddies/blocked' }) }
+    catch (e) { actionError.value = socialErrorMessage(e, '屏蔽失败，请重试'); await load() }
+    finally { busy.value = false }
+  } })
 }
-
-function backDiscover() {
-  uni.switchTab({ url: '/pages/discover/discover' })
-}
-
-function showDemo() {
-  uni.showModal({
-    title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：搭子资料、名片交换状态均为本地虚构数据。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
+function go(url: string) { uni.navigateTo({ url }) }
 </script>
-
-<style scoped lang="scss">
-.buddy-page {
-  padding-top: 24rpx;
-  padding-bottom: 56rpx;
-}
-
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 16rpx;
-}
-.demo-link {
-  color: #7560df;
-}
-
-.state {
-  padding-top: 220rpx;
-  text-align: center;
-}
-.state-text {
-  display: block;
-  font-size: 26rpx;
-  color: #77727e;
-}
-
-.buddy-profile {
-  text-align: center;
-  padding: 24rpx 0 30rpx;
-}
-.buddy-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #746380;
-}
-.buddy-avatar.large {
-  width: 170rpx;
-  height: 170rpx;
-  margin: 0 auto 26rpx;
-  border-radius: 52rpx;
-  font-size: 68rpx;
-}
-.tag {
-  display: inline-block;
-  font-size: 18rpx;
-  padding: 10rpx 20rpx;
-  border-radius: 16rpx;
-  background: #eee9ff;
-  color: #6d58b2;
-}
-.profile-name {
-  display: block;
-  font-size: 52rpx;
-  font-weight: 800;
-  margin: 24rpx 0 14rpx;
-  color: #292630;
-}
-.profile-type {
-  font-size: 34rpx;
-  color: #9470b3;
-  font-weight: 600;
-  margin-left: 10rpx;
-}
-.profile-line {
-  display: block;
-  font-size: 24rpx;
-  color: #77727e;
-}
-.tag-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 14rpx;
-  margin-top: 20rpx;
-}
-.interest {
-  font-size: 20rpx;
-  padding: 8rpx 18rpx;
-  border-radius: 14rpx;
-  background: #eee9ff;
-  color: #6d58b2;
-}
-
-.panel {
-  background: #fff;
-  border: 2rpx solid #ece7f1;
-  border-radius: 38rpx;
-  padding: 36rpx 32rpx;
-  margin-top: 28rpx;
-}
-.panel-title {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #292630;
-}
-.panel-text {
-  display: block;
-  margin-top: 14rpx;
-  font-size: 24rpx;
-  color: #77727e;
-  line-height: 1.7;
-}
-
-.notice {
-  display: block;
-  background: #f5f3fa;
-  border: 2rpx solid #e9e3f3;
-  padding: 26rpx 30rpx;
-  border-radius: 24rpx;
-  color: #7c728b;
-  font-size: 24rpx;
-  line-height: 1.7;
-}
-.notice.green {
-  background: #edf6f0;
-  border-color: #dceade;
-  color: #537c65;
-}
-
-.demo-reply {
-  margin-top: 24rpx;
-  padding: 28rpx;
-  background: #f5f1fa;
-  border: 2rpx dashed #d8c9e8;
-  border-radius: 24rpx;
-}
-.demo-label {
-  display: block;
-  font-size: 20rpx;
-  color: #aa95bc;
-  margin-bottom: 18rpx;
-}
-.demo-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
-.demo-actions view {
-  flex: 1;
-}
-
-.btn-primary,
-.btn-secondary,
-.btn-ghost {
-  display: block;
-  text-align: center;
-  border-radius: 24rpx;
-  padding: 22rpx 24rpx;
-  font-size: 26rpx;
-  font-weight: 600;
-}
-.btn-primary {
-  background: #6c4cf3;
-  color: #fff;
-}
-.btn-secondary {
-  background: #fff;
-  color: #292630;
-  border: 2rpx solid #ece7f1;
-}
-.btn-ghost {
-  background: transparent;
-  color: #77727e;
-  border: 2rpx solid #ece7f1;
-}
-.btn-secondary.small,
-.btn-ghost.small {
-  font-size: 22rpx;
-  padding: 16rpx 20rpx;
-  border-radius: 18rpx;
-}
-
-.textbtn {
-  display: inline-block;
-  color: #7560df;
-  font-size: 24rpx;
-  padding: 8rpx;
-}
-.textbtn.block {
-  display: block;
-  text-align: center;
-}
-.btnrow {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.fine {
-  display: block;
-  font-size: 20rpx;
-  color: #a398af;
-  line-height: 1.7;
-}
-.centered {
-  text-align: center;
-}
-.mt {
-  margin-top: 24rpx;
-}
-.mb {
-  margin-bottom: 24rpx;
-}
-</style>
+<style scoped lang="scss">@import '@/styles/social.scss';</style>

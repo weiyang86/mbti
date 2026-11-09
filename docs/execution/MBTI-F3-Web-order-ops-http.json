@@ -1,0 +1,200 @@
+{
+  "source": "Real LAN HTTP against the existing Web-created controlled test order; no SQL order lookup",
+  "api_base": "http://192.168.0.200:4156/api",
+  "run_id": "run_594d408d15de",
+  "task_id": "task_5672a0c22747",
+  "dispatch_id": "ctx_570f21fa3109",
+  "web_order_id": "MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+  "web_reference": {
+    "commit": "cfb02d32c089dbf3680cbf210b5e89e8149068a5",
+    "path": "web/F3-INTEGRATION.md",
+    "section": "真实 HTTP 与页面证据",
+    "expected_amount": 990,
+    "expected_currency": "CNY"
+  },
+  "checks": 9,
+  "receipts": [
+    {
+      "method": "GET",
+      "url": "http://192.168.0.200:4156/api/admin/mbti/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+      "request_authentication": "Existing Foundation non-super-admin ops session [REDACTED]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "observed_at": "2026-11-09T03:49:10.284Z",
+      "body": {
+        "id": "MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+        "result_id": "ef9d96f7-ea95-4b23-aefd-754155dfff55",
+        "product_code": "studio_tier_1",
+        "amount": 990,
+        "currency": "CNY",
+        "status": "pending",
+        "unlocked": false,
+        "created_at": "2026-11-09T03:35:12.292Z",
+        "payment_availability": "unconfigured",
+        "pricing_mode": "controlled_test_fixture"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.168.0.200:4156/api/admin/mbti/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+      "request_authentication": "none",
+      "status": 401,
+      "content_type": "application/json; charset=utf-8",
+      "observed_at": "2026-11-09T03:49:10.285Z",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.168.0.200:4156/api/admin/mbti/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+      "request_authentication": "Existing Foundation authenticated role without mbti:orders:read [REDACTED]",
+      "status": 403,
+      "content_type": "application/json; charset=utf-8",
+      "observed_at": "2026-11-09T03:49:10.298Z",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.168.0.200:4156/api/admin/mbti/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+      "request_authentication": "Separate synthetic ordinary guest [REDACTED]",
+      "status": 401,
+      "content_type": "application/json; charset=utf-8",
+      "observed_at": "2026-11-09T03:49:10.300Z",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.168.0.200:4156/api/admin/mbti/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+      "request_authentication": "Ordinary guest supplied as Bearer [REDACTED]",
+      "status": 401,
+      "content_type": "application/json; charset=utf-8",
+      "observed_at": "2026-11-09T03:49:10.300Z",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.168.0.200:4156/api/v1/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+      "request_authentication": "Separate synthetic ordinary guest [REDACTED]",
+      "status": 404,
+      "content_type": "application/json; charset=utf-8",
+      "observed_at": "2026-11-09T03:49:10.302Z",
+      "body": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    }
+  ],
+  "web_network_metadata": {
+    "source": "/tmp/mbti-f3-web-A-network.json",
+    "truncated": false,
+    "entries": [
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders",
+        "method": "POST",
+        "status": 201,
+        "mimeType": "application/json",
+        "timestamp": 1794195312311
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195312413
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195313213
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195326412
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders?limit=20",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195327512
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195328311
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders",
+        "method": "POST",
+        "status": 201,
+        "mimeType": "application/json",
+        "timestamp": 1794195344838
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195344912
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195363827
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195484010
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders/MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195501310
+      },
+      {
+        "url": "http://127.0.0.1:4156/api/v1/orders?limit=20",
+        "method": "GET",
+        "status": 200,
+        "mimeType": "application/json",
+        "timestamp": 1794195501810
+      }
+    ],
+    "limitation": "Original captured HTTP method/URL/status/timestamp only; response body was not included in this metadata capture"
+  },
+  "web_documented_order_projection": {
+    "source_commit": "cfb02d32c089dbf3680cbf210b5e89e8149068a5",
+    "source_path": "web/F3-INTEGRATION.md",
+    "provenance": "Fields documented by the Web worker and supplied by coordinator; not a reconstructed raw POST body",
+    "id": "MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7",
+    "amount": 990,
+    "currency": "CNY",
+    "status": "pending",
+    "unlocked": false,
+    "payment_availability": "unconfigured"
+  }
+}

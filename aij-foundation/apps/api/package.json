@@ -1,0 +1,45 @@
+{
+  "name": "@aij/api",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=10.0.0 <11"
+  },
+  "scripts": {
+    "dev": "node ../../scripts/run-app.mjs api dev",
+    "build": "node ../../scripts/run-app.mjs api build",
+    "start": "node ../../scripts/run-app.mjs api start",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "node --test -r ts-node/register test/*.test.ts",
+    "prisma:validate": "node ../../scripts/prisma-schema.mjs validate",
+    "prisma:generate": "node ../../scripts/prisma-schema.mjs generate"
+  },
+  "dependencies": {
+    "@aij/contracts": "workspace:*",
+    "@aij/core": "workspace:*",
+    "@aij/runtime-contracts": "workspace:*",
+    "@nestjs/common": "11.1.19",
+    "@nestjs/config": "4.0.4",
+    "@nestjs/core": "11.1.19",
+    "@nestjs/jwt": "11.0.2",
+    "@nestjs/platform-express": "11.1.19",
+    "@prisma/client": "6.19.3",
+    "bcryptjs": "3.0.3",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "docx": "9.15.2",
+    "htmlparser2": "10.1.0",
+    "pdfkit": "0.20.2",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "11.0.21",
+    "@types/node": "22.19.18",
+    "@types/pdfkit": "0.17.7",
+    "prisma": "6.19.3",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3"
+  }
+}

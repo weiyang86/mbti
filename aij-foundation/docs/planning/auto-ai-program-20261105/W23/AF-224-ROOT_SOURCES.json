@@ -1,0 +1,100 @@
+{
+  "candidate": "1246b61eec5ed596d9f1b965f778155058306a8a",
+  "bootstrap": "614e757d2d0e5d80ecd62707b9bc2257a8211133",
+  "originalStop": "msg_986302498264",
+  "workerHours": 0.35,
+  "completedDependencies": [
+    "task_99c0c174bf9e",
+    "task_f3fabfde50a6",
+    "task_f09046b94694"
+  ],
+  "candidateFiles": [
+    {
+      "path": "packages/sdk/src/personal-document-sections.ts",
+      "sha256": "7896198985bc867c5ca32ea8d1eb9cd2344ad0cc04d373ee33077073c3cb1b19"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-sdk.test.mjs",
+      "sha256": "796646d622ae55c0640bc25a2fabf0cccbe2894047ae7c43c8135693bfa90c71"
+    },
+    {
+      "path": "docs/execution/AF-224-candidate.md",
+      "sha256": "81a1ebf4a176dfcb8551f560bb577031c42c20fe3b825b60f3c9bd2333e52642"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W23/AF-224-ROOT_WIRING.md",
+      "sha256": "d5cb1758f8ebe595c8b387288315b0e6e3ee288b6cb5a9d5b03f15adb2e4e2e5"
+    }
+  ],
+  "files": [
+    {
+      "path": "packages/sdk/src/personal-document-sections.ts",
+      "sha256": "7896198985bc867c5ca32ea8d1eb9cd2344ad0cc04d373ee33077073c3cb1b19"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-sdk.test.mjs",
+      "sha256": "796646d622ae55c0640bc25a2fabf0cccbe2894047ae7c43c8135693bfa90c71"
+    },
+    {
+      "path": "docs/execution/AF-224-candidate.md",
+      "sha256": "81a1ebf4a176dfcb8551f560bb577031c42c20fe3b825b60f3c9bd2333e52642"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W23/AF-224-ROOT_WIRING.md",
+      "sha256": "d5cb1758f8ebe595c8b387288315b0e6e3ee288b6cb5a9d5b03f15adb2e4e2e5"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "sha256": "60d61d313a220a18ca42045081f0ff649c6764c46cbfac6bced95db07adfef74"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-sdk-prerequisite.mjs",
+      "sha256": "3eb41dee7285129624bf0bc9bcbe37c7666097050d2eac9bc0ba77a03cebd213"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-sdk-acceptance.mjs",
+      "sha256": "ef73011762264d91661ea62331d8431081bb23998269b39cc2b8f27bde75d064"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-sdk-live.test.mjs",
+      "sha256": "7b9234de18d962711657dad1d7988baab586c67d905992753c9d7a535ef6477d"
+    }
+  ],
+  "sharedAdmissions": [
+    {
+      "path": "scripts/database/migration.mjs",
+      "literal": "AF-224",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "literal": "AF-224",
+      "count": 1
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "literal": "AF-224",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "literal": "AF-224",
+      "count": 3
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "literal": "AF-224",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "literal": "AF-224",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "literal": "AF-224",
+      "count": 3
+    }
+  ]
+}

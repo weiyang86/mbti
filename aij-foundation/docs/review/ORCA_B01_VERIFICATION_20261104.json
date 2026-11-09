@@ -1,0 +1,161 @@
+{
+  "batch": "ORCA-B01",
+  "runId": "run_ffaba3dac618",
+  "status": "OWNER_CHECK_PENDING",
+  "baseline": "8546cbc3ff44e91aeb020d0566cd972759c3cbf3",
+  "budgetHours": 12,
+  "effectiveEngineeringHoursEstimated": 2.2,
+  "ownerAcceptanceRecordsUnchanged": true,
+  "productPackagesClosed": [],
+  "cards": [
+    {
+      "alias": "ORCH-GOV-01",
+      "formalTaskId": "AF-125",
+      "title": "建立 Orca 并行写入与单点集成约束",
+      "hours": 2,
+      "candidateTaskId": "task_058aefe2be31",
+      "integrationTaskId": "task_04c12ee99f6d",
+      "integrationDeps": [],
+      "writer": "coordinator",
+      "status": "DEV_INTEGRATED",
+      "dispatchId": null,
+      "worktree": null,
+      "baselineSha": "8546cbc3ff44e91aeb020d0566cd972759c3cbf3",
+      "candidateSha": null,
+      "devSha": "5430947b583e07d419f17c098a68f842f47ead40",
+      "report": ".artifacts/verification/AF-125/run-ASKbjU/report.json",
+      "effectiveEngineeringHoursEstimated": 0.27
+    },
+    {
+      "alias": "ORCH-DELTA-01",
+      "formalTaskId": "AF-126",
+      "title": "复核既有可靠性修复与剩余差量",
+      "hours": 3,
+      "candidateTaskId": "task_618edafa8803",
+      "integrationTaskId": "task_bf3de27a4a10",
+      "integrationDeps": [
+        "task_04c12ee99f6d"
+      ],
+      "writer": "worker-R",
+      "status": "DEV_INTEGRATED_AUDIT_ONLY",
+      "dispatchId": "ctx_b3d57f1880a7",
+      "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Users/lei/orca/workspaces/aij-foundation/orca-b01-delta",
+      "baselineSha": "5430947b583e07d419f17c098a68f842f47ead40",
+      "candidateSha": "d57b89d9422189578fce6f1aebe6b92a8460b9b0",
+      "devSha": "70a0f8254a93ab2ef1451e03bdfa2bb8c11b2c2a",
+      "startedAt": "2026-11-04T02:13:33.709Z",
+      "environmentPrepared": true,
+      "environmentEvidence": {
+        "command": "pnpm install --frozen-lockfile",
+        "exitCode": 0,
+        "reportedBy": "ctx_b3d57f1880a7",
+        "messageId": "msg_808613312421"
+      },
+      "branch": "weiyang86/orca-b01-delta",
+      "report": ".artifacts/verification/AF-126/run-Tj1GOI/report.json",
+      "productAcceptance": "PARTIAL_NOT_CLOSED",
+      "failedProductRun": ".artifacts/verification/AF-126/run-tOtWNz/report.json",
+      "repairTaskId": "task_3263e52a893f",
+      "repairDispatchId": "ctx_0d6dbb2b6a86",
+      "workerEffectiveHours": 0.35,
+      "coordinatorEffectiveHours": 0.2,
+      "effectiveEngineeringHoursEstimated": 0.55
+    },
+    {
+      "alias": "ORCH-GEN-01",
+      "formalTaskId": "AF-127",
+      "title": "新增 base 与 ai-standard 配置契约",
+      "hours": 4,
+      "candidateTaskId": "task_ab35ea51e26c",
+      "integrationTaskId": "task_fd7c0ba30304",
+      "integrationDeps": [
+        "task_04c12ee99f6d"
+      ],
+      "writer": "worker-P",
+      "status": "DEV_INTEGRATED",
+      "dispatchId": "ctx_80233e3150eb",
+      "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Users/lei/orca/workspaces/aij-foundation/orca-b01-gen",
+      "baselineSha": "5430947b583e07d419f17c098a68f842f47ead40",
+      "candidateSha": "ecad455dfc924510e38e27ec6b861412cf1968e1",
+      "devSha": "17b4f17b7bdd0d18882e58dfc7eee31d61aad453",
+      "startedAt": "2026-11-04T02:13:33.942Z",
+      "environmentPrepared": true,
+      "environmentEvidence": {
+        "command": "pnpm install --frozen-lockfile",
+        "exitCode": 0,
+        "reportedBy": "ctx_80233e3150eb",
+        "messageId": "msg_f1f03af0c153"
+      },
+      "branch": "weiyang86/orca-b01-gen",
+      "failureReport": ".artifacts/verification/AF-127/run-hRLLeT/report.json",
+      "repairTaskId": "task_6318a6146cd9",
+      "repairDispatchId": "ctx_dacf3baf8ae7",
+      "report": ".artifacts/verification/AF-127/run-dJc2nm/report.json",
+      "workerEffectiveHours": 0.23,
+      "coordinatorEffectiveHours": 0.14,
+      "effectiveEngineeringHoursEstimated": 0.37
+    },
+    {
+      "alias": "ORCH-CI-01",
+      "formalTaskId": "AF-128",
+      "title": "建立不依赖历史报告的产品验证入口",
+      "hours": 3,
+      "candidateTaskId": "task_7d01d561524b",
+      "integrationTaskId": "task_ed6efc3c4580",
+      "integrationDeps": [
+        "task_04c12ee99f6d"
+      ],
+      "writer": "worker-Q",
+      "status": "CODE_VERIFIED",
+      "dispatchId": "ctx_34932ddcfea9",
+      "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Users/lei/orca/workspaces/aij-foundation/orca-b01-ci",
+      "baselineSha": "5430947b583e07d419f17c098a68f842f47ead40",
+      "candidateSha": "f23f7c5311e679478aeed54a7d774a40a5e7eb85",
+      "devSha": null,
+      "startedAt": "2026-11-04T02:13:34.075Z",
+      "environmentPrepared": true,
+      "environmentEvidence": {
+        "command": "pnpm install --frozen-lockfile",
+        "exitCode": 0,
+        "reportedBy": "ctx_34932ddcfea9",
+        "messageId": "msg_bbbd99b73142"
+      },
+      "branch": "weiyang86/orca-b01-ci",
+      "repairTaskId": "task_621d04b1f953",
+      "repairDispatchId": "ctx_d09a21d4f0bc",
+      "failureReport": ".artifacts/verification/AF-128/run-1vuH4c/report.json",
+      "databaseFailureReport": ".artifacts/product-verification/run-0KVaqe/report.json",
+      "report": ".artifacts/verification/AF-128/run-Mlo2jn/report.json",
+      "databaseReport": ".artifacts/product-verification/run-oXXK90/report.json",
+      "checksReport": ".artifacts/product-verification/run-XLKwBU/report.json",
+      "failedDatabaseRuns": [
+        ".artifacts/product-verification/run-0KVaqe/report.json",
+        ".artifacts/product-verification/run-JdMH6K/report.json"
+      ],
+      "followups": [
+        {
+          "taskId": "task_621d04b1f953",
+          "dispatchId": "ctx_d09a21d4f0bc"
+        },
+        {
+          "taskId": "task_ac4dd422e81e",
+          "dispatchId": "ctx_a433b4723fb4"
+        }
+      ],
+      "workerEffectiveHours": 0.45,
+      "coordinatorEffectiveHoursEstimated": 0.56,
+      "devShaReceipt": ".artifacts/orca-b01/AF-128-git-closeout.json",
+      "devCommitLocator": "containing commit of docs/execution/AF-128.md; exact SHA in closeout receipt",
+      "effectiveEngineeringHoursEstimated": 1.01
+    }
+  ],
+  "finalGitReceipt": ".artifacts/orca-b01/AF-128-git-closeout.json",
+  "actualDeltaFailuresRemain": true,
+  "ciFiniteChecks": {
+    "checks": 98,
+    "database": 14,
+    "runnerRegression": 39
+  },
+  "realPaidAiOrPayment": false,
+  "productionOrRelease": false
+}

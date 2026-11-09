@@ -1,0 +1,46 @@
+{
+  "candidate": "0286de1b2984be58e952fc21ef9fdb6a407002cc",
+  "rootAdjustments": "Explicit CLI metadata fields; approved exact deps/font; actual Linux+independent readers, unit bridge and source provenance gates; no production route/schema/owner change; two pre-existing private source-loader test callers supply exact already-integrated external-services module, no generic loader policy change",
+  "files": [
+    {
+      "path": "apps/api/src/documents/document-renderer-cli.ts",
+      "sha256": "dbff088765421fcfe0a574a2ac43a76a96ae797f8b83f765b733a0a4ab6ff19d"
+    },
+    {
+      "path": "scripts/verification/document-renderer-linux.mjs",
+      "sha256": "cdde0cbcf8ae34d29be06ef25f5f68a8c571b33ce61840e6b6f362a7c7ea3f73"
+    },
+    {
+      "path": "scripts/verification/document-renderer-acceptance.mjs",
+      "sha256": "1926e2c1f03578b4f4c312e16e58195d6a022d78e3cc869b198b8661873ab968"
+    },
+    {
+      "path": "scripts/verification/document-renderer-prerequisite.mjs",
+      "sha256": "8909c34f83c92823a000dc686924bec722f68be576f0295febb644c9c9df4d9a"
+    },
+    {
+      "path": "apps/api/package.json",
+      "sha256": "4f2c62fc49427678bcfe572f7f817ca46b35e0b760e33c45a5155c40d20418cf"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "a78a4c5e892d1147719fe6fdc652a5c23ce832e8820ffceb29074142461ab7d6"
+    },
+    {
+      "path": "docs/execution/AF-197-dependency-provenance.json",
+      "sha256": "6a1bb2098b62fbed56fd1880118680f88499d720415a160ba5b98e2c570bcbc9"
+    },
+    {
+      "path": "docs/governance/SOURCE_PROVENANCE.md",
+      "sha256": "9502c5bbd5e0cc34bb3b3804ccabf1f00fff15124a15470945b073a89072f93c"
+    },
+    {
+      "path": "scripts/verification/personal-agents.test.mjs",
+      "sha256": "65982e94f3172a3404734de52c12490a49d09ca1327f573cb3c3ec71625d1327"
+    },
+    {
+      "path": "scripts/verification/personal-skills.test.mjs",
+      "sha256": "25527fdcea20211833cc175b695f1528a4dee6360834e4b50e96099732f94889"
+    }
+  ]
+}

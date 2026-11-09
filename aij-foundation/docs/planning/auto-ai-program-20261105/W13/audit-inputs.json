@@ -1,0 +1,1139 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "48e8d26ea1dcd67df65d316a0edfdec4bcb2d502",
+  "baselineId": "AIJ-REQ-20261105-R1",
+  "baselineFreezeCommit": "1f6549fd192b9ababe8c9d911ae19df3abd510ff",
+  "programSource": "48e8d26ea1dcd67df65d316a0edfdec4bcb2d502:docs/planning/auto-ai-program-20261105/program.json",
+  "rootReadOnly": "/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation",
+  "approvedReports": [
+    {
+      "card": "AF-002",
+      "path": ".artifacts/verification/AF-002/run-fJZLio/report.json",
+      "sha256": "e1bc22be6b361ae2b1a0b9ec709f9e42838af3a4bb8e830f83ddf0480025f61d",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-003",
+      "path": ".artifacts/verification/AF-003/run-Y09yWQ/report.json",
+      "sha256": "3d830df9f4ffb0015fa6b70108dd07f033777c1beb9906695fcc17de8b50e43b",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-004",
+      "path": ".artifacts/verification/AF-004/run-gATFoO/report.json",
+      "sha256": "43ba147e4394b012f0e0333e4fa98285d33329fcc2936e9ea094794b848ab583",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-005",
+      "path": ".artifacts/verification/AF-005/run-ellCZK/report.json",
+      "sha256": "082793ae1f9c0a21582ac4b3a871e91c413f7228871e030cad23be4ccb2a5995",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-006",
+      "path": ".artifacts/verification/AF-006/run-meRGGS/report.json",
+      "sha256": "5d239e47c9ec48d418cbe80ffc415764731eff79e500e950da5e7ab1efb90ba9",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-006",
+      "path": ".artifacts/verification/AF-006/run-VjOVPq/report.json",
+      "sha256": "b5bf5cebd4d79161113149773e11b283b3c26b3459410a37ef5da866e127a6a3",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-007",
+      "path": ".artifacts/verification/AF-007/run-ClFeAE/report.json",
+      "sha256": "310b42e72cd36a6d14194dcd234f6a5b256b5782721a7a80d3964999e96c2920",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-007",
+      "path": ".artifacts/verification/AF-007/run-l8R5TO/report.json",
+      "sha256": "f5677062a8cb05fc009e6bd61d94f7c3c44c57056a55a810b1f12de0a8468b2c",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-008",
+      "path": ".artifacts/verification/AF-008/run-4pDxWU/report.json",
+      "sha256": "258ea78c6fc8351c1f928c34d13fb2ce051d5f46b1f2e1ec71edcc6d84b86326",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-008",
+      "path": ".artifacts/verification/AF-008/run-MJ1mf8/report.json",
+      "sha256": "848e4e1dfde038ec44eabf962e1a8439c34af9647cd53969e82c950fe6ad317f",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-008",
+      "path": ".artifacts/verification/AF-008/run-y2RHyc/report.json",
+      "sha256": "32b15491cf80ab2c1ebad63706be946a980d79845c73fafa44303b2b409e2000",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-009",
+      "path": ".artifacts/verification/AF-009/run-fo3gIb/report.json",
+      "sha256": "ff7c57b08748212de44590b0c1c642b43577925be98d6f6f484c20c6d7e3fc65",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-009",
+      "path": ".artifacts/verification/AF-009/run-Xf7pCX/report.json",
+      "sha256": "a2a84eae772f0d52b0e11935926c2045782512999da806fc758be827f6208740",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-010",
+      "path": ".artifacts/verification/AF-010/run-PeXBRU/report.json",
+      "sha256": "5bc42ec6669523852bab146f20c1ace0748973e6cb0fd2adc5f571329ce9cc13",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-010",
+      "path": ".artifacts/verification/AF-010/run-ug9tLK/report.json",
+      "sha256": "18792f8a1e2d880a688a0d97b8b134ff8ce47137ab613236ea86dd3e05af47b9",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-011",
+      "path": ".artifacts/verification/AF-011/run-16eQ7z/report.json",
+      "sha256": "ddacefd3c68a2b52fdb8c64b0503f34521d772e1d0a972b55427ffbaea3d50cf",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-011",
+      "path": ".artifacts/verification/AF-011/run-DSRgoK/report.json",
+      "sha256": "c8808cd193ecdd506a45df1b8a5dbd5dc63d468402f4758555a9b3c0b60cb7b7",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-012",
+      "path": ".artifacts/verification/AF-012/run-N2SS8D/report.json",
+      "sha256": "3c289d7084cd66f59e7721415af9be13c17c1e2a62865c2f9fe4f47244f4cadb",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-013",
+      "path": ".artifacts/verification/AF-013/run-UpsFsN/report.json",
+      "sha256": "2c4e6f4ec36d0d8e8ade9eea8cb8d3ecf8dca387af39537a7d5668ec4f778248",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-014",
+      "path": ".artifacts/verification/AF-014/run-Q6cU28/report.json",
+      "sha256": "2556532d0c08cfaadff1c0688e11298354e8c0cf0622e565966f5c6da284fc35",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-015",
+      "path": ".artifacts/verification/AF-015/run-o6XXTW/report.json",
+      "sha256": "a8f51de6167b1316ba7458c34fbd80aabffb190e00ce892cc1aeeea80fa14e58",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-016",
+      "path": ".artifacts/verification/AF-016/run-8h9JKX/report.json",
+      "sha256": "3c13356550a32353c7067c42a60ab60dfb8a6fc037fd03fde01b6325ff56eda1",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-016",
+      "path": ".artifacts/verification/AF-016/run-cdwwJa/report.json",
+      "sha256": "d73ff2c5efd93060db549817b63244ddeebee8b3f99f43e8bafd92aa59645bd8",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-017",
+      "path": ".artifacts/verification/AF-017/run-jplFX8/report.json",
+      "sha256": "befd2c7bd520103502c345ec76737406ac0967d58564e59ab8bcdffc942813d8",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-018",
+      "path": ".artifacts/verification/AF-018/run-ChPInT/report.json",
+      "sha256": "e89d23f5c6fac1f538e0cbe8caaded612600af6eaccc4873c6ee87709bef1fbe",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-019",
+      "path": ".artifacts/verification/AF-019/run-IV47sU/report.json",
+      "sha256": "77f0e2deb7e61adb8a60e2cd6b9d67a4e1e13d5550d92b0511ff98b45ddb1769",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-020",
+      "path": ".artifacts/verification/AF-020/run-I1zPsI/report.json",
+      "sha256": "54d39f392bdd088cadd9f3401525ddb03904a45346fb5352cdb2380536e67fe5",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-021",
+      "path": ".artifacts/verification/AF-021/run-9ULbxQ/report.json",
+      "sha256": "58b372b73825fd1222c072473d98fce7811b30336a976933d4df482a82911e1a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-022",
+      "path": ".artifacts/verification/AF-022/run-yvLLG7/report.json",
+      "sha256": "f7bbbf27adb85af269dd0c1cc2742c0908b86eb0fb83250989c8cfe155f5bc5d",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-023",
+      "path": ".artifacts/verification/AF-023/run-16DfZb/report.json",
+      "sha256": "3fcefef9508c3a6ef9b2d3bc8889930f91d998813722066a7ee7db4253cd95f5",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-024",
+      "path": ".artifacts/verification/AF-024/run-a89Yzq/report.json",
+      "sha256": "96b4a4e62e75afbf6f8c5f8796cc1e983e3787ce7bca2d6b4875f049b2943de0",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-025-A",
+      "path": ".artifacts/verification/AF-025-A/run-ktULKn/report.json",
+      "sha256": "4872463eae4b3ce75a25aa4be48641ac679311cbd4785f5a5271ab1b1e05e45f",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-026",
+      "path": ".artifacts/verification/AF-026/run-pJyqms/report.json",
+      "sha256": "db09a65620113a20b10d1867385de9fe4e8dad67f958ca01f3778aef1bc803c0",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-027",
+      "path": ".artifacts/verification/AF-027/run-fviq25/report.json",
+      "sha256": "0df52297a5d5ff24c76774b245adbb2ef3e9ad8fa1031caeb15ce0e0d2a41fbd",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-028",
+      "path": ".artifacts/verification/AF-028/run-cFANXK/report.json",
+      "sha256": "d8c983abebfee163dd575f476f68fdf0c7bda4440f22028d3db758374cedbb60",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-029",
+      "path": ".artifacts/verification/AF-029/run-Pfon1z/report.json",
+      "sha256": "06a07ab7626e1e2a51cc970b6351f0c8f75f76cc3de6c8c9f83e0cc38c8258a2",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-030",
+      "path": ".artifacts/verification/AF-030/run-hkK7iv/report.json",
+      "sha256": "2da062345bc3e2c2383f16fb6eeeb5915fa27aa8d67fbc865c85c652f5fac9d5",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-031",
+      "path": ".artifacts/verification/AF-031/run-sSuqIS/report.json",
+      "sha256": "b8314c4a20a1db4cdc55d56e6f3ca047473bab717631a36f94262f9a5a165f38",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-032",
+      "path": ".artifacts/verification/AF-032/run-UY6VlX/report.json",
+      "sha256": "3b1c7f0f3a9dfa911e4e8b77caec09fddcdae53c39793b4c8faf3fbb3a16432b",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-033",
+      "path": ".artifacts/verification/AF-033/run-JIfruE/report.json",
+      "sha256": "9a2214eab9c5b6aeded26b336795c2992642a784569608067b6755418e677dd7",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-035",
+      "path": ".artifacts/verification/AF-035/run-5Sk1sT/report.json",
+      "sha256": "524081068bd750bbaaa7c79f10cd46e71d5d81708d1445661b8d7cfc2e0d5bca",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-036",
+      "path": ".artifacts/verification/AF-036/run-FnbF2H/report.json",
+      "sha256": "dee995b36cdbf1712aa2442a6d42113f43a8e8a5f269252e495abb80325587b0",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-037",
+      "path": ".artifacts/verification/AF-037/run-6k2W5p/report.json",
+      "sha256": "c98b99325830573a8cb7a9e9788e4b28aa0579db774235109dfe7d451cc7efac",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-038",
+      "path": ".artifacts/verification/AF-038/run-wRUGMB/report.json",
+      "sha256": "0f1d763a7df723a557206751d1349080d64559bff4e0baf54824dec116443f3a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-039",
+      "path": ".artifacts/verification/AF-039/run-255vPL/report.json",
+      "sha256": "b29d48678c863bce0490411ee129731225748875973e14bc4406c7310b565ba9",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-039",
+      "path": ".artifacts/verification/AF-039/run-59L72I/report.json",
+      "sha256": "5f1118e76e52815645746dc6165b40a598a740b01f676845ffd1cd46f4e2663f",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-040",
+      "path": ".artifacts/verification/AF-040/run-gOkeSv/report.json",
+      "sha256": "9744f8b3029cbd07e603055698cca930d0d57d6bff32d6288c331728f7e9352c",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-041",
+      "path": ".artifacts/verification/AF-041/run-WWS20c/report.json",
+      "sha256": "e15cadb2277d273b407436f7c9d1bb00eb095380c1df682ff01b7b4a0395249e",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-042",
+      "path": ".artifacts/verification/AF-042/run-zlCOnW/report.json",
+      "sha256": "8ff2df7e584bf62320aade86146ffb1caa21b9247c863f30f14ed3488b51a4d2",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-043",
+      "path": ".artifacts/verification/AF-043/run-XU9fei/report.json",
+      "sha256": "472da0b809ec3b47565006e87fc8cd7a32057db0b5ad180db3b244811bdb56ec",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-044",
+      "path": ".artifacts/verification/AF-044/run-VJsb5B/report.json",
+      "sha256": "1c9a761e168ee98a3f228174c4523d5a7e470a7b38947a576de5fac52ad784b6",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-045",
+      "path": ".artifacts/verification/AF-045/run-k8bfmL/report.json",
+      "sha256": "5f578b8fbabfb3270a1727d6ce97bae1b2a19c1aaa295578261b32dc8c1823f1",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-047",
+      "path": ".artifacts/verification/AF-047/run-ciTIs4/report.json",
+      "sha256": "042bfe43557766dd2a49ef28c24032b25928f1662c87a072f52ff9781c2e9430",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-048",
+      "path": ".artifacts/verification/AF-048/run-aFIpF2/report.json",
+      "sha256": "13093939e16909960f6f24b442bfd3946414002878e7a5bc56d055d99beaf2fa",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-049",
+      "path": ".artifacts/verification/AF-049/run-ayK3ct/report.json",
+      "sha256": "00e9ae06ece27beff562b3bde8b4b65f08511697074f76f6e3e9bd03d45ea904",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-050",
+      "path": ".artifacts/verification/AF-050/run-3ur5C5/report.json",
+      "sha256": "7bf1cd8fe9cb8648411d39943ab76febe828b1d35e30f5eb0f38770021b6173a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-051",
+      "path": ".artifacts/verification/AF-051/run-HWr7WQ/report.json",
+      "sha256": "725fd11b98f8a9adf115af59f8c6d26b9ff569f8662ab0783993f3c8a2d09082",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-052",
+      "path": ".artifacts/verification/AF-052/run-CetCRq/report.json",
+      "sha256": "22d5c7a80d1ae9d51509afb7fbf66241b53adee7cc3ffbc51d40aa585be369ee",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-053",
+      "path": ".artifacts/verification/AF-053/run-aXyQv9/report.json",
+      "sha256": "75e77ec1a94c298b22f67cb1e30ef8e925f7fc44352380d208d0bd35f75f6bbc",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-054",
+      "path": ".artifacts/verification/AF-054/run-UETJDG/report.json",
+      "sha256": "1241d9af286aea6f888bc3767784a00184eb99b5626875a1fc2d5688014ecce6",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-055",
+      "path": ".artifacts/verification/AF-055/run-dzoswo/report.json",
+      "sha256": "726d0498e4294bbd77e6d5d5528a6872332b79420a8da67ffdbac667125c7ad2",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-056",
+      "path": ".artifacts/verification/AF-056/run-6P4KKP/report.json",
+      "sha256": "4423d4709ce8b7c122a35bb5392552f4840a359e0c018314ad7788a6483b8838",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-057",
+      "path": ".artifacts/verification/AF-057/run-Ga1F0T/report.json",
+      "sha256": "5188eebe6c3434b56d64677cf4ce97affde19726a5f58a2d3c2b51bb5e45bf2e",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-058",
+      "path": ".artifacts/verification/AF-058/run-dDaFKo/report.json",
+      "sha256": "5cad185dd8ab9e7d80a63cc1b09e8abb8bf02a09d8224bf69a40613139d054db",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-059",
+      "path": ".artifacts/verification/AF-059/run-kobjiE/report.json",
+      "sha256": "88b5c3b0ce8ead4494c5abcd5aefc1294c0bd1de02f51cc08859302af18f196d",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-060",
+      "path": ".artifacts/verification/AF-060/run-Ou16O1/report.json",
+      "sha256": "aea7527c9c40b8611cc6842ea0366a7fdefffa44909c8ffc7c3aa9ad3a032ec6",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-060",
+      "path": ".artifacts/verification/AF-060/run-pdBUWh/report.json",
+      "sha256": "6264fee02988ad2a819a2ba1b5f6129e2d927b216047570faaef93f98637fb53",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-061",
+      "path": ".artifacts/verification/AF-061/run-gmGJ1E/report.json",
+      "sha256": "68e6a378abc2a85af207cbb746a2c42a85be712de322960cf3bc14fb5a7e6e60",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-062",
+      "path": ".artifacts/verification/AF-062/run-od0AUr/report.json",
+      "sha256": "6fd0c5fec349119e2164ae0b0209d7689656a9ed7a45bbe5c8f0efa180a9035e",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-063",
+      "path": ".artifacts/verification/AF-063/run-jxXERr/report.json",
+      "sha256": "f9aeb64295990fb69675ea45e31f181ee5145f8e72414bfe1e93e6f9b5eadbdf",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-064",
+      "path": ".artifacts/verification/AF-064/run-YfI6ni/report.json",
+      "sha256": "6f62cbf1cba42d35f5da3019b8a4ac2e3aa98bfad078734b8b03e7c707636068",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-065",
+      "path": ".artifacts/verification/AF-065/run-vJBboP/report.json",
+      "sha256": "e99cfc046324a84f30d92a3f1e45d841227afff59e63ac75e9958bfae7db0617",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-066",
+      "path": ".artifacts/verification/AF-066/run-99DMlC/report.json",
+      "sha256": "86a455abf2e6ffb9e856472087429b6c387a423cdeee9fa0f9fd7c8e75806917",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-067",
+      "path": ".artifacts/verification/AF-067/run-FhnZh2/report.json",
+      "sha256": "85b24e3fc4990b1cc1b6f832ae964cc88a92afc7cc6f07d47276307273160a36",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-068",
+      "path": ".artifacts/verification/AF-068/run-9e5nFf/report.json",
+      "sha256": "9523f5b27c1bcfea3f67d17299f696e5b3180ff917f86f0872dbeadcf49b335d",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-069",
+      "path": ".artifacts/verification/AF-069/run-zdRUl9/report.json",
+      "sha256": "3037d6911da53da18cb206b6fbdbc7a7d4e24eae11f77cc42f05c99457a8d916",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-070",
+      "path": ".artifacts/verification/AF-070/run-LLbGND/report.json",
+      "sha256": "4c20a4232adacda623aab2f700bfa8f71636360e0002de8f63e5bc9fa79dcbff",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-071",
+      "path": ".artifacts/verification/AF-071/run-5snL90/report.json",
+      "sha256": "0fe4c2e84edacfd64d96f936e7ea17cae87d7e5664cc5f9d1b31fd9eb4284bfc",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-071",
+      "path": ".artifacts/verification/AF-071/run-iHbWlq/report.json",
+      "sha256": "002115219857138325f1c882e46f58fb18bad2a0945e3980b25c6f3901f1810f",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-072",
+      "path": ".artifacts/verification/AF-072/run-YaZ0D6/report.json",
+      "sha256": "5924b42a3ab08b9cd3ccb7dd8def03cc17a01ed0c0e98bf4ad4182363cad9a5a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-073",
+      "path": ".artifacts/verification/AF-073/run-EImAwC/report.json",
+      "sha256": "c04ae44d56be13a56dc374862cee6280788796f85ca6112b323035e623258731",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-074",
+      "path": ".artifacts/verification/AF-074/run-GJUtqr/report.json",
+      "sha256": "01a064f39d4f101b78b56ecc205d6c831172d415fa8f437842168945e380deea",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-075",
+      "path": ".artifacts/verification/AF-075/run-pIHaNS/report.json",
+      "sha256": "d4d828b7f0cf892598f942157024d35e294173603343f2dfec39e0c0f3673258",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-076",
+      "path": ".artifacts/verification/AF-076/run-Ryh30Y/report.json",
+      "sha256": "af7912d919c822a830dd934d79714738016b9d4ae042cbba5c30d08301f8f47c",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-077",
+      "path": ".artifacts/verification/AF-077/run-Tt4722/report.json",
+      "sha256": "646bb314dd7a445fca7627d2f818fb677bc62685f32f6666e68437c69e4e2c64",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-078",
+      "path": ".artifacts/verification/AF-078/run-RADvpK/report.json",
+      "sha256": "fbca5a13f6df8e0079ab7b94db69cf83a53d8a31acd53bd4de78bf3594727da0",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-079",
+      "path": ".artifacts/verification/AF-079/run-cTE2Ty/report.json",
+      "sha256": "34ee93f252eb768370d5adb68cb78d284399c7e41666b697f4e778ff6a11edaf",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-080",
+      "path": ".artifacts/verification/AF-080/run-kd8tav/report.json",
+      "sha256": "62de9aa9ad4a2f090fb6f0e58b0b323e3594b4af915ed2591e45bbac0e762ca0",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-081",
+      "path": ".artifacts/verification/AF-081/run-32fXJh/report.json",
+      "sha256": "389f5dac5ec5bae644de88d8bd9d7dc2c97484afb68088444d513950156749c3",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-082",
+      "path": ".artifacts/verification/AF-082/run-pVmqnu/report.json",
+      "sha256": "d4b04f68c6052808c433599bf178f249e6e74728900579369fdfbcf918d10ec6",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-083",
+      "path": ".artifacts/verification/AF-083/run-9Bjcnx/report.json",
+      "sha256": "593099dc81cd26a3648e401b793b77d0dc01ec8c72eb80a6feaaf390b91b4d10",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-083",
+      "path": ".artifacts/verification/AF-083/run-lKe4Ri/report.json",
+      "sha256": "b93de18d8fdfeb220e1bca754ce35a83bc47b4c25fd50b9bc37e813aa5e99dfc",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-084",
+      "path": ".artifacts/verification/AF-084/run-YejTwi/report.json",
+      "sha256": "5122ae3e90d09522d7c247516c7abf78ac1c23ee11b36439b9471f590feb2d68",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-085",
+      "path": ".artifacts/verification/AF-085/run-W2jDGT/report.json",
+      "sha256": "30c3cafc165b6491c50762411ad61adf02a128688d19d499e06939385cbb5175",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-086",
+      "path": ".artifacts/verification/AF-086/run-mMMUZd/report.json",
+      "sha256": "b5a49d049b69e54356691d3de69e280a1e18414bc11a9aa851130392dfd03eab",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-087",
+      "path": ".artifacts/verification/AF-087/run-WKmiAK/report.json",
+      "sha256": "b44ae40e4f05f0e5033f1ed669838de1b22dfcdf35f1446c632a25ff55fb25d6",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-088",
+      "path": ".artifacts/verification/AF-088/run-GpTH3U/report.json",
+      "sha256": "7798aed7783a939464b4daeb88778fac05f1fbabd35f0ad56d8ff7af5459aa5c",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-089",
+      "path": ".artifacts/verification/AF-089/run-YxHYrR/report.json",
+      "sha256": "53e842149916c596a204fc3b683960dc386228c308ea6e6e0f974376ea4c6827",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-090",
+      "path": ".artifacts/verification/AF-090/run-TOVIX6/report.json",
+      "sha256": "ca556f254f9d8a0d45d9e84aafc39bcbe163057d3d2347014b630420ddd04c87",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-091",
+      "path": ".artifacts/verification/AF-091/run-heDPWt/report.json",
+      "sha256": "0d7555ce93af5cb069936b8652eab2723ef7e40a73841413ee74494a15346c7a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-092",
+      "path": ".artifacts/verification/AF-092/run-HU76si/report.json",
+      "sha256": "5f38f2f0567f436f64d68c8cee26e8eae6603e9f78029e989dfe2cff22c418d9",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-093",
+      "path": ".artifacts/verification/AF-093/run-WQDgKO/report.json",
+      "sha256": "542a322ffdeea1243f96e9048ccf7d30cb2c7a0ca6246a4904b5aa0a1a4091e0",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-094",
+      "path": ".artifacts/verification/AF-094/run-jNDj5y/report.json",
+      "sha256": "cc1c2bcd0a1fbde305fc57652aae47a5986bc227a533bd4894c5dbec85b5ebab",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-095",
+      "path": ".artifacts/verification/AF-095/run-T0ZKZt/report.json",
+      "sha256": "98757e31711dcfa3968562394c604a7ce193eb4a853fa321b27930ccb1df9d76",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-096",
+      "path": ".artifacts/verification/AF-096/run-ThJPB0/report.json",
+      "sha256": "65568668fd8199149da8637cf61455f6265193b45670366ecb0bb79733b45bce",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-097",
+      "path": ".artifacts/verification/AF-097/run-KUdsYN/report.json",
+      "sha256": "a3de9d9e10bd974fa8f5365a04838835ea51cca237ea310a5c469a4cf9a9b218",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-098",
+      "path": ".artifacts/verification/AF-098/run-Nkm6DT/report.json",
+      "sha256": "f7d34cf14978da72c597d0623999ac57b258a682b772aeda42d69784bcae5785",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-099",
+      "path": ".artifacts/verification/AF-099/run-6jlIMX/report.json",
+      "sha256": "eacf493f1ca179ff4d1a7dc64433ea59dcd9cfe8166dce2ac41491bf5aa350fd",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-100",
+      "path": ".artifacts/verification/AF-100/run-s4ceUr/report.json",
+      "sha256": "0b5d1a752cb1361e6403f1008b896924c6dcee483578a6f9fbedec28f3e82fdf",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-101",
+      "path": ".artifacts/verification/AF-101/run-GPPECd/report.json",
+      "sha256": "4371382b26e10741e22ae6a2c777197b6590ced24221d08b84319af40f4fa772",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-102",
+      "path": ".artifacts/verification/AF-102/run-rnaLu7/report.json",
+      "sha256": "7cffe52e61d4dd8748b348046057f86b459b1fb9d41f4e6061e8601727f90151",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-103",
+      "path": ".artifacts/verification/AF-103/run-hh3aYw/report.json",
+      "sha256": "e2f6e49ba02670b8409c9debe793a49442996669b2851d8828fb25630aec99ca",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-104",
+      "path": ".artifacts/verification/AF-104/run-blwpJr/report.json",
+      "sha256": "20d1a95b68ae4368d639ad9c79fe2efc2926a07fe385e7d7f0bdd7382494e542",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-105",
+      "path": ".artifacts/verification/AF-105/run-kEmT0v/report.json",
+      "sha256": "157da6e1240bc9cc11cc641d559a7d761bf91dbaceb3af84581d03145a81afe4",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-106",
+      "path": ".artifacts/verification/AF-106/run-OkmHy4/report.json",
+      "sha256": "27a9cfcdc74f6bf66bde000a5b0470f3823b83f3d0a391e416d8ba00034bfd85",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-107",
+      "path": ".artifacts/verification/AF-107/run-R0KPxw/report.json",
+      "sha256": "6403b059b9f806117bbb86e2600b81843f22105cf55cff2aabe2e70b3b838e32",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-109",
+      "path": ".artifacts/verification/AF-109/run-RJcZzy/report.json",
+      "sha256": "9b868b5018fce82cf7b6297a846120a90bea133e9503cde4fa39aabcf888bd56",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-110",
+      "path": ".artifacts/verification/AF-110/run-0xws2o/report.json",
+      "sha256": "b55a58d4bd5e0a043954576f1d5c373d9f7cb7af63c21223276f994bfee0ed17",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-111",
+      "path": ".artifacts/verification/AF-111/run-Ai70Jh/report.json",
+      "sha256": "b1496e87e05f0393b64a65fdd08b1896751bcaca6cbe43e78a4f81f6dc071484",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-112",
+      "path": ".artifacts/verification/AF-112/run-7QY4rs/report.json",
+      "sha256": "2695c4bbfac230e9dc61880fe5bf76ad0b6fa04c28dc2b4eab5f6ae51514ec80",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-113",
+      "path": ".artifacts/verification/AF-113/run-jKLRtI/report.json",
+      "sha256": "3e32b709d16ee6c3adbb6df1bec287ab90beaf9620f7071f4848589124909013",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-115",
+      "path": ".artifacts/verification/AF-115/run-EEhbKJ/report.json",
+      "sha256": "414455b86387ab24fa63d80a344f7a65edc7876364438e0c92163abaae6dcd46",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-116",
+      "path": ".artifacts/verification/AF-116/run-WjeNMK/report.json",
+      "sha256": "3016f9533d749159a23462b1655824ab6415a5f9dec25c88ada7d7cdec505ca6",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-117",
+      "path": ".artifacts/verification/AF-117/run-nk3GOF/report.json",
+      "sha256": "0cfe179df6b3a180036715d50d1890bbfb451439e3309af4d944562c29bce424",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-118",
+      "path": ".artifacts/verification/AF-118/run-YHQgqR/report.json",
+      "sha256": "9ce9193b85cebf6501c38b863a0ccd79147813d4ceb184657c618e0aadc59508",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-119",
+      "path": ".artifacts/verification/AF-119/run-coa2Cz/report.json",
+      "sha256": "f76b0bd7a7bbcbff549b5c660e7c8750dd953097c4fa279ac005a08a717c9b88",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-120",
+      "path": ".artifacts/verification/AF-120/run-WOnxza/report.json",
+      "sha256": "b5d4a32ad10876f5debed93a8382973d4f23f330fd57481b381b0136427520d5",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-121",
+      "path": ".artifacts/verification/AF-121/run-KBECjI/report.json",
+      "sha256": "a711534f4ab88e4de8bca9b483d340279e47515251351be4222774307a5210eb",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-122",
+      "path": ".artifacts/verification/AF-122/run-zaQW2R/report.json",
+      "sha256": "aa340cac8209ad860ab760ba655fd0eda6c2347430e6a4c883e9330ac427333f",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-123",
+      "path": ".artifacts/verification/AF-123/run-3Zt9FO/report.json",
+      "sha256": "14c442f9a040e6e34f278173305d58440eb4101c75df68b675f7be23a675cad7",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-124",
+      "path": ".artifacts/verification/AF-124/run-Iz7Mfi/report.json",
+      "sha256": "a50fc73d916d9e58c3eb27d316944c89d36048ae4db7e076e86088876d75ffba",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-125",
+      "path": ".artifacts/verification/AF-125/run-ASKbjU/report.json",
+      "sha256": "d90f9410a18cc54cf2a6edd31269add4de04dc91dd9901f59fb4596d7a5bc0b3",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-126",
+      "path": ".artifacts/verification/AF-126/run-Tj1GOI/report.json",
+      "sha256": "871a646b298cd46898425de19c55846fce6236757418c6955656d4733f5170d3",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-127",
+      "path": ".artifacts/verification/AF-127/run-dJc2nm/report.json",
+      "sha256": "466a31506c408e43469f27bb0faae8c06d9af1bca6be6eda7ed7b600cabcb087",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-128",
+      "path": ".artifacts/verification/AF-128/run-Mlo2jn/report.json",
+      "sha256": "fdc3764d45adbaec72de5697da5e37e36275d0eff561e230b67ecf186799d4e9",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-129",
+      "path": ".artifacts/verification/AF-129/run-ZzDLZV/report.json",
+      "sha256": "3a473aec1e0c79c488464d5e9bb984538a6f0ad74bc2df2fb0591ddafe76dfc7",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-132",
+      "path": ".artifacts/verification/AF-132/run-ZUg6uV/report.json",
+      "sha256": "eb8ddda69d925478bdfc5ed9341a1dda6a7fc54b361d275ced5429b2f9b5cb04",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-133",
+      "path": ".artifacts/verification/AF-133/run-e9vpPd/report.json",
+      "sha256": "30851e85d4eea007c5151cece1ac1ac34c4f660549d3d08ed98a59cb96d99052",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-134",
+      "path": ".artifacts/verification/AF-134/run-c1Q1Zx/report.json",
+      "sha256": "79ea39f9041b6d8aa7ed7850680dc66a369bef0bcb3b4f15788030fd231a9215",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-135",
+      "path": ".artifacts/verification/AF-135/run-WDjoeb/report.json",
+      "sha256": "5556a99af9170a9739716dfa9667badd2a33c3cb6c7a1a09b73bcfccec560785",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-136",
+      "path": ".artifacts/verification/AF-136/run-Lo83yw/report.json",
+      "sha256": "0e3a30518f133f52e24d70318e2ac5f46d5b3de7a30138896ac4973043fa8883",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-137",
+      "path": ".artifacts/verification/AF-137/run-ixzxnS/report.json",
+      "sha256": "16ad00f1323e7ef2f4c737f099c39197d42518c1bf7cadf2cc82b739dd364f17",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-138",
+      "path": ".artifacts/verification/AF-138/run-v2GC3z/report.json",
+      "sha256": "2399125ced990102fd0921528b7c1642e5e35e757ab798f00b97eb6678deddbf",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-139",
+      "path": ".artifacts/verification/AF-139/run-lHPWqf/report.json",
+      "sha256": "1e5314d6ef0da12f6a2eeea51608ba50dd4d6e4ca011533ec63ffdbb7cb1fb0c",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-140",
+      "path": ".artifacts/verification/AF-140/run-1y35B2/report.json",
+      "sha256": "b20f205ca4cf31f8bd99be0372ca3c9457b7abcd5baad8cb900b1ba3d029b72a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-141",
+      "path": ".artifacts/verification/AF-141/run-SXyCj3/report.json",
+      "sha256": "27256419d61b4e57ae785665bf9adbdb1c78cdbf04ae74fda124ba63d4f67c2a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-142",
+      "path": ".artifacts/verification/AF-142/run-02kTpE/report.json",
+      "sha256": "148e80924db8c9d47e5b3132ac2d2e06431230665b09ecb845ed15e63e68e67a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-143",
+      "path": ".artifacts/verification/AF-143/run-XKUsfb/report.json",
+      "sha256": "49807275c0da865c374b6c419f8d177679f3afb18d400b3cd2a2b8a2d117adca",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-144",
+      "path": ".artifacts/verification/AF-144/run-jYueXj/report.json",
+      "sha256": "93219cabf19c3e2ffb346ec2ef9ce19a7660b22329407465b0fdc6de0c0845c4",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-145",
+      "path": ".artifacts/verification/AF-145/run-JJJxO2/report.json",
+      "sha256": "a28f20b093ac258d951d8ecfa43938b1f1c2b269f94f35811e687353f48829a5",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-146",
+      "path": ".artifacts/verification/AF-146/run-AISxB7/report.json",
+      "sha256": "442e632f11af2c38e73f27fba1ef108717517eb6b92efc6499b67f4bb6179894",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-147",
+      "path": ".artifacts/verification/AF-147/run-RWlHYj/report.json",
+      "sha256": "660eee4bfd9bea558a6f115aa00bf04796f3bc8e8e044a3b0fbabf7b2d6290d3",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-148",
+      "path": ".artifacts/verification/AF-148/run-MnxjqM/report.json",
+      "sha256": "6c090d0bc9ad0f80e2a5f240c9b88ccd244d1ffb9a5272e39120792246d07a45",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-149",
+      "path": ".artifacts/verification/AF-149/run-PtfoNo/report.json",
+      "sha256": "7ab03773c09d46fd849bc58194eefba875258b15a8b302364252a98ff3840183",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-150",
+      "path": ".artifacts/verification/AF-150/run-gcNILC/report.json",
+      "sha256": "e8b509bb21303d0b36c69b7f9024296c967bba1f829515d54f3fb6fe31e92f07",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-151",
+      "path": ".artifacts/verification/AF-151/run-VLEVYM/report.json",
+      "sha256": "0277f35734315578ca4e668181f3057e4b0c323e09d28f37624e772473a088c0",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-152",
+      "path": ".artifacts/verification/AF-152/run-Btfrsg/report.json",
+      "sha256": "ec80230d5b78c9959dc53208d818c7e24b3fe2a9a818159b2ce41cd93afdc92d",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-153",
+      "path": ".artifacts/verification/AF-153/run-RK5GIk/report.json",
+      "sha256": "0cbd4ae03fa71caef8790880878876152a03c439ee53256fd2cb705917a4fdd9",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-154",
+      "path": ".artifacts/verification/AF-154/run-QAFujH/report.json",
+      "sha256": "e81ea6331a68e6747a75881ca69063750b156186bc716e851f9e6dce34bbec6f",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-155",
+      "path": ".artifacts/verification/AF-155/run-D0PLoP/report.json",
+      "sha256": "707b4a87c370779be8a14e019a8162ad90fdb59028c8f7fa7afb723fd18e3106",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-156",
+      "path": ".artifacts/verification/AF-156/run-nmU8Q3/report.json",
+      "sha256": "c8991fae6713b62c464758429e4010b361af5beb4322c2c269b578be7eb84436",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-157",
+      "path": ".artifacts/verification/AF-157/run-3B4GX0/report.json",
+      "sha256": "060b0d75d6397948675dea38678fa0475f5e7fcb3c95e26434515df20e4767d7",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-158",
+      "path": ".artifacts/verification/AF-158/run-0XVTsj/report.json",
+      "sha256": "0d88d29039ff117dc9736a24b8f4c6b29708c166fbd204a6d8c972850d21fadc",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-159",
+      "path": ".artifacts/verification/AF-159/run-zNjJOa/report.json",
+      "sha256": "25b2f20afd711cd45be19914e60355aa009962152c1b2c29cf6eeeb66a708751",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-160",
+      "path": ".artifacts/verification/AF-160/run-dJSK7g/report.json",
+      "sha256": "0a18495b9231a1d8ca00d2540f186a0c5d4bdd30b8503cc1b7f8fbda94620784",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-161",
+      "path": ".artifacts/verification/AF-161/run-sAMufh/report.json",
+      "sha256": "d337188d01349532b36ada02dc6167695cd0faa0cdc92e7dd2fca939974e0457",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-162",
+      "path": ".artifacts/verification/AF-162/run-IdyfUz/report.json",
+      "sha256": "1010616920d950fcf8a45b2c0ffcf339f54881e6984e735b40f34caa8309edd4",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-163",
+      "path": ".artifacts/verification/AF-163/run-ERIfmB/report.json",
+      "sha256": "7acc65c1e5cb6d13872fe4b25dd7e30380ea0128d17f392457b448a9aa6e752c",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-164",
+      "path": ".artifacts/verification/AF-164/run-PDaAey/report.json",
+      "sha256": "3817ee9d03568d868c485d5d1113925e37b0378dd3a7d4c01171c7d16e739a99",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-165",
+      "path": ".artifacts/verification/AF-165/run-Gh05eu/report.json",
+      "sha256": "9e7a86735e3f42e2d1614d0e42db4f8f96651ff755c84c5752f3e8c61f283940",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-166",
+      "path": ".artifacts/verification/AF-166/run-kMnpm1/report.json",
+      "sha256": "df8791af7c358aed7e2e65cf43151ca5d9dba0010aefab03878ca17c669db8b1",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-167",
+      "path": ".artifacts/verification/AF-167/run-WMScB5/report.json",
+      "sha256": "adc30e414b22b8c0c8ad7c77d3f470a7e7d9882a7a9edaaceda5dd182b717fe2",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-168",
+      "path": ".artifacts/verification/AF-168/run-6TOFKL/report.json",
+      "sha256": "57e9a09003c28dc7f52dbc825ce97b10adccbad24591a032c15cf5c141a9a608",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-169",
+      "path": ".artifacts/verification/AF-169/run-MMOLnu/report.json",
+      "sha256": "aac5feedf0c5982db7477bb638407d7d24d23627082e6a41e4c4246b9eb73f73",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-170",
+      "path": ".artifacts/verification/AF-170/run-6K9jBh/report.json",
+      "sha256": "acd3b344597408256873ea472eedef3af39d2417262c4909a2df0629b33e3d5a",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-171",
+      "path": ".artifacts/verification/AF-171/run-FwNVAo/report.json",
+      "sha256": "b1221c2638cf2c1718851d03c6a49410dfb99b152567756cdd892b88052874b1",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-172",
+      "path": ".artifacts/verification/AF-172/run-UUiIpu/report.json",
+      "sha256": "f1214e4e62740b9e028825c0fa802285f8df17988239cf5accd21c1ba7539ed5",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-173",
+      "path": ".artifacts/verification/AF-173/run-f389HZ/report.json",
+      "sha256": "2a137b402aa60faa5252d3db732af2764c8803e6e1571e7301e65763bc74f8b2",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-174",
+      "path": ".artifacts/verification/AF-174/run-dGH7nu/report.json",
+      "sha256": "5423bb44546dba8910f9d6d2bd51f545a2e30d824cf341192c6ae019ce3a4c3b",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-175",
+      "path": ".artifacts/verification/AF-175/run-mTMIXe/report.json",
+      "sha256": "148740f001efa6771cdbd69ef1e6d9943a40b698d9238802d06f987037a2df6d",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-176",
+      "path": ".artifacts/verification/AF-176/run-yez7nN/report.json",
+      "sha256": "86a8dc15c51babe91b2c7975fb396c2981ec2cf73325c61b381c6243dc13e167",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-177",
+      "path": ".artifacts/verification/AF-177/run-DrYmac/report.json",
+      "sha256": "30867d16cf3a60d7522720ef9c1da7dfc0deeff25667ada5f08fc32f1b945ffa",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-178",
+      "path": ".artifacts/verification/AF-178/run-YSPZBs/report.json",
+      "sha256": "75ea37fa708e4ae8cec7af41c7566908cc75c8ad09bb5b1da36bed019a982c9f",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-179",
+      "path": ".artifacts/verification/AF-179/run-BROWuA/report.json",
+      "sha256": "8cde81886e4429f78e1b07f884e73110010b559e30e6280b0816220bc2e3cc54",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-180",
+      "path": ".artifacts/verification/AF-180/run-Yib4Ec/report.json",
+      "sha256": "f9eb8ebcac436ed2f05f42c1c817cf034a5e1e52351bd755ee73fa6b2e3778df",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-181",
+      "path": ".artifacts/verification/AF-181/run-iIimMi/report.json",
+      "sha256": "46b896b554d748ae8e6b230268d0e803d5f66a1eba5abbe4c914166498b7c37d",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-182",
+      "path": ".artifacts/verification/AF-182/run-18ksmf/report.json",
+      "sha256": "09f238e169c6337c308495cd5f2198785ee23fa95173bd2180fcdc69beb24261",
+      "status": "PASS"
+    },
+    {
+      "card": "AF-183",
+      "path": ".artifacts/verification/AF-183/run-k8z7Ix/report.json",
+      "sha256": "84c24a87a9f01e7b6d3e1c5701a273c76d5e62828519d8c8684e0d651757d668",
+      "status": "PASS"
+    }
+  ],
+  "onlyRuntimeEvidence": "Approved PASS report.json files; no raw logs, credentials, .env, private fixtures or databases. PASS scope must match the claimed acceptance; source or synthetic protocol tests do not prove live vendor/product target acceptance."
+}

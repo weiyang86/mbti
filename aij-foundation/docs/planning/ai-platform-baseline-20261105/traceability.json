@@ -1,0 +1,2671 @@
+{
+  "schemaVersion": 1,
+  "baselineId": "AIJ-REQ-20261105-R1",
+  "sourceHead": "b8eb9c2ecc4cca749c5dd1d38dc43489cda3a01c",
+  "branch": "dev",
+  "method": "STATIC_SOURCE_AND_HISTORICAL_RECORD_REVIEW",
+  "liveTestsRun": false,
+  "requirementsAcceptanceIsNotHistoricalTaskAcceptance": true,
+  "evidence": [
+    {
+      "id": "E01",
+      "path": "apps/api/src/auth/auth.service.ts",
+      "line": 19,
+      "sha256": "5d8bd6f8c23634258aaf9df3015dbf0054d7f08600fada4c753381a2c5074018",
+      "claim": "复用管理员认证 owner；不是客户端短信登录实现",
+      "excerpt": "@Injectable()\nexport class AuthService {\n  private readonly dummyHash = bcrypt.hash(randomBytes(32).toString(\"hex\"), 12);\n  constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService, private readonly config: ConfigService) {}\n\n  private async ensureDatabase() {"
+    },
+    {
+      "id": "E02",
+      "path": "apps/api/src/rbac/permissions.service.ts",
+      "line": 8,
+      "sha256": "2d2080cdc8a306da39e050cf365feea9f96da84317a4be79e60d2524a15bc45c",
+      "claim": "复用服务端即时权限解析",
+      "excerpt": "@Injectable()\nexport class PermissionsService {\n  constructor(private readonly prisma: PrismaService) {}\n\n  private async database<T>(operation: () => Promise<T>): Promise<T> {\n    if (!(await this.prisma.readiness()).ready) throw new ServiceUnavailableException(\"Authorization service unavailable\");"
+    },
+    {
+      "id": "E03",
+      "path": "apps/api/src/menus/menus.service.ts",
+      "line": 17,
+      "sha256": "5508073ca994b2056195252f2c1a5c48c13e026be2b7f45e4750ce0d8aa6816e",
+      "claim": "复用后端菜单授权 owner",
+      "excerpt": "@Injectable()\nexport class MenusService {\n  constructor(private readonly prisma: PrismaService, private readonly permissions: PermissionsService, private readonly access: ManagementAccessService, private readonly availability: MenuAvailabilityService, private readonly config: ConfigService) {}\n  private tree(rows: SysMenu[], allowed: (row: SysMenu) => boolean): MenuNode[] {\n    const children = new Map<string | null, SysMenu[]>();\n    for (const row of rows) children.set(row.parentId, [...(children.get(row.parentId) ?? []), row]);"
+    },
+    {
+      "id": "E04",
+      "path": "apps/web/app/admin/page.tsx",
+      "line": 2,
+      "sha256": "a3db5884fcc5601096ee554fcd8a3bc19fbce47bed1a6aebd7f99b513355e06b",
+      "claim": "通用工作台已移除bootstrap页面权限门槛",
+      "excerpt": "import { AdminOverview, AdminShell } from \"../components/admin-shell\";\nexport default function AdminPage() { return <AdminShell><AdminOverview /></AdminShell>; }"
+    },
+    {
+      "id": "E05",
+      "path": "apps/api/src/client-auth/dto.ts",
+      "line": 5,
+      "sha256": "cf78df923ee29d5643f5c6d8846933268f13e4662520000a9cb02bea2db75795",
+      "claim": "客户登录 DTO 使用 email/password，未实现本轮用户名及短信验证码登录目标",
+      "excerpt": "// Source ClientLoginDto only; no registration/reset/consent endpoints in AF-025-A.\nexport class ClientLoginDto {\n  @Transform(({ value }: { value: unknown }) => typeof value === \"string\" ? value.trim().toLowerCase() : value)\n  @IsEmail() @MaxLength(254) email!: string;\n  @IsString() @Length(1, 72) password!: string;\n}"
+    },
+    {
+      "id": "E06",
+      "path": "apps/api/src/client-auth/client-auth.controller.ts",
+      "line": 18,
+      "sha256": "d99fa03f658435ca8cacbbc3ce8cb2edbd995dec77763a364ee6f9bfb98c5dc8",
+      "claim": "已有客户注册、邮件验证、找回及会话生命周期路由",
+      "excerpt": "\n  @Post(\"register\") @HttpCode(202) @Header(\"Cache-Control\", \"no-store\")\n  register(@Body(new ValidationPipe({ expectedType: ClientRegisterDto, whitelist: true, forbidNonWhitelisted: true, transform: true })) body: object, @Req() request: ClientRequest) {\n    return this.auth.register(body as ClientRegisterDto, { ip: request.socket.remoteAddress || \"unknown\", userAgent: request.headers[\"user-agent\"] || \"unknown\", correlationId: request.correlationId });\n  }\n"
+    },
+    {
+      "id": "E07",
+      "path": "apps/api/src/client-workspaces/workspace-context.service.ts",
+      "line": 11,
+      "sha256": "ee215e48d36447558601581137b05157fdc95ccd167666cfca07c06acf643193",
+      "claim": "服务端以真实 membership/role/permission 校验工作区",
+      "excerpt": "\n  async resolve(memberId: string, workspaceId: string, requiredPermissions: readonly string[]): Promise<ClientWorkspaceContext> {\n    if (!memberId || !WORKSPACE_ID.test(workspaceId) || !requiredPermissions.length) {\n      throw new ForbiddenException(\"Workspace access denied\");\n    }\n    try {"
+    },
+    {
+      "id": "E08",
+      "path": "apps/api/src/client-workspaces/client-workspace-management.service.ts",
+      "line": 167,
+      "sha256": "c3981a2363201d6b275e601a4f6c171992589c79492086c54b581f2cf7836d7d",
+      "claim": "已有OWNER/MEMBER系统角色与成员治理，不等于完整自定义租户角色设计器",
+      "excerpt": "          const owner = await tx.clientWorkspaceRole.create({\n            data: { workspaceId: created.id, code: \"OWNER\", name: \"Workspace Owner\", isSystem: true, sortOrder: 0 }\n          });\n          const member = await tx.clientWorkspaceRole.create({\n            data: { workspaceId: created.id, code: \"MEMBER\", name: \"Workspace Member\", isSystem: true, sortOrder: 10 }\n          });"
+    },
+    {
+      "id": "E09",
+      "path": "apps/api/prisma/schema.prisma",
+      "line": 428,
+      "sha256": "424153584ad4240e568b12bbdad0fd4ab548103f671c46c352499045b982f5d7",
+      "claim": "项目归属组织模型与ClientWorkspace分开",
+      "excerpt": "// AF-008: configuration, reference and audit definitions; provenance section 8.\nmodel OrganizationProfile {\n  id          String    @id @default(cuid())\n  code        String    @unique\n  name        String\n  legalEntity String?   @map(\"legal_entity\")"
+    },
+    {
+      "id": "E10",
+      "path": "apps/api/src/files/client-files.service.ts",
+      "line": 71,
+      "sha256": "93b29e665e3259d2b7299be4ddc879cd61e772ed9de5648d5667e3a5a423c900",
+      "claim": "现有客户文件按成员归属并限定workspaceId=null，不能当作组织共享文件完备实现",
+      "excerpt": "        projectId: this.config.getOrThrow<string>(\"projectId\"),\n        workspaceId: null,\n        pluginCode: null,\n        ownerType: \"user\",\n        ownerId: member.id,\n        uploaderId: member.id,"
+    },
+    {
+      "id": "E11",
+      "path": "apps/api/src/files/client-files.dto.ts",
+      "line": 11,
+      "sha256": "8879e7d789f85159073cdff2b0c6f69b7efec025a1bf01cb45effee4d995c4f4",
+      "claim": "客户附件当前5MiB，支持JPEG/PNG/WebP/PDF/text，上传PDF不等于解析PDF",
+      "excerpt": "\nexport const CLIENT_FILE_UPLOAD_LIMIT_BYTES = 5 * 1024 * 1024;\nexport const CLIENT_FILE_UPLOAD_FIELD = \"file\";\n\nexport const CLIENT_FILE_MEDIA_TYPES = Object.freeze([\n  \"image/jpeg\","
+    },
+    {
+      "id": "E12",
+      "path": "apps/api/src/files/local-storage.adapter.ts",
+      "line": 19,
+      "sha256": "456ba5a29d256f5c4b3b26d00b2d2590cceaf234804643e1a339c48fbd20d246",
+      "claim": "本地存储 owner 可复用；未提供七牛适配",
+      "excerpt": "@Injectable()\nexport class LocalStorageAdapter implements StorageAdapter {\n  private readonly root: string;\n  private readonly objects: string;\n  private readonly projectRoot: string;\n  private readonly projectId: string;"
+    },
+    {
+      "id": "E13",
+      "path": "apps/api/src/secret-center/secret-ref.ts",
+      "line": 11,
+      "sha256": "147f6eb75d9714705ac2a5b4807309c0d8d4851059d241728aa7690f4382e9a7",
+      "claim": "复用受控密钥引用解析，不把厂商密钥交给脚本",
+      "excerpt": "// Syntax validation is also reused by configuration. It does not access a provider.\nexport function parseSecretRef(input: string): ParsedSecretRef {\n  if (/^env:\\/\\/AIJ_[A-Z0-9_]{3,127}$/.test(input)) return { ref: input, provider: \"env\", name: input.slice(6) };\n  const match = /^local:\\/\\/([a-z][a-z0-9-]{1,62})\\/(development|test|production)\\/([A-Z][A-Z0-9_]{2,63})$/.exec(input);\n  if (match) return { ref: input, provider: \"local\", name: match[3] };\n  throw new BadRequestException(\"Invalid secret reference\");"
+    },
+    {
+      "id": "E14",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-policy.ts",
+      "line": 58,
+      "sha256": "106d1387e11e741868efd73b019c4e09ae4732f449484e04bd3b010e28a8a32c",
+      "claim": "模型目录是项目级受控配置，供应商为openai/deepseek/compatible",
+      "excerpt": "        reject();\n    const providers = list(c.providers, ['code', 'name', 'vendor', 'baseUrl', 'credentialRef', 'enabled', 'liveEnabled', 'revision']);\n    for (const p of providers) {\n        if (!['openai', 'deepseek', 'compatible'].includes(p.vendor as string))\n            reject();\n        string(p.baseUrl, 300);"
+    },
+    {
+      "id": "E15",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-policy.ts",
+      "line": 74,
+      "sha256": "106d1387e11e741868efd73b019c4e09ae4732f449484e04bd3b010e28a8a32c",
+      "claim": "目录能力仅text/image，向量/重排/图片编辑等需升级",
+      "excerpt": "        const p = providers.find(p => p.code === m.providerCode);\n        if (!p || !['text', 'image'].includes(m.capability as string))\n            reject();\n        string(m.upstreamModel, 128);\n        if (!/^[a-zA-Z0-9][a-zA-Z0-9._:/-]*$/.test(m.upstreamModel as string))\n            reject();"
+    },
+    {
+      "id": "E16",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-policy.ts",
+      "line": 93,
+      "sha256": "106d1387e11e741868efd73b019c4e09ae4732f449484e04bd3b010e28a8a32c",
+      "claim": "Skill配置项仅instructions等提示词字段，无可执行能力包契约",
+      "excerpt": "    }\n    const skills = list(c.skills, ['code', 'name', 'instructions', 'enabled', 'revision']);\n    for (const s of skills)\n        string(s.instructions, 8000);\n    const agents = list(c.agents, ['code', 'name', 'modelCode', 'skillCodes', 'instructions', 'inputFields', 'outputFormat', 'outputFields', 'enabled', 'published', 'revision']);\n    for (const a of agents) {"
+    },
+    {
+      "id": "E17",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-provider.ts",
+      "line": 13,
+      "sha256": "0ca19a8f3fbd75efbcb65e509a001eb15921f0a70fac966a2dfdc171f1422075",
+      "claim": "Agent与Skill通过系统提示词拼接",
+      "excerpt": "};\nexport function compileAgent(snapshot: AiAgentSnapshot, input: Record<string, string>) {\n    const system = [snapshot.agent.instructions, ...snapshot.skills.map(s => s.instructions), ...(snapshot.agent.outputFormat === 'json' ? [`Return only a JSON object with these string fields: ${snapshot.agent.outputFields.join(', ')}. No extra fields.`] : [])].join('\\n\\n');\n    const user = JSON.stringify(Object.fromEntries(snapshot.agent.inputFields.map(k => [k, redactAiExternalText(input[k])])));\n    const messages = [{ role: 'system', content: system }, { role: 'user', content: user }];\n    // Byte count plus envelope margin is conservative for common byte-based tokenizers."
+    },
+    {
+      "id": "E18",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-provider.ts",
+      "line": 42,
+      "sha256": "0ca19a8f3fbd75efbcb65e509a001eb15921f0a70fac966a2dfdc171f1422075",
+      "claim": "实际协议是非流式chat/completions及单图images/generations",
+      "excerpt": "        const messages = compileAgent(s, input), image = s.model.capability === 'image';\n        const body = image ? { model: s.model.upstreamModel, prompt: messages.map(m => m.content).join('\\n\\n'), n: 1, size: s.model.imageSize, quality: s.model.imageQuality, ...(s.model.imageBase64Format ? { response_format: 'b64_json' } : { output_format: 'png' }) } : { model: s.model.upstreamModel, messages, [s.model.tokenParameter]: s.model.maxOutputTokens, stream: false };\n        const response = await this.transport.request(s.provider.baseUrl + (image ? '/images/generations' : '/chat/completions'), { method: 'POST', redirect: 'error', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + credential }, body: JSON.stringify(body), signal });\n        if (!response.ok || response.redirected || !response.headers.get('content-type')?.includes('application/json')) {\n            await response.body?.cancel();\n            throw new Error('AI_UPSTREAM_REJECTED');"
+    },
+    {
+      "id": "E19",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-provider.ts",
+      "line": 81,
+      "sha256": "0ca19a8f3fbd75efbcb65e509a001eb15921f0a70fac966a2dfdc171f1422075",
+      "claim": "文本返回工具调用被拒绝，不能宣称已有自主工具Agent",
+      "excerpt": "        const choice = data.choices?.[0];\n        if (!Array.isArray(data.choices) || data.choices.length !== 1 || choice.finish_reason !== 'stop' || choice.message?.tool_calls || typeof choice.message?.content !== 'string' || !choice.message.content.trim() || Buffer.byteLength(choice.message.content) > 64000)\n            throw new Error('AI_TEXT_INVALID');\n        let output: unknown = redactAiExternalText(choice.message.content);\n        if (s.agent.outputFormat === 'json') {\n            output = JSON.parse(choice.message.content);"
+    },
+    {
+      "id": "E20",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-configuration.service.ts",
+      "line": 29,
+      "sha256": "1d429d644a6efdf7084265f13ff7730431f3e34167a1ab1ef3b264cb2dd6dc7a",
+      "claim": "目录存于项目ScopedConfig，版本号/变更审计可复用；不是个人/组织资产仓库",
+      "excerpt": "        await this.plugins.assertEnabledInTransaction(tx, projectId, 'aij-ai');\n        const row = await tx.scopedConfig.findUnique({ where: { scope_scopeId_pluginCode_configKey: { scope: 'project', scopeId: projectId, pluginCode: 'aij-ai', configKey: AI_CENTER_CONFIG_KEY } } });\n        if (row && (row.deletedAt || row.status !== 'active' || row.valueType !== 'string'))\n            throw new ConflictException('AI center configuration unavailable');\n        return { projectId, version: row?.version ?? 0, catalog: row ? validateAiCatalog(JSON.parse(row.configValue), this.approvedBases()) : structuredClone(EMPTY_AI_CATALOG) };\n    }"
+    },
+    {
+      "id": "E21",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-run.service.ts",
+      "line": 110,
+      "sha256": "437808387305059bde47fd17bf3dcd63ff5c4647856431affe18dd782ac45a80",
+      "claim": "已有提交幂等、快照、unknown保留预留与Trace，不可盲目改为错误自动重试",
+      "excerpt": "                return;\n            // Once a request may have reached the upstream, an error is not evidence of zero cost.\n            const uncertain = attempted || !!row.attemptedAt;\n            if (!uncertain)\n                await this.budget.settle(tx, id, 0n);\n            const traces = await tx.aiExecutionTrace.findMany({ where: { jobId: row.jobId, status: 'running' }, select: { id: true } });"
+    },
+    {
+      "id": "E22",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-budget.service.ts",
+      "line": 17,
+      "sha256": "b5b91157e12ecc88fe82f06e4568e8b2d6df455c885bdf761d9d8640b6d78746",
+      "claim": "已有内部预算预留与结算，不等于客户现金钱包或充值账本",
+      "excerpt": "    }\n    async reserve(tx: Prisma.TransactionClient, projectId: string, workspaceId: string, callId: string, catalog: AiCenterCatalog, model: AiCenterModel, now = new Date()) {\n        const month = now.toISOString().slice(0, 7), runKey = 'application:' + month, start = new Date(month + '-01T00:00:00.000Z');\n        // Shared project lock serializes different members/workspaces and configuration cap changes.\n        await tx.$executeRaw `SELECT pg_advisory_xact_lock(hashtext(${'ai-application-budget:' + projectId}))`;\n        const amount = this.estimate(model), limit = BigInt(catalog.monthlyBudgetNanos);"
+    },
+    {
+      "id": "E23",
+      "path": "apps/api/src/plugins/aij-ai/ai-center-client.controller.ts",
+      "line": 32,
+      "sha256": "f853bab7bebb7eda59101a227e0a182cbe14ea88b93abcefeb2d417d7ddbc828",
+      "claim": "客户直接执行默认受显式开关与Workspace权限约束",
+      "excerpt": "    r: ClientRequest) { if (r.headers.origin !== this.config.getOrThrow('webUrl') || r.headers['sec-fetch-site'] === 'cross-site')\n        throw new ForbiddenException('Invalid request origin'); if (this.config.get<string>(\"AI_CENTER_CLIENT_EXECUTION_ENABLED\") !== \"true\") throw new ServiceUnavailableException(\"Direct client AI execution is disabled\"); const c = this.context(r); return this.runs.submit(c.memberId, c.workspaceId, code, body, r.correlationId); }\n    @Get('runs/:id')\n    @RequireClientWorkspacePermissions(P.aiRead)\n    @Header('Cache-Control', 'private, no-store')\n    read("
+    },
+    {
+      "id": "E24",
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge.service.ts",
+      "line": 153,
+      "sha256": "512fba2ebf811c9d98b34672624d06ede3ecdccac9dce17a82343638656deb09",
+      "claim": "已有知识文档API，导入仅UTF-8文本类",
+      "excerpt": "\n  async importDocument(memberId: string, workspaceId: string, dto: ImportAiKnowledgeDocumentDto, file: ClientUploadFile | undefined, correlationId?: string) {\n    await this.assertMembership(memberId, workspaceId, CLIENT_WORKSPACE_PERMISSION.knowledgeManage);\n    if (!file || !Buffer.isBuffer(file.buffer) || file.size !== file.buffer.length || !file.size || file.size > 50 * 1024 ||\n        typeof file.originalname !== \"string\" || ![\"text/plain\", \"text/markdown\", \"application/octet-stream\", \"\"].includes(file.mimetype)) throw new BadRequestException(\"A UTF-8 text file up to 50KB is required\");\n    // Only a display filename is retained, never a client filesystem path or raw file object."
+    },
+    {
+      "id": "E25",
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge-retrieval.ts",
+      "line": 33,
+      "sha256": "352bcbac1c9a6f1b7f8ab6f7cd96bb2234da4ce14590e1d01f5d55812cba8375",
+      "claim": "检索使用词项匹配，无外部tokenizer或向量模型调用",
+      "excerpt": "/**\n * Produces stable lexical units without external tokenizers or model calls.\n * Han text uses adjacent bigrams; other letters/numbers use normalized words.\n */\nexport function knowledgeTerms(input: string): string[] {\n  const normalized = input.normalize(\"NFKC\").toLowerCase();"
+    },
+    {
+      "id": "E26",
+      "path": "apps/api/src/async-runtime/registry.ts",
+      "line": 40,
+      "sha256": "e03c57c3d704db7ae8b4a9a8f7df3e04b871d2217f8f8f40d5ac1eb3c3ef1645",
+      "claim": "复用Job/Event/Schedule注册和执行模式；名称orchestrated不是图编排引擎",
+      "excerpt": "  }\n  registerOrchestratedJob(type: string, version: number, handler: JobHandler) {\n    this.declaredJobs.add(`${type}@${version}`);\n    this.register(this.jobHandlers, `${type}@${version}`, { handler, executionMode: \"orchestrated\" });\n  }\n  declareJob(type: string, version: number) {"
+    },
+    {
+      "id": "E27",
+      "path": "apps/api/src/async-runtime/runtime-worker.service.ts",
+      "line": 11,
+      "sha256": "b240a87630b0685678ff6f090401207bdd25e7205bc68ba9defb82cfb52f5f8d",
+      "claim": "复用队列/租约/心跳/取消基础；已知差量仍需关闭",
+      "excerpt": "@Injectable()\nexport class RuntimeWorkerService implements OnModuleInit, OnModuleDestroy {\n  private readonly instanceId = `${process.env.HOSTNAME || \"local\"}:${process.pid}:${randomUUID()}`;\n  private timers: NodeJS.Timeout[] = [];\n  private stopping = false;\n  private activePoll?: Promise<void>;"
+    },
+    {
+      "id": "E28",
+      "path": "apps/api/src/integration-center/connector-webhook.service.ts",
+      "line": 42,
+      "sha256": "c6b6c0c1c4bda9499072d7172ae5081d6be027228f33d26a8a2a27da3f6dafee",
+      "claim": "已有签名及幂等入站Webhook；不是用户可编辑的工作流触发器",
+      "excerpt": "\n  async receive(projectCode: string, connectorCode: string, request: WebhookRequest) {\n    const contentType = request.headers[\"content-type\"];\n    if (typeof contentType !== \"string\" || !/^application\\/json(?:\\s*;|$)/i.test(contentType)) throw new BadRequestException(\"Webhook content type must be application/json\");\n    if (!Buffer.isBuffer(request.rawBody) || request.rawBody.length < 1 || request.rawBody.length > 65_536) throw new BadRequestException(\"Invalid webhook body size\");\n    const signatureHeaders = {"
+    },
+    {
+      "id": "E29",
+      "path": "apps/api/src/plugin-runtime/plugin-manifest.ts",
+      "line": 30,
+      "sha256": "2e8a246c80313ac4c55b3b403cff27b5f0c386d5c97e827f767a333f5e311b8e",
+      "claim": "manifest已有依赖/权限/菜单/迁移/jobs/events声明及校验基础",
+      "excerpt": "};\nexport type PluginManifestV2 = {\n  manifestVersion: 2;\n  code: string;\n  name: string;\n  version: string;"
+    },
+    {
+      "id": "E30",
+      "path": "apps/api/src/plugin-runtime/trusted-plugins.ts",
+      "line": 8,
+      "sha256": "7918211614cd378d0d21eaeb77bc2aecf3e2e81406a6c6d85529e32e7021fc2b",
+      "claim": "运行代码由宿主静态导入可信AI/通知/支付注册，不会下载任意第三方包",
+      "excerpt": "export const TRUSTED_PLUGINS: ReadonlyMap<string, TrustedPluginRegistration> = new Map(\n  [aiPluginRegistration, notificationPluginRegistration, aijPaymentPluginRegistration].map(p => [p.manifest.code, p])\n);"
+    },
+    {
+      "id": "E31",
+      "path": "apps/api/src/plugin-runtime/plugin-lifecycle.service.ts",
+      "line": 235,
+      "sha256": "10ac9b6495b0ad3bea298535f63686150bc1a1dcda10ff9af4698338cb1a9072",
+      "claim": "已有生命周期与事务状态，升级要求先停用；不能推定其他插件业务不停服已验",
+      "excerpt": "        if (action === \"upgrade\") {\n          if (current.status !== \"installed\") throw new ConflictException(\"Plugin must be installed and disabled before upgrade\");\n          if (comparePluginVersions(registration.manifest.version, current.version) <= 0) throw new ConflictException(\"Upgrade must select a newer trusted version\");\n          await this.assertUpgradeCompatibleWithDependents(tx, projectId, pluginCode, registration.manifest.version);\n          previousVersion = current.version;\n          result = await tx.pluginInstallation.update({ where: { id: current.id }, data: { version: registration.manifest.version, owner: registration.owner, failureReason: null } });"
+    },
+    {
+      "id": "E32",
+      "path": "apps/api/src/plugins/aij-payment/payment-runtime.module.ts",
+      "line": 43,
+      "sha256": "d3c5ed87ca4dbdb2c6f08fd06df04cc145abfdffb6c591c867326bca0c55ba79",
+      "claim": "非测试运行Provider注册表为空，仅隔离测试注册synthetic",
+      "excerpt": "      inject: [ConfigService],\n      useFactory: (config: ConfigService) => new PaymentProviderRegistry(isTestRuntime(config) ? [new SyntheticTestPaymentProvider()] : [])\n    },\n    WorkspaceContextGuard,\n    PaymentService,\n    PaymentCallbackService,"
+    },
+    {
+      "id": "E33",
+      "path": "apps/api/src/plugins/aij-payment/payment-callback.service.ts",
+      "line": 16,
+      "sha256": "d0ca3f97b4900078c87efc9926c0047007f9031b726ebfb686e4f420483bc8d7",
+      "claim": "回调验签/幂等和交易状态 owner 可复用",
+      "excerpt": "@Injectable()\nexport class PaymentCallbackService {\n  private readonly environment: string;\n\n  constructor(\n    private readonly prisma: PrismaService,"
+    },
+    {
+      "id": "E34",
+      "path": "apps/api/src/plugins/aij-payment/payment-reconciliation.service.ts",
+      "line": 36,
+      "sha256": "2b4c444c43e7ecbc3c47e91caf6e2ebf951a6d59e1c714e9686241e9d30c3a03",
+      "claim": "已有合成交易对账及差异审计 owner，不等于商户真实结算",
+      "excerpt": "@Injectable()\nexport class PaymentReconciliationService {\n  constructor(\n    private readonly prisma: PrismaService,\n    private readonly pluginAccess: PluginRuntimeAccessService,\n    private readonly management: ManagementAccessService"
+    },
+    {
+      "id": "E35",
+      "path": "apps/api/src/plugins/aij-notification/notification-provider.ts",
+      "line": 4,
+      "sha256": "98a62595bda93282fa42c6bbfcf9d5d2766ceea7e1d614a9615c667778765b3d",
+      "claim": "声明in_app/email/sms/wecom/feishu/webhook；未含钉钉和微信公众号小程序",
+      "excerpt": "\nexport const NOTIFICATION_CHANNEL_TYPES = [\"in_app\", \"email\", \"sms\", \"wecom\", \"feishu\", \"webhook\"] as const;\nexport type NotificationChannelType = typeof NOTIFICATION_CHANNEL_TYPES[number];\n\nexport type NotificationDeliveryContext = Readonly<{\n  projectId: string;"
+    },
+    {
+      "id": "E36",
+      "path": "apps/api/src/plugins/aij-notification/notification-runtime.module.ts",
+      "line": 10,
+      "sha256": "8a79359f8248adb12da225ee42f471df59fa806030914c9b319a365a64312e45",
+      "claim": "真实运行默认无投递Provider；枚举不等于真实渠道可用",
+      "excerpt": "  providers: [\n    { provide: NotificationProviderRegistry, useFactory: () => new NotificationProviderRegistry([]) },\n    NotificationDeliveryService\n  ],\n  exports: [NotificationDeliveryService, NotificationProviderRegistry]\n})"
+    },
+    {
+      "id": "E37",
+      "path": "scripts/project/editions.mjs",
+      "line": 13,
+      "sha256": "a2a57f0e880e6319a6a7350a8b0b6988e590aad2fe175499a5cb112db585f29f",
+      "claim": "现默认base而非新目标ai-standard；仅base/ai-standard两种固定组合",
+      "excerpt": "\nexport function resolveEdition(code = \"base\") {\n  if (code === \"base\") return base;\n  if (code === \"ai-standard\") return aiStandard;\n  throw new Error(\"Unknown project edition; select base or ai-standard\");\n}"
+    },
+    {
+      "id": "E38",
+      "path": "scripts/project/cli.mjs",
+      "line": 217,
+      "sha256": "e22cade10b79effef47162a483bde404c4ffbc5fcf8ce892294cc296798cd867",
+      "claim": "生成器明确只创建配置，不提供独立宿主安装",
+      "excerpt": "    const editionNote = edition.code === \"base\" ? \"No plugin dependencies are declared.\" : \"AI requirements and allowed configuration: see editionContract in aij.project.json; all live gates default off.\";\n    const readme = `# ${configuration.projectId}\\n\\nGenerated from the local AIJ Foundation project template. This directory contains project-scoped configuration only; it does not claim that package installation, license, distribution channel, supported platforms, or release authorization are complete.\\n\\n- Edition: ${edition.code}\\n- Profile: ${edition.profile}\\n- Declared plugins: ${edition.enabledPlugins.join(\", \") || \"none\"}; this does not install or enable a persistent plugin installation\\n- Runtime roots: project-local; see aij.project.json\\n- Local secrets: provision this project's ignored .env independently. Never copy a host or another project's credentials.\\n- ${editionNote}\\n- Independent project Seed and runnable AI consumption remain GEN-02/03 work\\n\\nFrom the AIJ Foundation checkout, inspect configuration with:\\n\\n\\`\\`\\`sh\\npnpm run aij:project -- show --dir <project-directory>\\n\\`\\`\\`\\n\\nTo run a local API from the checkout, use \\`pnpm run aij:project -- run --dir <project-directory> --app api --mode dev\\`. The source checkout provides the host code in this development template; a standalone installable distribution remains a separate release gate.\\n`;\n    writeOwnedFile(root, manifestName, JSON.stringify(document, null, 2) + \"\\n\", 0o644, created);\n    writeOwnedFile(root, \".env.example\", envExample(configuration, contract), 0o644, created);\n    writeOwnedFile(root, \".gitignore\", \".env\\n.local-data/\\n*.log\\n\", 0o644, created);\n    writeOwnedFile(root, \"README.md\", readme, 0o644, created);"
+    },
+    {
+      "id": "E39",
+      "path": "scripts/database/seed.mjs",
+      "line": 156,
+      "sha256": "33a69462f6f5bfd25786e940b4a3c8a39a70aaaada94b793c9ed22b0c6106431",
+      "claim": "普通seed绑定host；专用Base开发入口不能代替任意项目初始化",
+      "excerpt": "  const target = resolveDatabaseTarget(mode, values, acceptanceId);\n  if ((values.RUNTIME_PROFILE || \"host\") !== \"host\" || (values.PROJECT_ID || \"aij-foundation\") !== \"aij-foundation\") reject(\"PROJECT_IDENTITY\", \"This seed only owns the aij-foundation host\");\n  if (acceptanceId && ![\"AF-012\", \"AF-013\", \"AF-014\", \"AF-015\", \"AF-016\", \"AF-017\", \"AF-018\", \"AF-019\", \"AF-020\", \"AF-021\", \"AF-022\", \"AF-023\", \"AF-024\", \"AF-025-A\", \"AF-026\", \"AF-027\", \"AF-028\", \"AF-029\", \"AF-030\", \"AF-031\", \"AF-032\", \"AF-033\", \"AF-035\", \"AF-036\", \"AF-037\", \"AF-038\", \"AF-039\", \"AF-040\", \"AF-041\", \"AF-042\", \"AF-043\", \"AF-044\", \"AF-045\", \"AF-046\", \"AF-047\", \"AF-048\", \"AF-049\", \"AF-050\", \"AF-051\", \"AF-052\", \"AF-053\", \"AF-054\", \"AF-055\", \"AF-056\", \"AF-057\", \"AF-058\", \"AF-063\", \"AF-068\", \"AF-069\", \"AF-070\", \"AF-071\", \"AF-072\", \"AF-081\", \"AF-082\", \"AF-083\", \"AF-084\", \"AF-085\", \"AF-086\", \"AF-087\", \"AF-088\", \"AF-089\", \"AF-090\", \"AF-092\", \"AF-093\", \"AF-094\", \"AF-095\", \"AF-096\", \"AF-097\", \"AF-098\", \"AF-099\", \"AF-100\", \"AF-101\", \"AF-102\", \"AF-104\", \"AF-105\", \"AF-106\", \"AF-107\", \"AF-108\", \"AF-109\", \"AF-110\", \"AF-111\", \"AF-112\", \"AF-113\", \"AF-114\", \"AF-115\", \"AF-116\", \"AF-118\", \"AF-119\", \"AF-120\", \"AF-121\", \"AF-122\", \"AF-123\", \"AF-124\"].includes(acceptanceRecord(mode, acceptanceId).task)) reject(\"ACCEPTANCE_TASK\", \"Seed requires a registered Seed/auth acceptance database\");\n  const request = credentials(mode, target, values, generateCredentials); // Missing/template inputs fail before any connection.\n  await migrate({ mode, action: \"status\", acceptanceId }, input); // Includes managed preflight, actual identity/checksum/pending checks. No deploy.\n  return withDatabase(mode, values, async (client, checkedTarget, identity) => {"
+    },
+    {
+      "id": "E40",
+      "path": "scripts/distribution/pack-aij-base.mjs",
+      "line": 1,
+      "sha256": "96f821fdfc2ef0e2fceae7a59f4a64597e1afab4f029f81eea7e240e83853e4b",
+      "claim": "已有私有源码制品pack入口，应复用并核验消费范围",
+      "excerpt": "import { execFileSync, spawnSync } from \"node:child_process\";\nimport { createHash, randomBytes } from \"node:crypto\";\nimport { chmodSync, copyFileSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\nimport { dirname, join, relative, resolve, sep } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";"
+    },
+    {
+      "id": "E41",
+      "path": "scripts/verification/packed-consumer-upgrade.test.mjs",
+      "line": 381,
+      "sha256": "0caa24e161bee7c8ac1af4a308fe630df63b382dc1f3764f89d9e9bcb40058d1",
+      "claim": "已有合成整库/文件备份恢复与升级测试，可复用场景，不是组织PITR产品",
+      "excerpt": "\ntest(taskId + \" packed consumer restores, upgrades and runs against an earlier synthetic database/file snapshot\", { timeout: 900000 }, async (t) => {\n  try {\n    assert.equal(process.versions.node.split(\".\")[0], \"24\");\n    assert.ok(!resolve(installRoot).startsWith(repositoryRoot + sep));\n    await assertPortAvailable(sourcePort); await assertPortAvailable(restorePort);"
+    },
+    {
+      "id": "E42",
+      "path": "packages/core/package.json",
+      "line": 5,
+      "sha256": "c3f50648f77e9a2d8279c5eac5e88b0048a7edb1618df217e653abf61acb75a7",
+      "claim": "实包未获公开分发授权；不能因第三方市场目标直接公开发布",
+      "excerpt": "  \"private\": true,\n  \"license\": \"UNLICENSED\",\n  \"type\": \"module\",\n  \"main\": \"./dist/index.cjs\",\n  \"module\": \"./dist/index.mjs\",\n  \"types\": \"./dist/index.d.ts\","
+    },
+    {
+      "id": "E43",
+      "path": "packages/core/src/index.ts",
+      "line": 14,
+      "sha256": "dfe872a5dff3c527083c34a55c3ebd0a566ebba72062c13cbc7707e434421adb",
+      "claim": "当前core实包导出关联ID等有限能力，不是全部Nest服务产品化包",
+      "excerpt": "\nexport function correlateRequest(request: CorrelationRequest, response: CorrelationResponse): string {\n  const correlationId = resolveCorrelationId(request.correlationId ?? request.headers[\"x-correlation-id\"]);\n  request.correlationId = correlationId;\n  response.setHeader(\"x-correlation-id\", correlationId);\n  return correlationId;"
+    },
+    {
+      "id": "E44",
+      "path": "packages/sdk/src/index.ts",
+      "line": 53,
+      "sha256": "3bd27665b3e659a97e143c9f4021293f741330a6dbc1ca8003a0bbc6cd032ff3",
+      "claim": "已有客户API及Agent提交/读取SDK，可扩展非重写",
+      "excerpt": "export type AiAgentSummary = { code: string; name: string; revision: number; inputFields: string[]; outputFormat: 'text' | 'json'; capability: 'text' | 'image'; maximumEstimatedCostNanos: string };\nexport function createAiClient(api: ClientApi) {\n  return {\n    listAgents: (workspaceId: string) => api<AiAgentSummary[]>('/client/ai/agents', { workspaceId }),\n    submit: (workspaceId: string, agentCode: string, input: Record<string, string>, idempotencyKey: string) => api<import('@aij/contracts').AiAgentRunResult>('/client/ai/agents/' + encodeURIComponent(agentCode) + '/runs', { method: 'POST', workspaceId, body: JSON.stringify({ input, idempotencyKey }) }),\n    read: (workspaceId: string, id: string) => api<import('@aij/contracts').AiAgentRunResult>('/client/ai/runs/' + encodeURIComponent(id), { workspaceId }),"
+    },
+    {
+      "id": "E45",
+      "path": "apps/web/app/components/admin-ai-center.tsx",
+      "line": 21,
+      "sha256": "22296b270acb6eae44f0081c63c7f4e9683b8d940634c1a1f9ceb772e211ad8b",
+      "claim": "已有管理员AI目录配置UI，不是完整客户端AI工作台",
+      "excerpt": "\nexport function AdminAiCenter() {\n const {request,can}=useAdmin();const writable=can(AI_CENTER_CONFIGURATION_PERMISSION)&&can(AI_CENTER_SECRET_PERMISSION);\n const [config,setConfig]=useState<AiCenterConfiguration>({version:0,catalog:EMPTY}),[tab,setTab]=useState<Kind>(\"providers\"),[revision,setRevision]=useState(0),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState(\"\"),[notice,setNotice]=useState(\"\"),[editor,setEditor]=useState<{kind:Kind;entry?:Entry}|null>(null),[formError,setFormError]=useState(\"\");\n const [form]=Form.useForm(),[budgetForm]=Form.useForm();const capability=Form.useWatch(\"capability\",form),outputFormat=Form.useWatch(\"outputFormat\",form);\n const load=useEffectEvent(async()=>{setLoading(true);try{const next=await request<AiCenterConfiguration>(\"/admin/ai/center/configuration\");setConfig(next);budgetForm.setFieldsValue({monthly:money(next.catalog.monthlyBudgetNanos),workspace:money(next.catalog.workspaceMonthlyBudgetNanos)});setError(\"\");}catch(e){setError(requestMessage(e));}finally{setLoading(false);}});"
+    },
+    {
+      "id": "E46",
+      "path": "scripts/verification/product/catalog.mjs",
+      "line": 46,
+      "sha256": "5b678a93e677874cd76b6f2e0c114649b5b63bed73ff70c16e6a9e6e7b6cda6b",
+      "claim": "产品校验只有有限checks/database组，完整矩阵尚待扩展",
+      "excerpt": "\nexport const deferredMatrix = [\n  \"GEN-03 后干净 clone 的 ai-standard 生成、安装与端到端产品矩阵（CI-02）\",\n  \"完整管理端/客户端页面、全部插件/异步运行时/集成/AI/通知/支付能力矩阵\",\n  \"真实收费 Provider、部署、发布及负责人接收\"\n];"
+    },
+    {
+      "id": "E47",
+      "path": "docs/execution/AF-130.md",
+      "line": 3,
+      "sha256": "6260ca5e9f8defa851ce3a80182087b2f8e4d5d97e69e41c44a90b9010a176f8",
+      "claim": "AF130有真实验证记录，此次仅读历史，不重跑、不代负责人接收",
+      "excerpt": "\n2026-11-05，状态 `CODE_VERIFIED`，负责人接收 `PENDING`。沿用 Run `run_d4eae5ba3a3b`、候选 `task_766e5e9f3411` / Dispatch `ctx_455adcc583b2`、本地集成 `task_f351efee8cb6`。起始 `dev@580cba1f8363cf63ab637e070b20d9e8d7ce49e0`，remote 为原 origin。原 Worker 的 `msg_0006bfbb64f3` 明确停写，runtime 回读 succeeded/settled/exited/released；AF-134/135 两个真实集成节点 completed。当前唯一 Writer 接回正式集成，没有重建 Run、重复派发或并发写入。\n\n## 实际差异与影响\n\n- 通用 `/admin` 工作台移除 `aij.bootstrap.admin` 页面门槛，仍使用原 AdminShell 的真实会话、后端权限和菜单；资源页/API继续执行原权限。普通账号没有获得 bootstrap/manage/super。"
+    },
+    {
+      "id": "E48",
+      "path": "docs/execution/optimization-delta/AF-126.md",
+      "line": 3,
+      "sha256": "6a3975d365aa822573a4467f80ff4182dc24bc753f7a1defb9aee314fee6000a",
+      "claim": "已知心跳重入/文档生命周期竞争/readiness与fixture前置差量未被审计PASS关闭",
+      "excerpt": "\n本卡交付差量审计和可重复离线实验，不关闭 OPT-001/002/003/004/008。候选检查成功仅代表审计材料成立；产品验收仍为 `PARTIAL_NOT_CLOSED`，负责人出口仍为 `OWNER_CHECK_PENDING`。本记录是同一 Writer 自查，不是独立复核。\n\n## 基线与授权\n\n| 字段 | 实际值 |"
+    }
+  ],
+  "auditedScope": [
+    "apps/api/prisma/schema.prisma",
+    "apps/api/src/admin-clients/admin-client-directory.controller.ts",
+    "apps/api/src/admin-clients/admin-client-directory.dto.ts",
+    "apps/api/src/admin-clients/admin-client-directory.module.ts",
+    "apps/api/src/admin-clients/admin-client-directory.service.ts",
+    "apps/api/src/admin/admin-users.controller.ts",
+    "apps/api/src/admin/admin-users.module.ts",
+    "apps/api/src/admin/admin-users.service.ts",
+    "apps/api/src/admin/dto.ts",
+    "apps/api/src/app.module.ts",
+    "apps/api/src/async-runtime/async-runtime.module.ts",
+    "apps/api/src/async-runtime/job.service.ts",
+    "apps/api/src/async-runtime/outbox.service.ts",
+    "apps/api/src/async-runtime/registry.ts",
+    "apps/api/src/async-runtime/runtime-admin.controller.ts",
+    "apps/api/src/async-runtime/runtime-admin.dto.ts",
+    "apps/api/src/async-runtime/runtime-admin.service.ts",
+    "apps/api/src/async-runtime/runtime-contracts.ts",
+    "apps/api/src/async-runtime/runtime-health.service.ts",
+    "apps/api/src/async-runtime/runtime-worker.service.ts",
+    "apps/api/src/async-runtime/scheduler.service.ts",
+    "apps/api/src/audit-log/audit-query.controller.ts",
+    "apps/api/src/audit-log/audit-query.module.ts",
+    "apps/api/src/audit-log/audit-query.service.ts",
+    "apps/api/src/audit-log/audit-redaction.ts",
+    "apps/api/src/audit-log/dto.ts",
+    "apps/api/src/auth/auth-errors.module.ts",
+    "apps/api/src/auth/auth-exception.filter.ts",
+    "apps/api/src/auth/auth.controller.ts",
+    "apps/api/src/auth/auth.module.ts",
+    "apps/api/src/auth/auth.service.ts",
+    "apps/api/src/auth/auth.types.ts",
+    "apps/api/src/auth/browser-session.ts",
+    "apps/api/src/auth/dto/change-password.dto.ts",
+    "apps/api/src/auth/dto/login.dto.ts",
+    "apps/api/src/bootstrap.ts",
+    "apps/api/src/client-auth/client-auth-notification.adapter.ts",
+    "apps/api/src/client-auth/client-auth.controller.ts",
+    "apps/api/src/client-auth/client-auth.guard.ts",
+    "apps/api/src/client-auth/client-auth.module.ts",
+    "apps/api/src/client-auth/client-auth.security.ts",
+    "apps/api/src/client-auth/client-auth.service.ts",
+    "apps/api/src/client-auth/dto.ts",
+    "apps/api/src/client-workspaces/client-workspace-context.controller.ts",
+    "apps/api/src/client-workspaces/client-workspace-management.controller.ts",
+    "apps/api/src/client-workspaces/client-workspace-management.service.ts",
+    "apps/api/src/client-workspaces/client-workspace-permission.decorator.ts",
+    "apps/api/src/client-workspaces/client-workspace-permissions.ts",
+    "apps/api/src/client-workspaces/client-workspace.dto.ts",
+    "apps/api/src/client-workspaces/client-workspaces.module.ts",
+    "apps/api/src/client-workspaces/workspace-context.guard.ts",
+    "apps/api/src/client-workspaces/workspace-context.service.ts",
+    "apps/api/src/common/decorators/authenticated-admin.decorator.ts",
+    "apps/api/src/common/decorators/permissions.decorator.ts",
+    "apps/api/src/common/guards/admin-authorization.guard.ts",
+    "apps/api/src/common/guards/jwt-auth.guard.ts",
+    "apps/api/src/common/guards/permissions.guard.ts",
+    "apps/api/src/common/interceptors/correlation.interceptor.ts",
+    "apps/api/src/common/interceptors/transform.interceptor.ts",
+    "apps/api/src/common/session-cookie.ts",
+    "apps/api/src/configuration/configuration-policy.ts",
+    "apps/api/src/configuration/configuration.controller.ts",
+    "apps/api/src/configuration/configuration.module.ts",
+    "apps/api/src/configuration/configuration.service.ts",
+    "apps/api/src/configuration/dto.ts",
+    "apps/api/src/dictionaries/dictionaries.controller.ts",
+    "apps/api/src/dictionaries/dictionaries.module.ts",
+    "apps/api/src/dictionaries/dictionaries.service.ts",
+    "apps/api/src/dictionaries/dto.ts",
+    "apps/api/src/files/admin-files.controller.ts",
+    "apps/api/src/files/admin-files.dto.ts",
+    "apps/api/src/files/admin-files.module.ts",
+    "apps/api/src/files/admin-files.service.ts",
+    "apps/api/src/files/client-files.controller.ts",
+    "apps/api/src/files/client-files.dto.ts",
+    "apps/api/src/files/client-files.module.ts",
+    "apps/api/src/files/client-files.service.ts",
+    "apps/api/src/files/file-content.service.ts",
+    "apps/api/src/files/files.module.ts",
+    "apps/api/src/files/local-storage.adapter.ts",
+    "apps/api/src/health.controller.ts",
+    "apps/api/src/integration-center/connector-manifest.ts",
+    "apps/api/src/integration-center/connector-operation.dto.ts",
+    "apps/api/src/integration-center/connector-operations.controller.ts",
+    "apps/api/src/integration-center/connector-operations.service.ts",
+    "apps/api/src/integration-center/connector-webhook-signature.ts",
+    "apps/api/src/integration-center/connector-webhook.controller.ts",
+    "apps/api/src/integration-center/connector-webhook.service.ts",
+    "apps/api/src/integration-center/connector.dto.ts",
+    "apps/api/src/integration-center/integration-center.controller.ts",
+    "apps/api/src/integration-center/integration-center.module.ts",
+    "apps/api/src/integration-center/integration-center.service.ts",
+    "apps/api/src/main.ts",
+    "apps/api/src/menus/menu-availability.service.ts",
+    "apps/api/src/menus/menu.dto.ts",
+    "apps/api/src/menus/menus.controller.ts",
+    "apps/api/src/menus/menus.module.ts",
+    "apps/api/src/menus/menus.service.ts",
+    "apps/api/src/plugin-runtime/plugin-catalog.ts",
+    "apps/api/src/plugin-runtime/plugin-enabled.guard.ts",
+    "apps/api/src/plugin-runtime/plugin-lifecycle.service.ts",
+    "apps/api/src/plugin-runtime/plugin-management.controller.ts",
+    "apps/api/src/plugin-runtime/plugin-management.dto.ts",
+    "apps/api/src/plugin-runtime/plugin-management.module.ts",
+    "apps/api/src/plugin-runtime/plugin-manifest.ts",
+    "apps/api/src/plugin-runtime/plugin-operation-policy.ts",
+    "apps/api/src/plugin-runtime/plugin-runtime-access.module.ts",
+    "apps/api/src/plugin-runtime/plugin-runtime-access.service.ts",
+    "apps/api/src/plugin-runtime/plugin-runtime.module.ts",
+    "apps/api/src/plugin-runtime/trusted-plugins.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-admin.controller.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-budget.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-client.controller.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-configuration.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-policy.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-provider.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-run.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-usage.controller.ts",
+    "apps/api/src/plugins/aij-ai/ai-center-usage.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-configuration.ts",
+    "apps/api/src/plugins/aij-ai/ai-evaluation-budget.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-evaluation.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-execution-trace.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-execution.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-knowledge-retrieval.ts",
+    "apps/api/src/plugins/aij-ai/ai-knowledge.controller.ts",
+    "apps/api/src/plugins/aij-ai/ai-knowledge.dto.ts",
+    "apps/api/src/plugins/aij-ai/ai-knowledge.service.ts",
+    "apps/api/src/plugins/aij-ai/ai-plugin.ts",
+    "apps/api/src/plugins/aij-ai/ai-provider.ts",
+    "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+    "apps/api/src/plugins/aij-ai/ai-trace-query.controller.ts",
+    "apps/api/src/plugins/aij-ai/ai-trace-query.dto.ts",
+    "apps/api/src/plugins/aij-ai/ai-trace-query.service.ts",
+    "apps/api/src/plugins/aij-ai/deepseek-provider.ts",
+    "apps/api/src/plugins/aij-ai/offline-test-ai-provider.ts",
+    "apps/api/src/plugins/aij-notification/notification-delivery.service.ts",
+    "apps/api/src/plugins/aij-notification/notification-management.controller.ts",
+    "apps/api/src/plugins/aij-notification/notification-management.dto.ts",
+    "apps/api/src/plugins/aij-notification/notification-management.module.ts",
+    "apps/api/src/plugins/aij-notification/notification-management.service.ts",
+    "apps/api/src/plugins/aij-notification/notification-plugin.ts",
+    "apps/api/src/plugins/aij-notification/notification-provider.ts",
+    "apps/api/src/plugins/aij-notification/notification-runtime.module.ts",
+    "apps/api/src/plugins/aij-notification/template-engine.ts",
+    "apps/api/src/plugins/aij-payment/payment-admin.controller.ts",
+    "apps/api/src/plugins/aij-payment/payment-admin.dto.ts",
+    "apps/api/src/plugins/aij-payment/payment-admin.service.ts",
+    "apps/api/src/plugins/aij-payment/payment-callback-signature.ts",
+    "apps/api/src/plugins/aij-payment/payment-callback.controller.ts",
+    "apps/api/src/plugins/aij-payment/payment-callback.dto.ts",
+    "apps/api/src/plugins/aij-payment/payment-callback.service.ts",
+    "apps/api/src/plugins/aij-payment/payment-payable-source.ts",
+    "apps/api/src/plugins/aij-payment/payment-plugin.ts",
+    "apps/api/src/plugins/aij-payment/payment-provider.ts",
+    "apps/api/src/plugins/aij-payment/payment-reconciliation.controller.ts",
+    "apps/api/src/plugins/aij-payment/payment-reconciliation.dto.ts",
+    "apps/api/src/plugins/aij-payment/payment-reconciliation.service.ts",
+    "apps/api/src/plugins/aij-payment/payment-runtime.module.ts",
+    "apps/api/src/plugins/aij-payment/payment-state.ts",
+    "apps/api/src/plugins/aij-payment/payment.controller.ts",
+    "apps/api/src/plugins/aij-payment/payment.dto.ts",
+    "apps/api/src/plugins/aij-payment/payment.service.ts",
+    "apps/api/src/plugins/aij-payment/synthetic-test-payment.provider.ts",
+    "apps/api/src/prisma/prisma.module.ts",
+    "apps/api/src/prisma/prisma.service.ts",
+    "apps/api/src/rbac/management-access.service.ts",
+    "apps/api/src/rbac/management.controller.ts",
+    "apps/api/src/rbac/management.dto.ts",
+    "apps/api/src/rbac/management.service.ts",
+    "apps/api/src/rbac/permissions.service.ts",
+    "apps/api/src/rbac/rbac.controller.ts",
+    "apps/api/src/rbac/rbac.module.ts",
+    "apps/api/src/ready.controller.ts",
+    "apps/api/src/secret-center/dto.ts",
+    "apps/api/src/secret-center/secret-adapter.ts",
+    "apps/api/src/secret-center/secret-center.controller.ts",
+    "apps/api/src/secret-center/secret-center.module.ts",
+    "apps/api/src/secret-center/secret-center.service.ts",
+    "apps/api/src/secret-center/secret-ref.ts",
+    "apps/web/app/admin/page.tsx",
+    "apps/web/app/auth/admin-users/page.tsx",
+    "apps/web/app/auth/ai/center/page.tsx",
+    "apps/web/app/auth/ai/traces/page.tsx",
+    "apps/web/app/auth/ai/usage/page.tsx",
+    "apps/web/app/auth/audit-logs/page.tsx",
+    "apps/web/app/auth/clients/page.tsx",
+    "apps/web/app/auth/configuration/page.tsx",
+    "apps/web/app/auth/dictionaries/page.tsx",
+    "apps/web/app/auth/files/page.tsx",
+    "apps/web/app/auth/integrations/page.tsx",
+    "apps/web/app/auth/payments/page.tsx",
+    "apps/web/app/auth/roles/page.tsx",
+    "apps/web/app/auth/secrets/page.tsx",
+    "apps/web/app/client/forgot-password/page.tsx",
+    "apps/web/app/client/knowledge/page.tsx",
+    "apps/web/app/client/knowledge/questions/page.tsx",
+    "apps/web/app/client/login/page.tsx",
+    "apps/web/app/client/register/page.tsx",
+    "apps/web/app/client/reset-password/page.tsx",
+    "apps/web/app/client/verify-email/page.tsx",
+    "apps/web/app/client/workspaces/page.tsx",
+    "apps/web/app/components/admin-ai-center.tsx",
+    "apps/web/app/components/admin-ai-policy.ts",
+    "apps/web/app/components/admin-ai-traces.tsx",
+    "apps/web/app/components/admin-ai-usage.tsx",
+    "apps/web/app/components/admin-api.ts",
+    "apps/web/app/components/admin-audit-logs.tsx",
+    "apps/web/app/components/admin-auth.tsx",
+    "apps/web/app/components/admin-client-directory.tsx",
+    "apps/web/app/components/admin-configuration.tsx",
+    "apps/web/app/components/admin-dictionaries.tsx",
+    "apps/web/app/components/admin-files.tsx",
+    "apps/web/app/components/admin-integration-operations.tsx",
+    "apps/web/app/components/admin-list.tsx",
+    "apps/web/app/components/admin-payments.tsx",
+    "apps/web/app/components/admin-roles.tsx",
+    "apps/web/app/components/admin-secrets.tsx",
+    "apps/web/app/components/admin-shell.tsx",
+    "apps/web/app/components/admin-users.tsx",
+    "apps/web/app/components/client-api.mjs",
+    "apps/web/app/components/client-knowledge-api.ts",
+    "apps/web/app/components/client-knowledge-manager.tsx",
+    "apps/web/app/components/client-knowledge-questions-page.tsx",
+    "apps/web/app/components/client-knowledge-questions.ts",
+    "apps/web/app/components/client-workspaces.tsx",
+    "apps/web/app/layout.tsx",
+    "apps/web/app/login/page.tsx",
+    "apps/web/app/page.tsx",
+    "packages/contracts/src/index.ts",
+    "packages/core/src/index.ts",
+    "packages/runtime-contracts/src/index.ts",
+    "packages/sdk/src/index.ts",
+    "packages/sdk/test/contracts-sdk.test.mjs",
+    "packages/ui/src/index.ts",
+    "scripts/project/cli.mjs",
+    "scripts/project/editions.mjs"
+  ],
+  "negativeProbes": {
+    "qiniu_adapter": {
+      "pattern": "(?i)qiniu|qiniuyun",
+      "matches": [],
+      "meaning": "No matches only means not found by this bounded text probe; use existing constrained source behavior as primary gap evidence."
+    },
+    "aliyun_model_adapter": {
+      "pattern": "(?i)dashscope|bailian",
+      "matches": [],
+      "meaning": "No matches only means not found by this bounded text probe; use existing constrained source behavior as primary gap evidence."
+    },
+    "real_merchant_adapters": {
+      "pattern": "(?i)douyin|alipay|wechatpay|wechat.pay",
+      "matches": [],
+      "meaning": "No matches only means not found by this bounded text probe; use existing constrained source behavior as primary gap evidence."
+    },
+    "workflow_definition": {
+      "pattern": "WorkflowDefinition|workflowDefinition",
+      "matches": [],
+      "meaning": "No matches only means not found by this bounded text probe; use existing constrained source behavior as primary gap evidence."
+    },
+    "long_term_memory": {
+      "pattern": "AgentMemory|agentMemory",
+      "matches": [],
+      "meaning": "No matches only means not found by this bounded text probe; use existing constrained source behavior as primary gap evidence."
+    },
+    "user_script_sandbox": {
+      "pattern": "SkillSandbox|skillSandbox",
+      "matches": [],
+      "meaning": "No matches only means not found by this bounded text probe; use existing constrained source behavior as primary gap evidence."
+    }
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "group": "产品与交付",
+      "title": "独立部署",
+      "requirement": "各产品独立代码消费、数据库、凭据、会话issuer、存储和验收；行业业务由独立插件持有。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E37",
+        "E38",
+        "E39",
+        "E40"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-001",
+      "positive": "在仓库外两个空目录独立安装同版制品并启动，业务数据/附件各归项目。",
+      "negative": "A有效会话用于B被拒；不允许链接宿主源码、node_modules、上传目录或复用库。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D01",
+        "D07"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "group": "产品与交付",
+      "title": "装配配置",
+      "requirement": "创建默认完整AI标准版，兼容基础后台和自定义组合；已安装未配置、未启用、缺依赖、未交付区分展示。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E37",
+        "E38",
+        "E45"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-002",
+      "positive": "三种组合生成可运行宿主；标准版提供已实现AI入口及准确待配置状态。",
+      "negative": "未实现能力不能伪装待配置；未知插件、缺依赖或跨项目配置拒绝。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D07"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "group": "产品与交付",
+      "title": "工作台与SDK",
+      "requirement": "提供管理员后台、普通用户通用AI工作台及API/SDK，业务前端可只消费API。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E04",
+        "E23",
+        "E44",
+        "E45"
+      ],
+      "phase": "M2",
+      "acceptanceId": "AC-003",
+      "positive": "普通用户从工作台提交/查看同一API任务；独立前端消费SDK获得相同权限结果。",
+      "negative": "匿名/无权限/其他成员访问任务被拒，UI隐藏不能替代API授权。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D07"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "group": "身份与治理",
+      "title": "管理员及系统管理",
+      "requirement": "保留管理员、RBAC、后端菜单、字典、配置、密钥引用和脱敏审计唯一owner。",
+      "classification": "REUSE",
+      "evidence": [
+        "E01",
+        "E02",
+        "E03",
+        "E13",
+        "E47"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-004",
+      "positive": "通过正式页面/API完成建号、授权、只读查询和目标审计。",
+      "negative": "合法会话正确CSRF写403且数据不变；撤权后下一请求拒绝。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D01",
+        "D04"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "group": "身份与治理",
+      "title": "客户端身份",
+      "requirement": "客户端支持用户名密码、手机号验证码；复用客户注册、邀请、改密、找回、会话与账号状态基础；具体管理员启用方式待配置。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E05",
+        "E06",
+        "E36"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-005",
+      "positive": "客户用两种已配置方式登录，停用/改密后旧会话失效，身份关联规则明确。",
+      "negative": "错误/过期/重放验证码、撞库、跨产品Token均拒绝，发码受限流。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D12"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "group": "身份与治理",
+      "title": "个人与多组织",
+      "requirement": "同一产品内可切换个人及多个组织空间，角色/资产/记忆/任务/额度按归属隔离；ProjectProfile不代替租户Membership。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E07",
+        "E08",
+        "E09",
+        "E10"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-006",
+      "positive": "同一成员在两个组织具有不同角色，个人资源及任务保留原归属。",
+      "negative": "客户端自报workspaceId不授予权限；停用成员/角色立即失效。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D02",
+        "D12"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "group": "身份与治理",
+      "title": "动作授权",
+      "requirement": "产品管理员规定工具/动作权限上限，组织和个人可在上限内收紧；审批、授权及运行态检查一致。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E02",
+        "E07",
+        "E19",
+        "E26"
+      ],
+      "phase": "M3",
+      "acceptanceId": "AC-007",
+      "positive": "已授权工具执行；需人工确认的写操作停在审批点，审计可关联。",
+      "negative": "批准后撤权、换组织或变更工具版本不能沿用旧审批执行。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D04"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "group": "文件与知识",
+      "title": "统一附件与七牛",
+      "requirement": "统一文件归属、用途、访问权限、存储位置；保留本地适配并新增七牛；公开与私有策略分别控制。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E10",
+        "E11",
+        "E12"
+      ],
+      "phase": "M2",
+      "acceptanceId": "AC-008",
+      "positive": "个人/组织通过同一接口上传下载，两种存储实现同一访问策略并校验内容摘要。",
+      "negative": "猜测对象key、跨组织/过期链接和越权公开私有附件被拒。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D05",
+        "D14"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "group": "文件与知识",
+      "title": "多源知识导入",
+      "requirement": "支持PDF、Word、Excel/CSV、图片、文本，网页导入和后续更新，业务插件经授权接口提供数据；文件上传与内容解析分别验收。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E11",
+        "E24",
+        "E28"
+      ],
+      "phase": "M2",
+      "acceptanceId": "AC-009",
+      "positive": "每类格式形成可追溯文档/版本；网页更新按版本入库，业务来源记录授权主体。",
+      "negative": "恶意文件、SSRF网址、越权业务API和解析失败不污染已发布知识。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D05"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "group": "文件与知识",
+      "title": "检索与引用",
+      "requirement": "从词项检索升级为可配置向量化/重排，引用可追溯至可访问来源，知识权限贯穿入库、检索和回答。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E07",
+        "E24",
+        "E25"
+      ],
+      "phase": "M2",
+      "acceptanceId": "AC-010",
+      "positive": "基于合成数据检索命中预期来源，回答可打开对应文件或业务记录。",
+      "negative": "跨组织引用为0，无依据明确拒答；更换向量模型不能混用旧向量索引。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D05",
+        "D08"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "group": "AI模型与调用",
+      "title": "首批模型能力",
+      "requirement": "接DeepSeek及阿里云模型平台；覆盖文本/推理/代码、图片理解/生成/编辑、向量化/重排；能力逐项声明和实测。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E14",
+        "E15",
+        "E18"
+      ],
+      "phase": "M2",
+      "acceptanceId": "AC-011",
+      "positive": "按能力矩阵对两家可用模型执行真实小额成功/失败/用量样例。",
+      "negative": "不兼容能力不能只改URL冒充支持；模型不可用状态有明确原因。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D08",
+        "D14"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "group": "AI模型与调用",
+      "title": "多级厂商配置",
+      "requirement": "产品统一密钥与用户/组织自带配置并存，凭据归属/付款方与当前空间分别绑定。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E13",
+        "E14",
+        "E20",
+        "E23"
+      ],
+      "phase": "M3",
+      "acceptanceId": "AC-012",
+      "positive": "两个组织和个人分别使用授权配置，产品允许的模型可被客户端选择。",
+      "negative": "其他组织密钥不可读/不可借用，脚本/日志/导出只含引用不含值。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D04"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "group": "AI模型与调用",
+      "title": "受控切换",
+      "requirement": "跨自带密钥与产品付费额度默认关闭，需付款方显式授权；同意后受候选范围和预算约束；每步骤最多3次尝试、1次切换。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E18",
+        "E21",
+        "E22"
+      ],
+      "phase": "M3",
+      "acceptanceId": "AC-013",
+      "positive": "限流/已确认失败按策略切换，并展示实际模型、付款来源和消耗。",
+      "negative": "结果未知不得盲目重发；切空间不转移付款方；超预算不启动新调用。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D08",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "group": "AI模型与调用",
+      "title": "计量与对客结算",
+      "requirement": "上游成本与对客售价分别记录，预占额度后按价格版本结算并释放差额；平台分配与套餐/充值/任务付费并存。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E21",
+        "E22",
+        "E34"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-014",
+      "positive": "10元预占、3元可计费时实扣3释放7；关联唯一任务/调用/来源与价格。",
+      "negative": "usage缺失保持待核对而非零成本；重放和并发不重复扣费或双花。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D08",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "group": "Agent与Skill",
+      "title": "多级Agent资产",
+      "requirement": "管理员、企业、个人可配置Agent，绑定模型、指令、知识、Skill、工具和运行权限，支持调试及可追溯版本。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E16",
+        "E17",
+        "E20",
+        "E23"
+      ],
+      "phase": "M3",
+      "acceptanceId": "AC-015",
+      "positive": "三个归属层能创建私有Agent并在授权范围共享/运行，运行保留版本快照。",
+      "negative": "未发布/被禁用/依赖失效Agent不能执行；旧快照不能绕过当前撤权。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D01",
+        "D03",
+        "D04"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "group": "Agent与Skill",
+      "title": "可执行Skill包",
+      "requirement": "Skill含说明、模板、文件、输入输出、工具接口及脚本；普通用户可上传自用脚本，公开/收费发布需审核。",
+      "classification": "MISSING",
+      "evidence": [
+        "E16",
+        "E17",
+        "E19"
+      ],
+      "phase": "M3",
+      "acceptanceId": "AC-016",
+      "positive": "上传能力包通过校验，在隔离执行器处理已授权文件，输出可下载且可审计。",
+      "negative": "脚本越权网络/文件/凭据、超时/内存/并发超限被拦截，不在API进程运行用户代码。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D03",
+        "D04"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "group": "Agent与Skill",
+      "title": "多Agent协作",
+      "requirement": "支持分工、受控上下文传递、并行、评审、交接和汇总，并可作为流程节点组合。",
+      "classification": "MISSING",
+      "evidence": [
+        "E17",
+        "E19",
+        "E26"
+      ],
+      "phase": "M4",
+      "acceptanceId": "AC-017",
+      "positive": "规划/执行/评审Agent在任务图中分工，前后结果与成本可追踪。",
+      "negative": "交接不能扩大数据权限；被取消分支不继续产生工具副作用。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D09"
+      ]
+    },
+    {
+      "id": "REQ-018",
+      "group": "Agent与Skill",
+      "title": "长期记忆",
+      "requirement": "记住用户偏好、已确认事实和历史摘要，用户可查看/修改/删除，并控制可使用的Agent；个人与组织分别管理。",
+      "classification": "MISSING",
+      "evidence": [
+        "E20",
+        "E21"
+      ],
+      "phase": "M3",
+      "acceptanceId": "AC-018",
+      "positive": "跨会话读取获授权记忆，修改/删除和撤销Agent授权即时生效。",
+      "negative": "被删除或其他组织的记忆不得通过缓存、检索和恢复重新注入。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D09"
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "group": "流程与运行",
+      "title": "可视化与自主执行",
+      "requirement": "支持节点/连接/参数/条件/并行/循环/人工审核、子流程与Agent自主拆解；工作流定义与运行实例分离。",
+      "classification": "MISSING",
+      "evidence": [
+        "E19",
+        "E26",
+        "E27"
+      ],
+      "phase": "M4",
+      "acceptanceId": "AC-019",
+      "positive": "编辑、验证、发布含脚本/Agent/审批的流程，查看各步骤结果并继续执行。",
+      "negative": "循环与分支有边界；无权限、错误连线、缺依赖、过期审批拒绝发布或执行。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D03"
+      ]
+    },
+    {
+      "id": "REQ-020",
+      "group": "流程与运行",
+      "title": "五种触发入口",
+      "requirement": "工作台、API、定时、插件事件和Webhook触发同一任务契约，统一权限、幂等、预算及来源追踪。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E23",
+        "E26",
+        "E28"
+      ],
+      "phase": "M4",
+      "acceptanceId": "AC-020",
+      "positive": "五入口对同一发布流程生成可关联任务，参数与调用主体明确。",
+      "negative": "重复Webhook/事件/调度不重复收费或产生外部动作，验签失败不入执行队列。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D09"
+      ]
+    },
+    {
+      "id": "REQ-021",
+      "group": "流程与运行",
+      "title": "任务中心与可靠性",
+      "requirement": "统一观察进度、中间结果、错误、用量、取消/重试/可恢复点；修复既有租约、健康及生命周期差量。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E21",
+        "E26",
+        "E27",
+        "E46",
+        "E48"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-021",
+      "positive": "两个独立执行者竞争同一任务仅有效租约执行；故障可见并恢复，后续M4显示步骤。",
+      "negative": "旧租约/重入/停用期间写入和结果未知重试均拒绝，不能用历史PASS覆盖失败。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "ENGINEERING_ACCEPTANCE_DERIVED_FROM_CONFIRMED_GOALS",
+      "decisionRefs": [
+        "D09",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "group": "文档与图表",
+      "title": "在线文档与导出",
+      "requirement": "网页预览和正文编辑、章节局部重生成、历史版本恢复，首批导出Word/PDF；论文规则由业务插件组合。",
+      "classification": "MISSING",
+      "evidence": [
+        "E23",
+        "E24"
+      ],
+      "phase": "M5",
+      "acceptanceId": "AC-022",
+      "positive": "编辑正文后重生成指定章节，显示差异并导出可打开且排版可读的Word/PDF。",
+      "negative": "并发编辑与AI重生成不得静默覆盖用户修改；导出越权资源被拒。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D05",
+        "D06"
+      ]
+    },
+    {
+      "id": "REQ-023",
+      "group": "文档与图表",
+      "title": "图表编辑与生成",
+      "requirement": "数据图表与示意图均支持；PNG/SVG、数据/配置/生成脚本保留，网页可改数据、颜色、坐标轴和图例。",
+      "classification": "MISSING",
+      "evidence": [
+        "E18",
+        "E11"
+      ],
+      "phase": "M5",
+      "acceptanceId": "AC-023",
+      "positive": "以已知数据生成图表、网页改数据重绘并导出PNG/SVG，统计值与来源一致。",
+      "negative": "示意图片不能冒充数据计算图，未授权数据/脚本及恶意SVG不可执行或外泄。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D03",
+        "D06"
+      ]
+    },
+    {
+      "id": "REQ-024",
+      "group": "插件与市场",
+      "title": "完整插件开发",
+      "requirement": "面向内部和第三方，提供规范/SDK/模板/调试/兼容检查/打包审核；插件可扩展页面/API/权限/数据/任务/AI工具。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E29",
+        "E30",
+        "E42",
+        "E43",
+        "E44"
+      ],
+      "phase": "M6",
+      "acceptanceId": "AC-024",
+      "positive": "独立插件目录开发最小完整业务模块，安装到兼容消费者，无内核业务改动。",
+      "negative": "未签验/未知包/不兼容依赖或非法命名空间拒绝，不把manifest声明当真实页面/API。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D10"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "group": "插件与市场",
+      "title": "生命周期与局部升级",
+      "requirement": "提供安装、配置、启停、升级、影响预览及恢复；被升级插件可维护或重启，其他插件/业务继续使用；保留已有数据。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E29",
+        "E30",
+        "E31",
+        "E41"
+      ],
+      "phase": "M6",
+      "acceptanceId": "AC-025",
+      "positive": "插件A升级中停用，插件B业务读写/任务继续，A恢复后数据及授权可核对。",
+      "negative": "失败升级不污染B；停用A后导航移除且直接API拒绝；未知恢复能力不承诺任意回滚。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D11"
+      ]
+    },
+    {
+      "id": "REQ-026",
+      "group": "插件与市场",
+      "title": "两层市场",
+      "requirement": "AIJ跨产品能力市场和产品内部内容/交易市场并存；运行数据仍归独立产品，安装/审批与个人AI资产使用权限分开。",
+      "classification": "MISSING",
+      "evidence": [
+        "E29",
+        "E30",
+        "E42"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-026",
+      "positive": "市场发布版本经审核后授权安装到指定产品或组织，个人可购买获准AI资产。",
+      "negative": "用户购买不能获得后台代码安装权限；市场不可读取消费者业务库/密钥。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D02",
+        "D06"
+      ]
+    },
+    {
+      "id": "REQ-027",
+      "group": "插件与市场",
+      "title": "商业授权",
+      "requirement": "支持实例、组织、个人、按调用授权；版本、期限、购买及使用记录关联，授权到期与历史成果处置规则明确。",
+      "classification": "MISSING",
+      "evidence": [
+        "E29",
+        "E32",
+        "E42"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-027",
+      "positive": "同一商品按所选授权范围开通并计次/到期，使用与退款可追溯。",
+      "negative": "复制许可证到其他实例/组织、重放回调和伪造次数均不能扩权。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D10"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "group": "支付与通知",
+      "title": "真实支付渠道",
+      "requirement": "微信、支付宝、抖音接入；保留支付单/尝试/回调/交易/退款/对账唯一owner，行业订单与权益仍归业务或市场owner。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E32",
+        "E33",
+        "E34"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-028",
+      "positive": "按商户能力完成小额下单、回调、查询、退款与对账，权益基于核实交易。",
+      "negative": "伪造签名、金额/币种/商户/应付对象不一致与重复回调拒绝或幂等。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D12",
+        "D14"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "group": "支付与通知",
+      "title": "订阅续费",
+      "requirement": "提供独立续费授权、到期提醒和关闭入口，保留各支付渠道能力差异。",
+      "classification": "MISSING",
+      "evidence": [
+        "E32",
+        "E33"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-029",
+      "positive": "授权后续费，到期前提醒；关闭后不再发起后续扣款，账期权益可查。",
+      "negative": "无有效授权/不支持渠道不得伪造自动续费；超时不重复扣款。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D14",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "group": "支付与通知",
+      "title": "优惠券",
+      "requirement": "提供可复用优惠规则/券和核销能力，价格真值由商品/订单owner确定后交支付。",
+      "classification": "MISSING",
+      "evidence": [
+        "E32",
+        "E34"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-030",
+      "positive": "符合规则的订单锁券、核销或失败释放，与退款规则关联。",
+      "negative": "并发重复核销、跨商家券和篡改客户端价格被拒。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D14"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "group": "支付与通知",
+      "title": "分账与结算",
+      "requirement": "按核实交易、退款和渠道可用能力处理分账/结算，保留失败/撤销/重试与审计。",
+      "classification": "MISSING",
+      "evidence": [
+        "E32",
+        "E34"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-031",
+      "positive": "合成/获准真实小额交易完成分账结算并核对金额来源。",
+      "negative": "未支付/已全退/超可分账金额不执行，不承诺所有渠道同等能力。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D14"
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "group": "支付与通知",
+      "title": "任务退款与余额",
+      "requirement": "未执行取消释放预占；平台故障未交付可用成果退对应费用；中途取消按公示规则结算；BYOK上游费用不由平台伪造退款。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E21",
+        "E22",
+        "E33",
+        "E34"
+      ],
+      "phase": "M7",
+      "acceptanceId": "AC-032",
+      "positive": "核对平台故障、中途取消、现金余额和赠额分开处理，原路退款状态可核实。",
+      "negative": "补偿/退款重复请求不重复退；退款未核实不能记成功，旧流水不覆盖。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "group": "支付与通知",
+      "title": "全部通知渠道",
+      "requirement": "站内信、邮件、短信、公众号/小程序、企业微信/钉钉/飞书、Webhook；模板、触发、定时、重试、记录和投递状态统一。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E26",
+        "E28",
+        "E35",
+        "E36"
+      ],
+      "phase": "M2",
+      "acceptanceId": "AC-033",
+      "positive": "各适配渠道以已批准测试收件人完成发送并展示真实投递/失败状态；M1先打通短信登录所需渠道。",
+      "negative": "枚举和mock不能当投递成功；撤权、错组织、重复事件和未知结果不重复投递。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D11"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "group": "部署与恢复",
+      "title": "Linux私有化与升级",
+      "requirement": "首批Linux单机；后台与CLI使用同一受控升级机制，展示版本/兼容/备份/结果/恢复范围。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E38",
+        "E39",
+        "E40",
+        "E41"
+      ],
+      "phase": "M8",
+      "acceptanceId": "AC-034",
+      "positive": "干净Linux主机按文档安装，UI与CLI生成同一升级计划、校验和及回执。",
+      "negative": "不可用制品、越权/任意命令、错误数据库或无法恢复的变更被阻止。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D13"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "group": "部署与恢复",
+      "title": "整实例灾备",
+      "requirement": "数据库、附件、配置及授权关系形成一致备份清单；恢复后校验版本/摘要并对外部事实对账。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E41",
+        "E46"
+      ],
+      "phase": "M8",
+      "acceptanceId": "AC-035",
+      "positive": "在新隔离目标实际恢复全部数据/文件/授权，比较摘要并恢复服务。",
+      "negative": "只有备份文件没有恢复不算通过；缺对象/错版本/损坏归档明确失败。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D13",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "group": "部署与恢复",
+      "title": "组织恢复与冲突",
+      "requirement": "先隔离重建并提取组织数据，检查依赖及差异；默认副本/新版本，覆盖需预览冲突，应用时仅暂停目标组织相关写入。",
+      "classification": "MISSING",
+      "evidence": [
+        "E07",
+        "E10",
+        "E41"
+      ],
+      "phase": "M8",
+      "acceptanceId": "AC-036",
+      "positive": "A组织恢复到已验证点，B保持业务读写；A数据、文件和依赖完整。",
+      "negative": "跨组织引用、恢复点后的新修改和全局记录覆盖不自动合并，保留现状/副本/逐项选择。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D13",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "group": "部署与恢复",
+      "title": "资源版本恢复",
+      "requirement": "文件、知识、Agent、Skill、流程、文档/图表恢复成新版本，保留当前内容和运行引用。",
+      "classification": "MISSING",
+      "evidence": [
+        "E20",
+        "E24",
+        "E41"
+      ],
+      "phase": "M8",
+      "acceptanceId": "AC-037",
+      "positive": "指定资源恢复历史版本并形成新版本，运行仍能引用原冻结版本。",
+      "negative": "不复活已撤销会话、密钥、权限和被删除记忆，不自动重放通知/扣款/任务。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D13",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "group": "部署与恢复",
+      "title": "保留周期",
+      "requirement": "7天恢复点目标间隔≤15分钟、日备份30天、月备份12个月、自动草稿30天、手工版本90天、回收站30天；发布版本有效引用期间保留，下架后至少180天。",
+      "classification": "MISSING",
+      "evidence": [
+        "E21",
+        "E41"
+      ],
+      "phase": "M8",
+      "acceptanceId": "AC-038",
+      "positive": "按可控时钟验证到期清理、引用固定、有效恢复点显示及删除标记的恢复处理。",
+      "negative": "数据库/附件未共同验证的点不可选；清理不删除有效购买/安装/任务引用版本；财务审计不套草稿期限。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "OWNER_CONFIRMED_REQUIREMENT",
+      "decisionRefs": [
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "group": "质量与边界",
+      "title": "唯一真值与权限复检",
+      "requirement": "AI执行/成本、运行任务、支付交易、通知投递、文件、租户关系各保留唯一owner；上层组合而非复制账本。",
+      "classification": "REUSE",
+      "evidence": [
+        "E07",
+        "E10",
+        "E21",
+        "E26",
+        "E33",
+        "E36"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-039",
+      "positive": "端到端任务的配置/Run/Trace/Job/交易引用可关联，入口与执行时均按当前权限复检。",
+      "negative": "伪造上下文、旧权限快照、上游成功未知和重复消费者不得制造第二份真值。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "ENGINEERING_ACCEPTANCE_DERIVED_FROM_CONFIRMED_GOALS",
+      "decisionRefs": [
+        "D01",
+        "D04",
+        "D15"
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "group": "质量与边界",
+      "title": "真实验收与运营状态",
+      "requirement": "功能按实际页面/API/执行/账单/渠道验收；监控区分未配置、未启用、正常、降级、故障，保留失败证据。",
+      "classification": "UPGRADE",
+      "evidence": [
+        "E27",
+        "E46",
+        "E47",
+        "E48"
+      ],
+      "phase": "M1",
+      "acceptanceId": "AC-040",
+      "positive": "新鲜候选制品跑成功/拒绝/恢复路径，人工操作能重现，运行状态与依赖实际一致。",
+      "negative": "旧报告、descriptor、配置VALID、页面HTTP200不能替代产品通过；失败不改断言伪绿。",
+      "verificationStatus": "NOT_RUN_TARGET_ACCEPTANCE",
+      "targetStatus": "ENGINEERING_ACCEPTANCE_DERIVED_FROM_CONFIRMED_GOALS",
+      "decisionRefs": [
+        "D07",
+        "D11",
+        "D13",
+        "D16"
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "id": "M1",
+      "title": "现有可靠性与独立项目骨架",
+      "dependsOn": [],
+      "scope": "修复DELTA已知竞争/健康问题；复用私有pack与项目隔离，补通用初始化、基本身份治理和完整状态语义。先交外部可运行开发候选。",
+      "gate": "不称完整AI标准版；独立消费前核对AF127及AF077..080必要接收门禁。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    },
+    {
+      "id": "M2",
+      "title": "首条真实AI与知识文件闭环",
+      "dependsOn": [
+        "M1"
+      ],
+      "scope": "DeepSeek/阿里云按能力分卡接入；七牛、文件解析、向量/重排与用户工作台；通知按渠道分卡逐个实测。",
+      "gate": "每个厂商/格式/渠道独立小卡；真实付费、收件人、预算另核验后执行。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    },
+    {
+      "id": "M3",
+      "title": "自服务Agent与隔离Skill",
+      "dependsOn": [
+        "M1",
+        "M2"
+      ],
+      "scope": "个人/组织Agent资产、BYOK授权、工具策略、脚本沙箱和包校验、可管理记忆。",
+      "gate": "先隔离与资源限制，再开放普通用户脚本；不修改现有unknown保护来凑自动重试。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    },
+    {
+      "id": "M4",
+      "title": "流程与多Agent执行",
+      "dependsOn": [
+        "M3"
+      ],
+      "scope": "可视化编辑和版本，分支/并行/循环/人工审核/子流程、多Agent及五入口统一触发，扩展任务中心。",
+      "gate": "复用RuntimeJob，不新建第二队列；外部副作用需幂等及结果未知处理。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    },
+    {
+      "id": "M5",
+      "title": "通用文档图表工具",
+      "dependsOn": [
+        "M2",
+        "M3"
+      ],
+      "scope": "文档编辑、章节再生成与Word/PDF；可编辑数据图表和示意图、PNG/SVG及源码配置。",
+      "gate": "页面编辑器、格式解析、每种导出分别验收；业务论文规则留行业插件。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    },
+    {
+      "id": "M6",
+      "title": "独立插件开发与局部升级",
+      "dependsOn": [
+        "M1",
+        "M3"
+      ],
+      "scope": "完整插件SDK/模板/调试及可信包入口，迁移依赖校验，插件A维护时B持续可用。",
+      "gate": "内部受信样例先跑通；第三方公开制品须先解决许可证和发布权。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    },
+    {
+      "id": "M7",
+      "title": "交易授权与两层市场",
+      "dependsOn": [
+        "M2",
+        "M3",
+        "M6"
+      ],
+      "scope": "真实支付渠道、对客计费退款、订阅/券/分账/结算，AIJ市场与产品市场及四种授权。",
+      "gate": "先交易唯一真值和授权，再上架收费；各渠道能力及商户准入分别确认。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    },
+    {
+      "id": "M8",
+      "title": "分层恢复与最终产品验收",
+      "dependsOn": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7"
+      ],
+      "scope": "UI/CLI升级、整实例灾备、组织选择恢复与资源版本，保留周期和最终Linux制品全矩阵。",
+      "gate": "M1起持续建设基础备份；M8关闭组织/资源恢复及全产品出口，不把备份推迟到上线后。",
+      "status": "PROPOSED_NOT_AUTHORIZED"
+    }
+  ],
+  "auditedSourceFiles": [
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "424153584ad4240e568b12bbdad0fd4ab548103f671c46c352499045b982f5d7"
+    },
+    {
+      "path": "apps/api/src/admin-clients/admin-client-directory.controller.ts",
+      "sha256": "84e9f423f47b145dc2715d64c93469e4b27283bb0f4eec5aed3c3fea36e44219"
+    },
+    {
+      "path": "apps/api/src/admin-clients/admin-client-directory.dto.ts",
+      "sha256": "7100db3658862058040a16f250dee11dd9c380f595e5006fb89dbb482bf5911e"
+    },
+    {
+      "path": "apps/api/src/admin-clients/admin-client-directory.module.ts",
+      "sha256": "2966bf8c662890a63d67b637aa950e8ea05f960e327bfb584d2616e8586148d8"
+    },
+    {
+      "path": "apps/api/src/admin-clients/admin-client-directory.service.ts",
+      "sha256": "90c70f1a0299b17a44f1480fcd746583205efb089e1aa6455d8f6a4e58c61be6"
+    },
+    {
+      "path": "apps/api/src/admin/admin-users.controller.ts",
+      "sha256": "6564c36fdfdb079ca3dc9ec2b712f77bfa8c1934735a378b1ea90062efcbaf2d"
+    },
+    {
+      "path": "apps/api/src/admin/admin-users.module.ts",
+      "sha256": "f0eea080cfafba5dafde62c532162028eacfebb08988a50a098095c1d6f32bde"
+    },
+    {
+      "path": "apps/api/src/admin/admin-users.service.ts",
+      "sha256": "d5a6714174e66e8a2c677867f98e2d621763aebb466fc373f481a8e5d3829536"
+    },
+    {
+      "path": "apps/api/src/admin/dto.ts",
+      "sha256": "d3977ea36ea186ba49d66970e2c04dcbd9aba022c589b915c0f5653f1de04af7"
+    },
+    {
+      "path": "apps/api/src/app.module.ts",
+      "sha256": "57ba32b1ac374c7602ba4ede65fbb0fd493d5cd3dff8e23d72fdfc093eee28ce"
+    },
+    {
+      "path": "apps/api/src/async-runtime/async-runtime.module.ts",
+      "sha256": "b6f1974552db286f389b8bafd1b81e52a6535dbc2184e19cc30843823af05269"
+    },
+    {
+      "path": "apps/api/src/async-runtime/job.service.ts",
+      "sha256": "d63f2b0ee6da199dde3cdcb702440ef259995929b91c28ecb2de24f29448bbce"
+    },
+    {
+      "path": "apps/api/src/async-runtime/outbox.service.ts",
+      "sha256": "4469ae7224806c9df3777b14f4c5a78a52f2c63cc063fe83fe1d0644b3a7f5c9"
+    },
+    {
+      "path": "apps/api/src/async-runtime/registry.ts",
+      "sha256": "e03c57c3d704db7ae8b4a9a8f7df3e04b871d2217f8f8f40d5ac1eb3c3ef1645"
+    },
+    {
+      "path": "apps/api/src/async-runtime/runtime-admin.controller.ts",
+      "sha256": "f33ea806e0627cd5627504dd1204271ced45f17822322cb5918341297bd11b74"
+    },
+    {
+      "path": "apps/api/src/async-runtime/runtime-admin.dto.ts",
+      "sha256": "304755aa5e8a03ec64e36a5e84c6d6089ff1dcf7f2c2a2eb735588e08fbaa569"
+    },
+    {
+      "path": "apps/api/src/async-runtime/runtime-admin.service.ts",
+      "sha256": "57923781ece3e35cbaf36aecbbeb25311b3cc368e98e7064d77b7b44639bf41b"
+    },
+    {
+      "path": "apps/api/src/async-runtime/runtime-contracts.ts",
+      "sha256": "da1c2338932404a5f97328c205e21a535b4db913d429f6cb98c8b94fd6dd40d7"
+    },
+    {
+      "path": "apps/api/src/async-runtime/runtime-health.service.ts",
+      "sha256": "d21dc1a091a2d063de119b11d3ed49f3a33c5eb01a0ca17c68cde1cc33f45fd5"
+    },
+    {
+      "path": "apps/api/src/async-runtime/runtime-worker.service.ts",
+      "sha256": "b240a87630b0685678ff6f090401207bdd25e7205bc68ba9defb82cfb52f5f8d"
+    },
+    {
+      "path": "apps/api/src/async-runtime/scheduler.service.ts",
+      "sha256": "757c5ab068ab7115efbe7c471bb569d660203100b5f5f910fbf2587880d3db08"
+    },
+    {
+      "path": "apps/api/src/audit-log/audit-query.controller.ts",
+      "sha256": "559ef814b47dee36a1ad30d6770afb87be84f757d46ea5cf3b14a0c3967de4c9"
+    },
+    {
+      "path": "apps/api/src/audit-log/audit-query.module.ts",
+      "sha256": "e2098b2cb2e93efa6d40d8178685ffb390606d74ec168c51134f1d94eda2951c"
+    },
+    {
+      "path": "apps/api/src/audit-log/audit-query.service.ts",
+      "sha256": "82521f1c217c4d94f90fd21c94f610900ce1306a6fee22361bd69278d09dfa80"
+    },
+    {
+      "path": "apps/api/src/audit-log/audit-redaction.ts",
+      "sha256": "1b4dc3af5d47bc78af6327bb6dcdaf03e989ed35090d45ab26d0b33fd5a76fd8"
+    },
+    {
+      "path": "apps/api/src/audit-log/dto.ts",
+      "sha256": "146b718512062d1b08ad1de5e25301ff7fc315503d42e93fbd5edc67987e71e6"
+    },
+    {
+      "path": "apps/api/src/auth/auth-errors.module.ts",
+      "sha256": "9572ce13751ba43480ad5d1211569ad83c64425b6df41e99012700520c78f9ab"
+    },
+    {
+      "path": "apps/api/src/auth/auth-exception.filter.ts",
+      "sha256": "3b82955cc9e2e7ac59df9fa3b8bd3f069e84c4390980bca8a70ccd52dce6342e"
+    },
+    {
+      "path": "apps/api/src/auth/auth.controller.ts",
+      "sha256": "d32d057c6a80fedfd945c2688a4feee15a8508c93c95821fb420c534efb9d0b1"
+    },
+    {
+      "path": "apps/api/src/auth/auth.module.ts",
+      "sha256": "d9e5ee0f39c9049f7a57203ba0582955880fa40337973908339b5028d631705c"
+    },
+    {
+      "path": "apps/api/src/auth/auth.service.ts",
+      "sha256": "5d8bd6f8c23634258aaf9df3015dbf0054d7f08600fada4c753381a2c5074018"
+    },
+    {
+      "path": "apps/api/src/auth/auth.types.ts",
+      "sha256": "a949e85030d36586187ab986e65b8300e18d013eddb2c9bb40e99eb907d97458"
+    },
+    {
+      "path": "apps/api/src/auth/browser-session.ts",
+      "sha256": "c0af6e175c643eddd3595f238e2d20f17e445088c4c9b1ccda42964412400257"
+    },
+    {
+      "path": "apps/api/src/auth/dto/change-password.dto.ts",
+      "sha256": "a3cef657c0161142cfa18c6fb21f4ec6bb3084549e5c39b5d42b79a1cbf1263f"
+    },
+    {
+      "path": "apps/api/src/auth/dto/login.dto.ts",
+      "sha256": "37887fb23bf7e4d0082446f818d34241eca888c1214958865a0499fe10503f04"
+    },
+    {
+      "path": "apps/api/src/bootstrap.ts",
+      "sha256": "6282f64aa3bc4e5dae436d04f49bd423d3903336e4cb2fb182476f45d30a2522"
+    },
+    {
+      "path": "apps/api/src/client-auth/client-auth-notification.adapter.ts",
+      "sha256": "601eec3c8300227fd2bcb10955f6171c9b8a746c9720475a5011a2d8c99e807b"
+    },
+    {
+      "path": "apps/api/src/client-auth/client-auth.controller.ts",
+      "sha256": "d99fa03f658435ca8cacbbc3ce8cb2edbd995dec77763a364ee6f9bfb98c5dc8"
+    },
+    {
+      "path": "apps/api/src/client-auth/client-auth.guard.ts",
+      "sha256": "6fe0ae69b8b3ee30f82b6b30aabd4a2052bfe124d9aff04799e512ac3e656748"
+    },
+    {
+      "path": "apps/api/src/client-auth/client-auth.module.ts",
+      "sha256": "9fb3532d7fe0ac635fe79d4216d1e7f2d404c0a56aec98bbb9067d82f638549e"
+    },
+    {
+      "path": "apps/api/src/client-auth/client-auth.security.ts",
+      "sha256": "8777a7df9a5f114ef915f19cea9e878a4ef52e98a484cd21d295e111249aada5"
+    },
+    {
+      "path": "apps/api/src/client-auth/client-auth.service.ts",
+      "sha256": "271dad1c7b3457b79ff7e02d92a6d4880b7db55a2a5c48ed85c41c6051bbcb14"
+    },
+    {
+      "path": "apps/api/src/client-auth/dto.ts",
+      "sha256": "cf78df923ee29d5643f5c6d8846933268f13e4662520000a9cb02bea2db75795"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace-context.controller.ts",
+      "sha256": "a1dfd9701c8357281a495c949e1479c2df9b04b72158b0e7a6c1f08880591f3e"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace-management.controller.ts",
+      "sha256": "cd1143133addd6399ef49efeeeb556755e6dae894e322283d53ebc8a23886fa0"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace-management.service.ts",
+      "sha256": "c3981a2363201d6b275e601a4f6c171992589c79492086c54b581f2cf7836d7d"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace-permission.decorator.ts",
+      "sha256": "fc055e921c3709a6b42d6d2b501e35de4b9de6879f82943bb25b97eb35a13caf"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace-permissions.ts",
+      "sha256": "28c93981d4430161bf7fb5ac6b03b6f9733bd1c36464dffa4f5ad8eb2dfd602f"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace.dto.ts",
+      "sha256": "a516e34dea34a15fa4863c6ef988f8a571ceb522cb5fd512a71df8261895a25b"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspaces.module.ts",
+      "sha256": "0c150a685a71f967417f1c47164a6d8ceaa5c6398114ab03f0b621efc1b0d636"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/workspace-context.guard.ts",
+      "sha256": "bfa3719ee8f4ce74d1aa379c922131ef7fb1f1135c9818399157661934b9ec49"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/workspace-context.service.ts",
+      "sha256": "ee215e48d36447558601581137b05157fdc95ccd167666cfca07c06acf643193"
+    },
+    {
+      "path": "apps/api/src/common/decorators/authenticated-admin.decorator.ts",
+      "sha256": "e718d12cbbe4fdcc6473d6777d47fcf856a83114bcc3bae856a4fbe3365b51e2"
+    },
+    {
+      "path": "apps/api/src/common/decorators/permissions.decorator.ts",
+      "sha256": "7fc4e31f62d28ec9100aafe9efec8ffa756b94a90644f0d4e80cc58ba70218b4"
+    },
+    {
+      "path": "apps/api/src/common/guards/admin-authorization.guard.ts",
+      "sha256": "edf9d36fe770c54f924982874cd58b0ff1d450a35cfa43b94c92b5e28691a0a2"
+    },
+    {
+      "path": "apps/api/src/common/guards/jwt-auth.guard.ts",
+      "sha256": "e0fe141eebb83ea944a2ff634b6e0b596e0d733a24863fd8679260337bf3421d"
+    },
+    {
+      "path": "apps/api/src/common/guards/permissions.guard.ts",
+      "sha256": "4f0d9b79211edc9dc3d0a23ea6c3b550e0f53a7078df61d4dea738eebf7ac25b"
+    },
+    {
+      "path": "apps/api/src/common/interceptors/correlation.interceptor.ts",
+      "sha256": "f5cecf2486d313bb2615cdebd440b2eaeabc1b3c80c3a75a04db644b85ace19a"
+    },
+    {
+      "path": "apps/api/src/common/interceptors/transform.interceptor.ts",
+      "sha256": "a51c36f28f21205fc66340d289b67feb8049181c38c92c1a5821f2a5b23aed82"
+    },
+    {
+      "path": "apps/api/src/common/session-cookie.ts",
+      "sha256": "94aa20c8069f3b8f618acba80d285f09564a5e085f612e6560d1e8d37d6d0609"
+    },
+    {
+      "path": "apps/api/src/configuration/configuration-policy.ts",
+      "sha256": "91975493090baf9aa446e8b30549e081088a348aa1f6139effd4c885497b872f"
+    },
+    {
+      "path": "apps/api/src/configuration/configuration.controller.ts",
+      "sha256": "f69d42a2d4b525d698790faa6e72198396d1dc009d56e22094ebea834b32e481"
+    },
+    {
+      "path": "apps/api/src/configuration/configuration.module.ts",
+      "sha256": "9fb5aaf2e390d2a26bb05b9a264795178a0a395ad582f8a443afd17c46f559b0"
+    },
+    {
+      "path": "apps/api/src/configuration/configuration.service.ts",
+      "sha256": "2383501ea2c500d8d1e1b9a0ada1e9076bf09bdb6e7d5fb3b35cdb7348d187e7"
+    },
+    {
+      "path": "apps/api/src/configuration/dto.ts",
+      "sha256": "238fce04e04a9e416a236d7bc9d4f92bf038eaa9564449dd2e7db2363c7092a0"
+    },
+    {
+      "path": "apps/api/src/dictionaries/dictionaries.controller.ts",
+      "sha256": "8ab88a0f2ffe3972b5b5b47a1859b6b743ae716e563d7326df7426113b389978"
+    },
+    {
+      "path": "apps/api/src/dictionaries/dictionaries.module.ts",
+      "sha256": "a00a0d8e17e5eebf21df0824e93847703ebb365f5c141883545ce5b5148b0f99"
+    },
+    {
+      "path": "apps/api/src/dictionaries/dictionaries.service.ts",
+      "sha256": "3f25ccdb28649cdf8d8f638f5a5a3623598402ef5609539debb5809ff4162673"
+    },
+    {
+      "path": "apps/api/src/dictionaries/dto.ts",
+      "sha256": "1bae8d6c114fbd11463cc6972156f9e17a6ba312c8ca5c3f481f6c3ef2af246b"
+    },
+    {
+      "path": "apps/api/src/files/admin-files.controller.ts",
+      "sha256": "865f3ef6492eff0ff9bd0d4549ebeb9a18d812a3edb01df318e9f81b0f1d8ddb"
+    },
+    {
+      "path": "apps/api/src/files/admin-files.dto.ts",
+      "sha256": "75bdfb2eeabb7c3699db8c4f0393ff4e64338c0f40ce2339b0ab866abaa7acc1"
+    },
+    {
+      "path": "apps/api/src/files/admin-files.module.ts",
+      "sha256": "e41f3fa916eb2c69d0c6908fce81ffaa45269abe9856be7a17a36ccf3041da35"
+    },
+    {
+      "path": "apps/api/src/files/admin-files.service.ts",
+      "sha256": "bd3f511f15eb1cc1474b2e290ca1c33bc568c856cbf9072d5de63f6f5f7f7a1e"
+    },
+    {
+      "path": "apps/api/src/files/client-files.controller.ts",
+      "sha256": "0019596500a06c07269424dc5f2d4fb61e8868bc38ffcab716f5ee52b2371782"
+    },
+    {
+      "path": "apps/api/src/files/client-files.dto.ts",
+      "sha256": "8879e7d789f85159073cdff2b0c6f69b7efec025a1bf01cb45effee4d995c4f4"
+    },
+    {
+      "path": "apps/api/src/files/client-files.module.ts",
+      "sha256": "db1d85d5686035264b0de36e60de15b56d758440664386ea422af9961510c1fa"
+    },
+    {
+      "path": "apps/api/src/files/client-files.service.ts",
+      "sha256": "93b29e665e3259d2b7299be4ddc879cd61e772ed9de5648d5667e3a5a423c900"
+    },
+    {
+      "path": "apps/api/src/files/file-content.service.ts",
+      "sha256": "66d54e1fa4af795a3aab04bacef3b16ecaf5c014a7d5cc2972b42f9fdaaab3f5"
+    },
+    {
+      "path": "apps/api/src/files/files.module.ts",
+      "sha256": "2c7eb6f11e71292e2408873cc05f813eca4922c4d70ee8cbf4fddba22a9ff911"
+    },
+    {
+      "path": "apps/api/src/files/local-storage.adapter.ts",
+      "sha256": "456ba5a29d256f5c4b3b26d00b2d2590cceaf234804643e1a339c48fbd20d246"
+    },
+    {
+      "path": "apps/api/src/health.controller.ts",
+      "sha256": "226924e51b5255024a0bb1600d5b906fe055d3ad7e5d56f64469aef6dd7c2ed7"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector-manifest.ts",
+      "sha256": "aab2a0ee3371b7e16b435613b41a3e74909f8086dfb51aaf6dfae1073e95a225"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector-operation.dto.ts",
+      "sha256": "e4604c2e16799ca0fd7d84377ae0b2be3ddb20bbfcde048534eba98e5b9630bc"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector-operations.controller.ts",
+      "sha256": "0a67615ce4ed63dc0e7773ceadcfcab56c9077c53c2254e064d8c311ccc24eb8"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector-operations.service.ts",
+      "sha256": "b18d5574c4c202a17cefb9842bf98b0beaa1194b30b5da9e6afe330b149acc28"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector-webhook-signature.ts",
+      "sha256": "25ecb5857b86e799674453f18b6a5096b988ab09d8e2deb81219f5a562b572be"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector-webhook.controller.ts",
+      "sha256": "1f92de8b5197a08f03702f17a5a0e98f23cf8f7264b35c8a7a8e82a1eb32981f"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector-webhook.service.ts",
+      "sha256": "c6b6c0c1c4bda9499072d7172ae5081d6be027228f33d26a8a2a27da3f6dafee"
+    },
+    {
+      "path": "apps/api/src/integration-center/connector.dto.ts",
+      "sha256": "be07fbc8d5473ade958f697c7df176ddb260a8b59b5557dd4a43c54528b04900"
+    },
+    {
+      "path": "apps/api/src/integration-center/integration-center.controller.ts",
+      "sha256": "adc945a4742ad0971c25a0ab804782a09b88930cb32c0576defdfe9a9856a318"
+    },
+    {
+      "path": "apps/api/src/integration-center/integration-center.module.ts",
+      "sha256": "d3256e25d97cfc89baacf901b4248417d9175b4d2f54669cac29c4e96b6cd926"
+    },
+    {
+      "path": "apps/api/src/integration-center/integration-center.service.ts",
+      "sha256": "44c716727bb6bd60c08f6de5fb4a6f4812b12299a2195f96c933fe5c08480466"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "sha256": "cf14cff1aeacd5678dc4618c6571db605f5711daecde805e9d6f3b88a7a7df4c"
+    },
+    {
+      "path": "apps/api/src/menus/menu-availability.service.ts",
+      "sha256": "b2e3a2139cdce5a1b8f16e12ddb16b6cdb38f9be40116f41cbe3a925a3c5f571"
+    },
+    {
+      "path": "apps/api/src/menus/menu.dto.ts",
+      "sha256": "622728c6fb562f1f60406c4ab0309110d0ebe3039413cf1285b9115f1e86bd7e"
+    },
+    {
+      "path": "apps/api/src/menus/menus.controller.ts",
+      "sha256": "192dfa45ee493ee5150bc2d3d8b36a472c808bec397d7152e2f75cbe6114ee85"
+    },
+    {
+      "path": "apps/api/src/menus/menus.module.ts",
+      "sha256": "1819398ffd21ed8275f3fd73a8feb9a628b6729f594603efb468d06227b0aae4"
+    },
+    {
+      "path": "apps/api/src/menus/menus.service.ts",
+      "sha256": "5508073ca994b2056195252f2c1a5c48c13e026be2b7f45e4750ce0d8aa6816e"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-catalog.ts",
+      "sha256": "731de0015a35b3071d9ab7143bd50221ab2b5ea4f9290101fe75b2159694f5ca"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-enabled.guard.ts",
+      "sha256": "0f536f2c89f7584faa3a4ba75d902095c84f3e84fa6a6673926aada7569b38b6"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-lifecycle.service.ts",
+      "sha256": "10ac9b6495b0ad3bea298535f63686150bc1a1dcda10ff9af4698338cb1a9072"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-management.controller.ts",
+      "sha256": "1e6ba56f3680f8b1d9ba0d8d733f66541d578ce14c4dd866b12e3275046ce8b2"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-management.dto.ts",
+      "sha256": "69fbd647a84715e8c00b913f86e29a90a130e404d8a19aa496478672a9edb1b1"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-management.module.ts",
+      "sha256": "370ed02bddc48cd36e894f822d593b36a5e5410e8af2ae84778edf0241494558"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-manifest.ts",
+      "sha256": "2e8a246c80313ac4c55b3b403cff27b5f0c386d5c97e827f767a333f5e311b8e"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-operation-policy.ts",
+      "sha256": "1b1711a13b38ae5ef224cff83bf8b46cc2dc209a60390c8cfe3ca3b6ccbb8fdd"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-runtime-access.module.ts",
+      "sha256": "6ff961d2fac8ae37cda592f936f95d6c53542f5027d0f16bd58f59f90644bcf9"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-runtime-access.service.ts",
+      "sha256": "63936077b0401953215d0275d0d61900d9b8b6758f8606fb76fabdda82b40d16"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/plugin-runtime.module.ts",
+      "sha256": "b2fc12a2cdc1ccd19ffa4fc8ed7436f83e934c132c7958d7d022843cf6a3174f"
+    },
+    {
+      "path": "apps/api/src/plugin-runtime/trusted-plugins.ts",
+      "sha256": "7918211614cd378d0d21eaeb77bc2aecf3e2e81406a6c6d85529e32e7021fc2b"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-admin.controller.ts",
+      "sha256": "77ad2fd4b618621154688adc767a4250ee3544cd2514bfaca47d05180c270e4e"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-budget.service.ts",
+      "sha256": "b5b91157e12ecc88fe82f06e4568e8b2d6df455c885bdf761d9d8640b6d78746"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-client.controller.ts",
+      "sha256": "f853bab7bebb7eda59101a227e0a182cbe14ea88b93abcefeb2d417d7ddbc828"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-configuration.service.ts",
+      "sha256": "1d429d644a6efdf7084265f13ff7730431f3e34167a1ab1ef3b264cb2dd6dc7a"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-policy.ts",
+      "sha256": "106d1387e11e741868efd73b019c4e09ae4732f449484e04bd3b010e28a8a32c"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-provider.ts",
+      "sha256": "0ca19a8f3fbd75efbcb65e509a001eb15921f0a70fac966a2dfdc171f1422075"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-run.service.ts",
+      "sha256": "437808387305059bde47fd17bf3dcd63ff5c4647856431affe18dd782ac45a80"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-usage.controller.ts",
+      "sha256": "4dfe7cc874c62427418f6d60d15f3ee380e03dabe61b2a1454bc5bc453aaab6b"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-usage.service.ts",
+      "sha256": "190bdf0d473caf9633d0d5a4f9e731ea4ce34b07cd9a4126d211fdb9b4408983"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-configuration.ts",
+      "sha256": "d5b0cf6be25fb1c57095912bd834c4ecad6fe7fd58f6ea312a1403ad116440bb"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-evaluation-budget.service.ts",
+      "sha256": "732acb3076334465d661c29be5d8b6b471521b857bcda2efacc2b43d33e542ca"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-evaluation.service.ts",
+      "sha256": "07e520307041f7893c07acba88619669477bb9721f5d8ccd201a8f0711109e1f"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-execution-trace.service.ts",
+      "sha256": "fb2936eb538fd597931389e1c05855a622fef7a94ef3e9d77e9be0b5d2a4d2da"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-execution.service.ts",
+      "sha256": "abb130c75feba9583a7416b3516da4f1320f014c02d4ac84d903608f06acb19b"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge-retrieval.ts",
+      "sha256": "352bcbac1c9a6f1b7f8ab6f7cd96bb2234da4ce14590e1d01f5d55812cba8375"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge.controller.ts",
+      "sha256": "e0175768616d01a252a17b522e7fe4da11e558104e58bd6ad146c6f40548719f"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge.dto.ts",
+      "sha256": "623502b12578e7e74b61da697f77ce81d66543e6e3ed2961f909ba458b77f222"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge.service.ts",
+      "sha256": "512fba2ebf811c9d98b34672624d06ede3ecdccac9dce17a82343638656deb09"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-plugin.ts",
+      "sha256": "5cc5cf77a19e6a4347a9996541738f7fac554c9846d62a9769c2098c68085b99"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-provider.ts",
+      "sha256": "71eded7b8c852346d34e51f9e0f8d59c304a6d4fae0c96b3efd30917732eb882"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "02b4d5c10efdf9ccbb433817315cb1177758ed7d350acf9e915b8a87db4a1270"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-trace-query.controller.ts",
+      "sha256": "5b0a472cb50bf828e6671e366d604afcfa09aad0bf65cf625a27ba64803f0e54"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-trace-query.dto.ts",
+      "sha256": "e92a2ba881e19da02bf0fb294c4ef3c251aec113349b6cf2155769615d1992b0"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-trace-query.service.ts",
+      "sha256": "2c511f55037014136a36e35b46c1d0ca2ed8cab14815d454a23517cd5a2a2cae"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/deepseek-provider.ts",
+      "sha256": "80e8a41e4b71c99309cf40ca668eefe2b3d68b3918ad4ac4b71bd6379cfbc9c1"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/offline-test-ai-provider.ts",
+      "sha256": "e5e0d36a85c0b982d969c93aee7a13ee6a2f604cf5ef33c22d35793bce9205c2"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-delivery.service.ts",
+      "sha256": "534955b965ce9fe9f178e3e84c9fe36cec98384c387f8c355a3ec78e453176ab"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-management.controller.ts",
+      "sha256": "1f87d0ee874577a9ea984e821218eb1dadd2a98deb4a40ab87750096108a3d69"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-management.dto.ts",
+      "sha256": "48d1c114d6a6d2441724e43a667e7e607691444b6e1e5af2a5da0bf7c49fb1e5"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-management.module.ts",
+      "sha256": "c65c350232a22a4f2085cf184a272eeb5ac9c49f60eb4cd5fb80fd4c521bba14"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-management.service.ts",
+      "sha256": "b8b4b025e676905a49b0840aa0564bf525d24177690e16e3db4102e91b881a79"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-plugin.ts",
+      "sha256": "185a32cf7f45e1df3cede24d6952b7f654d42e7e4b828e932189fdfab7016261"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-provider.ts",
+      "sha256": "98a62595bda93282fa42c6bbfcf9d5d2766ceea7e1d614a9615c667778765b3d"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/notification-runtime.module.ts",
+      "sha256": "8a79359f8248adb12da225ee42f471df59fa806030914c9b319a365a64312e45"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-notification/template-engine.ts",
+      "sha256": "4d81ecdcd2ca802a13e4dda50f59ec91d2d708c1686491d951bfdd9ca7060329"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-admin.controller.ts",
+      "sha256": "6e399f08652413b5d8919ff528560317b0303a72ac397739906998ae1a3952b6"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-admin.dto.ts",
+      "sha256": "e7eeeea1e039eb334f9d205b07455914d5c335686eb1c93531c27c5590508a41"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-admin.service.ts",
+      "sha256": "32394524899f5a42e11e38babbb7f2e5a7711e9956c1ee5696de64b28025319b"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-callback-signature.ts",
+      "sha256": "09c1e62a29c3bc9616484f173d2ee7f6be18a35465c0b7bb24dfee503899f664"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-callback.controller.ts",
+      "sha256": "800de63ce8633ffcedd3b8911c7e37879f0005ea49323b783e15fdad1ee0125c"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-callback.dto.ts",
+      "sha256": "8fcfd1363f21311ecaa9a76fae56efcb51e21f4edc7bce48cc34cc139370a13d"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-callback.service.ts",
+      "sha256": "d0ca3f97b4900078c87efc9926c0047007f9031b726ebfb686e4f420483bc8d7"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-payable-source.ts",
+      "sha256": "0370e913a7882ddc9fb6914bcb38889f4bf9713b93cff0ac3a6418d56707ee48"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-plugin.ts",
+      "sha256": "31c073682b0a6020a787eb50389512d1cb739527d9d68a66e0179dfd6cff001c"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-provider.ts",
+      "sha256": "5d4c7239a8de37d6c108d6c3fc76e60c73c13e998ea324d06124449f4f06aa99"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-reconciliation.controller.ts",
+      "sha256": "729d55878d09f95744e0e680507d3248b3df362517897b246e318a6f4eb7882d"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-reconciliation.dto.ts",
+      "sha256": "81234c6320bec52ee345ce8fa3e2e26085dbdff16e45417c82ca0949eadbd17a"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-reconciliation.service.ts",
+      "sha256": "2b4c444c43e7ecbc3c47e91caf6e2ebf951a6d59e1c714e9686241e9d30c3a03"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-runtime.module.ts",
+      "sha256": "d3c5ed87ca4dbdb2c6f08fd06df04cc145abfdffb6c591c867326bca0c55ba79"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment-state.ts",
+      "sha256": "26301a989bb2469da6c392e3791e550e27c09db910cb26246114cb5f06fa3975"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment.controller.ts",
+      "sha256": "61bb5a7fe9fb471d4aa4c86f06410de94b06c03d1a3d0613f7b7cc85cb1df0cd"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment.dto.ts",
+      "sha256": "3cd6772547e8350d2e748ca3e2e85b6230c5212c4ac96cc08c60a3d04b43ba34"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/payment.service.ts",
+      "sha256": "4ec1a00af13c94ce47dcc309f5b0f320bd73fbca803ba889250570fc54a164a9"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-payment/synthetic-test-payment.provider.ts",
+      "sha256": "ea77694995d1ea05430698b9d67a3db1771f14ccd944052d7490cfb08a002e8c"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma.module.ts",
+      "sha256": "07232b0f78d3368d231317a2367ff97e3820b9c23dca0b0b6223812d6929883d"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma.service.ts",
+      "sha256": "3fba295bf74a8c0badbe4593d687825ca41257aa676bab436ffd06ed481b3d1e"
+    },
+    {
+      "path": "apps/api/src/rbac/management-access.service.ts",
+      "sha256": "ca71529fe877f04e3ddba45c6620e36a0e50cc9772ca370e2cb61e177a9f3abc"
+    },
+    {
+      "path": "apps/api/src/rbac/management.controller.ts",
+      "sha256": "561c62d8ba1f8e5fb16f1713e51de64dddf30dff55e27a27bfa2cb0795079be5"
+    },
+    {
+      "path": "apps/api/src/rbac/management.dto.ts",
+      "sha256": "720fe2fc3febacc85d509994bf74382048a8f1eaca9b65a1ae46630a0e4b40c5"
+    },
+    {
+      "path": "apps/api/src/rbac/management.service.ts",
+      "sha256": "8a973f6b8acb76451ca16537c85e067dadacd004da9545edd47cb7e8e4516784"
+    },
+    {
+      "path": "apps/api/src/rbac/permissions.service.ts",
+      "sha256": "2d2080cdc8a306da39e050cf365feea9f96da84317a4be79e60d2524a15bc45c"
+    },
+    {
+      "path": "apps/api/src/rbac/rbac.controller.ts",
+      "sha256": "03b4fef1c5f931415fbedf2d064b7606b9cb7d0a6e64619be546773911791f98"
+    },
+    {
+      "path": "apps/api/src/rbac/rbac.module.ts",
+      "sha256": "9886cc9d975d10571ecd1ec220e24bf852190a5930207403a6a4b17039d71453"
+    },
+    {
+      "path": "apps/api/src/ready.controller.ts",
+      "sha256": "000a36e43177b7c7dccd282de3bab2fdb06fa4cc3019063e35a25366fd9026f7"
+    },
+    {
+      "path": "apps/api/src/secret-center/dto.ts",
+      "sha256": "be19c4fe3b189c37f3b7ceb12afaffbb04b76e6b890ff5859c85b9a2e3a7582c"
+    },
+    {
+      "path": "apps/api/src/secret-center/secret-adapter.ts",
+      "sha256": "47cb0fc1a5fe7cd252be6da3d1a15e54bcdc544851e539762cb8ae3cbe135cb8"
+    },
+    {
+      "path": "apps/api/src/secret-center/secret-center.controller.ts",
+      "sha256": "9055cff05ae99ab602c97eb0fcece5cc77f11e65815778b7f739c318a7d56ced"
+    },
+    {
+      "path": "apps/api/src/secret-center/secret-center.module.ts",
+      "sha256": "c6661211791dda6f1cdd1ab49b061a2a587db7477d7647ff53c7680525466bb4"
+    },
+    {
+      "path": "apps/api/src/secret-center/secret-center.service.ts",
+      "sha256": "c536175cc425299830412388bc5a78665ee7a618fc0c14205862fc0f35d97844"
+    },
+    {
+      "path": "apps/api/src/secret-center/secret-ref.ts",
+      "sha256": "147f6eb75d9714705ac2a5b4807309c0d8d4851059d241728aa7690f4382e9a7"
+    },
+    {
+      "path": "apps/web/app/admin/page.tsx",
+      "sha256": "a3db5884fcc5601096ee554fcd8a3bc19fbce47bed1a6aebd7f99b513355e06b"
+    },
+    {
+      "path": "apps/web/app/auth/admin-users/page.tsx",
+      "sha256": "fa10e67f7e9d783b5c9f11893eccee709f57f816e7f1bfdabd7a5b552dbe97af"
+    },
+    {
+      "path": "apps/web/app/auth/ai/center/page.tsx",
+      "sha256": "e0dfb3acc45d3414615cd92764478a27a3e9103aec88075e2ca439a527846ed2"
+    },
+    {
+      "path": "apps/web/app/auth/ai/traces/page.tsx",
+      "sha256": "794f2c4fc7406f4534c1c592d7d0217ef3e819377f13a3e4d519b4cf34f735d2"
+    },
+    {
+      "path": "apps/web/app/auth/ai/usage/page.tsx",
+      "sha256": "3efce53a97b2dd41556f77adb78feb44621cff46d86987baba3b05330b7a357c"
+    },
+    {
+      "path": "apps/web/app/auth/audit-logs/page.tsx",
+      "sha256": "d61149e7c3b035717baa070caeb3a52d800790a799f02aac62d6aa39317d5e1b"
+    },
+    {
+      "path": "apps/web/app/auth/clients/page.tsx",
+      "sha256": "551ed79cefcf85f944b7edc45c555719abcdd73f97ba414c7580c7564811fb45"
+    },
+    {
+      "path": "apps/web/app/auth/configuration/page.tsx",
+      "sha256": "bee15a85746c986ab47e562030dae4e632cc4a3a64461e8ac5a83a4213628aaf"
+    },
+    {
+      "path": "apps/web/app/auth/dictionaries/page.tsx",
+      "sha256": "291957bc34269df6ef25ced91a062a45ac329a3862cfc5908e902f1f3c66db14"
+    },
+    {
+      "path": "apps/web/app/auth/files/page.tsx",
+      "sha256": "57278992d435de2e927d4bbc368420a9f85c5daad3a84012e3291d5d1d34d56d"
+    },
+    {
+      "path": "apps/web/app/auth/integrations/page.tsx",
+      "sha256": "d4f256024e2081ea423796c7adf41180e5b73783c826050b0bb2adce1661d1bd"
+    },
+    {
+      "path": "apps/web/app/auth/payments/page.tsx",
+      "sha256": "adbefe118adde2ab02d6cd8dbc0d5fe5afe3b09d3a68d49111530b2fdfc33cd6"
+    },
+    {
+      "path": "apps/web/app/auth/roles/page.tsx",
+      "sha256": "7578a1cdc57b8bd42a22e10a4b8e3ea4cf96d7825d4f20d54b53d866450d5c09"
+    },
+    {
+      "path": "apps/web/app/auth/secrets/page.tsx",
+      "sha256": "5882c9ef048cd5f2070a86fcbffb5e694fedc05bfeb0a52504f9479e16b87262"
+    },
+    {
+      "path": "apps/web/app/client/forgot-password/page.tsx",
+      "sha256": "cfc22ad0428d828d96aff85140f2b2d2ed4bb530605f837d0ef2cde98ba4e1f1"
+    },
+    {
+      "path": "apps/web/app/client/knowledge/page.tsx",
+      "sha256": "5df31b2e4a879ced60b16b5588861f8ce56ee331f30af1654687e0c7cfd07953"
+    },
+    {
+      "path": "apps/web/app/client/knowledge/questions/page.tsx",
+      "sha256": "40785d808f8f06e211714848f25d79b8de49749fcd91d516c1359f42356803b4"
+    },
+    {
+      "path": "apps/web/app/client/login/page.tsx",
+      "sha256": "1b1e2daffc0a5048e9ba5d0475cae60fa91ca747733108056581e4c06191cfc7"
+    },
+    {
+      "path": "apps/web/app/client/register/page.tsx",
+      "sha256": "383683a4fec188216343b9dd2ff7e5bd1ea05b869e5bd67c5fa16d0907a336cc"
+    },
+    {
+      "path": "apps/web/app/client/reset-password/page.tsx",
+      "sha256": "c097644c946a956f3099d16a020ee0dd97d3b5be8e7e7ddcbea6ad4f7f0977ad"
+    },
+    {
+      "path": "apps/web/app/client/verify-email/page.tsx",
+      "sha256": "66b41fc54439dcc8784d928a6eb0956576da573f9a8b4fd376444a41534cd577"
+    },
+    {
+      "path": "apps/web/app/client/workspaces/page.tsx",
+      "sha256": "f170adfd5799a1a8a2837a7de84c3ac59ed94a928c006621a75c315d56b33f75"
+    },
+    {
+      "path": "apps/web/app/components/admin-ai-center.tsx",
+      "sha256": "22296b270acb6eae44f0081c63c7f4e9683b8d940634c1a1f9ceb772e211ad8b"
+    },
+    {
+      "path": "apps/web/app/components/admin-ai-policy.ts",
+      "sha256": "458408d2e61c73d0a2ae0e6a4c627a865786f42551b2baa6c93d8e236a70b245"
+    },
+    {
+      "path": "apps/web/app/components/admin-ai-traces.tsx",
+      "sha256": "589deccee37a7ec03d801a377c123295b63d01c2e1b401253a8aa846c9902fc3"
+    },
+    {
+      "path": "apps/web/app/components/admin-ai-usage.tsx",
+      "sha256": "57081f7f99e07db2e4f7175cc6c01ae0a016950f330f06b1693cbb8e4e220b5b"
+    },
+    {
+      "path": "apps/web/app/components/admin-api.ts",
+      "sha256": "e70216e1f52dcfe60a78d56ed3363815443a159e8772f962b15419dc5ddee828"
+    },
+    {
+      "path": "apps/web/app/components/admin-audit-logs.tsx",
+      "sha256": "fa6c8202f52b726469c5ce6ff06af317c5c1217eacc5b90b29bfc18c9286cabb"
+    },
+    {
+      "path": "apps/web/app/components/admin-auth.tsx",
+      "sha256": "0504ec815958500014b2feef17d42a362762be1e2c39efafd44608edfc53a06b"
+    },
+    {
+      "path": "apps/web/app/components/admin-client-directory.tsx",
+      "sha256": "1b4cf587602c95e5b8327670995af9ad8e44a05fab41393f07cd49e2597ffd0b"
+    },
+    {
+      "path": "apps/web/app/components/admin-configuration.tsx",
+      "sha256": "02229e1a0359c7b4df70218d0aa34c9d0c1927c29058dc3192d4f79d6303ffb9"
+    },
+    {
+      "path": "apps/web/app/components/admin-dictionaries.tsx",
+      "sha256": "f4f87b3a740f3895da63b09224fbdd3c083fee7ddc700864fbace9cb2bb5e897"
+    },
+    {
+      "path": "apps/web/app/components/admin-files.tsx",
+      "sha256": "2cd1bbd5707bfb4382b833a2f8299d5781153544b56c13dfacebbe510510c401"
+    },
+    {
+      "path": "apps/web/app/components/admin-integration-operations.tsx",
+      "sha256": "3ea9b9c34fc4c5656d85a902be69d1c909a948d5c79e01abe848099f09aaf11c"
+    },
+    {
+      "path": "apps/web/app/components/admin-list.tsx",
+      "sha256": "0b133fb74f5815691886125fb197040bf5cadd5606ca74f0d57225832e2fcfd4"
+    },
+    {
+      "path": "apps/web/app/components/admin-payments.tsx",
+      "sha256": "9d01675744d2ae16e169cc8471c3ba5d2cc47d4d52ddb48383e59190f41b71c7"
+    },
+    {
+      "path": "apps/web/app/components/admin-roles.tsx",
+      "sha256": "04141e375386909da3094725d13fcc41ba4e637f48a68440571b629281051e80"
+    },
+    {
+      "path": "apps/web/app/components/admin-secrets.tsx",
+      "sha256": "93a568fa84ef5883ca81670ebccbb42f269a6df8a46e5941a4f6df602d77d403"
+    },
+    {
+      "path": "apps/web/app/components/admin-shell.tsx",
+      "sha256": "98859a10bb092d28a5d480a95ce9658b6c056c587b0039e1264f5a7ac4637896"
+    },
+    {
+      "path": "apps/web/app/components/admin-users.tsx",
+      "sha256": "f5d74efdaac2ddcc28c0dac4b56f458dd3a27a616dfbec514e4f800969cfd0ed"
+    },
+    {
+      "path": "apps/web/app/components/client-api.mjs",
+      "sha256": "85d796b553182a2f71b3b676b9b1b41cc962a817e22b0669d1d061af2cf24739"
+    },
+    {
+      "path": "apps/web/app/components/client-knowledge-api.ts",
+      "sha256": "cae5403414307808133d16dcf1a32a47871c237f2142ec2f75efb8c29e1de538"
+    },
+    {
+      "path": "apps/web/app/components/client-knowledge-manager.tsx",
+      "sha256": "d3a80666309fb31282e3c525deb622fe19b4f2dfc31629a2f8eb3a7335a54db6"
+    },
+    {
+      "path": "apps/web/app/components/client-knowledge-questions-page.tsx",
+      "sha256": "427eebc46dc25abb10cc187bcbc63cb46fdd2bf32acdc686de629fd4a132028a"
+    },
+    {
+      "path": "apps/web/app/components/client-knowledge-questions.ts",
+      "sha256": "97d84c72f7961b3e54bd4a3b82fb4ceb80a2823a478251674ee3a457c34b9379"
+    },
+    {
+      "path": "apps/web/app/components/client-workspaces.tsx",
+      "sha256": "836d6a96fbb6cc8cc05bbf25e4ccc7d9eaa9cd6d02ea932315652f2d78b57c89"
+    },
+    {
+      "path": "apps/web/app/layout.tsx",
+      "sha256": "ce9468c87fcb7e85b83e67f25cb5c88cf8f74690455d1f3a9aecf7b107eeee09"
+    },
+    {
+      "path": "apps/web/app/login/page.tsx",
+      "sha256": "ffbd21cbbde3c35337484cef4e6ff825f38d8ac24237c4e09c94467c295d0e87"
+    },
+    {
+      "path": "apps/web/app/page.tsx",
+      "sha256": "bb5f20b3dea1f94615eed3a5d07a61df590ed5864cc1c350d2e4bd5b8f6126e0"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "a48ecde5dfdf3efc7f5277f80fdb77f8bf650efe897ccb16bed3c0c084309638"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "dfe872a5dff3c527083c34a55c3ebd0a566ebba72062c13cbc7707e434421adb"
+    },
+    {
+      "path": "packages/runtime-contracts/src/index.ts",
+      "sha256": "b4caef0b7b6f10dcd7e0310806c11eb1aa04fa0262b22b2277dddc32284fa78b"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "sha256": "3bd27665b3e659a97e143c9f4021293f741330a6dbc1ca8003a0bbc6cd032ff3"
+    },
+    {
+      "path": "packages/sdk/test/contracts-sdk.test.mjs",
+      "sha256": "71330e19b6fcde74f11f3ffd785404ea6fb9cd9360ca1a1b75209007773bb22b"
+    },
+    {
+      "path": "packages/ui/src/index.ts",
+      "sha256": "1e7df997b81755e1f360cef929bd7b50e04429d79d107fff1c4ec7198176f0d4"
+    },
+    {
+      "path": "scripts/project/cli.mjs",
+      "sha256": "e22cade10b79effef47162a483bde404c4ffbc5fcf8ce892294cc296798cd867"
+    },
+    {
+      "path": "scripts/project/editions.mjs",
+      "sha256": "a2a57f0e880e6319a6a7350a8b0b6988e590aad2fe175499a5cb112db585f29f"
+    }
+  ],
+  "sourceTreeDigest": "71cf7d2af82aabdcd8043ead236f63cd872c0172beee817cdc641b005fc6cec1",
+  "documentStatus": "OWNER_REVIEW_PENDING",
+  "executionAuthorization": "DOCUMENTATION_ONLY",
+  "decisions": [
+    {
+      "id": "D01",
+      "confirmedScope": "各业务产品独立部署、数据库和用户；管理员及客户端企业/个人可配置 AI",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D02",
+      "confirmedScope": "论文先个人后团队；易修多商家；AI资产支持收费共享",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D03",
+      "confirmedScope": "Skill可含执行脚本；可视化编排与Agent自主执行；数据图表和示意图均需",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D04",
+      "confirmedScope": "普通用户可上传自用脚本，公共/收费发布需审核；产品模型与自带配置并存；动作权限有产品上限",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D05",
+      "confirmedScope": "知识来源文件/网页更新/业务API；统一附件中心；Word/PDF首批输出",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D06",
+      "confirmedScope": "网页图表编辑、文档预览编辑/局部重生成/历史版本；AIJ与产品两层市场",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D07",
+      "confirmedScope": "通用工作台与API两种消费；默认标准AI，创建时可选择组合",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D08",
+      "confirmedScope": "文本/推理/代码、图片理解/生成编辑、向量与重排；受控自动切换；分配与购买额度",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D09",
+      "confirmedScope": "多Agent协作、可管理长期记忆；手动/API/定时/事件/Webhook五入口",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D10",
+      "confirmedScope": "内部与第三方开发支持；实例/组织/个人/按调用四种授权",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D11",
+      "confirmedScope": "升级插件可短暂停用，其他业务继续；通知覆盖所列全部渠道",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D12",
+      "confirmedScope": "微信/支付宝/抖音；用户名密码/手机号验证码；个人和多组织空间",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D13",
+      "confirmedScope": "Linux单机；后台/CLI同一升级机制；整实例/组织/资源三层恢复",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D14",
+      "confirmedScope": "DeepSeek、阿里云、七牛；订阅续费、优惠券、分账和结算需要",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D15",
+      "confirmedScope": "明确回复“接受以上建议”：切换、计费、退款、恢复冲突和保留规则",
+      "source": "owner statements in current conversation"
+    },
+    {
+      "id": "D16",
+      "confirmedScope": "本轮授权“形成正式需求基线→对照源码…→划分交付阶段与验收场景”，继续复用原代码",
+      "source": "owner statements in current conversation"
+    }
+  ]
+}

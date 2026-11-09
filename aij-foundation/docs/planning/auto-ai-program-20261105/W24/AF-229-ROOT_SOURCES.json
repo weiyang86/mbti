@@ -1,0 +1,218 @@
+{
+  "task": "AF-229",
+  "sourceHead": "165338eb41eca99d3b779964a7e9f73f402a0d23",
+  "parentCommit": "9dd90ef12c467ffdabf4d757b89fd43316db81b2",
+  "parentSources": [
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "8198e0e621f9012ffbf9babb46f3cfcb81fcc0827dad65e1bc455d2f8445a964"
+    },
+    {
+      "path": "apps/api/prisma/migrations/20261108160000_personal_document_run_origin/migration.sql",
+      "sha256": "445d18ea88f5d0cd8e2643183f1fdc51631f3a71a9b91ce648cbdcdd32e71e2a"
+    },
+    {
+      "path": "apps/api/src/documents/personal-documents.service.ts",
+      "sha256": "3d1e696440fd7eeb68f436117eaa7baeb29d8491c0f1e66f125a1cb66f2ab3f8"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-run.service.ts",
+      "sha256": "7995fba336a93533c67b3e6f44488beda655565ecfdcea4df50ad722ae418aef"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-run-origin.service.ts",
+      "sha256": "5752b64290dd5b35f756847b19e2049959be3ecf32fcfb9c4ad0037447073e99"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-source-runtime.service.ts",
+      "sha256": "1a55be27097f4a490fe887d54d51cd1b7552b77ed15c7626cd785cfaf0f4ea76"
+    }
+  ],
+  "candidate": "96312239d44d4a0f95b20d700e672c43949941cf",
+  "bootstrap": "46957a47cf82311717c9ce83e2987beeec7de8dc",
+  "originalStop": "msg_402ce256ef28",
+  "completedDependencies": [
+    "task_934be74b6ad9",
+    "task_64c7d5d018e8",
+    "task_2e4970206b58",
+    "task_30adea22acfe"
+  ],
+  "candidateFiles": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-generation.dto.ts",
+      "sha256": "1d6516df00c9a08ad34b03fc619d4a644e7fc0de3b0cd1e1f2d6b09335a67019"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-generation.controller.ts",
+      "sha256": "c769ee1fc8bd0a93d699febb89600b16026ba2456aa780c0a9ee64051c799f24"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-generation.service.ts",
+      "sha256": "6f468074985d1bff33708dd113c331243c307aff54ae1d4263522929d671a95b"
+    },
+    {
+      "path": "apps/api/test/personal-document-generation.test.ts",
+      "sha256": "8342c54abb40da4b1f231a44de24e85379394fd3302e53bd1fd0b340cbfe1f81"
+    },
+    {
+      "path": "packages/sdk/src/personal-document-generation.ts",
+      "sha256": "f9620d773d3aac8015a296e45470543fbfd64af46cdcc09b4d3b73363fe8dad7"
+    },
+    {
+      "path": "scripts/verification/personal-document-generation-sdk.test.mjs",
+      "sha256": "e7e0c2318b9c8f8c55622ff1ff2fb72328be86d7c2709bc36461940d6c22932e"
+    },
+    {
+      "path": "docs/execution/AF-229-candidate.md",
+      "sha256": "2c3eb620664cd57ea1dadf175deb3c5132c0bb6d371d1b3a6312bae8ca11174b"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W24/AF-229-ROOT_WIRING.md",
+      "sha256": "28113e6041306e343d2d8c40ad8135b2703f12f7938c3ab21d47a7dbc0bbb0f1"
+    }
+  ],
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-generation.dto.ts",
+      "sha256": "1d6516df00c9a08ad34b03fc619d4a644e7fc0de3b0cd1e1f2d6b09335a67019"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-generation.controller.ts",
+      "sha256": "c769ee1fc8bd0a93d699febb89600b16026ba2456aa780c0a9ee64051c799f24"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-generation.service.ts",
+      "sha256": "6f468074985d1bff33708dd113c331243c307aff54ae1d4263522929d671a95b"
+    },
+    {
+      "path": "apps/api/test/personal-document-generation.test.ts",
+      "sha256": "8342c54abb40da4b1f231a44de24e85379394fd3302e53bd1fd0b340cbfe1f81"
+    },
+    {
+      "path": "packages/sdk/src/personal-document-generation.ts",
+      "sha256": "545e72b83900f67c9687c7429232e449962628ab213f8b6a9d1d230635483701"
+    },
+    {
+      "path": "scripts/verification/personal-document-generation-sdk.test.mjs",
+      "sha256": "e7e0c2318b9c8f8c55622ff1ff2fb72328be86d7c2709bc36461940d6c22932e"
+    },
+    {
+      "path": "docs/execution/AF-229-candidate.md",
+      "sha256": "2c3eb620664cd57ea1dadf175deb3c5132c0bb6d371d1b3a6312bae8ca11174b"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W24/AF-229-ROOT_WIRING.md",
+      "sha256": "28113e6041306e343d2d8c40ad8135b2703f12f7938c3ab21d47a7dbc0bbb0f1"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-generation.http.ts",
+      "sha256": "2767b3c419b474639ff18a03c5f85d73adf852c7bed572defd0fff1aa49b2d72"
+    },
+    {
+      "path": "apps/api/src/bootstrap.ts",
+      "sha256": "4b85916d566ffefb8f8fc2baa75eca148939dd8804c0d08cc8f31cc878bfc37d"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "732278fbb5d9f9bc815bff7e4268e0e836bade150da0f03ac814ba7515b2e131"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "sha256": "81ffb3fb07391d7f58b809e39a812fe983f52201addc4798f1023723563b4779"
+    },
+    {
+      "path": "apps/api/test/personal-document-generation.test.mjs",
+      "sha256": "b5f5a8be4e12b1083eafdeb894befcb6702325ddab7019045c356eb100260b6c"
+    },
+    {
+      "path": "scripts/verification/personal-document-generation-acceptance.mjs",
+      "sha256": "e6639c4f42e3c241e6c0ccdac5a44cf9a3a990e2342bbf8fb60e5aff758c6e04"
+    },
+    {
+      "path": "scripts/verification/personal-document-generation-live.test.mjs",
+      "sha256": "f9a921ab077d6f31d3c6c445a78e253af2ec65f3aa19e7729dc42deecb0784de"
+    },
+    {
+      "path": "scripts/verification/personal-document-generation-prerequisite.mjs",
+      "sha256": "ad91da1fd81dc910a8480d945a8d16e7bfa81046b58441f80d0db151c95874a4"
+    },
+    {
+      "path": "scripts/verification/registry.mjs",
+      "sha256": "6170908ed755e742d08af5538923363d83539db8a3a69914e956d1b5bc90f547"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "3149d3b11134286e2f8a242fe753c42f1ecbe0c9da5e7d2457457b417535f34b"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "9d2e838136238b9aee4040ac7ead6a2691172735500b7e64450d6a1542e550d2"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "2527ccbab1bbac1544ad2a9bf632fbe7c40f9251eb17899492617caa38761173"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "f7b036a062e7f297fc36cc8d019a8a76a757613eb8f0110cecde5ce11fa878de"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "e934e5a6f7817f37b51d0a04deaf6da641ef22e0f052f726fdcde2445264fba6"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "ca38542b3f3440c7cadff57c718cfdc028a57000d2ab6754a28b6366118c202b"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "ec41e36e7471116149ed30aca080bc330b7f5981f15d9e1fbb79af3bba1959f2"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-fixture.mjs",
+      "sha256": "0c7e412015c5e655e95be8848e3508460bfa1d27c3beb39d59b73c99c522e4d4"
+    }
+  ],
+  "sharedAdmissions": [
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "literal": "\"AF-229\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "literal": "\"AF-229\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "literal": "\"AF-229\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "literal": "\"AF-229\"",
+      "count": 3
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "literal": "\"AF-229\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "literal": "\"AF-229\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "literal": "'AF-229'",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-fixture.mjs",
+      "literal": "'AF-229'",
+      "count": 1
+    }
+  ]
+}

@@ -1,0 +1,1766 @@
+{
+  "base": "http://192.168.0.200:4156/api/v1",
+  "revision": "74c546cc4e1de602eaf26a0421729808399c653d",
+  "started_at": "2026-11-09T05:00:15.435Z",
+  "checks": [
+    {
+      "evidence_id": "S001",
+      "actor": "none",
+      "method": "POST",
+      "path": "/auth/guest",
+      "status": 201,
+      "response": {
+        "guest_token": "[omitted]",
+        "expires_at": "2027-02-07T05:00:15.446Z"
+      }
+    },
+    {
+      "evidence_id": "S002",
+      "actor": "receiver",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "type_code": "INFP",
+        "discoverable": true
+      },
+      "status": 200,
+      "response": {
+        "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "nickname": "",
+        "type_code": "INFP",
+        "type_name": "调停者",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": true,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.459Z"
+      }
+    },
+    {
+      "evidence_id": "S003",
+      "actor": "none",
+      "method": "POST",
+      "path": "/auth/guest",
+      "status": 201,
+      "response": {
+        "guest_token": "[omitted]",
+        "expires_at": "2027-02-07T05:00:15.461Z"
+      }
+    },
+    {
+      "evidence_id": "S004",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": []
+      }
+    },
+    {
+      "evidence_id": "S005",
+      "actor": "no_card",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 404,
+      "response": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "evidence_id": "S006",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": []
+      }
+    },
+    {
+      "evidence_id": "S007",
+      "actor": "no_card",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "type_code": "ESTJ",
+        "discoverable": true
+      },
+      "status": 200,
+      "response": {
+        "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": true,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.475Z"
+      }
+    },
+    {
+      "evidence_id": "S008",
+      "actor": "no_card",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 201,
+      "response": {
+        "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.480Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S009",
+      "actor": "no_card",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.480Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S010",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "pending",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "pending",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S011",
+      "actor": "receiver",
+      "method": "POST",
+      "path": "/card-exchanges/exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt/respond",
+      "request": {
+        "action": "accept"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+        "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+        "buddy": {
+          "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+          "nickname": "",
+          "type_code": "ESTJ",
+          "type_name": "总经理",
+          "avatar_text": "ES",
+          "avatar_color": "#53677a",
+          "tagline": "组织落实",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "accepted",
+          "is_demo": false
+        },
+        "direction": "incoming",
+        "status": "accepted",
+        "created_at": "2026-11-09T05:00:15.480Z",
+        "responded_at": "2026-11-09T05:00:15.498Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S012",
+      "actor": "no_card",
+      "method": "DELETE",
+      "path": "/card-exchanges/exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+      "status": 204,
+      "response": null
+    },
+    {
+      "evidence_id": "S013",
+      "actor": "no_card",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 201,
+      "response": {
+        "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.510Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S014",
+      "actor": "no_card",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "discoverable": false
+      },
+      "status": 200,
+      "response": {
+        "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": false,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.514Z"
+      }
+    },
+    {
+      "evidence_id": "S015",
+      "actor": "no_card",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 404,
+      "response": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "evidence_id": "S016",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": []
+      }
+    },
+    {
+      "evidence_id": "S017",
+      "actor": "no_card",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "discoverable": true
+      },
+      "status": 200,
+      "response": {
+        "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": true,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.524Z"
+      }
+    },
+    {
+      "evidence_id": "S018",
+      "actor": "no_card",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.510Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S019",
+      "actor": "no_card",
+      "method": "DELETE",
+      "path": "/card-exchanges/exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+      "status": 204,
+      "response": null
+    },
+    {
+      "evidence_id": "S020",
+      "actor": "none",
+      "method": "POST",
+      "path": "/auth/guest",
+      "status": 201,
+      "response": {
+        "guest_token": "[omitted]",
+        "expires_at": "2027-02-07T05:00:15.535Z"
+      }
+    },
+    {
+      "evidence_id": "S021",
+      "actor": "empty_type",
+      "method": "GET",
+      "path": "/cards/me",
+      "status": 200,
+      "response": {
+        "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+        "nickname": "",
+        "type_code": "",
+        "type_name": "",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": false,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.540Z"
+      }
+    },
+    {
+      "evidence_id": "S022",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S023",
+      "actor": "empty_type",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 404,
+      "response": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "evidence_id": "S024",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S025",
+      "actor": "empty_type",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "type_code": "ESTJ",
+        "discoverable": true
+      },
+      "status": 200,
+      "response": {
+        "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": true,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.556Z"
+      }
+    },
+    {
+      "evidence_id": "S026",
+      "actor": "empty_type",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 201,
+      "response": {
+        "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.561Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S027",
+      "actor": "empty_type",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.561Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S028",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "pending",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "pending",
+            "created_at": "2026-11-09T05:00:15.561Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S029",
+      "actor": "receiver",
+      "method": "POST",
+      "path": "/card-exchanges/exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ/respond",
+      "request": {
+        "action": "accept"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+        "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+        "buddy": {
+          "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+          "nickname": "",
+          "type_code": "ESTJ",
+          "type_name": "总经理",
+          "avatar_text": "ES",
+          "avatar_color": "#53677a",
+          "tagline": "组织落实",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "accepted",
+          "is_demo": false
+        },
+        "direction": "incoming",
+        "status": "accepted",
+        "created_at": "2026-11-09T05:00:15.561Z",
+        "responded_at": "2026-11-09T05:00:15.577Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S030",
+      "actor": "empty_type",
+      "method": "DELETE",
+      "path": "/card-exchanges/exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+      "status": 204,
+      "response": null
+    },
+    {
+      "evidence_id": "S031",
+      "actor": "empty_type",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 201,
+      "response": {
+        "id": "exchange_wSQZCb2VxvtTS20Nn7pRISe0W-K53ocZ",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.587Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S032",
+      "actor": "empty_type",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "discoverable": false
+      },
+      "status": 200,
+      "response": {
+        "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": false,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.591Z"
+      }
+    },
+    {
+      "evidence_id": "S033",
+      "actor": "empty_type",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 404,
+      "response": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "evidence_id": "S034",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S035",
+      "actor": "empty_type",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "discoverable": true
+      },
+      "status": 200,
+      "response": {
+        "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": true,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.602Z"
+      }
+    },
+    {
+      "evidence_id": "S036",
+      "actor": "empty_type",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_wSQZCb2VxvtTS20Nn7pRISe0W-K53ocZ",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.587Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S037",
+      "actor": "empty_type",
+      "method": "DELETE",
+      "path": "/card-exchanges/exchange_wSQZCb2VxvtTS20Nn7pRISe0W-K53ocZ",
+      "status": 204,
+      "response": null
+    },
+    {
+      "evidence_id": "S038",
+      "actor": "none",
+      "method": "POST",
+      "path": "/auth/guest",
+      "status": 201,
+      "response": {
+        "guest_token": "[omitted]",
+        "expires_at": "2027-02-07T05:00:15.612Z"
+      }
+    },
+    {
+      "evidence_id": "S039",
+      "actor": "typed_private",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "type_code": "ESTJ"
+      },
+      "status": 200,
+      "response": {
+        "id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": false,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.616Z"
+      }
+    },
+    {
+      "evidence_id": "S040",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_wSQZCb2VxvtTS20Nn7pRISe0W-K53ocZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.587Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.561Z",
+            "responded_at": "2026-11-09T05:00:15.577Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S041",
+      "actor": "typed_private",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 404,
+      "response": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "evidence_id": "S042",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_wSQZCb2VxvtTS20Nn7pRISe0W-K53ocZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.587Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.561Z",
+            "responded_at": "2026-11-09T05:00:15.577Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S043",
+      "actor": "typed_private",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "type_code": "ESTJ",
+        "discoverable": true
+      },
+      "status": 200,
+      "response": {
+        "id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": true,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.636Z"
+      }
+    },
+    {
+      "evidence_id": "S044",
+      "actor": "typed_private",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 201,
+      "response": {
+        "id": "exchange_5hhjOj_L3e62Zf1efRjm5bxCclPlxdcu",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.641Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S045",
+      "actor": "typed_private",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_5hhjOj_L3e62Zf1efRjm5bxCclPlxdcu",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.641Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S046",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_5hhjOj_L3e62Zf1efRjm5bxCclPlxdcu",
+            "buddy_id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+            "buddy": {
+              "id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "pending",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "pending",
+            "created_at": "2026-11-09T05:00:15.641Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_wSQZCb2VxvtTS20Nn7pRISe0W-K53ocZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.587Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.561Z",
+            "responded_at": "2026-11-09T05:00:15.577Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S047",
+      "actor": "receiver",
+      "method": "POST",
+      "path": "/card-exchanges/exchange_5hhjOj_L3e62Zf1efRjm5bxCclPlxdcu/respond",
+      "request": {
+        "action": "accept"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_5hhjOj_L3e62Zf1efRjm5bxCclPlxdcu",
+        "buddy_id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+        "buddy": {
+          "id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+          "nickname": "",
+          "type_code": "ESTJ",
+          "type_name": "总经理",
+          "avatar_text": "ES",
+          "avatar_color": "#53677a",
+          "tagline": "组织落实",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "accepted",
+          "is_demo": false
+        },
+        "direction": "incoming",
+        "status": "accepted",
+        "created_at": "2026-11-09T05:00:15.641Z",
+        "responded_at": "2026-11-09T05:00:15.664Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S048",
+      "actor": "typed_private",
+      "method": "DELETE",
+      "path": "/card-exchanges/exchange_5hhjOj_L3e62Zf1efRjm5bxCclPlxdcu",
+      "status": 204,
+      "response": null
+    },
+    {
+      "evidence_id": "S049",
+      "actor": "typed_private",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 201,
+      "response": {
+        "id": "exchange_L1Q8VPLzqVjrNa03PMrpQI3J-iwJd9Fu",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.675Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S050",
+      "actor": "typed_private",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "discoverable": false
+      },
+      "status": 200,
+      "response": {
+        "id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": false,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.679Z"
+      }
+    },
+    {
+      "evidence_id": "S051",
+      "actor": "typed_private",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 404,
+      "response": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "evidence_id": "S052",
+      "actor": "receiver",
+      "method": "GET",
+      "path": "/card-exchanges",
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": "exchange_wSQZCb2VxvtTS20Nn7pRISe0W-K53ocZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.587Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_9wOli68aVlNP4nzYoF6yHPDYcbGo4rYZ",
+            "buddy_id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+            "buddy": {
+              "id": "card_vwK0giszsi3etWJWFxot2gew1-sQE783",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.561Z",
+            "responded_at": "2026-11-09T05:00:15.577Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_L6gmCeeDgG3K9vMRCslWkiL_SFZhCo3f",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.510Z",
+            "simulated": false
+          },
+          {
+            "id": "exchange_ITHhI-yawshHMplgVneVDjLVyUKZ0eRt",
+            "buddy_id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+            "buddy": {
+              "id": "card_c-b3PqISB4CIaZmSiZGvbjO7LWtZn9dO",
+              "nickname": "",
+              "type_code": "ESTJ",
+              "type_name": "总经理",
+              "avatar_text": "ES",
+              "avatar_color": "#53677a",
+              "tagline": "组织落实",
+              "interests": [],
+              "same_type": false,
+              "shared_interests": [],
+              "exchange_status": "revoked",
+              "is_demo": false
+            },
+            "direction": "incoming",
+            "status": "revoked",
+            "created_at": "2026-11-09T05:00:15.480Z",
+            "responded_at": "2026-11-09T05:00:15.498Z",
+            "simulated": false
+          }
+        ]
+      }
+    },
+    {
+      "evidence_id": "S053",
+      "actor": "typed_private",
+      "method": "PUT",
+      "path": "/cards/me",
+      "request": {
+        "discoverable": true
+      },
+      "status": 200,
+      "response": {
+        "id": "card_NbWKj10cMtTT1_tRwzbf3DYOXWa2rWfI",
+        "nickname": "",
+        "type_code": "ESTJ",
+        "type_name": "总经理",
+        "declaration": "",
+        "interests": [],
+        "style": "illustration",
+        "discoverable": true,
+        "visibility": {
+          "name": false,
+          "interests": false,
+          "declaration": false,
+          "manual": false
+        },
+        "has_visual_set": false,
+        "updated_at": "2026-11-09T05:00:15.692Z"
+      }
+    },
+    {
+      "evidence_id": "S054",
+      "actor": "typed_private",
+      "method": "POST",
+      "path": "/card-exchanges",
+      "request": {
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU"
+      },
+      "status": 200,
+      "response": {
+        "id": "exchange_L1Q8VPLzqVjrNa03PMrpQI3J-iwJd9Fu",
+        "buddy_id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+        "buddy": {
+          "id": "card_pFYDexbS17n12Vcmf6a9e93NJzQ9d1TU",
+          "nickname": "",
+          "type_code": "INFP",
+          "type_name": "调停者",
+          "avatar_text": "IN",
+          "avatar_color": "#53677a",
+          "tagline": "内在理想",
+          "interests": [],
+          "same_type": false,
+          "shared_interests": [],
+          "exchange_status": "pending",
+          "is_demo": false
+        },
+        "direction": "outgoing",
+        "status": "pending",
+        "created_at": "2026-11-09T05:00:15.675Z",
+        "simulated": false
+      }
+    },
+    {
+      "evidence_id": "S055",
+      "actor": "typed_private",
+      "method": "DELETE",
+      "path": "/card-exchanges/exchange_L1Q8VPLzqVjrNa03PMrpQI3J-iwJd9Fu",
+      "status": 204,
+      "response": null
+    }
+  ],
+  "assertions": [
+    "uniform visibility rejection no_card",
+    "no unreachable pending inserted no_card",
+    "explicitly published retry reuses pending no_card",
+    "receiver sees published sender no_card",
+    "receiver can accept no_card",
+    "opt-out hides incoming pending no_card",
+    "republish reuses same pending no_card",
+    "empty type fixture stays private",
+    "uniform visibility rejection empty_type",
+    "no unreachable pending inserted empty_type",
+    "explicitly published retry reuses pending empty_type",
+    "receiver sees published sender empty_type",
+    "receiver can accept empty_type",
+    "opt-out hides incoming pending empty_type",
+    "republish reuses same pending empty_type",
+    "typed private fixture has no opt-in",
+    "uniform visibility rejection typed_private",
+    "no unreachable pending inserted typed_private",
+    "explicitly published retry reuses pending typed_private",
+    "receiver sees published sender typed_private",
+    "receiver can accept typed_private",
+    "opt-out hides incoming pending typed_private",
+    "republish reuses same pending typed_private"
+  ],
+  "outcome": "passed",
+  "finished_at": "2026-11-09T05:00:15.702Z",
+  "evidence_note": "Actual HTTP regression using only newly created synthetic guests. Authentication tokens omitted. No direct SQL state transitions or inserts; before/after receiver lists prove no unreachable pending."
+}

@@ -1,0 +1,127 @@
+{
+  "governanceTaskId": "task_0b13cb98ad28",
+  "cards": [
+    {
+      "id": "AF-231",
+      "title": "统一个人Agent日志的文档生成恢复端口",
+      "hours": 3.5,
+      "workerHoursLimit": 1.25,
+      "allowPaths": [
+        "apps/web/app/components/client-personal-agent-request-journal.mjs",
+        "apps/web/app/components/client-personal-agent-request-journal.d.mts",
+        "scripts/verification/client-personal-agent-request-journal.test.mjs",
+        "docs/execution/AF-231-candidate.md",
+        "docs/planning/auto-ai-program-20261105/W25/AF-231-ROOT_WIRING.md"
+      ],
+      "spec": "docs/planning/auto-ai-program-20261105/AF-231.md",
+      "status": "READY_AFTER_GOVERNANCE",
+      "requirements": [
+        "REQ-022",
+        "REQ-037",
+        "REQ-040"
+      ],
+      "scopeBaseVerifiedEqual": true,
+      "bootstrap": [],
+      "bootstrapManifest": {
+        "path": "docs/planning/auto-ai-program-20261105/W25/SOURCE_BOOTSTRAP.json",
+        "sha256": "105443376feda721bcc0196921333f655a9f0f9aeb0a6d4c8dea7664e0bb7001",
+        "sourceCommit": "46079d20b55b4c581cc5cd0a8464ad2e0dd55326"
+      },
+      "plannedWorktreeName": "AIJ-W25-AF231",
+      "model": "inherited-default",
+      "effort": "inherited-default",
+      "codeDeps": [
+        "task_0b13cb98ad28",
+        "task_4d76852ccaad"
+      ],
+      "candidateTaskId": "task_99e42f0b8b56",
+      "integrationDeps": [
+        "task_0b13cb98ad28",
+        "task_99e42f0b8b56",
+        "task_4d76852ccaad"
+      ],
+      "integrationTaskId": "task_cbc2517e9fbb"
+    },
+    {
+      "id": "AF-232",
+      "title": "实现文档章节生成预览与任务控制器",
+      "hours": 3.5,
+      "workerHoursLimit": 1.5,
+      "allowPaths": [
+        "apps/web/app/components/client-document-generation-state.mjs",
+        "apps/web/app/components/client-document-generation-state.d.mts",
+        "scripts/verification/client-document-generation-state.test.mjs",
+        "docs/execution/AF-232-candidate.md",
+        "docs/planning/auto-ai-program-20261105/W25/AF-232-ROOT_WIRING.md"
+      ],
+      "spec": "docs/planning/auto-ai-program-20261105/AF-232.md",
+      "status": "READY_AFTER_GOVERNANCE",
+      "requirements": [
+        "REQ-022",
+        "REQ-037",
+        "REQ-040"
+      ],
+      "scopeBaseVerifiedEqual": true,
+      "bootstrap": [],
+      "bootstrapManifest": {
+        "path": "docs/planning/auto-ai-program-20261105/W25/SOURCE_BOOTSTRAP.json",
+        "sha256": "105443376feda721bcc0196921333f655a9f0f9aeb0a6d4c8dea7664e0bb7001",
+        "sourceCommit": "46079d20b55b4c581cc5cd0a8464ad2e0dd55326"
+      },
+      "plannedWorktreeName": "AIJ-W25-AF232",
+      "model": "inherited-default",
+      "effort": "inherited-default",
+      "codeDeps": [
+        "task_0b13cb98ad28",
+        "task_4d76852ccaad"
+      ],
+      "candidateTaskId": "task_11944e614359",
+      "integrationDeps": [
+        "task_0b13cb98ad28",
+        "task_11944e614359",
+        "task_cbc2517e9fbb"
+      ],
+      "integrationTaskId": "task_4863caf772d5"
+    },
+    {
+      "id": "AF-233",
+      "title": "接入文档章节生成面板与显式恢复",
+      "hours": 3.75,
+      "workerHoursLimit": 1.0,
+      "allowPaths": [
+        "apps/web/app/components/client-document-generation-panel.tsx",
+        "scripts/verification/client-document-generation-panel.test.mjs",
+        "docs/execution/AF-233-candidate.md",
+        "docs/planning/auto-ai-program-20261105/W25/AF-233-ROOT_WIRING.md"
+      ],
+      "spec": "docs/planning/auto-ai-program-20261105/AF-233.md",
+      "status": "READY_AFTER_GOVERNANCE",
+      "requirements": [
+        "REQ-022",
+        "REQ-037",
+        "REQ-040"
+      ],
+      "scopeBaseVerifiedEqual": true,
+      "bootstrap": [],
+      "bootstrapManifest": {
+        "path": "docs/planning/auto-ai-program-20261105/W25/SOURCE_BOOTSTRAP.json",
+        "sha256": "105443376feda721bcc0196921333f655a9f0f9aeb0a6d4c8dea7664e0bb7001",
+        "sourceCommit": "46079d20b55b4c581cc5cd0a8464ad2e0dd55326"
+      },
+      "plannedWorktreeName": "AIJ-W25-AF233",
+      "model": "inherited-default",
+      "effort": "inherited-default",
+      "codeDeps": [
+        "task_0b13cb98ad28",
+        "task_4d76852ccaad"
+      ],
+      "candidateTaskId": "task_b223cf50e64e",
+      "integrationDeps": [
+        "task_0b13cb98ad28",
+        "task_b223cf50e64e",
+        "task_4863caf772d5"
+      ],
+      "integrationTaskId": "task_ede20a81b978"
+    }
+  ]
+}

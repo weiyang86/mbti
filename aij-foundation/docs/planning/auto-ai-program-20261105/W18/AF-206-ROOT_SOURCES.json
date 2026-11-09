@@ -1,0 +1,125 @@
+{
+  "card": "AF-206",
+  "candidate": "54a44e4669a65a453493185902b081b210da8c32",
+  "actualI205Commit": "28e1f19a0a7dfc757ef3d2ce628d495fe1512bc6",
+  "rootCorrectedCandidatePaths": [
+    "apps/api/src/plugins/aij-ai/ai-personal-workflow-runs.service.ts",
+    "scripts/verification/personal-workflow-run-origin.test.mjs"
+  ],
+  "rootCorrection": "Pass string revision to existing preview query DTO and exercise the actual DTO in the collaborator, never weaken old contract",
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-run-origin.service.ts",
+      "sha256": "28563065287b44ff5d1dfd937273b672909f552b4f6da4f5714daf81c59b36da"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-runs.service.ts",
+      "sha256": "b962a5bcc88c7574d36420fa5326c373c3f77545cf1a90d8d0bc550e0e108754"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-run-origin.test.mjs",
+      "sha256": "b1e745d5844f0e7ec3de0fd1c5d9a8a69b5769bab18b79bcb955fa5d77040c7e"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W18/AF-206-ROOT_WIRING.md",
+      "sha256": "eae0fcce76e54ec5a715df37f6e5e32eb236596f796b56e9c1490cd2318756f2"
+    },
+    {
+      "path": "docs/execution/AF-206-candidate.md",
+      "sha256": "092f5dff1077dcb0d6d4049d8ca3ef5b16c5e6e4b252a3e5a6b566be83a6ebcf"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-run.service.ts",
+      "sha256": "126a9aa3a5ef2003f230d89d7b97ab7483c66e2030b1e16d4a23fcb7bb0748df"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-agent-snapshots.service.ts",
+      "sha256": "c411918bdf52815ef03cef1d182b950814bd58ede080486513bfdbb50de2e079"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflows.service.ts",
+      "sha256": "ecc762f7612cc86b32c1b4629b2b36139a15a1a9dc931d760d7aff94877ebd7c"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-run-access.service.ts",
+      "sha256": "3a828e11b9fafaca19432790104507d2af4a4458c96a6675ad45458608fffcad"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "0385fc1a24a9285b5f73b97f395b22c38ee0d496ba554046961f8470da5089c3"
+    },
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "3d45f6693e0e806540879b504b1a122d1cbba5db62440ddd49062b5f1d128c5f"
+    },
+    {
+      "path": "apps/api/prisma/migrations/20261107030000_personal_workflow_run_origin/migration.sql",
+      "sha256": "4e65c393e27d76b736b6363eb1056b2c47d104f098f6571aef39195fe451c5d5"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "ae17970ae3da6f9a18575a052aa62d9c2fc8b2e1794b902cac5462238526d9e8"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "0f133987a5870a80ad2a0bfa1b7d78443455ca0d487edd1e0bef54055707358e"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "ba15c87c21cbf21c490103225b8becdd8bc65aba4b5daa051e70978b9914a410"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "b208e4767242adf30df61ed1c2fd11205917f1021552295ef00841def240e6f1"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "8eb978e6932077a9de038c83c5da72539289300d8df7fdb84b4cd71c113d6ff6"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "cdcd7a8e355b334c894547ebd1c07831a72540d9f06f27a5e2c9a645dba2ed05"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "003b04932e016cf11d5687f964bf1a295bf67f92fa867d7e9810ebec9ef83071"
+    },
+    {
+      "path": "scripts/verification/personal-agent-runs.test.mjs",
+      "sha256": "32d23928df78e359d1b3148f7afe8c20b5066e4b9bfcac14eb41b1847fe00765"
+    },
+    {
+      "path": "scripts/verification/personal-agent-memory.test.mjs",
+      "sha256": "7f354272db179d7aee2b5b46f2e5aad72eb103682cecd7ba0989aff4ccf3d20f"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-fixture.mjs",
+      "sha256": "fb21f6ecc2cad769b5589fcd8c86268a9e9c8ea4347caacd2c3bcda915755db4"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-live.test.mjs",
+      "sha256": "2037a6f8009b80f9291558e3eb9ea2366385dfe3cd7c14e5e03b5a1e9fa8bb73"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-acceptance.mjs",
+      "sha256": "90e119212e708cce025bcd4908012ab746d836fca414d0f2a94cd41a124ee41b"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-original-regressions.mjs",
+      "sha256": "3fbd05ed884d5fe488d512ca0913eb387ccf076c4907bca241d2e74fd3aa8a3f"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-prerequisite.mjs",
+      "sha256": "05c306336d793872aa6753aa65e534a1f1113330ce4ec163ee5e611cfdd30d48"
+    },
+    {
+      "path": "scripts/verification/registry.mjs",
+      "sha256": "79eac674a1a1f46a685ce7ca32e70cbda1bd74beff0812287c176bf24931716b"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-publication-live.test.mjs",
+      "sha256": "e83dd7f11483f6b2606fddf29be16bf4713e7d19312170e919caf1445594dfd3"
+    }
+  ],
+  "rootRegressionAdjustment": "AF205 immutable TRUNCATE CASCADE must still return55000 after origin FK; original update/delete guards unchanged, original0A000 failure retained"
+}

@@ -1,0 +1,185 @@
+{
+  "task": "AF-228",
+  "sourceHead": "165338eb41eca99d3b779964a7e9f73f402a0d23",
+  "parentCommit": "ead7ad105c2731bf1b436854fd07da1bd99e7fbb",
+  "parentSources": [
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "8198e0e621f9012ffbf9babb46f3cfcb81fcc0827dad65e1bc455d2f8445a964"
+    },
+    {
+      "path": "apps/api/prisma/migrations/20261108160000_personal_document_run_origin/migration.sql",
+      "sha256": "445d18ea88f5d0cd8e2643183f1fdc51631f3a71a9b91ce648cbdcdd32e71e2a"
+    },
+    {
+      "path": "apps/api/src/documents/personal-documents.service.ts",
+      "sha256": "3d1e696440fd7eeb68f436117eaa7baeb29d8491c0f1e66f125a1cb66f2ab3f8"
+    }
+  ],
+  "candidate": "1e8203359745cdb78d29d928a032f771759eb7f0",
+  "bootstrap": "0ff64b57bfe4f3f7079b43856db519f7152a0f72",
+  "originalStop": "msg_9d0055b6d6e5",
+  "completedDependencies": [
+    "task_934be74b6ad9",
+    "task_8f375db3b184",
+    "task_2e4970206b58"
+  ],
+  "candidateFiles": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-run-origin.service.ts",
+      "sha256": "5752b64290dd5b35f756847b19e2049959be3ecf32fcfb9c4ad0037447073e99"
+    },
+    {
+      "path": "apps/api/test/personal-document-run-origin.test.ts",
+      "sha256": "2ceae97fc689ddb761e6a6cd84c7e8c429077dd3a910db3af932ded3b1c82e4d"
+    },
+    {
+      "path": "docs/execution/AF-228-candidate.md",
+      "sha256": "433c25fa6e5e3f882239cf53f1f5767e462314c37e9052405f28b992f5c5a47f"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W24/AF-228-ROOT_WIRING.md",
+      "sha256": "50763b62c18f8c57d416ec958e20e77e54e93f851ccf38746c37d2586e33e974"
+    }
+  ],
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-run-origin.service.ts",
+      "sha256": "5752b64290dd5b35f756847b19e2049959be3ecf32fcfb9c4ad0037447073e99"
+    },
+    {
+      "path": "apps/api/test/personal-document-run-origin.test.ts",
+      "sha256": "2ceae97fc689ddb761e6a6cd84c7e8c429077dd3a910db3af932ded3b1c82e4d"
+    },
+    {
+      "path": "docs/execution/AF-228-candidate.md",
+      "sha256": "433c25fa6e5e3f882239cf53f1f5767e462314c37e9052405f28b992f5c5a47f"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W24/AF-228-ROOT_WIRING.md",
+      "sha256": "50763b62c18f8c57d416ec958e20e77e54e93f851ccf38746c37d2586e33e974"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-run.service.ts",
+      "sha256": "7995fba336a93533c67b3e6f44488beda655565ecfdcea4df50ad722ae418aef"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-agent-snapshots.service.ts",
+      "sha256": "d1a0888549a8f1d3e5f58631efc6285ea10f3d51b193ca255b10fc1eedaa33a2"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "0bfe5d59531a9cd81d25b3fbcdc169a8d6a76dc4936e469bc6e7cc224642683b"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-document-source-runtime.service.ts",
+      "sha256": "1a55be27097f4a490fe887d54d51cd1b7552b77ed15c7626cd785cfaf0f4ea76"
+    },
+    {
+      "path": "apps/api/test/personal-document-run-origin.test.mjs",
+      "sha256": "42f8a1666ddd16bb7da79189d5b607cbe317fbaa6485a3cbab8763e819915930"
+    },
+    {
+      "path": "scripts/verification/personal-agent-memory.test.mjs",
+      "sha256": "00dd909405bcb7b6f81efa87f115ce072c8c846ce967ef45ec91538a07308f39"
+    },
+    {
+      "path": "scripts/verification/personal-agent-runs.test.mjs",
+      "sha256": "ad80225ce486d5616ed542a740d68f4a45d5a51e82312543586ad4a5583fb386"
+    },
+    {
+      "path": "scripts/verification/personal-document-run-runtime-live.test.mjs",
+      "sha256": "ceb0681ba984cc6ee20a12eb1f786de84d5b036169662f3533603eb071118e17"
+    },
+    {
+      "path": "scripts/verification/personal-document-run-runtime-acceptance.test.mjs",
+      "sha256": "f0cf9dcfabae27f8922cbcee4a2db65018da922c10794ab1adb585a734744a28"
+    },
+    {
+      "path": "scripts/verification/personal-document-run-workflow-regression.test.mjs",
+      "sha256": "c2f3aefac296b74819fdc3e3c8f2bbb180ecf9e6e6a353c9d285cfd3470f8a2b"
+    },
+    {
+      "path": "scripts/verification/personal-document-run-runtime-prerequisite.mjs",
+      "sha256": "6782546f7f7f09db121ec453af882626952575675e5134fec7fa98de521986dc"
+    },
+    {
+      "path": "scripts/verification/registry.mjs",
+      "sha256": "b5e66c25ac58bf95600a38f1f8facd5b11ddcc4d754f94fb76d1601d3444147d"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "6ea8812c88de3ddbfc718951e22e91eac3bf59f42048cfc1a84a8a2b2217ed8a"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "6eac19f784ff1790b9dae3e0bd3d7c975452581d149ea36529077c6216455035"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "2209bc73598578304301662bd0d361600a95ac1d6899f46143931b72e7b73ffe"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "d22df1e9d3497ed7fb045b97b4ac6c7f70a953afa749cc3d418c7c5411121848"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "f3aa2826ef9e5258206c88324f305f56120c993a8d64089ad5ab76d3274e077f"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "91cf7b31841cc0f4624b8c61ccba5b6b49d6d17f1ea4234abce535ecaa480fb5"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "241c73e6388d2eba84893ce5e6db8c09fdd770123d9469147dbfbda1bffccf1f"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-fixture.mjs",
+      "sha256": "ac663212321f66f752fd6d543401ab9a441fe399e31850edfd811391d08c078f"
+    }
+  ],
+  "sharedAdmissions": [
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "literal": "\"AF-228\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "literal": "\"AF-228\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "literal": "\"AF-228\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "literal": "\"AF-228\"",
+      "count": 3
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "literal": "\"AF-228\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "literal": "\"AF-228\"",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "literal": "'AF-228'",
+      "count": 3
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-fixture.mjs",
+      "literal": "'AF-228'",
+      "count": 1
+    }
+  ]
+}

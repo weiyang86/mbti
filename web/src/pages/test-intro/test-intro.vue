@@ -97,7 +97,6 @@ import {
 import {
   clearQuizDraft,
   loadQuizDraft,
-  quizDraftAnswerCount,
   saveQuizDraft,
   type QuizDraft,
 } from '@/store/quiz-draft'
@@ -105,7 +104,11 @@ import {
 const profile = ref(loadProfile())
 const submitting = ref(false)
 const draft = ref<QuizDraft | null>(null)
-const draftCount = computed(() => quizDraftAnswerCount(draft.value))
+const draftCount = computed(() => draftAnswerCount(draft.value))
+
+function draftAnswerCount(item: QuizDraft | null): number {
+  return item ? Object.keys(item.answers || {}).length : 0
+}
 
 onShow(() => {
   profile.value = loadProfile()
@@ -142,10 +145,10 @@ function showDemo() {
 function start() {
   if (submitting.value) return
   const current = loadQuizDraft()
-  if (current && quizDraftAnswerCount(current) > 0) {
+  if (current && draftAnswerCount(current) > 0) {
     uni.showModal({
       title: '还有一份没完成的记录',
-      content: `已选 ${quizDraftAnswerCount(current)} / 12 题。既有历史仍保留。`,
+      content: `已选 ${draftAnswerCount(current)} / 12 题。既有历史仍保留。`,
       confirmText: '继续这次测试',
       cancelText: '放弃并重新开始',
       success: (res) => {

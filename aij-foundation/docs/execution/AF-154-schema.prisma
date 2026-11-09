@@ -1,0 +1,50 @@
+// AF-154 PROPOSAL ONLY. Root integrates AFTER worker STOP ALL WRITING.
+// Insert exactly these fields inside BOTH existing MemberUser and ClientWorkspace models:
+//   personalAiSkills        AiPersonalSkill[]
+//   personalAiSkillVersions AiPersonalSkillVersion[]
+// Append the two models below; no ProjectProfile relation or second ledger.
+// SQL-only CHECK constraints and immutability triggers in migration are intentional
+// Prisma-unrepresentable protections; preserve them when checking migration parity.
+model AiPersonalSkill {
+  id           String    @id @default(cuid())
+  workspaceId  String    @map("workspace_id")
+  memberId     String    @map("member_id")
+  code         String    @db.VarChar(63)
+  name         String    @db.VarChar(100)
+  instructions String
+  revision     Int       @default(1)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member    MemberUser      @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  versions  AiPersonalSkillVersion[]
+
+  @@unique([workspaceId, memberId, code], map: "ai_personal_skill_owner_code_key")
+  @@unique([id, workspaceId, memberId], map: "ai_personal_skill_id_scope_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_skill_owner_page_idx")
+  @@index([memberId], map: "ai_personal_skill_member_idx")
+  @@map("ai_personal_skill")
+}
+
+model AiPersonalSkillVersion {
+  id           String   @id @default(cuid())
+  skillId      String   @map("skill_id")
+  workspaceId  String   @map("workspace_id")
+  memberId     String   @map("member_id")
+  code         String   @db.VarChar(63)
+  name         String   @db.VarChar(100)
+  instructions String
+  revision     Int
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  skill     AiPersonalSkill @relation(fields: [skillId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_skill_version_skill_scope_fkey")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member    MemberUser      @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([skillId, revision], map: "ai_personal_skill_version_revision_key")
+  @@index([workspaceId, memberId, skillId, revision], map: "ai_personal_skill_version_owner_idx")
+  @@index([memberId], map: "ai_personal_skill_version_member_idx")
+  @@map("ai_personal_skill_version")
+}

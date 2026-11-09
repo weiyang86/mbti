@@ -1,0 +1,96 @@
+{
+  "task": "AF-213",
+  "candidateCommit": "656e463a917e8f6a1037d3fe706040ec3614f7b3",
+  "candidateStop": "msg_f69ac0f69b84",
+  "purpose": "Frozen actual root integration inputs including inherited shared admission configuration; exact AF213 clean commit projection excludes AF203 and is independently linted. Root fixes real session generation, post-attempt unknown locks, confirmation portals and actual keyboard/download/OS hidden acceptance. No native14/full40/vendor proof.",
+  "files": [
+    {
+      "path": "apps/web/app/components/client-personal-script-panel.tsx",
+      "sha256": "60bc61f7f0e2feda8d230720d2ca7f2dbfe4f0f37153d888eb103718719c9f7a"
+    },
+    {
+      "path": "apps/web/app/components/client-personal-script-state.mjs",
+      "sha256": "09e84fed092cd1f3bcebad10cea2fce00159aba3e23dc436c97520b86fa4ec2e"
+    },
+    {
+      "path": "apps/web/app/components/client-personal-script-state.d.mts",
+      "sha256": "99d1cb3240e0166763bf44c48d7b5ae0585950e9573ccfa9b14f55ed2363be24"
+    },
+    {
+      "path": "scripts/verification/client-personal-script-state.test.mjs",
+      "sha256": "e1718c6a7ae1b553ad72f8ab49ce39e1f63b99581de19e99cd8f956c266f4bac"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W20/AF-213-ROOT_WIRING.md",
+      "sha256": "b20e8184e472fa41393f2f0b29075daaca93b7b63af855a5cbd22d5f252784b1"
+    },
+    {
+      "path": "docs/execution/AF-213-candidate.md",
+      "sha256": "3bfbeab52d0a5d723406a5b4759646c9f598fc2a50f0881a2b6427cc729052dd"
+    },
+    {
+      "path": "apps/web/app/components/client-skill-library.tsx",
+      "sha256": "6c00d9729960666e81698c1eb51ed922a8b565acf886bc09299f30cc45a645b0"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha256": "e2d4622a485057844358f24c4b46ed80cbd7349cfae096fd8399e1f09cdf1b1c"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "8e8ecf422ee322811a75ac3b2120d537b291f7a4246778206e8e52ad698b88b7"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "0bdb0ad180e2068f3fb457f92954bd73ee1831e605e80ead22a9d0f673929318"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "9f2dd4af99464948961e5069731a876e53493f48bfebad6f0e9d7fc8eacd67e9"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "2fafc591069962876a9b75623ec1f323aadd3879cadc80203ff5231ef1c6d057"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "6085845a6e1f9b194a800798414e5041f4c820b542d4877e6f99d2db4175a5fe"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "a36b8d6d032f6c52a0f0a1f0f28e071abc91ded971c5809804ac851bb315b1fe"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "336698e887406a62fcea97d03f13306f9575b019460224a66ab02ef85bc8479d"
+    },
+    {
+      "path": "scripts/verification/web-build-isolated.mjs",
+      "sha256": "0e42714cf21c0aaeae56e187629eb73f5be8e63c702ac1d7c475d582149d2857"
+    },
+    {
+      "path": "scripts/verification/client-personal-script-acceptance.mjs",
+      "sha256": "6ab706d023d9644ab680ab2a55e410c90ffee294de40e848ddf120bb8d8c6225"
+    },
+    {
+      "path": "scripts/verification/client-personal-script-live.test.mjs",
+      "sha256": "141e9271cd23c791f503cf80ddc1df69ebf3d6d7185fbf88118c487769acb0df"
+    },
+    {
+      "path": "scripts/verification/client-personal-script-browser.mjs",
+      "sha256": "1f6cc68aa18301dd44fced188e825ddf28577001a197f248189168a50e02e4ae"
+    },
+    {
+      "path": "scripts/verification/client-personal-script-browser-host.mjs",
+      "sha256": "4efe41638e75012b11b15e4b33c76c586977b2444e66600748649a16fc49ce8c"
+    },
+    {
+      "path": "scripts/verification/client-personal-script-clean-lint.mjs",
+      "sha256": "7045434531e9af5d510dd59637a0c2e2916e4a4a8d4ffd35cbb2d57cb2158fdc"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W20/AF-213-UI_REVIEW.md",
+      "sha256": "7c62ec807becf87e46b81614ccd293c8f473b2d5c7a6bc18183625cba39276af"
+    }
+  ]
+}

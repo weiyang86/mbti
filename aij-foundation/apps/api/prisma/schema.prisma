@@ -1,0 +1,1933 @@
+// AF-006: directed extraction from qingqi-ai-consultant, dev@cd8d006ffd3f2830dd0bdb4e62d0288e059dd9eb.
+// Source hash and license limits: docs/governance/SOURCE_PROVENANCE.md, section 6.
+// AF-006: seven core models and two enums; no business reverse relations.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+enum ResourceType {
+  menu
+  button
+  api
+  data
+}
+
+enum PaymentOrderStatus {
+  created
+  pending
+  succeeded
+  failed
+  closed
+}
+
+enum PaymentAttemptStatus {
+  created
+  submitting
+  pending
+  succeeded
+  failed
+  unknown
+  cancelled
+}
+
+enum PaymentCallbackEventStatus {
+  received
+  accepted
+  rejected
+}
+
+enum PaymentTransactionKind {
+  charge
+  refund
+  reversal
+}
+
+enum PaymentRefundRequestStatus {
+  pending_manual_review
+}
+
+enum PaymentReconciliationDiscrepancyType {
+  missing_local
+  missing_provider
+  duplicate_provider
+  order_mismatch
+  amount_mismatch
+  currency_mismatch
+  status_mismatch
+}
+
+enum PaymentReconciliationReviewState {
+  open
+  acknowledged
+  escalated
+}
+
+model SysUser {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  passwordHash String        @map("password_hash")
+  realName     String        @map("real_name")
+  phone        String?
+  email        String?
+  status       UserStatus    @default(active)
+  isSuperAdmin Boolean       @default(false) @map("is_super_admin")
+  lastLoginAt  DateTime?     @map("last_login_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  deletedAt    DateTime?     @map("deleted_at")
+  userRoles    SysUserRole[]
+  tokenVersion Int           @default(0) @map("token_version")
+  sessions     AdminAuthSession[]
+  paymentRefundRequests PaymentRefundRequest[]
+  paymentReconciliationRuns PaymentReconciliationRun[]
+  paymentReconciliationReviews PaymentReconciliationDiscrepancy[] @relation("PaymentReconciliationReviewer")
+
+  @@map("sys_user")
+}
+
+// AF-026 / UI1-01: core admin identity owner; distinct from client sessions.
+// Store session metadata only, never bearer tokens or credentials.
+model AdminAuthSession {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  namespace    String
+  transport    String   @default("bearer")
+  issuedAt     DateTime @default(now()) @map("issued_at")
+  expiresAt    DateTime @map("expires_at")
+  revokedAt    DateTime? @map("revoked_at")
+  revokeReason String?  @map("revoke_reason")
+  user         SysUser  @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([userId, namespace, revokedAt])
+  @@index([expiresAt])
+  @@map("admin_auth_session")
+}
+
+model SysRole {
+  id          String              @id @default(cuid())
+  roleCode    String              @unique @map("role_code")
+  roleName    String              @map("role_name")
+  dataScope   String              @default("all") @map("data_scope")
+  status      String              @default("active")
+  remark      String?
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+  deletedAt   DateTime?           @map("deleted_at")
+  userRoles   SysUserRole[]
+  permissions SysRolePermission[]
+  menus       SysRoleMenu[]
+
+  @@map("sys_role")
+}
+
+model SysPermission {
+  id             String              @id @default(cuid())
+  permissionCode String              @unique @map("permission_code")
+  permissionName String              @map("permission_name")
+  resourceType   ResourceType        @map("resource_type")
+  module         String
+  action         String
+  apiPath        String?             @map("api_path")
+  status         String              @default("active")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+  roles          SysRolePermission[]
+
+  @@map("sys_permission")
+}
+
+model SysMenu {
+  id             String        @id @default(cuid())
+  parentId       String?       @map("parent_id")
+  title          String
+  path           String        @unique
+  icon           String?
+  type           String        @default("menu")
+  permissionCode String?       @map("permission_code")
+  pluginCode     String?       @map("plugin_code")
+  sortOrder      Int           @default(0) @map("sort_order")
+  visible        Boolean       @default(true)
+  status         String        @default("active")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  deletedAt      DateTime?     @map("deleted_at")
+  roles          SysRoleMenu[]
+
+  @@index([parentId])
+  @@index([status])
+  @@map("sys_menu")
+}
+
+// Mandatory relations retain Prisma 6's source defaults, now stated explicitly.
+// Remove join rows deliberately before hard-deleting a referenced core record.
+model SysUserRole {
+  id     String  @id @default(cuid())
+  userId String  @map("user_id")
+  roleId String  @map("role_id")
+  user   SysUser @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  role   SysRole @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("sys_user_role")
+}
+
+model SysRolePermission {
+  id           String        @id @default(cuid())
+  roleId       String        @map("role_id")
+  permissionId String        @map("permission_id")
+  role         SysRole       @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  permission   SysPermission @relation(fields: [permissionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("sys_role_permission")
+}
+
+model SysRoleMenu {
+  id     String  @id @default(cuid())
+  roleId String  @map("role_id")
+  menuId String  @map("menu_id")
+  role   SysRole @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  menu   SysMenu @relation(fields: [menuId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([roleId, menuId])
+  @@map("sys_role_menu")
+}
+
+// AF-007: five AIJ identity models from the same verified source; provenance section 7.
+model MemberUser {
+  personalAiSkills        AiPersonalSkill[]
+  personalAiSkillVersions AiPersonalSkillVersion[]
+  id                String    @id @default(cuid())
+  username          String?   @unique
+  mobile            String?   @unique
+  email             String?   @unique
+  nickname          String
+  avatar            String?
+  passwordHash      String?   @map("password_hash")
+  tokenVersion      Int       @default(0) @map("token_version")
+  lastLoginAt       DateTime? @map("last_login_at")
+  passwordChangedAt DateTime? @map("password_changed_at")
+  emailVerifiedAt   DateTime? @map("email_verified_at")
+  status            String    @default("active")
+  remark            String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  authSessions   ClientAuthSession[]
+  authTokens     ClientAuthOneTimeToken[]
+  consentRecords ClientConsentRecord[]
+  createdWorkspaces ClientWorkspace[] @relation("ClientWorkspaceCreator")
+  workspaceMemberships ClientWorkspaceMembership[]
+  authoredAiKnowledgeDocuments AiKnowledgeDocument[] @relation("AiKnowledgeDocumentAuthor")
+  aiKnowledgeQuestions AiKnowledgeQuestion[] @relation("AiKnowledgeQuestionMember")
+  aiAgentRuns AiAgentRun[]
+
+  @@index([status])
+  @@map("member_user")
+  personalAiAgents AiPersonalAgent[]
+  personalAiAgentVersions AiPersonalAgentVersion[]
+  personalAiMemories AiPersonalMemory[]
+  personalWorkflows AiPersonalWorkflow[]
+}
+
+model ClientAuthSession {
+  personalScriptRuns AiPersonalScriptRun[]
+  id            String    @id @default(cuid())
+  memberId      String    @map("member_id")
+  namespace     String
+  status        String    @default("active")
+  deviceHash    String    @map("device_hash")
+  deviceSummary String    @map("device_summary")
+  ipHash        String    @map("ip_hash")
+  regionSummary String?   @map("region_summary")
+  issuedAt      DateTime  @default(now()) @map("issued_at")
+  expiresAt     DateTime  @map("expires_at")
+  lastSeenAt    DateTime  @default(now()) @map("last_seen_at")
+  revokedAt     DateTime? @map("revoked_at")
+  revokeReason  String?   @map("revoke_reason")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([namespace, memberId, status, lastSeenAt], map: "client_auth_session_namespace_member_status_seen_idx")
+  @@index([expiresAt], map: "client_auth_session_expires_idx")
+  @@unique([id,memberId], map: "client_session_origin_member_uq")
+  @@map("client_auth_session")
+}
+
+model ClientAuthOneTimeToken {
+  id         String    @id @default(cuid())
+  memberId   String    @map("member_id")
+  purpose    String
+  tokenHash  String    @unique @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  consumedAt DateTime? @map("consumed_at")
+  revokedAt  DateTime? @map("revoked_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([memberId, purpose, createdAt], map: "client_auth_token_member_purpose_created_idx")
+  @@index([purpose, expiresAt], map: "client_auth_token_purpose_expires_idx")
+  @@map("client_auth_one_time_token")
+}
+
+model ClientConsentRecord {
+  id          String    @id @default(cuid())
+  memberId    String    @map("member_id")
+  namespace   String
+  consentType String    @map("consent_type")
+  granted     Boolean
+  textVersion String    @map("text_version")
+  textDigest  String    @map("text_digest")
+  source      String
+  capturedAt  DateTime  @default(now()) @map("captured_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([namespace, memberId, consentType, capturedAt], map: "client_consent_namespace_member_type_captured_idx")
+  @@map("client_consent_record")
+}
+
+model ClientAuthRateBucket {
+  id              String    @id @default(cuid())
+  scope           String
+  keyHash         String    @map("key_hash")
+  attemptCount    Int       @default(0) @map("attempt_count")
+  windowStartedAt DateTime  @default(now()) @map("window_started_at")
+  blockedUntil    DateTime? @map("blocked_until")
+  lastAttemptAt   DateTime  @default(now()) @map("last_attempt_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  @@unique([scope, keyHash])
+  @@index([scope, blockedUntil])
+  @@index([windowStartedAt])
+  @@map("client_auth_rate_bucket")
+}
+
+// AF-053 / NEXT-06: customer tenancy is separate from ProjectProfile and SysRole.
+// Invitations and business/product relations are intentionally outside this base schema.
+model ClientWorkspace {
+  personalAiSkills        AiPersonalSkill[]
+  personalAiSkillVersions AiPersonalSkillVersion[]
+  id                     String    @id @default(cuid())
+  code                   String    @unique
+  name                   String
+  status                 String    @default("active")
+  timezone               String    @default("Asia/Shanghai")
+  locale                 String    @default("zh-CN")
+  createdByMemberId      String    @map("created_by_member_id")
+  creationIdempotencyKey String    @map("creation_idempotency_key")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  deletedAt              DateTime? @map("deleted_at")
+
+  createdBy    MemberUser                 @relation("ClientWorkspaceCreator", fields: [createdByMemberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roles        ClientWorkspaceRole[]
+  memberships  ClientWorkspaceMembership[]
+  aiAgentRuns AiAgentRun[]
+  aiKnowledgeDocuments AiKnowledgeDocument[]
+  aiKnowledgeQuestions AiKnowledgeQuestion[]
+
+  @@unique([createdByMemberId, creationIdempotencyKey], map: "client_workspace_creator_idempotency_key")
+  @@index([status, deletedAt], map: "client_workspace_status_deleted_idx")
+  @@map("client_workspace")
+  personalAiAgents AiPersonalAgent[]
+  personalAiAgentVersions AiPersonalAgentVersion[]
+  personalAiMemories AiPersonalMemory[]
+  personalWorkflows AiPersonalWorkflow[]
+}
+
+model ClientWorkspaceRole {
+  id          String    @id @default(cuid())
+  workspaceId String    @map("workspace_id")
+  code        String
+  name        String
+  description String?
+  isSystem    Boolean   @default(false) @map("is_system")
+  status      String    @default("active")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  workspace       ClientWorkspace                 @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  memberships     ClientWorkspaceMembership[]
+  rolePermissions ClientWorkspaceRolePermission[]
+
+  @@unique([workspaceId, code], map: "client_workspace_role_workspace_code_key")
+  @@unique([workspaceId, id], map: "client_workspace_role_workspace_id_key")
+  @@index([workspaceId, status, sortOrder], map: "client_workspace_role_scope_status_sort_idx")
+  @@map("client_workspace_role")
+}
+
+model ClientWorkspacePermission {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  description String?
+  status      String    @default("active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  rolePermissions ClientWorkspaceRolePermission[]
+
+  @@index([status], map: "client_workspace_permission_status_idx")
+  @@map("client_workspace_permission")
+}
+
+model ClientWorkspaceRolePermission {
+  id           String    @id @default(cuid())
+  roleId       String    @map("role_id")
+  permissionId String    @map("permission_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  role       ClientWorkspaceRole       @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  permission ClientWorkspacePermission @relation(fields: [permissionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([roleId, permissionId], map: "client_workspace_role_permission_key")
+  @@index([permissionId], map: "client_workspace_role_permission_permission_idx")
+  @@map("client_workspace_role_permission")
+}
+
+model ClientWorkspaceMembership {
+  id             String    @id @default(cuid())
+  workspaceId    String    @map("workspace_id")
+  memberId       String    @map("member_id")
+  roleId         String    @map("role_id")
+  status         String    @default("active")
+  sessionVersion Int       @default(0) @map("session_version")
+  joinedAt       DateTime  @default(now()) @map("joined_at")
+  disabledAt     DateTime? @map("disabled_at")
+  removedAt      DateTime? @map("removed_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  workspace ClientWorkspace     @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  member    MemberUser          @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  role      ClientWorkspaceRole @relation(fields: [workspaceId, roleId], references: [workspaceId, id], onDelete: Restrict, onUpdate: Cascade)
+  paymentOrders PaymentOrder[]
+  personalDocuments PersonalDocument[]
+
+  @@unique([workspaceId, memberId], map: "client_workspace_membership_workspace_member_key")
+  @@index([memberId, status, createdAt], map: "client_workspace_membership_member_status_idx")
+  @@index([workspaceId, roleId, status], map: "client_workspace_membership_role_status_idx")
+  @@map("client_workspace_membership")
+}
+
+// AF-008: configuration, reference and audit definitions; provenance section 8.
+model OrganizationProfile {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  legalEntity String?   @map("legal_entity")
+  status      String    @default("active")
+  meta        Json?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  projects ProjectProfile[]
+
+  @@index([status])
+  @@map("organization_profile")
+}
+
+model ProjectProfile {
+  id             String    @id @default(cuid())
+  organizationId String    @map("organization_id")
+  code           String    @unique
+  name           String
+  legalEntity    String?   @map("legal_entity")
+  timezone       String    @default("Asia/Shanghai")
+  currency       String    @default("CNY")
+  locale         String    @default("zh-CN")
+  brand          Json?
+  environment    String    @default("development")
+  status         String    @default("active")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  organization OrganizationProfile @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  aiExecutionTraces AiExecutionTrace[]
+  connectorInstallations ConnectorInstallation[]
+  paymentOrders PaymentOrder[]
+  paymentCallbackEvents PaymentCallbackEvent[]
+  paymentRefundRequests PaymentRefundRequest[]
+  paymentReconciliationRuns PaymentReconciliationRun[]
+  paymentReconciliationDiscrepancies PaymentReconciliationDiscrepancy[]
+
+  @@index([organizationId, status])
+  @@map("project_profile")
+  documentExports PersonalDocumentExport[]
+  personalScriptVersions AiPersonalScriptVersion[]
+}
+
+// G18-02 / AF-104: payment ledger owns request/attempt state; payable ownership remains external.
+model PaymentOrder {
+  mbtiOrder             MbtiOrder?
+  id                    String             @id @default(cuid())
+  projectId             String             @map("project_id")
+  workspaceId           String             @map("workspace_id")
+  memberId              String             @map("member_id")
+  orderNo               String             @unique @map("order_no")
+  payableOwner          String             @map("payable_owner")
+  payableReference      String             @map("payable_reference")
+  amountMinor           BigInt             @map("amount_minor")
+  currency              String             @db.Char(3)
+  currencyExponent      Int                @map("currency_exponent")
+  idempotencyKeyHash    String             @map("idempotency_key_hash") @db.Char(64)
+  requestFingerprint    String             @map("request_fingerprint") @db.Char(64)
+  status                PaymentOrderStatus @default(created)
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+  deletedAt             DateTime?          @map("deleted_at")
+
+  project    ProjectProfile            @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  membership ClientWorkspaceMembership @relation(fields: [workspaceId, memberId], references: [workspaceId, memberId], onDelete: Restrict, onUpdate: Cascade)
+  attempts   PaymentAttempt[]
+  callbackEvents PaymentCallbackEvent[]
+  transactions PaymentTransaction[]
+  refundRequests PaymentRefundRequest[]
+  reconciliationDiscrepancies PaymentReconciliationDiscrepancy[]
+
+  @@unique([projectId, workspaceId, memberId, idempotencyKeyHash], map: "payment_order_scope_idempotency_key")
+  @@unique([id, projectId], map: "payment_order_id_project_key")
+  @@index([projectId, workspaceId, memberId, createdAt], map: "payment_order_member_scope_created_idx")
+  @@index([status, createdAt], map: "payment_order_status_created_idx")
+  @@map("payment_order")
+}
+
+model PaymentAttempt {
+  id                String               @id @default(cuid())
+  orderId           String               @map("order_id")
+  attemptNumber     Int                  @map("attempt_number")
+  providerCode      String               @map("provider_code")
+  providerReference String?              @map("provider_reference")
+  credentialRef     String?              @map("credential_ref")
+  status            PaymentAttemptStatus @default(created)
+  submittedAt       DateTime?            @map("submitted_at")
+  observedAt        DateTime?            @map("observed_at")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+
+  order PaymentOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  callbackEvents PaymentCallbackEvent[]
+  transactions PaymentTransaction[]
+
+  @@unique([orderId, attemptNumber], map: "payment_attempt_order_number_key")
+  @@unique([providerCode, providerReference], map: "payment_attempt_provider_reference_key")
+  @@index([status, createdAt], map: "payment_attempt_status_created_idx")
+  @@map("payment_attempt")
+}
+
+// G18-03: aij-payment owns authenticated callback replay receipts and immutable transaction facts.
+model PaymentCallbackEvent {
+  id             String                      @id @default(cuid())
+  projectId      String                      @map("project_id")
+  orderId        String                      @map("order_id")
+  attemptId      String                      @map("attempt_id")
+  providerCode   String                      @map("provider_code")
+  eventId        String                      @map("event_id")
+  payloadSha256  String                      @map("payload_sha256") @db.Char(64)
+  status         PaymentCallbackEventStatus  @default(received)
+  failureCode    String?                     @map("failure_code")
+  receivedAt     DateTime                    @default(now()) @map("received_at")
+  processedAt    DateTime?                   @map("processed_at")
+
+  project     ProjectProfile @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  order       PaymentOrder   @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  attempt     PaymentAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  transaction PaymentTransaction?
+
+  @@unique([projectId, providerCode, eventId], map: "payment_callback_project_provider_event_key")
+  @@index([orderId, receivedAt], map: "payment_callback_order_received_idx")
+  @@map("payment_callback_event")
+}
+
+model PaymentTransaction {
+  id                    String                 @id @default(cuid())
+  orderId               String                 @map("order_id")
+  attemptId             String                 @map("attempt_id")
+  callbackEventId       String                 @unique(map: "payment_transaction_callback_event_key") @map("callback_event_id")
+  providerCode          String                 @map("provider_code")
+  providerReference     String                 @map("provider_reference")
+  kind                  PaymentTransactionKind
+  amountMinor           BigInt                 @map("amount_minor")
+  currency              String                 @db.Char(3)
+  occurredAt            DateTime               @map("occurred_at")
+  recordedAt            DateTime               @default(now()) @map("recorded_at")
+
+  order         PaymentOrder        @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  attempt       PaymentAttempt      @relation(fields: [attemptId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  callbackEvent PaymentCallbackEvent @relation(fields: [callbackEventId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  refundRequests PaymentRefundRequest[]
+  reconciliationDiscrepancies PaymentReconciliationDiscrepancy[]
+
+  @@unique([providerCode, providerReference, kind], map: "payment_transaction_provider_reference_kind_key")
+  @@unique([id, orderId], map: "payment_transaction_id_order_key")
+  @@index([orderId, recordedAt], map: "payment_transaction_order_recorded_idx")
+  @@map("payment_transaction")
+}
+
+// G18-04 / AF-106: a refund request is a manual-review record only; it is never a provider command.
+model PaymentRefundRequest {
+  id                    String                       @id @default(cuid())
+  projectId             String                       @map("project_id")
+  paymentOrderId        String                       @map("payment_order_id")
+  chargeTransactionId   String                       @map("charge_transaction_id")
+  requestedByUserId     String                       @map("requested_by_user_id")
+  amountMinor           BigInt                       @map("amount_minor")
+  currency              String                       @db.Char(3)
+  currencyExponent      Int                          @map("currency_exponent")
+  reason                String                       @db.VarChar(500)
+  idempotencyKeyHash    String                       @map("idempotency_key_hash") @db.Char(64)
+  requestFingerprint    String                       @map("request_fingerprint") @db.Char(64)
+  status                PaymentRefundRequestStatus   @default(pending_manual_review)
+  createdAt             DateTime                     @default(now()) @map("created_at")
+  updatedAt             DateTime                     @updatedAt @map("updated_at")
+
+  project           ProjectProfile     @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  paymentOrder      PaymentOrder       @relation(fields: [paymentOrderId, projectId], references: [id, projectId], onDelete: Restrict, onUpdate: Cascade)
+  chargeTransaction PaymentTransaction @relation(fields: [chargeTransactionId, paymentOrderId], references: [id, orderId], onDelete: Restrict, onUpdate: Cascade)
+  requestedBy       SysUser            @relation(fields: [requestedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([projectId, requestedByUserId, idempotencyKeyHash], map: "payment_refund_request_scope_idempotency_key")
+  @@index([paymentOrderId, status, createdAt], map: "payment_refund_request_order_status_created_idx")
+  @@index([projectId, createdAt], map: "payment_refund_request_project_created_idx")
+  @@map("payment_refund_request")
+}
+
+// G18-05 / AF-107: normalized reconciliation evidence and operator disposition only.
+// This owner never writes PaymentOrder, PaymentAttempt or PaymentTransaction facts.
+model PaymentReconciliationRun {
+  id                    String   @id @default(cuid())
+  projectId             String   @map("project_id")
+  providerCode          String   @map("provider_code") @db.VarChar(50)
+  windowStart           DateTime @map("window_start")
+  windowEnd             DateTime @map("window_end")
+  sourceRecordCount     Int      @map("source_record_count")
+  matchedCount          Int      @map("matched_count")
+  discrepancyCount      Int      @map("discrepancy_count")
+  idempotencyKeyHash    String   @map("idempotency_key_hash") @db.Char(64)
+  requestFingerprint    String   @map("request_fingerprint") @db.Char(64)
+  createdByUserId       String   @map("created_by_user_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  project    ProjectProfile @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  createdBy  SysUser        @relation(fields: [createdByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  items      PaymentReconciliationDiscrepancy[]
+
+  @@unique([id, projectId], map: "payment_reconciliation_run_id_project_key")
+  @@unique([projectId, createdByUserId, idempotencyKeyHash], map: "payment_reconciliation_run_scope_idempotency_key")
+  @@index([projectId, createdAt], map: "payment_reconciliation_run_project_created_idx")
+  @@index([projectId, providerCode, windowStart, windowEnd], map: "payment_reconciliation_run_provider_window_idx")
+  @@map("payment_reconciliation_run")
+}
+
+model PaymentReconciliationDiscrepancy {
+  id                    String                              @id @default(cuid())
+  projectId             String                              @map("project_id")
+  runId                 String                              @map("run_id")
+  sequence              Int
+  type                  PaymentReconciliationDiscrepancyType
+  reviewState           PaymentReconciliationReviewState    @default(open) @map("review_state")
+  orderId               String?                             @map("order_id")
+  transactionId         String?                             @map("transaction_id")
+  observedOrderNo       String?                             @map("observed_order_no") @db.VarChar(100)
+  providerReferenceHash String?                             @map("provider_reference_hash") @db.Char(64)
+  sourceRecordHash      String                              @map("source_record_hash") @db.Char(64)
+  localAmountMinor      BigInt?                             @map("local_amount_minor")
+  observedAmountMinor   BigInt?                             @map("observed_amount_minor")
+  localCurrency         String?                             @map("local_currency") @db.Char(3)
+  observedCurrency      String?                             @map("observed_currency") @db.Char(3)
+  localStatus           String?                             @map("local_status") @db.VarChar(32)
+  observedStatus        String?                             @map("observed_status") @db.VarChar(32)
+  observedAt            DateTime?                           @map("observed_at")
+  reviewedByUserId      String?                             @map("reviewed_by_user_id")
+  reviewedAt            DateTime?                           @map("reviewed_at")
+  createdAt             DateTime                            @default(now()) @map("created_at")
+
+  project     ProjectProfile          @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  run         PaymentReconciliationRun @relation(fields: [runId, projectId], references: [id, projectId], onDelete: Restrict, onUpdate: Cascade)
+  order       PaymentOrder?           @relation(fields: [orderId, projectId], references: [id, projectId], onDelete: Restrict, onUpdate: Cascade)
+  transaction PaymentTransaction?     @relation(fields: [transactionId, orderId], references: [id, orderId], onDelete: Restrict, onUpdate: Cascade)
+  reviewedBy  SysUser?                @relation("PaymentReconciliationReviewer", fields: [reviewedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([runId, sequence], map: "payment_reconciliation_discrepancy_run_sequence_key")
+  @@index([projectId, reviewState, createdAt], map: "payment_reconciliation_discrepancy_project_review_idx")
+  @@index([runId, type, reviewState], map: "payment_reconciliation_discrepancy_run_type_idx")
+  @@map("payment_reconciliation_discrepancy")
+}
+
+model ScopedConfig {
+  id          String    @id @default(cuid())
+  scope       String
+  scopeId     String    @map("scope_id")
+  pluginCode  String    @default("") @map("plugin_code")
+  configKey   String    @map("config_key")
+  configValue String    @map("config_value")
+  valueType   String    @default("string") @map("value_type")
+  name        String
+  description String?
+  sensitive   Boolean   @default(false)
+  isPublic    Boolean   @default(false) @map("is_public")
+  status      String    @default("active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  // AF-008: revision metadata only; atomic version checks belong to the future service.
+  version Int                   @default(1)
+  changes ConfigurationChange[]
+
+  @@unique([scope, scopeId, pluginCode, configKey])
+  @@index([scope, scopeId, status])
+  @@index([pluginCode, configKey])
+  @@map("scoped_config")
+}
+
+model ConfigurationChange {
+  id             String    @id @default(cuid())
+  eventType      String    @default("configuration.changed") @map("event_type")
+  scope          String
+  scopeId        String    @map("scope_id")
+  pluginCode     String    @default("") @map("plugin_code")
+  configKey      String    @map("config_key")
+  operatorId     String?   @map("operator_id")
+  operatorName   String?   @map("operator_name")
+  changeMetadata Json?     @map("change_metadata")
+  status         String    @default("recorded")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  // Optional for non-scoped events such as project metadata or reference changes.
+  // Captured version is historical, not an FK to the mutable current version.
+  configId      String?       @map("config_id")
+  configVersion Int?          @map("config_version")
+  auditLogId    String?       @map("audit_log_id")
+  config        ScopedConfig? @relation(fields: [configId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  auditLog      AuditLog?     @relation(fields: [auditLogId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([configId, configVersion])
+  @@index([auditLogId])
+  @@index([scope, scopeId, createdAt])
+  @@index([configKey])
+  @@map("configuration_change")
+}
+
+model SecretReference {
+  id              String    @id @default(cuid())
+  ref             String    @unique
+  provider        String
+  description     String?
+  status          String    @default("active")
+  lastCheckedAt   DateTime? @map("last_checked_at")
+  lastCheckStatus String?   @map("last_check_status")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  connectorInstallations ConnectorInstallation[]
+
+  @@index([provider, status])
+  @@map("secret_reference")
+}
+
+// G17-01: Integration owns connector configuration separately from PluginInstallation.
+// Only the reference is persisted; external credentials remain in SecretCenter.
+model ConnectorInstallation {
+  id             String    @id @default(cuid())
+  projectId      String    @map("project_id")
+  connectorCode  String    @map("connector_code")
+  manifestVersion String   @map("manifest_version")
+  scopes         String[]  @default([])
+  secretRef      String    @map("secret_ref")
+  status         String    @default("configured")
+  version        Int       @default(1)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  project        ProjectProfile @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  secretReference SecretReference @relation(fields: [secretRef], references: [ref], onDelete: Restrict, onUpdate: Cascade)
+  inboundEvents  ConnectorInboundEvent[]
+  operations     ConnectorOperation[]
+
+  @@unique([projectId, connectorCode], map: "connector_installation_project_connector_key")
+  @@index([projectId, status], map: "connector_installation_project_status_idx")
+  @@index([connectorCode, status], map: "connector_installation_connector_status_idx")
+  @@map("connector_installation")
+}
+
+// G17-02: stores only an accepted webhook payload digest and idempotency metadata.
+model ConnectorInboundEvent {
+  id                  String   @id @default(cuid())
+  projectId           String   @map("project_id")
+  connectorCode       String   @map("connector_code")
+  idempotencyKey      String   @map("idempotency_key")
+  payloadSha256       String   @map("payload_sha256") @db.Char(64)
+  eventTimestamp      DateTime @map("event_timestamp")
+  installationVersion Int      @map("installation_version")
+  receivedAt          DateTime @default(now()) @map("received_at")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  connectorInstallation ConnectorInstallation @relation(fields: [projectId, connectorCode], references: [projectId, connectorCode], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([projectId, connectorCode, idempotencyKey], map: "connector_inbound_event_idempotency_key")
+  @@index([projectId, connectorCode, receivedAt], map: "connector_inbound_event_received_idx")
+  @@map("connector_inbound_event")
+}
+
+enum ConnectorOperationType {
+  secret_reference_check
+}
+
+enum ConnectorOperationStatus {
+  succeeded
+  failed
+}
+
+enum ConnectorOperationFailureCode {
+  secret_unavailable
+}
+
+// G17-03: auditable local connector readiness checks; retries re-read SecretRef metadata only.
+// No webhook body, raw secret, provider result or external request is stored.
+model ConnectorOperation {
+  id                     String                      @id @default(cuid())
+  projectId              String                      @map("project_id")
+  connectorCode          String                      @map("connector_code")
+  type                   ConnectorOperationType
+  status                 ConnectorOperationStatus
+  attemptCount           Int                         @default(1) @map("attempt_count")
+  lastFailureCode        ConnectorOperationFailureCode? @map("last_failure_code")
+  installationVersion    Int                         @map("installation_version")
+  startedAt              DateTime                    @map("started_at")
+  completedAt            DateTime                    @map("completed_at")
+  createdAt              DateTime                    @default(now()) @map("created_at")
+  updatedAt              DateTime                    @updatedAt @map("updated_at")
+
+  installation ConnectorInstallation        @relation(fields: [projectId, connectorCode], references: [projectId, connectorCode], onDelete: Restrict, onUpdate: Cascade)
+  attempts     ConnectorOperationAttempt[]
+
+  @@index([projectId, connectorCode, createdAt, id], map: "connector_operation_project_created_idx")
+  @@index([status, updatedAt], map: "connector_operation_status_updated_idx")
+  @@map("connector_operation")
+}
+
+model ConnectorOperationAttempt {
+  id          String                     @id @default(cuid())
+  operationId String                     @map("operation_id")
+  attempt     Int
+  status      ConnectorOperationStatus
+  failureCode ConnectorOperationFailureCode? @map("failure_code")
+  startedAt   DateTime                   @map("started_at")
+  completedAt DateTime                   @map("completed_at")
+  createdAt   DateTime                   @default(now()) @map("created_at")
+
+  operation ConnectorOperation @relation(fields: [operationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([operationId, attempt], map: "connector_operation_attempt_number_key")
+  @@index([operationId, attempt], map: "connector_operation_attempt_history_idx")
+  @@map("connector_operation_attempt")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  module         String
+  action         String
+  userId         String?  @map("user_id")
+  userName       String?  @map("user_name")
+  method         String?
+  path           String?
+  requestSummary Json?    @map("request_summary")
+  status         String   @default("success")
+  errorMessage   String?  @map("error_message")
+  resourceType   String   @map("resource_type")
+  resourceId     String?  @map("resource_id")
+  beforeData     Json?    @map("before_data")
+  afterData      Json?    @map("after_data")
+  ip             String?
+  userAgent      String?  @map("user_agent")
+  workspaceId    String?  @map("workspace_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  configurationChanges ConfigurationChange[]
+
+  @@index([userId])
+  @@index([userName])
+  @@index([module])
+  @@index([action])
+  @@index([createdAt])
+  @@index([workspaceId, createdAt], map: "audit_log_workspace_created_idx")
+  @@map("audit_log")
+}
+
+// AF-009: file metadata and plugin state only; provenance section 9.
+// Paths/URLs have no environment defaults; validation belongs to the future storage service.
+model FileAsset {
+  personalScriptRuns AiPersonalScriptRun[]
+  id           String    @id @default(cuid())
+  originalName String    @map("original_name")
+  filename     String
+  mimeType     String    @map("mime_type")
+  size         Int
+  path         String
+  url          String
+  storageType  String    @default("local") @map("storage_type")
+  objectKey    String?   @unique @map("object_key")
+  checksum     String?
+  projectId    String?   @map("project_id")
+  workspaceId  String?   @map("workspace_id")
+  pluginCode   String?   @map("plugin_code")
+  ownerType    String    @default("user") @map("owner_type")
+  ownerId      String?   @map("owner_id")
+  uploaderId   String?   @map("uploader_id")
+  status       String    @default("active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  aiAgentRuns AiAgentRun[]
+
+  @@unique([id, workspaceId], map: "file_asset_id_workspace_key")
+  @@unique([id, projectId, workspaceId, ownerId], map: "file_asset_script_owner_key")
+  @@index([uploaderId])
+  @@index([projectId, pluginCode])
+  @@index([workspaceId, pluginCode], map: "file_asset_workspace_plugin_idx")
+  @@index([ownerType, ownerId])
+  @@index([status])
+  @@map("file_asset")
+  documentExports PersonalDocumentExport[]
+}
+
+// G19: workspace-owned knowledge source content. aij-ai is the sole data owner;
+// ClientWorkspace remains the tenant boundary and its membership owns access.
+model AiKnowledgeDocument {
+sourceUrl               String? @map("source_url") @db.VarChar(2048)
+sourceFinalUrl          String? @map("source_final_url") @db.VarChar(2048)
+sourceTextChecksum      String? @map("source_text_checksum") @db.Char(64)
+sourceExtractionVersion String? @map("source_extraction_version") @db.VarChar(64)
+  id                String    @id @default(cuid())
+  workspaceId       String    @map("workspace_id")
+  documentCode      String    @map("document_code")
+  sourceFilename    String?   @map("source_filename")
+  sourceChecksum    String?   @map("source_checksum") @db.Char(64)
+  title             String
+  content           String    @db.Text
+  status            String    @default("active")
+  createdByMemberId String    @map("created_by_member_id")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  author    MemberUser      @relation("AiKnowledgeDocumentAuthor", fields: [createdByMemberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([workspaceId, documentCode], map: "ai_knowledge_document_workspace_code_key")
+  @@index([workspaceId, status, deletedAt], map: "ai_knowledge_document_workspace_status_idx")
+  @@index([workspaceId, createdAt], map: "ai_knowledge_document_workspace_created_idx")
+  @@map("ai_knowledge_document")
+}
+
+// AF-110: aij-ai owns customer question/result state; workspace auth, AsyncRuntime and trace/cost remain separate owners.
+model AiKnowledgeQuestion {
+  id                 String                    @id @default(cuid())
+  workspaceId        String                    @map("workspace_id")
+  memberId           String                    @map("member_id")
+  idempotencyKeyHash String                    @map("idempotency_key_hash") @db.Char(64)
+  requestFingerprint String                    @map("request_fingerprint") @db.Char(64)
+  query              String                    @db.Text
+  status             AiKnowledgeQuestionStatus @default(queued)
+  answer             String?                   @db.Text
+  citations          Json?
+  refusalCode        String?                   @map("refusal_code")
+  failureCode        String?                   @map("failure_code")
+  runtimeJobId       String?                   @unique @map("runtime_job_id")
+  traceId            String?                   @map("trace_id")
+  contentPurgedAt    DateTime?                 @map("content_purged_at")
+  createdAt          DateTime                  @default(now()) @map("created_at")
+  updatedAt          DateTime                  @updatedAt @map("updated_at")
+  deletedAt          DateTime?                 @map("deleted_at")
+
+  workspace  ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  member     MemberUser      @relation("AiKnowledgeQuestionMember", fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  runtimeJob RuntimeJob?     @relation(fields: [runtimeJobId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  evaluations AiEvaluationRecord[]
+  @@unique([id, workspaceId], map: "ai_knowledge_question_id_workspace_key")
+  @@unique([workspaceId, idempotencyKeyHash], map: "ai_knowledge_question_workspace_idempotency_key")
+  @@index([workspaceId, status, createdAt], map: "ai_knowledge_question_workspace_status_created_idx")
+  @@index([createdAt], map: "ai_knowledge_question_created_at_idx")
+  @@map("ai_knowledge_question")
+}
+
+enum PluginInstallationStatus {
+  uninstalled
+  installed
+  enabled
+  failed
+}
+
+enum PluginOperationStatus {
+  pending
+  running
+  succeeded
+  failed
+}
+
+enum RuntimeOutboxStatus {
+  pending
+  processing
+  retry
+  processed
+  dead
+}
+
+enum RuntimeJobStatus {
+  pending
+  running
+  retry
+  completed
+  failed
+  dead
+  cancelled
+}
+
+enum RuntimeIdempotencyStatus {
+  processing
+  completed
+}
+
+enum AiExecutionTraceStatus {
+  running
+  succeeded
+  failed
+}
+
+enum AiKnowledgeQuestionStatus {
+  queued
+  running
+  answered
+  refused
+  failed
+}
+
+enum AiExecutionFailureCategory {
+  configuration_unavailable
+  capability_unavailable
+  budget_denied
+  credential_unavailable
+  provider_unavailable
+  invalid_provider_response
+  provider_error
+  timeout
+  execution_error
+}
+
+enum AiTraceCostSource {
+  unreported
+  provider_reported
+}
+
+// Adapted from source Plugin, not a copy of its business module registry.
+// Version is the requested/last-known version, including an uninstalled row.
+// Owner is the implementation package/module identifier, never authorization.
+model PluginInstallation {
+  id            String                   @id @default(cuid())
+  projectId     String                   @map("project_id")
+  pluginCode    String                   @map("plugin_code")
+  version       String
+  owner         String
+  status        PluginInstallationStatus @default(uninstalled)
+  installedAt   DateTime?                @map("installed_at")
+  enabledAt     DateTime?                @map("enabled_at")
+  disabledAt    DateTime?                @map("disabled_at")
+  uninstalledAt DateTime?                @map("uninstalled_at")
+  failureReason String?                  @map("failure_reason")
+  createdAt     DateTime                 @default(now()) @map("created_at")
+  updatedAt     DateTime                 @updatedAt @map("updated_at")
+
+  operations PluginOperation[]
+
+  @@unique([projectId, pluginCode])
+  @@index([status])
+  @@map("plugin_installation")
+}
+
+// Adapted from PluginInstallLog; version/owner are historical snapshots.
+// Action remains a required string; its allowlist and transitions are future service rules.
+model PluginOperation {
+  id             String                @id @default(cuid())
+  installationId String                @map("installation_id")
+  action         String
+  version        String
+  previousVersion String?               @map("previous_version")
+  owner          String
+  status         PluginOperationStatus @default(pending)
+  failureReason  String?               @map("failure_reason")
+  operatorId     String?               @map("operator_id")
+  retryOfOperationId String?           @unique(map: "plugin_operation_retry_of_key") @map("retry_of_operation_id")
+  startedAt      DateTime?             @map("started_at")
+  finishedAt     DateTime?             @map("finished_at")
+  createdAt      DateTime              @default(now()) @map("created_at")
+
+  installation PluginInstallation @relation(fields: [installationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  retryOfOperation PluginOperation? @relation("PluginOperationRetry", fields: [retryOfOperationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  retryAttempt PluginOperation? @relation("PluginOperationRetry")
+
+  @@index([installationId, createdAt])
+  @@index([status, createdAt])
+  @@map("plugin_operation")
+}
+
+// AF-021: F00 SysDict/SysDictItem core slice; no source records or business relations.
+model SysDict {
+  id          String    @id @default(cuid())
+  dictCode    String    @unique @map("dict_code")
+  dictName    String    @map("dict_name")
+  description String?
+  status      String    @default("active")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  // Reserved for future plugin-owned registration; admin DTO cannot set/adopt this owner.
+  pluginCode String? @map("plugin_code")
+  isPublic Boolean @default(false) @map("is_public")
+  items SysDictItem[]
+
+  @@index([status])
+  @@map("system_dict")
+}
+
+model SysDictItem {
+  id          String    @id @default(cuid())
+  dictId      String    @map("dict_id")
+  itemLabel   String    @map("item_label")
+  itemValue   String    @map("item_value")
+  description String?
+  status      String    @default("active")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  dict SysDict @relation(fields: [dictId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([dictId, itemValue])
+  @@index([dictId])
+  @@index([status])
+  @@map("system_dict_item")
+}
+
+// AF-049: durable generic runtime queue owner. No business-specific relations or payload logging.
+model RuntimeOutbox {
+  id             String              @id @default(uuid())
+  eventType      String              @map("event_type")
+  eventVersion   Int                 @default(1) @map("event_version")
+  occurredAt     DateTime            @map("occurred_at")
+  producer       String
+  scope          Json
+  correlationId  String?             @map("correlation_id")
+  causationId    String?             @map("causation_id")
+  idempotencyKey String              @map("idempotency_key")
+  payload        Json
+  status         RuntimeOutboxStatus @default(pending)
+  attempts       Int                 @default(0)
+  maxAttempts    Int                 @default(8) @map("max_attempts")
+  nextAttemptAt  DateTime            @default(now()) @map("next_attempt_at")
+  processedAt    DateTime?           @map("processed_at")
+  lastError      String?             @map("last_error")
+  leaseOwner     String?             @map("lease_owner")
+  leaseExpiresAt DateTime?           @map("lease_expires_at")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+  deletedAt      DateTime?           @map("deleted_at")
+
+  @@unique([eventType, idempotencyKey])
+  @@index([status, nextAttemptAt])
+  @@index([leaseExpiresAt])
+  @@map("runtime_outbox")
+}
+
+// AF-049: generic scheduled/background work. Business handlers register against this contract.
+model RuntimeJob {
+  personalScriptRun AiPersonalScriptRun?
+  leaseNonce String? @map("lease_nonce") @db.Uuid
+  id              String          @id @default(cuid())
+  jobType         String          @map("job_type")
+  jobVersion      Int             @default(1) @map("job_version")
+  payload         Json
+  scope           String
+  scopeId         String          @map("scope_id")
+  pluginCode      String          @default("") @map("plugin_code")
+  workspaceId     String?         @map("workspace_id")
+  status          RuntimeJobStatus @default(pending)
+  priority        Int             @default(0)
+  runAt           DateTime        @default(now()) @map("run_at")
+  attempts        Int             @default(0)
+  maxAttempts     Int             @default(5) @map("max_attempts")
+  timeoutMs       Int             @default(30000) @map("timeout_ms")
+  dedupeKey       String?         @map("dedupe_key")
+  idempotencyKey  String          @map("idempotency_key")
+  correlationId   String?         @map("correlation_id")
+  resultReference Json?           @map("result_reference")
+  lastError       String?         @map("last_error")
+  leaseOwner      String?         @map("lease_owner")
+  leaseExpiresAt  DateTime?       @map("lease_expires_at")
+  startedAt       DateTime?       @map("started_at")
+  completedAt     DateTime?       @map("completed_at")
+  cancelledAt     DateTime?       @map("cancelled_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  deletedAt       DateTime?       @map("deleted_at")
+  aiExecutionTraces AiExecutionTrace[]
+  aiKnowledgeQuestion AiKnowledgeQuestion?
+  aiAgentRun AiAgentRun?
+
+  @@unique([scope, scopeId, jobType, dedupeKey])
+  @@unique([scope, scopeId, jobType, idempotencyKey])
+  @@index([status, runAt, priority])
+  @@index([leaseExpiresAt])
+  @@index([workspaceId, status, runAt], map: "runtime_job_workspace_status_run_idx")
+  @@unique([id, scopeId, workspaceId], map: "runtime_job_script_scope_key")
+  @@map("runtime_job")
+}
+
+// G15-03: one AI-owned trace/cost truth row per durable runtime-job attempt.
+// Content is stored only as a value-free shape projection; cost is provider-reported or absent.
+model AiExecutionTrace {
+  id                 String                       @id @default(uuid())
+  jobId              String                       @map("job_id")
+  attempt            Int
+  projectId          String                       @map("project_id")
+  correlationId      String                       @map("correlation_id")
+  capabilityCode     String                       @map("capability_code")
+  providerCode       String?                      @map("provider_code")
+  modelCode          String?                      @map("model_code")
+  status             AiExecutionTraceStatus       @default(running)
+  failureCategory    AiExecutionFailureCategory?  @map("failure_category")
+  inputShape         Json                         @map("input_shape")
+  outputShape        Json?                        @map("output_shape")
+  promptTokens       Int?                         @map("prompt_tokens")
+  completionTokens   Int?                         @map("completion_tokens")
+  cachedTokens       Int?                         @map("cached_tokens")
+  imageCount         Int?                         @map("image_count")
+  costAmountNanos    BigInt?                      @map("cost_amount_nanos")
+  costCurrency       String?                      @map("cost_currency") @db.Char(3)
+  costSource         AiTraceCostSource            @default(unreported) @map("cost_source")
+  startedAt          DateTime                     @default(now()) @map("started_at")
+  completedAt        DateTime?                    @map("completed_at")
+  createdAt          DateTime                     @default(now()) @map("created_at")
+  updatedAt          DateTime                     @updatedAt @map("updated_at")
+
+  job     RuntimeJob      @relation(fields: [jobId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  project ProjectProfile @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([jobId, attempt], map: "ai_execution_trace_job_attempt_key")
+  @@index([projectId, createdAt], map: "ai_execution_trace_project_created_idx")
+  @@index([correlationId], map: "ai_execution_trace_correlation_idx")
+  @@index([status, createdAt], map: "ai_execution_trace_status_created_idx")
+  @@map("ai_execution_trace")
+}
+
+// AF-049: leader/scheduler lease, isolated by unique schedule code.
+model RuntimeSchedulerLock {
+  id             String    @id @default(cuid())
+  scheduleCode   String    @unique @map("schedule_code")
+  leaseOwner     String    @map("lease_owner")
+  leaseExpiresAt DateTime  @map("lease_expires_at")
+  lastEnqueuedAt DateTime? @map("last_enqueued_at")
+  status         String    @default("active")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  @@index([leaseExpiresAt])
+  @@map("runtime_scheduler_lock")
+}
+
+// AF-049: durable idempotency ledger for transactional queue handlers and outbox delivery.
+model RuntimeIdempotency {
+  id              String                   @id @default(cuid())
+  requestScope    String                   @map("request_scope")
+  scope           String
+  scopeId         String                   @map("scope_id")
+  pluginCode      String                   @default("") @map("plugin_code")
+  owner           String
+  idempotencyKey  String                   @map("idempotency_key")
+  status          RuntimeIdempotencyStatus @default(processing)
+  resultReference Json?                    @map("result_reference")
+  expiresAt       DateTime                 @map("expires_at")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
+  deletedAt       DateTime?                @map("deleted_at")
+
+  @@unique([requestScope, scope, scopeId, pluginCode, owner, idempotencyKey], map: "runtime_idempotency_scope_owner_key")
+  @@index([status, expiresAt])
+  @@map("runtime_idempotency")
+}
+
+// Internal budget estimates only; authoritative Provider Cost remains AiExecutionTrace.
+model AiEvaluationBudgetRun {
+  id           String   @id @default(cuid())
+  projectId    String   @map("project_id")
+  runKey       String   @map("run_key")
+  policyHash   String   @map("policy_hash") @db.Char(64)
+  usedNanos    BigInt   @default(0) @map("used_nanos")
+  limitNanos   BigInt   @default(10000000000) @map("limit_nanos")
+  kind         String   @default("evaluation")
+  createdAt    DateTime @default(now()) @map("created_at")
+  reservations AiEvaluationBudgetReservation[]
+  @@unique([projectId, runKey])
+  @@map("ai_evaluation_budget_run")
+}
+
+model AiEvaluationBudgetReservation {
+  id            String   @id
+  runId         String   @map("run_id")
+  reservedNanos BigInt   @map("reserved_nanos")
+  chargedNanos  BigInt   @map("charged_nanos")
+  status        String   @default("reserved")
+  createdAt     DateTime @default(now()) @map("created_at")
+  settledAt     DateTime? @map("settled_at")
+  run           AiEvaluationBudgetRun @relation(fields: [runId], references: [id], onDelete: Restrict)
+  @@index([runId, status])
+  @@map("ai_evaluation_budget_reservation")
+}
+
+// Content snapshots for evaluations have an independent purge marker, never a second Cost owner.
+model AiEvaluationRecord {
+  id              String   @id @default(cuid())
+  projectId       String   @map("project_id")
+  workspaceId     String   @map("workspace_id")
+  questionId      String   @map("question_id")
+  runKey          String   @map("run_key")
+  caseKey         String   @map("case_key")
+  status          String
+  inputText       String?  @map("input_text") @db.Text
+  outputText      String?  @map("output_text") @db.Text
+  contentPurgedAt DateTime? @map("content_purged_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  question        AiKnowledgeQuestion @relation(fields: [questionId, workspaceId], references: [id, workspaceId], onDelete: Restrict)
+  @@unique([workspaceId, runKey, caseKey])
+  @@index([createdAt, contentPurgedAt])
+  @@map("ai_evaluation_record")
+}
+
+// General AI application run; RuntimeJob owns scheduling, Trace owns provider usage/cost.
+model AiAgentRun {
+  id                 String   @id
+  projectId          String   @map("project_id")
+  workspaceId        String   @map("workspace_id")
+  memberId           String   @map("member_id")
+  agentCode          String   @map("agent_code")
+  agentRevision      Int      @map("agent_revision")
+  catalogVersion     Int      @map("catalog_version")
+  jobId              String   @unique @map("job_id")
+  idempotencyKey     String   @map("idempotency_key")
+  requestHash        String   @map("request_hash") @db.Char(64)
+  status             String   @default("queued")
+  snapshot           Json?
+  input              Json?
+  output             Json?
+  estimatedCostNanos BigInt   @map("estimated_cost_nanos")
+  budgetStatus       String   @default("reserved") @map("budget_status")
+  imageAssetId       String?  @map("image_asset_id")
+  failureCode        String?  @map("failure_code")
+  attemptedAt        DateTime? @map("attempted_at")
+  completedAt        DateTime? @map("completed_at")
+  expiresAt          DateTime @map("expires_at")
+  contentPurgedAt    DateTime? @map("content_purged_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  job RuntimeJob @relation(fields: [jobId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  imageAsset FileAsset? @relation(fields: [imageAssetId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  @@unique([projectId, workspaceId, memberId, idempotencyKey])
+  @@index([projectId, createdAt])
+  @@index([projectId, workspaceId, createdAt])
+  @@index([expiresAt, contentPurgedAt])
+  @@unique([id,projectId,workspaceId,memberId], map: "ai_run_origin_scope_uq")
+  @@map("ai_agent_run")
+}
+
+model AiPersonalSkill {
+  id           String    @id @default(cuid())
+  workspaceId  String    @map("workspace_id")
+  memberId     String    @map("member_id")
+  code         String    @db.VarChar(63)
+  name         String    @db.VarChar(100)
+  instructions String
+  revision     Int       @default(1)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member    MemberUser      @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  versions  AiPersonalSkillVersion[]
+
+  @@unique([workspaceId, memberId, code], map: "ai_personal_skill_owner_code_key")
+  @@unique([id, workspaceId, memberId], map: "ai_personal_skill_id_scope_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_skill_owner_page_idx")
+  @@index([memberId], map: "ai_personal_skill_member_idx")
+  @@map("ai_personal_skill")
+}
+
+model AiPersonalSkillVersion {
+  id           String   @id @default(cuid())
+  skillId      String   @map("skill_id")
+  workspaceId  String   @map("workspace_id")
+  memberId     String   @map("member_id")
+  code         String   @db.VarChar(63)
+  name         String   @db.VarChar(100)
+  instructions String
+  revision     Int
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  skill     AiPersonalSkill @relation(fields: [skillId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_skill_version_skill_scope_fkey")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member    MemberUser      @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([skillId, revision], map: "ai_personal_skill_version_revision_key")
+  @@index([workspaceId, memberId, skillId, revision], map: "ai_personal_skill_version_owner_idx")
+  @@index([memberId], map: "ai_personal_skill_version_member_idx")
+  @@map("ai_personal_skill_version")
+  personalAgentBindings AiPersonalAgentSkillBinding[]
+  @@unique([id, workspaceId, memberId], map: "ai_personal_skill_version_id_scope_key")
+  scriptVersion AiPersonalScriptVersion?
+  @@unique([id, skillId, workspaceId, memberId, revision], map: "ai_personal_skill_version_script_ref_key")
+}
+
+model AiPersonalAgent {
+  id             String   @id @default(cuid())
+  workspaceId    String   @map("workspace_id")
+  memberId       String   @map("member_id")
+  code           String   @db.VarChar(63)
+  name           String   @db.VarChar(100)
+  instructions   String
+  enabled        Boolean  @default(false)
+  publishedRevision Int? @map("published_revision")
+  publicationVersion Int @default(0) @map("publication_version")
+  modelCode      String   @db.VarChar(63) @map("model_code")
+  modelRevision  Int      @map("model_revision")
+  catalogVersion Int      @map("catalog_version")
+  inputFields    Json     @map("input_fields")
+  outputFormat   String   @db.VarChar(4) @map("output_format")
+  outputFields   Json     @map("output_fields")
+  revision       Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  versions AiPersonalAgentVersion[]
+  @@unique([workspaceId, memberId, code], map: "ai_personal_agent_owner_code_key")
+  @@unique([id, workspaceId, memberId], map: "ai_personal_agent_id_scope_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_agent_owner_page_idx")
+  @@index([memberId], map: "ai_personal_agent_member_idx")
+  @@map("ai_personal_agent")
+  personalMemoryGrants AiPersonalMemoryAgentGrant[]
+}
+model AiPersonalAgentVersion {
+  id             String   @id @default(cuid())
+  workspaceId    String   @map("workspace_id")
+  memberId       String   @map("member_id")
+  code           String   @db.VarChar(63)
+  name           String   @db.VarChar(100)
+  instructions   String
+  enabled        Boolean  @default(false)
+  modelCode      String   @db.VarChar(63) @map("model_code")
+  modelRevision  Int      @map("model_revision")
+  catalogVersion Int      @map("catalog_version")
+  inputFields    Json     @map("input_fields")
+  outputFormat   String   @db.VarChar(4) @map("output_format")
+  outputFields   Json     @map("output_fields")
+  revision       Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at")
+  skillBindingCount Int @db.SmallInt @map("skill_binding_count")
+  agentId String @map("agent_id")
+  agent AiPersonalAgent @relation(fields: [agentId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_agent_version_agent_scope_fkey")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  skillBindings AiPersonalAgentSkillBinding[]
+  @@unique([id, workspaceId, memberId], map: "ai_personal_agent_version_id_scope_key")
+  @@unique([agentId, revision], map: "ai_personal_agent_version_revision_key")
+  @@index([workspaceId, memberId, agentId, revision], map: "ai_personal_agent_version_owner_idx")
+  @@index([memberId], map: "ai_personal_agent_version_member_idx")
+  @@unique([id, agentId, workspaceId, memberId, revision], map: "ai_personal_agent_version_publication_key")
+  @@map("ai_personal_agent_version")
+  personalWorkflowBindings AiPersonalWorkflowAgentBinding[]
+}
+model AiPersonalAgentSkillBinding {
+  id String @id @default(cuid())
+  agentVersionId String @map("agent_version_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  skillVersionId String @map("skill_version_id")
+  position Int @db.SmallInt
+  agentVersion AiPersonalAgentVersion @relation(fields: [agentVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_agent_binding_version_scope_fkey")
+  skillVersion AiPersonalSkillVersion @relation(fields: [skillVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_agent_binding_skill_scope_fkey")
+  @@unique([agentVersionId, position], map: "ai_personal_agent_binding_position_key")
+  @@unique([agentVersionId, skillVersionId], map: "ai_personal_agent_binding_skill_key")
+  @@index([skillVersionId, workspaceId, memberId], map: "ai_personal_agent_binding_skill_scope_idx")
+  @@map("ai_personal_agent_skill_binding")
+}
+
+model AiPersonalMemory {
+  id String @id @default(cuid())
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  code String @db.VarChar(63)
+  title String? @db.VarChar(100)
+  content String?
+  kind String? @db.VarChar(14)
+  enabled Boolean?
+  initialDigest String? @db.VarChar(64) @map("initial_digest")
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_workspace_fkey")
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_member_fkey")
+  agentGrants AiPersonalMemoryAgentGrant[]
+  @@unique([workspaceId, memberId, code], map: "ai_personal_memory_owner_code_key")
+  @@unique([id, workspaceId, memberId], map: "ai_personal_memory_id_scope_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_memory_owner_page_idx")
+  @@index([memberId], map: "ai_personal_memory_member_idx")
+  @@map("ai_personal_memory")
+}
+model AiPersonalMemoryAgentGrant {
+  id String @id @default(cuid())
+  memoryId String @map("memory_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  agentId String @map("agent_id")
+  memory AiPersonalMemory @relation(fields: [memoryId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_grant_memory_scope_fkey")
+  agent AiPersonalAgent @relation(fields: [agentId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_grant_agent_scope_fkey")
+  @@unique([memoryId, agentId], map: "ai_personal_memory_grant_agent_key")
+  @@index([agentId, workspaceId, memberId], map: "ai_personal_memory_grant_agent_scope_idx")
+  @@index([memoryId, workspaceId, memberId], map: "ai_personal_memory_grant_memory_scope_idx")
+  @@map("ai_personal_memory_agent_grant")
+}
+
+model AiPersonalWorkflow {
+  id String @id @default(cuid())
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  code String @db.VarChar(63)
+  name String @db.VarChar(100)
+  graph Json
+  graphDigest String @db.VarChar(64) @map("graph_digest")
+  contentDigest String @db.VarChar(64) @map("content_digest")
+  initialDigest String @db.VarChar(64) @map("initial_digest")
+  publishedRevision Int? @map("published_revision")
+  publicationEpoch Int @default(0) @map("publication_epoch")
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  versions AiPersonalWorkflowVersion[]
+  @@unique([id, workspaceId, memberId], map: "ai_personal_workflow_id_scope_key")
+  @@unique([workspaceId, memberId, code], map: "ai_personal_workflow_owner_code_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_workflow_owner_page_idx")
+  @@index([memberId], map: "ai_personal_workflow_member_idx")
+  @@map("ai_personal_workflow")
+}
+model AiPersonalWorkflowVersion {
+  id String @id @default(cuid())
+  workflowId String @map("workflow_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  code String @db.VarChar(63)
+  name String @db.VarChar(100)
+  graph Json
+  graphDigest String @db.VarChar(64) @map("graph_digest")
+  contentDigest String @db.VarChar(64) @map("content_digest")
+  revision Int
+  createdAt DateTime @default(now()) @map("created_at")
+  agentBindingCount Int @db.SmallInt @map("agent_binding_count")
+  workflow AiPersonalWorkflow @relation(fields: [workflowId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_workflow_version_owner_fkey")
+  agentBindings AiPersonalWorkflowAgentBinding[]
+  @@unique([id, workspaceId, memberId], map: "ai_personal_workflow_version_id_scope_key")
+  @@unique([workflowId, revision], map: "ai_personal_workflow_version_revision_key")
+  @@index([workspaceId, memberId, workflowId, revision], map: "ai_personal_workflow_version_owner_idx")
+  @@unique([id, workflowId, workspaceId, memberId, revision, graphDigest], map: "ai_personal_workflow_version_publication_key")
+  @@map("ai_personal_workflow_version")
+}
+model AiPersonalWorkflowAgentBinding {
+  id String @id @default(cuid())
+  workflowVersionId String @map("workflow_version_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  nodeId String @db.VarChar(48) @map("node_id")
+  agentVersionId String @map("agent_version_id")
+  workflowVersion AiPersonalWorkflowVersion @relation(fields: [workflowVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_workflow_binding_owner_fkey")
+  agentVersion AiPersonalAgentVersion @relation(fields: [agentVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_workflow_binding_agent_fkey")
+  @@unique([workflowVersionId, nodeId], map: "ai_personal_workflow_binding_node_key")
+  @@index([agentVersionId, workspaceId, memberId], map: "ai_personal_workflow_binding_agent_idx")
+  @@unique([workflowVersionId, workspaceId, memberId, nodeId, agentVersionId], map: "ai_personal_workflow_binding_publication_key")
+  @@map("ai_personal_workflow_agent_binding")
+}
+
+model PersonalDocument {
+  id String @id @db.Uuid
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  code String
+  name String
+  body String
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(3)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(3)
+  owner ClientWorkspaceMembership @relation(map:"personal_document_owner_fk", fields:[workspaceId,memberId], references:[workspaceId,memberId], onDelete:Restrict, onUpdate:Restrict)
+  versions PersonalDocumentVersion[]
+  @@unique([id,workspaceId,memberId], map:"personal_document_scope_key")
+  @@unique([workspaceId,memberId,code], map:"personal_document_code_key")
+  @@index([workspaceId,memberId,deletedAt,id], map:"personal_document_owner_idx")
+  @@map("personal_document")
+  documentExports PersonalDocumentExport[]
+}
+model PersonalDocumentVersion {
+  id String @id @db.Uuid
+  documentId String @map("document_id") @db.Uuid
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  revision Int
+  name String
+  body String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  document PersonalDocument @relation(map:"personal_document_version_scope_fk", fields:[documentId,workspaceId,memberId], references:[id,workspaceId,memberId], onDelete:Restrict, onUpdate:Restrict)
+  @@unique([documentId,revision], map:"personal_document_version_revision_key")
+  @@index([workspaceId,memberId,documentId,revision], map:"personal_document_version_owner_idx")
+  @@map("personal_document_version")
+  documentExports PersonalDocumentExport[]
+}
+
+model PersonalDocumentExport {
+ id String @id @db.Uuid
+ documentId String @map("document_id") @db.Uuid
+ workspaceId String @map("workspace_id")
+ memberId String @map("member_id")
+ projectId String @map("project_id")
+ revision Int
+ fileAssetId String @unique(map:"personal_document_export_file_key") @map("file_asset_id")
+ format String
+ rendererVersion String @map("renderer_version")
+ pageCount Int? @map("page_count")
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+ document PersonalDocument @relation(fields:[documentId,workspaceId,memberId],references:[id,workspaceId,memberId],onDelete:Restrict,onUpdate:Restrict,map:"personal_document_export_scope_fk")
+ version PersonalDocumentVersion @relation(fields:[documentId,revision],references:[documentId,revision],onDelete:Restrict,onUpdate:Restrict,map:"personal_document_export_revision_fk")
+ file FileAsset @relation(fields:[fileAssetId,workspaceId],references:[id,workspaceId],onDelete:Restrict,onUpdate:Restrict,map:"personal_document_export_file_fk")
+ project ProjectProfile @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:Restrict)
+ @@unique([documentId,revision,format,rendererVersion],map:"personal_document_export_tuple_key")
+ @@index([workspaceId,memberId,documentId,revision],map:"personal_document_export_owner_idx")
+ @@map("personal_document_export")
+}
+
+model AiPersonalWorkflowPublication {
+  id String @id @db.Uuid
+  projectId String @map("project_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  workflowId String @map("workflow_id")
+  workflowVersionId String @map("workflow_version_id")
+  revision Int
+  graphDigest String @db.VarChar(64) @map("graph_digest")
+  publicationEpoch Int @map("publication_epoch")
+  nodeId String @db.VarChar(48) @map("node_id")
+  agentId String @map("agent_id")
+  agentVersionId String @map("agent_version_id")
+  agentRevision Int @map("agent_revision")
+  agentPublicationEpoch Int @map("agent_publication_epoch")
+  ref Json
+  createdAt DateTime @default(now()) @db.Timestamp(3) @map("created_at")
+  @@unique([workflowId, publicationEpoch], map: "ai_personal_workflow_publication_epoch_key")
+  @@unique([id, projectId, workspaceId, memberId], map: "ai_personal_workflow_publication_id_scope_key")
+  @@index([workspaceId, memberId, workflowId, publicationEpoch], map: "ai_personal_workflow_publication_owner_idx")
+  @@unique([id, projectId, workspaceId, memberId, ref], map: "workflow_pub_origin_scope_uq")
+  @@map("ai_personal_workflow_publication")
+}
+
+// Source provenance only. Run/Job/Trace/cost and output remain owned by the existing runtime.
+model AiPersonalWorkflowRunOrigin {
+  runId String @id @map("run_id")
+  projectId String @map("project_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  publicationId String @db.Uuid @map("publication_id")
+  ref Json
+  sessionId String @map("session_id")
+  tokenVersion Int @map("token_version")
+  createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  @@index([publicationId,runId],map:"workflow_run_origin_publication_idx")
+  @@index([projectId,workspaceId,memberId,runId],map:"workflow_run_origin_owner_idx")
+  @@map("ai_personal_workflow_run_origin")
+}
+
+model AiPersonalScriptVersion {
+  runs AiPersonalScriptRun[]
+  id String @id @db.Uuid
+  projectId String @map("project_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  skillId String @map("skill_id")
+  skillVersionId String @unique(map: "ai_personal_script_version_original_key") @map("skill_version_id")
+  revision Int
+  scriptSource String @map("script_source")
+  scriptDigest String @map("script_digest")
+  policyDigest String @map("policy_digest")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  project ProjectProfile @relation(fields: [projectId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_script_version_project_fkey")
+  skillVersion AiPersonalSkillVersion @relation(fields: [skillVersionId, skillId, workspaceId, memberId, revision], references: [id, skillId, workspaceId, memberId, revision], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_script_version_original_fkey")
+  @@unique([skillVersionId, skillId, workspaceId, memberId, revision], map: "ai_personal_script_version_original_scope_key")
+  @@unique([id, projectId, workspaceId, memberId], map: "ai_personal_script_version_scope_key")
+  @@map("ai_personal_script_version")
+}
+
+model AiPersonalScriptRun {
+  id String @id @db.Uuid
+  projectId String @map("project_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  scriptVersionId String @map("script_version_id") @db.Uuid
+  skillRef Json @map("skill_ref")
+  requestKey String @map("request_key")
+  requestHash String @map("request_hash")
+  input Json? @db.Json
+  sessionId String @map("session_id")
+  tokenVersion Int @map("token_version")
+  jobId String @unique(map: "ai_personal_script_run_job_id_key") @map("job_id")
+  attemptedAt DateTime? @map("attempted_at") @db.Timestamp(3)
+  outcome String?
+  outputAssetId String? @map("output_asset_id")
+  createdAt DateTime @map("created_at") @db.Timestamp(3)
+  expiresAt DateTime @map("expires_at") @db.Timestamp(3)
+  contentPurgedAt DateTime? @map("content_purged_at") @db.Timestamp(3)
+  scriptVersion AiPersonalScriptVersion @relation(fields: [scriptVersionId, projectId, workspaceId, memberId], references: [id, projectId, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_script_run_source_fkey")
+  job RuntimeJob @relation(fields: [jobId, projectId, workspaceId], references: [id, scopeId, workspaceId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_script_run_job_fkey")
+  session ClientAuthSession @relation(fields: [sessionId, memberId], references: [id, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_script_run_session_fkey")
+  outputAsset FileAsset? @relation(fields: [outputAssetId, projectId, workspaceId, memberId], references: [id, projectId, workspaceId, ownerId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_script_run_asset_fkey")
+  @@unique([jobId, projectId, workspaceId], map: "ai_personal_script_run_job_scope_key")
+  @@unique([projectId, workspaceId, memberId, requestKey], map: "ai_personal_script_run_request_key")
+  @@map("ai_personal_script_run")
+}
+
+// File-owner tombstones prevent a late commit while failed stage cleanup performs unlocked IO.
+model GeneratedFileCleanupFence {
+  assetId String @id @map("asset_id")
+  objectKey String @unique @map("object_key")
+  reservedAt DateTime @default(now()) @map("reserved_at") @db.Timestamp(3)
+  removedAt DateTime? @map("removed_at") @db.Timestamp(3)
+  @@map("generated_file_cleanup_fence")
+}
+
+// Immutable metadata relation only; compound owner FKs/guards live in the additive migration.
+model AiPersonalDocumentRunOrigin {
+  runId String @id @map("run_id")
+  projectId String @map("project_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  documentId String @db.Uuid @map("document_id")
+  documentRevision Int @map("document_revision")
+  agentId String @map("agent_id")
+  agentVersionId String @map("agent_version_id")
+  agentRevision Int @map("agent_revision")
+  ref Json
+  sessionId String @map("session_id")
+  tokenVersion Int @map("token_version")
+  createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  @@index([projectId,workspaceId,memberId,runId],map:"document_run_origin_owner_idx")
+  @@index([documentId,documentRevision,runId],map:"document_run_origin_document_idx")
+  @@map("ai_personal_document_run_origin")
+}
+
+// MBTI business identities are independent guests; opaque credentials are stored only as digests.
+model MbtiGuest {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  sessions  MbtiQuizSession[]
+  results   MbtiResult[]
+  orders    MbtiOrder[]
+  card      MbtiCard?
+  socialBlocksSent MbtiSocialBlock[] @relation("MbtiBlockSender")
+  socialBlocksReceived MbtiSocialBlock[] @relation("MbtiBlockTarget")
+  cardExchangesSent MbtiCardExchange[] @relation("MbtiExchangeSender")
+  cardExchangesReceived MbtiCardExchange[] @relation("MbtiExchangeRecipient")
+}
+
+model MbtiQuestionBank {
+  version   String @id
+  payload   Json
+  scoring   Json
+  createdAt DateTime @default(now())
+  sessions  MbtiQuizSession[]
+}
+
+model MbtiQuizSession {
+  id          String @id @default(uuid())
+  ownerId     String
+  bankVersion String
+  status      String @default("in_progress")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  owner       MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  bank        MbtiQuestionBank @relation(fields: [bankVersion], references: [version], onDelete: NoAction, onUpdate: NoAction)
+  answers     MbtiAnswer[]
+  result      MbtiResult?
+  @@index([ownerId, createdAt, id])
+}
+
+model MbtiAnswer {
+  sessionId  String
+  questionId String
+  optionId   String
+  session    MbtiQuizSession @relation(fields: [sessionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  @@id([sessionId, questionId])
+}
+
+model MbtiResult {
+  id              String @id @default(uuid())
+  ownerId         String
+  sessionId       String? @unique
+  source          String
+  typeCode        String
+  bankVersion     String
+  dimensionCounts Json?
+  lifeStage       String?
+  recentStatus    String?
+  submittedAt     DateTime @default(now())
+  owner           MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  session         MbtiQuizSession? @relation(fields: [sessionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shareAssets     MbtiShareAsset[]
+  @@index([ownerId, submittedAt(sort: Desc), id(sort: Desc)])
+}
+
+// Only explicitly rendered share images are accessible through the anonymous asset route.
+model MbtiShareAsset {
+  key       String @id
+  resultId  String
+  bytes     Bytes
+  createdAt DateTime @default(now())
+  result    MbtiResult @relation(fields: [resultId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@index([resultId])
+}
+
+// Business purchase intent/snapshot, not a second payment transaction ledger.
+// resultId deliberately is an immutable reference without a cascading relation: F2 may delete results.
+model MbtiOrder {
+  id                 String @id
+  ownerId            String
+  resultId           String
+  productCode        String
+  amount             Int
+  currency           String @db.Char(3)
+  pricingMode        String @default("controlled_test_fixture")
+  idempotencyKeyHash  String @db.Char(64)
+  requestFingerprint String @db.Char(64)
+  status             String @default("pending")
+  createdAt          DateTime @default(now())
+  paidAt             DateTime?
+  paymentOrderId     String? @unique
+  owner              MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  paymentOrder       PaymentOrder? @relation(fields: [paymentOrderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  entitlement        MbtiEntitlement?
+  @@unique([ownerId, idempotencyKeyHash])
+  @@index([ownerId, createdAt(sort: Desc), id(sort: Desc)])
+}
+
+model MbtiEntitlement {
+  id          String @id @default(uuid())
+  orderId     String @unique
+  kind        String
+  scope       String @default("controlled_test")
+  grantedAt   DateTime @default(now())
+  order       MbtiOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+}
+
+// F4 internal runtime candidate. Public card IDs never reuse the private guest ID.
+model MbtiCard {
+  id String @id
+  ownerId String @unique
+  nickname String @default("")
+  typeCode String @default("")
+  declaration String @default("")
+  interests String[] @default([])
+  style String @default("illustration")
+  discoverable Boolean @default(false)
+  visibilityName Boolean @default(false)
+  visibilityInterests Boolean @default(false)
+  visibilityDeclaration Boolean @default(false)
+  visibilityManual Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@index([discoverable, updatedAt(sort: Desc), id(sort: Desc)])
+}
+
+// Directional active flag retains lastBlockedAt for later F5 invalidation; unblock never erases history.
+model MbtiSocialBlock {
+  blockerId String
+  blockedId String
+  active Boolean @default(true)
+  lastBlockedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blocker MbtiGuest @relation("MbtiBlockSender", fields: [blockerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  blocked MbtiGuest @relation("MbtiBlockTarget", fields: [blockedId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@id([blockerId, blockedId])
+  @@index([blockedId, active])
+}
+
+// Partial unique active-pair index and canonical-pair checks live in the additive migration.
+model MbtiCardExchange {
+  id String @id
+  pairKey String
+  senderId String
+  recipientId String
+  status String @default("pending")
+  respondedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sender MbtiGuest @relation("MbtiExchangeSender", fields: [senderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  recipient MbtiGuest @relation("MbtiExchangeRecipient", fields: [recipientId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@index([pairKey, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([senderId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([recipientId, createdAt(sort: Desc), id(sort: Desc)])
+}

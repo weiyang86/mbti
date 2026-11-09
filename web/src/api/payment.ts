@@ -1,17 +1,20 @@
-// TODO: 待 Remy 确认接口路径和字段（后端支付接口未开发，当前用 mock 数据支撑页面演示）
-import { request, useMock } from './client'
-import * as mock from './mock/payment'
+// Internal F3 integration candidate; see F3-INTEGRATION.md, not a published contract.
+import { baseURL, ensureGuestSession, request, useMock } from './client'
 
 export type OrderStatusValue = 'pending' | 'paid' | 'failed'
+export type PaymentAvailability = 'unconfigured' | 'controlled_test'
 
-/** 微信支付调起参数（前端 wx.requestPayment 使用；mock 不真实调起） */
-export interface WechatPayParams {
-  appId: string
-  timeStamp: string
-  nonceStr: string
-  package: string
-  signType: 'RSA' | 'MD5' | 'HMAC-SHA256'
-  paySign: string
+export interface PaymentProduct {
+  code: string
+  name: string
+  description: string
+  amount: number
+  currency: 'CNY'
+  saleable: boolean
+  pricing_mode: 'controlled_test_fixture'
+  highlights: string[]
+  tier: 1 | 2
+  unavailable_reason?: string
 }
 
 export interface CreateOrderBody {
@@ -23,68 +26,108 @@ export interface Order {
   id: string
   result_id: string
   product_code: string
-  /** 金额，单位：分 */
+  /** Server price in minor units (分). */
   amount: number
   currency: 'CNY'
   status: OrderStatusValue
   unlocked: boolean
   created_at: string
+  payment_availability: PaymentAvailability
+  pricing_mode: 'controlled_test_fixture'
   paid_at?: string
-  pay_params?: WechatPayParams
+  pay_params?: Record<string, unknown>
 }
 
 export interface OrderStatus {
   order_id: string
   status: OrderStatusValue
   unlocked: boolean
+  payment_availability: PaymentAvailability
   paid_at?: string
 }
 
-export interface PollOptions {
-  /** 轮询间隔，默认 2000ms */
-  intervalMs?: number
-  /** 超时时间，默认 60000ms */
-  timeoutMs?: number
+export interface Entitlement {
+  id: string
+  order_id: string
+  result_id: string
+  product_code: string
+  kind: 'studio_tier_1'
+  status: 'active'
+  granted_at: string
+  scope: 'controlled_test'
 }
 
-/** 创建订单：POST /api/v1/orders */
-export function createOrder(body: CreateOrderBody) {
-  if (useMock()) return mock.createOrder(body)
-  return request<Order>('/orders', { method: 'POST', data: body })
+interface PurchaseIntent extends CreateOrderBody {
+  owner: string
+  key: string
 }
 
-/** 查询订单状态：GET /api/v1/orders/{id} */
-export function getOrderStatus(orderId: string) {
-  if (useMock()) return mock.getOrderStatus(orderId)
+const intentStorageKey = `mbti_purchase_intent_v1:${baseURL}`
+
+function requireOnline() {
+  if (useMock()) throw new Error('商品、订单和权益需要在线服务，请关闭 Mock 后使用')
+}
+
+function newIntentKey(): string {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID()
+  if (globalThis.crypto?.getRandomValues) {
+    const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16))
+    return `purchase-${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`
+  }
+  // This key deduplicates a request; it is not an authentication credential.
+  return `purchase-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`
+}
+
+/** Persist only request intent, never local payment or entitlement state. */
+export async function preparePurchaseIntent(body: CreateOrderBody): Promise<string> {
+  requireOnline()
+  if (!body.result_id || !body.product_code) throw new Error('请先选择本人的结果和商品')
+  const guest = await ensureGuestSession()
+  const stored = uni.getStorageSync(intentStorageKey) as PurchaseIntent | undefined
+  if (stored?.owner === guest.guest_token && stored.result_id === body.result_id && stored.product_code === body.product_code && typeof stored.key === 'string' && /^[A-Za-z0-9_-]{16,128}$/.test(stored.key)) {
+    return stored.key
+  }
+  const intent: PurchaseIntent = {
+    owner: guest.guest_token,
+    result_id: body.result_id,
+    product_code: body.product_code,
+    key: newIntentKey(),
+  }
+  // If persistence fails, do not create an order that cannot be safely retried.
+  uni.setStorageSync(intentStorageKey, intent)
+  return intent.key
+}
+
+/** Repeated attempts for the same intent, including after refresh, reuse its key. */
+export async function createOrder(body: CreateOrderBody): Promise<Order> {
+  const key = await preparePurchaseIntent(body)
+  return request<Order>('/orders', {
+    method: 'POST',
+    data: { result_id: body.result_id, product_code: body.product_code },
+    header: { 'Idempotency-Key': key },
+  })
+}
+
+export function getOrderStatus(orderId: string): Promise<OrderStatus> {
+  requireOnline()
   return request<OrderStatus>(`/orders/${encodeURIComponent(orderId)}`)
 }
 
-/**
- * 前端轮询订单状态：每 intervalMs 查一次，直到 paid / failed，或超时返回当前状态。
- * 注意：这不是后端端点，而是对 getOrderStatus 的客户端封装。
- */
-export function pollOrderStatus(orderId: string, options: PollOptions = {}): Promise<OrderStatus> {
-  const intervalMs = options.intervalMs ?? 2000
-  const timeoutMs = options.timeoutMs ?? 60000
-  const start = Date.now()
+export function listProducts(): Promise<{ items: PaymentProduct[] }> {
+  requireOnline()
+  return request('/products')
+}
 
-  return new Promise<OrderStatus>((resolve, reject) => {
-    const tick = async () => {
-      try {
-        const status = await getOrderStatus(orderId)
-        if (status.status === 'paid' || status.status === 'failed') {
-          resolve(status)
-          return
-        }
-        if (Date.now() - start >= timeoutMs) {
-          resolve(status)
-          return
-        }
-        setTimeout(tick, intervalMs)
-      } catch (error) {
-        reject(error)
-      }
-    }
-    tick()
-  })
+export function listOrders(params: { limit?: number; cursor?: string } = {}): Promise<{ items: Order[]; next_cursor: string | null }> {
+  requireOnline()
+  const query = new URLSearchParams()
+  if (params.limit !== undefined) query.set('limit', String(params.limit))
+  if (params.cursor) query.set('cursor', params.cursor)
+  const suffix = query.toString()
+  return request(`/orders${suffix ? `?${suffix}` : ''}`)
+}
+
+export function getMyEntitlements(): Promise<{ items: Entitlement[] }> {
+  requireOnline()
+  return request('/entitlements/me')
 }

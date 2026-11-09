@@ -1,212 +1,88 @@
 <template>
-  <view class="page unlock-page">
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+  <view class="page commerce-page">
+    <text class="heading">确认测试订单</text>
+    <text class="notice">当前为受控测试；支付通道未配置时，订单保持待支付，不能发起支付。</text>
+    <text v-if="loading" class="muted">正在核对商品和本人结果…</text>
+    <text v-if="error" class="error">{{ error }}</text>
+    <view v-if="product && result" class="card mt">
+      <text class="section">{{ product.name }}</text>
+      <text class="muted line">{{ product.description }}</text>
+      <text class="price">{{ formatMoney(product.amount, product.currency) }}</text>
+      <text class="notice">受控测试价格，以服务端订单快照为准。</text>
+      <text class="identifier">商品：{{ product.code }}</text>
+      <text class="line">结果类型：{{ result.type_code }}</text>
+      <text class="identifier">结果编号：{{ result.id }}</text>
+      <text v-if="!product.saleable" class="notice">该商品暂未开放，暂不可创建测试订单。</text>
+      <button class="btn-primary mt" :disabled="creating || loading || !product.saleable || !intentReady" @click="create">{{ creating ? '正在创建订单…' : '创建待支付测试订单' }}</button>
+      <text class="notice">网络失败后可点击重试或刷新；同一购买意图会复用订单号。</text>
     </view>
-
-    <text class="kicker">UNLOCK / 付费解锁</text>
-    <text class="title">{{ product ? product.name : '商品不存在' }}</text>
-    <text class="sub" v-if="product">{{ product.description }}</text>
-
-    <view class="product-card" v-if="product">
-      <view class="price-row">
-        <text class="price">¥{{ priceYuan }}</text>
-        <text class="price-note">{{ isUpgrade ? '已有晒图套装 · 本次补差 ¥10' : '一次购买 · 无自动续费' }}</text>
-      </view>
-      <view class="highlight" v-for="h in product.highlights" :key="h">
-        <text class="dot">✓</text>
-        <text class="hl-text">{{ h }}</text>
-      </view>
-    </view>
-
-    <view v-if="error" class="notice err">{{ error }}</view>
-
-    <view
-      class="btn-primary pay-btn"
-      :class="{ disabled: paying || !product }"
-      @click="pay"
-    >
-      {{ paying ? '正在发起支付…' : `微信支付 ¥${priceYuan} 解锁` }}
-    </view>
-    <text class="fine centered">当前为模拟支付，不会真实扣款；发起后自动进入订单确认。</text>
+    <button v-if="error && !creating" class="btn-secondary mt" @click="load">重新核对</button>
+    <button class="btn-secondary mt" :disabled="creating" @click="goOrders">查询我的订单与权益</button>
+    <button class="btn-secondary mt" :disabled="creating" @click="goCatalog">返回商品目录</button>
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { PAYMENT_PRODUCTS } from '@/constants/payment'
-import { createOrder } from '@/api/payment'
-import { studio } from '@/store/studio'
+import { createOrder, listProducts, preparePurchaseIntent, type PaymentProduct } from '@/api/payment'
+import { getResult } from '@/api/results'
+import type { ResultSnapshot } from '@/api/types'
+import { requestErrorMessage } from '@/api/client'
+import { formatMoney } from '@/utils/payment-display'
 
 const resultId = ref('')
-const productCode = ref('studio_tier_1')
-const paying = ref(false)
+const productCode = ref('')
+const product = ref<PaymentProduct | null>(null)
+const result = ref<ResultSnapshot | null>(null)
+const loading = ref(false)
+const creating = ref(false)
+const intentReady = ref(false)
 const error = ref('')
-
-const product = computed(
-  () =>
-    PAYMENT_PRODUCTS[productCode.value] ||
-    PAYMENT_PRODUCTS[productCode.value.replace(/_fail$/, '')],
-)
-/** 已有晒图套装再买本人形象套装时只补差价（与原型一致：¥10） */
-const isUpgrade = computed(() => product.value?.tier === 2 && studio.tier === 1)
-const priceYuan = computed(() =>
-  product.value ? ((isUpgrade.value ? 1000 : product.value.amount) / 100).toFixed(1) : '0',
-)
 
 onLoad((q) => {
   resultId.value = (q?.result_id as string) || ''
-  productCode.value = (q?.product_code as string) || 'studio_tier_1'
+  productCode.value = (q?.product_code as string) || ''
+  load()
 })
 
-async function pay() {
-  if (paying.value || !product.value) return
-  paying.value = true
+async function load() {
+  if (loading.value || creating.value) return
+  loading.value = true
+  intentReady.value = false
+  product.value = null
+  result.value = null
   error.value = ''
   try {
-    // 升级补差由服务端按已购权益计价，前端只传商品编码，不额外发明字段
-    const order = await createOrder({ result_id: resultId.value, product_code: productCode.value })
-    // 真实模式：此处应调用 uni.requestPayment(order.pay_params)；mock 跳过
-    const suffix = resultId.value ? `&result_id=${encodeURIComponent(resultId.value)}` : ''
-    uni.redirectTo({
-      url: `/pages/order-status/order-status?order_id=${order.id}&product_code=${productCode.value}${suffix}`,
-    })
-  } catch {
-    error.value = '发起支付失败，请稍后重试'
-  } finally {
-    paying.value = false
-  }
+    if (!resultId.value || !productCode.value) throw new Error('请从商品目录选择本人的结果和商品')
+    const [catalog, owned] = await Promise.all([listProducts(), getResult(resultId.value)])
+    product.value = catalog.items.find((item) => item.code === productCode.value) || null
+    result.value = owned
+    if (!product.value) throw new Error('商品不存在，请返回目录')
+    await preparePurchaseIntent({ result_id: resultId.value, product_code: productCode.value })
+    intentReady.value = true
+  } catch (e) {
+    error.value = requestErrorMessage(e, e instanceof Error ? e.message : '核对失败，请稍后重试')
+  } finally { loading.value = false }
 }
 
-function showDemo() {
-  uni.showModal({
-    title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：支付流程仅在本机模拟，不会拉起真实微信支付，也不会扣款。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
+async function create() {
+  if (creating.value || loading.value || !product.value?.saleable || !result.value || !intentReady.value) return
+  creating.value = true
+  error.value = ''
+  try {
+    const order = await createOrder({ result_id: resultId.value, product_code: productCode.value })
+    // Never infer payment success or write local unlocked state from order creation.
+    uni.redirectTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(order.id)}` })
+  } catch (e) {
+    error.value = requestErrorMessage(e, '创建结果尚未确认，请查询本人订单或重试；重试会保留同一购买意图')
+  } finally { creating.value = false }
 }
+
+function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
+function goCatalog() { uni.redirectTo({ url: `/pages/pricing/pricing?result_id=${encodeURIComponent(resultId.value)}` }) }
 </script>
 
 <style scoped lang="scss">
-.unlock-page {
-  padding-top: 24rpx;
-  padding-bottom: 56rpx;
-}
-
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 28rpx;
-}
-.demo-link {
-  color: #7560df;
-}
-
-.kicker {
-  display: block;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: #a398af;
-  font-weight: 600;
-}
-.title {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 56rpx;
-  font-weight: 800;
-  line-height: 1.28;
-  letter-spacing: -1rpx;
-}
-.sub {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #77727e;
-  line-height: 1.6;
-}
-
-.product-card {
-  margin-top: 36rpx;
-  padding: 34rpx 30rpx;
-  border-radius: 30rpx;
-  background: linear-gradient(150deg, #f6f1ff, #efe8ff 60%, #f2f7ec);
-  border: 2rpx solid #e3d9f6;
-}
-.price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 16rpx;
-  padding-bottom: 22rpx;
-  border-bottom: 2rpx solid rgba(120, 96, 180, 0.14);
-}
-.price {
-  font-size: 64rpx;
-  font-weight: 800;
-  color: #6c4cf3;
-  line-height: 1;
-}
-.price-note {
-  font-size: 20rpx;
-  color: #8b8099;
-}
-.highlight {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-top: 20rpx;
-}
-.dot {
-  color: #3f9a6e;
-  font-size: 24rpx;
-  font-weight: 700;
-}
-.hl-text {
-  font-size: 25rpx;
-  color: #3f3552;
-}
-
-.notice {
-  margin-top: 24rpx;
-  padding: 22rpx 24rpx;
-  border-radius: 18rpx;
-  background: #f3f0f8;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.7;
-}
-.notice.err {
-  background: #fdecec;
-  color: #b34747;
-}
-
-.btn-primary {
-  margin-top: 40rpx;
-  text-align: center;
-  background: #6c4cf3;
-  color: #fff;
-  border-radius: 24rpx;
-  padding: 26rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-}
-.btn-primary.disabled {
-  opacity: 0.6;
-}
-
-.fine {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 20rpx;
-  color: #a398af;
-  line-height: 1.7;
-}
-.fine.centered {
-  text-align: center;
-}
+@import '@/styles/payment.scss';
 </style>

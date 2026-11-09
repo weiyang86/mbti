@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "productSourceHead": "48e8d26ea1dcd67df65d316a0edfdec4bcb2d502",
+  "reviewedAtHead": "b434da8ba34f03b07b83f03be19b20061bb92fa9",
+  "counts": {
+    "READY_FOR_TARGET_ACCEPTANCE": 1,
+    "PARTIAL": 28,
+    "MISSING": 11,
+    "UNPROVEN": 0
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-002",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-003",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-004",
+      "coverage": "READY_FOR_TARGET_ACCEPTANCE",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-005",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-006",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-008",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-009",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-010",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-011",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-021",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-033",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-039",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-040",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-185"
+    },
+    {
+      "id": "REQ-007",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-012",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-013",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-015",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-016",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-017",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-018",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-019",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-020",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-186"
+    },
+    {
+      "id": "REQ-014",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-022",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-023",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-024",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-025",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-026",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-027",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-028",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-029",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-030",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-031",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-032",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-034",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-035",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-036",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-037",
+      "coverage": "PARTIAL",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    },
+    {
+      "id": "REQ-038",
+      "coverage": "MISSING",
+      "targetAcceptance": "NOT_RUN_BY_THIS_AUDIT",
+      "auditCard": "AF-187"
+    }
+  ],
+  "meaning": "Read-only source/evidence coverage, not completion percentage or target acceptance. All40 target acceptance NOT_RUN, owner pending. REQ004 only ready for a separate full target run."
+}

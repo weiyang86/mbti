@@ -1,0 +1,38 @@
+{
+  "wave": "W20",
+  "scope": "governance-inputs-only-not-product-proof",
+  "files": [
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-212.md",
+      "sha256": "cd85bd512fffa2e0b5309592ed2682c6fd3daba20234f7bf5bae407ef4ee1a2d"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-213.md",
+      "sha256": "e5d4f3a3fba2c4be0b848eeb3bb922f1c857ec110c0406fbe1c1fa45b5d7c1d6"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-214.md",
+      "sha256": "d5e72ea118b893a04987ade61379d61a35ce5ff56e0bb705745f6d6b38e9a46e"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-215.md",
+      "sha256": "2a0b5caeae3e80bec5926c955cb85f5e781cd6e3b33cfc201a791a219c7d0192"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/WAVE-20.md",
+      "sha256": "43293c1bf69f6d2c062a76140224ce023718d418c900eecac23ba65c1208d55f"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W20/CONTRACT.md",
+      "sha256": "9c40f7e10b129535fc2fd490f58b86ba4212d1a0ad4473b216b805827ca8b40c"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W20/SOURCE_BOOTSTRAP.json",
+      "sha256": "0dd96fc9dbe0b3652a2f1d82e577d1aeb39a36ea2d897ea1673f0e6da653220b"
+    },
+    {
+      "path": "scripts/verification/w20-governance-prerequisite.mjs",
+      "sha256": "11763d60e447578176251c0040492fddff61c68a82da9dbb034bcb8ff1b811aa"
+    }
+  ]
+}

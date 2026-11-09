@@ -1,253 +1,59 @@
 <template>
-  <view class="page exchanges-page">
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="demo-link" @click="showDemo">演示状态 ↗</text>
-    </view>
-
-    <text class="kicker">CARD WALLET / 名片夹</text>
-    <text class="title">每次交换，</text>
-    <text class="title"><text class="hl">都由双方选择。</text></text>
-    <text class="sub">名片交换与联系方式交换是两次独立授权。</text>
-
-    <view v-if="loading" class="state"><text class="state-text">正在读名片夹…</text></view>
-
-    <view v-else-if="loadError" class="state">
-      <text class="state-text">名片夹加载失败</text>
-      <view class="btn-secondary mt" @click="load">重试</view>
-    </view>
-
-    <view v-else-if="items.length === 0" class="empty">
-      <text class="empty-mark">▣</text>
-      <text class="empty-title">名片夹还空着</text>
-      <text class="empty-desc">先向喜欢的示例搭子发出一张名片。</text>
-      <view class="btn-primary mt" @click="goDiscover">去发现搭子</view>
-    </view>
-
-    <view v-else>
-      <view v-for="item in items" :key="item.id" class="wallet-item">
-        <view class="wallet-head">
-          <text class="wallet-name">{{ item.buddy.nickname }} · {{ item.buddy.type_code }}</text>
-          <text class="tag" :class="statusClass(item.status)">{{ statusLabel(item.status) }}</text>
-        </view>
-        <text class="wallet-line">{{ lineOf(item) }}</text>
-        <text class="wallet-link" @click="goBuddy(item.buddy_id)">查看详情与交换设置 →</text>
+  <view class="page social-page">
+    <text class="heading">我的名片夹</text>
+    <text class="notice">显示当前身份的收发记录。名片关系不会授予联系方式，联系方式功能尚未开放。</text>
+    <text v-if="error" class="error" role="alert">{{ error }}</text>
+    <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
+    <button class="btn-secondary" :disabled="loading || busy" @click="load">刷新名片夹</button>
+    <text v-if="loading" class="notice">正在读取收发记录…</text>
+    <text v-if="loaded && !items.length" class="notice">暂无可见的名片交换记录。</text>
+    <view v-for="item in items" :key="item.id" class="card">
+      <text class="section">{{ item.buddy.nickname || '匿名搭子' }} · {{ item.buddy.type_code }}</text>
+      <text class="line">{{ item.direction === 'incoming' ? '收到的申请' : '发出的申请' }} · {{ exchangeStatusLabel(item.status) }}</text>
+      <text v-if="item.buddy.tagline" class="line">{{ item.buddy.tagline }}</text>
+      <view><text v-for="interest in item.buddy.interests" :key="interest" class="tag">{{ interest }}</text></view>
+      <text class="notice">创建时间：{{ item.created_at }}</text>
+      <view v-if="canRespond(item)" class="row mt">
+        <button class="btn-primary" :disabled="busy || loading" @click="respond(item, 'accept')">接受名片交换</button>
+        <button class="btn-secondary" :disabled="busy || loading" @click="respond(item, 'decline')">拒绝名片交换</button>
       </view>
+      <button v-if="canRevoke(item)" class="btn-secondary mt" :disabled="busy || loading" @click="revoke(item)">{{ item.status === 'accepted' ? '撤回已接受的交换' : '撤回申请' }}</button>
+      <button class="btn-secondary mt" @click="go(`/pages/buddies/detail?id=${encodeURIComponent(item.buddy_id)}`)">查看搭子详情</button>
     </view>
-
-    <view class="notice mt">
-      撤销会停止应用内展示；正式服务无法收回对方已经保存或复制的内容。
-    </view>
+    <button class="btn-secondary mt" @click="go('/pages/discover/discover')">发现搭子</button>
+    <button class="btn-secondary mt" @click="go('/pages/card/card')">我的名片</button>
+    <button class="btn-secondary mt" @click="go('/pages/buddies/blocked')">屏蔽管理</button>
   </view>
 </template>
-
 <script setup lang="ts">
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
+import { listCardExchanges, respondCardExchange, revokeCardExchange } from '@/api/card-exchanges'
 import type { CardExchange } from '@/api/types-social'
-import { listCardExchanges } from '@/api/card-exchanges'
-import { listContactRequests } from '@/api/contacts'
-
+import { canRespond, canRevoke, exchangeStatusLabel, socialErrorMessage } from '@/utils/social-display'
 const items = ref<CardExchange[]>([])
-const acceptedContactIds = ref<string[]>([])
-const loading = ref(true)
-const loadError = ref(false)
-
-onShow(load)
-
+const loading = ref(false)
+const loaded = ref(false)
+const busy = ref(false)
+const error = ref('')
+const actionError = ref('')
+onShow(() => { actionError.value = ''; load() })
 async function load() {
-  loading.value = !items.value.length
-  loadError.value = false
-  try {
-    const [exchanges, requests] = await Promise.all([listCardExchanges(), listContactRequests()])
-    items.value = exchanges.items
-    acceptedContactIds.value = requests.items
-      .filter((item) => item.status === 'accepted')
-      .map((item) => item.buddy_id)
-  } catch {
-    items.value = []
-    acceptedContactIds.value = []
-    loadError.value = true
-  } finally {
-    loading.value = false
-  }
+  if (loading.value) return
+  loading.value = true; loaded.value = false; items.value = []; error.value = ''
+  try { items.value = (await listCardExchanges()).items; loaded.value = true }
+  catch (e) { error.value = socialErrorMessage(e, '名片夹读取失败，请重试') }
+  finally { loading.value = false }
 }
-
-function statusLabel(status: CardExchange['status']) {
-  if (status === 'accepted') return '已互换名片'
-  if (status === 'pending') return '等待回应'
-  if (status === 'declined') return '已拒绝'
-  return '已撤销'
+async function act(operation: () => Promise<unknown>) {
+  if (busy.value || loading.value) return
+  busy.value = true; actionError.value = ''
+  try { await operation(); await load() }
+  catch (e) { actionError.value = socialErrorMessage(e, '操作失败，请重试'); await load() }
+  finally { busy.value = false }
 }
-
-function statusClass(status: CardExchange['status']) {
-  if (status === 'accepted') return 'green'
-  if (status === 'declined') return 'rose'
-  return ''
-}
-
-function lineOf(item: CardExchange) {
-  if (acceptedContactIds.value.includes(item.buddy_id)) {
-    return '联系方式已获双方授权 · 本次页面会话有效'
-  }
-  return '联系方式仍未公开'
-}
-
-function goBuddy(id: string) {
-  uni.navigateTo({ url: `/pages/buddies/detail?id=${id}` })
-}
-
-function goDiscover() {
-  uni.switchTab({ url: '/pages/discover/discover' })
-}
-
-function showDemo() {
-  uni.showModal({
-    title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：名片夹记录保存在本机，不会与真实用户交换。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
+function respond(item: CardExchange, action: 'accept' | 'decline') { if (canRespond(item)) act(() => respondCardExchange(item.id, action)) }
+function revoke(item: CardExchange) { if (canRevoke(item)) act(() => revokeCardExchange(item.id)) }
+function go(url: string) { uni.navigateTo({ url }) }
 </script>
-
-<style scoped lang="scss">
-.exchanges-page {
-  padding-top: 24rpx;
-  padding-bottom: 56rpx;
-}
-
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 24rpx;
-}
-.demo-link {
-  color: #7560df;
-}
-
-.kicker {
-  display: block;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: #a398af;
-  font-weight: 600;
-}
-.title {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 58rpx;
-  font-weight: 800;
-  line-height: 1.28;
-  letter-spacing: -1rpx;
-}
-.hl {
-  color: #7560df;
-  border-bottom: 10rpx solid #dfff8b;
-}
-.sub {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #77727e;
-  line-height: 1.6;
-}
-
-.state {
-  padding: 80rpx 0;
-  text-align: center;
-}
-.state-text {
-  font-size: 26rpx;
-  color: #77727e;
-}
-
-.empty {
-  margin-top: 56rpx;
-  padding: 64rpx 32rpx;
-  border-radius: 28rpx;
-  border: 2rpx dashed #d7cbe7;
-  background: rgba(255, 255, 255, 0.6);
-  text-align: center;
-}
-.empty-mark {
-  display: block;
-  font-size: 44rpx;
-  color: #b9a4da;
-}
-.empty-title {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 32rpx;
-  font-weight: 700;
-}
-.empty-desc {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 24rpx;
-  color: #77727e;
-}
-
-.wallet-item {
-  background: #fff;
-  border: 2rpx solid #e7dfed;
-  border-radius: 32rpx;
-  padding: 34rpx;
-  margin-top: 24rpx;
-}
-.wallet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-}
-.wallet-name {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #292630;
-}
-.tag {
-  font-size: 20rpx;
-  padding: 8rpx 16rpx;
-  border-radius: 14rpx;
-  background: #eee9ff;
-  color: #6d58b2;
-  flex-shrink: 0;
-}
-.tag.green {
-  background: #e3f4ec;
-  color: #2f8f6b;
-}
-.tag.rose {
-  background: #fbeaea;
-  color: #b45555;
-}
-.wallet-line {
-  display: block;
-  font-size: 24rpx;
-  color: #77727e;
-  margin: 24rpx 0;
-}
-.wallet-link {
-  display: inline-block;
-  font-size: 24rpx;
-  color: #7560df;
-}
-
-.notice {
-  display: block;
-  background: #f5f3fa;
-  border: 2rpx solid #e9e3f3;
-  padding: 26rpx 30rpx;
-  border-radius: 24rpx;
-  color: #7c728b;
-  font-size: 24rpx;
-  line-height: 1.7;
-}
-.mt {
-  margin-top: 32rpx;
-}
-</style>
+<style scoped lang="scss">@import '@/styles/social.scss';</style>
