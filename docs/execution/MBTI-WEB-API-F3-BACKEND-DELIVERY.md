@@ -112,3 +112,7 @@ node scripts/mbti/verify-f3.mjs verify-restart
 从新集成树运行时须先本树安装依赖/Prisma生成/构建，再在该树执行 `seed-f3-test.mjs` 创建其自己的0600 fixture，不能链接依赖或复制展示秘密；不要同时启动第二个4156或迁移dev。`verify-restart` 的本次状态属于F3树 `.artifacts/mbti-f3-restart.json`，切树后要用原F3脚本核验本次保存状态（重新prepare-restart会创建新合成状态）。
 
 待总控：集成该后端候选与Web消费者到dev，按安全项目配置接入管理员认证/授权后复验，再由总控部署。Worker没有完成dev迁移/部署、实习生另一台物理设备或H5页面验收；本机LAN的真实HTTP已通过，H5证据由Web Writer提供。保留owner工作树、测试卷、运行配置和忽略fixture，不删库、不停已交付开发服务。
+
+## Web 实单运营补证
+
+后续 Task `task_5672a0c22747` / Dispatch `ctx_570f21fa3109` 已用 Web 实际创建的 `MBTI-3f4a78f2-1e80-4871-9ea4-478944f33df7` 补齐现有Foundation运营同号990CNY的HTTP200和401/403拒绝，不再仅以本后端脚本另建订单代表Web同号链路。详见 [Web实单运营补证与dev准备](MBTI-F3-WEB-ORDER-OPS-ADDENDUM.md)、[去敏回执](MBTI-F3-Web-order-ops-http.json)；dev4056只读检查证实尚无管理员、JWT配置或F3迁移，具体准备流程/内部阻塞与NOT_RUN项均单列，未移用test凭证或重启服务。
