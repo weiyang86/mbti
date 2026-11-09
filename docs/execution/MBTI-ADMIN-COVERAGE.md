@@ -1,8 +1,8 @@
-# MBTI 运营工作台动作覆盖记录（B1）
+# MBTI 运营工作台动作覆盖记录（B1 / B2a 订单）
 
-基准原型：输入包 `inputs/mbti-dazi-admin.html`，SHA-256 `fb7607763dbc41472bccda10fc24f9241ec4d306d3b745eaabdb7be4a94248a6`。实现 `/ops/` 路由为 UI 外壳，真实业务服务尚未连接；不能把占位空态当成业务验收。原稿42组按单项动作列出，组内复合操作展开到按钮、表单、筛选与弹层。
+基准原型：输入包 `inputs/mbti-dazi-admin.html`，SHA-256 `fb7607763dbc41472bccda10fc24f9241ec4d306d3b745eaabdb7be4a94248a6`。实现 `/ops/` 保留 B1 UI 外壳；B2a 已连接既有订单按号详情客户端，其余业务服务尚未连接。不能把占位空态或隔离组件测试当成真实业务验收。原稿42组按单项动作列出，组内复合操作展开到按钮、表单、筛选与弹层。
 
-状态：`UI_SHELL` 表示导航或控件占位；`UI_CONTRACT` 表示等待后续业务 API；`NOT_RUN` 表示未执行验收。B2–B5/C2 不预先勾选。订单唯一既有读取 API 为 `GET /api/admin/mbti/orders/{id}`，权限 `mbti:orders:read`。前端 capabilities 只负责显隐，服务端决定授权。未创建订单、配置草稿或支付数据。
+状态：`UI_SHELL` 表示导航或控件占位；`UI_CONTRACT` 表示等待后续业务 API；`NOT_RUN` 表示未执行验收。`LOCAL_UI_TESTED` 仅指本地合成响应/组件测试；`BLOCKED` 表示环境依赖阻塞，真实服务端授权与公网同号验收另列，B2–B5/C2 不预先勾选。订单唯一既有读取 API 为 `GET /api/admin/mbti/orders/{id}`，权限 `mbti:orders:read`。前端 capabilities 只负责显隐，服务端决定授权。未创建订单、配置草稿或支付数据。
 
 ## 全局动作（B1）
 
@@ -30,11 +30,11 @@
 | `UI-02.1` 渠道指标、测评完成与传播行为（控件：渠道指标；测评完成；传播行为） | `#/growth` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/editor/support/reader（查看）；导出 owner/editor/support；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
 | `UI-02.2` 预览后 7 日付费率与指标口径（控件：预览后 7 日付费率；指标口径） | `#/growth` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/editor/support/reader（查看）；导出 owner/editor/support；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
 | `UI-02.3` 导出渠道表（控件：导出渠道表） | `#/growth` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/editor/support/reader（查看）；导出 owner/editor/support；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
-| `UI-03.1` 交易订单 · 搜索、状态、分页、导出、详情（控件：交易订单；搜索；状态；分页；导出；详情） | `#/orders` | GET /api/admin/mbti/orders/{订单号}；`mbti:orders:read`（保留既有码） | owner/support（退款/重试）；reader（允许读取）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
-| `UI-03.2` 生成任务 · 筛选异常、详情、重试、恢复范围（控件：生成任务；筛选异常；详情；重试；恢复范围） | `#/orders` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/support（退款/重试）；reader（允许读取）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
-| `UI-03.3` 退款原因与确认（控件：退款原因；确认） | `#/orders` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/support（退款/重试）；reader（允许读取）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
-| `UI-03.4` 体验兑换码 · 生成一批、按套装、停用（控件：体验兑换码；生成一批；按套装；停用） | `#/orders` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/support（退款/重试）；reader（允许读取）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
-| `UI-03.5` 本机前台订单 · 刷新、详情与处理（控件：本机前台订单；刷新；详情；处理） | `#/orders` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/support（退款/重试）；reader（允许读取）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
+| `UI-03.1` 交易订单 · 搜索、状态、分页、导出、详情（控件：交易订单；搜索；状态；分页；导出；详情） | `#/orders` | 仅 GET /api/admin/mbti/orders/{orderId}；精确权限 `mbti:orders:read`；列表/状态筛选/分页/导出无已接接口 | 以服务端权限判定读取，不在客户端按角色授权；仅白名单订单字段，金额为分+币种，保留 H5 同一订单号；无支付凭据、私密联系方式或私有作答 | B2a 本地13项测试通过，含原始响应、按号输入校验/编码、加载/空/错误/401/403/404、字段投影及旧响应丢弃；隔离组件桌面/手机空态和非法输入已检查。真实角色200/403/401/404及公网H5同号：`BLOCKED/NOT_RUN`，未证明服务端授权通过；状态/分页/导出等控件可见禁用。详见 [B2a交付](MBTI-ADMIN-B2-ORDERS-DELIVERY.md) | 详情 `LOCAL_UI_TESTED`；服务端验收 `BLOCKED`；列表/筛选/分页/导出 `UI_CONTRACT` |
+| `UI-03.2` 生成任务 · 筛选异常、详情、重试、恢复范围（控件：生成任务；筛选异常；详情；重试；恢复范围） | `#/orders` 生成任务标签 | UI_CONTRACT：任务查询/异常队列/同任务重试/幂等/审计接口未接通 | 不把 `unlocked` 当素材已交付；所有任务动作禁用，reader无可调用写路径；owner/support预期操作仍待服务端契约 | B2a 本地组件测试和390px隔离组件检查标签/禁用控件；真实任务、重试、权限拒绝、持久化均 `NOT_RUN` | `UI_CONTRACT`；禁用呈现 `LOCAL_UI_TESTED` |
+| `UI-03.3` 退款原因与确认（控件：退款原因；确认） | `#/orders` 订单详情 | UI_CONTRACT：退款/原因/确认/审计接口未接通 | 详情中退款按钮禁用并说明依赖；不虚构退款原因表单、资金结果或累计退款金额；任何角色均无客户端退款写路径 | B2a 组件测试覆盖详情及拒绝后旧数据清除；真实owner/support退款、editor/reader拒绝和幂等/持久化 `NOT_RUN`，无接口不能用路由404冒充403 | `UI_CONTRACT` |
+| `UI-03.4` 体验兑换码 · 生成一批、按套装、停用（控件：体验兑换码；生成一批；按套装；停用） | `#/orders` 体验兑换码标签 | UI_CONTRACT：来源隔离账本/套装查询/生成/停用接口未接通；unknowns `needs_human_review` | 保留标签与禁用控件；不生成码、不读写原型localStorage、不消耗权益；无客户端兑换码写路径 | B2a 本地组件测试及390px隔离组件检查禁用态；真实生成/停用/重复兑换/角色拒绝和持久化 `NOT_RUN` | `UI_CONTRACT`；禁用呈现 `LOCAL_UI_TESTED` |
+| `UI-03.5` 本机前台订单 · 刷新、详情与处理（控件：本机前台订单；刷新；详情；处理） | `#/orders` 本机前台订单标签 | UI_CONTRACT：来源隔离测试账本和处理接口未接通；可返回交易订单执行既有按号读取 | 保留原型入口与测试语义，刷新/详情/处理禁用；不把公网独立guest/数据库混成本机账本，不制造演练订单 | B2a 本地组件测试及390px隔离组件检查入口和禁用控件；真实测试账本/处理/角色拒绝 `NOT_RUN`；公网同一H5订单待总控协调 | `UI_CONTRACT`；禁用呈现 `LOCAL_UI_TESTED` |
 | `UI-04.1` 互换/联系授权与待处理统计（控件：互换/联系授权；待处理统计） | `#/moderation` | 名片治理 API 待契约/UI_CONTRACT | owner/editor/support（处理）；reader（拒绝写入）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
 | `UI-04.2` 查看处理、查看记录、驳回/限制（控件：查看处理；查看记录；驳回/限制） | `#/moderation` | 名片治理 API 待契约/UI_CONTRACT | owner/editor/support（处理）；reader（拒绝写入）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B2；当前只有UI壳 | `UI_CONTRACT` |
 | `UI-05.1` 双图调试台 · 上传/替换、恢复两张图、选择配方/人格、确认授权（控件：双图调试台；上传/替换；恢复两张图；选择配方/人格；确认授权） | `#/ai` | 对应B2/B3/B4业务接口/UI_CONTRACT | owner/editor（草稿/试片）；owner（系统参数）；低权限不返回支付凭据、私密联系方式或私有作答 | 成功/拒绝HTTP及数据变化：`NOT_RUN`；阶段：B4；当前只有UI壳 | `UI_CONTRACT` |

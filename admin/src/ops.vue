@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { login, logout, readOrder, session, type OpsSession } from './ops-api'
+import { login, logout, session, type OpsSession } from './ops-api'
+import OrdersPage from './orders.vue'
 
 type Page = { id: string; name: string; group: string; code: string; description: string; access: 'access' | 'draft' | 'orders' | 'moderation' | 'systemRead' | 'systemWrite' | 'release' }
 const pages: Page[] = [
@@ -36,10 +37,6 @@ const from = ref('')
 const to = ref('')
 const drawer = ref('')
 const unsaved = ref(false)
-const orderId = ref('')
-const orderLoading = ref(false)
-const orderResult = ref('')
-const orderError = ref('')
 const listPage = ref(1)
 const pageSize = ref(10)
 const draftText = ref('')
@@ -79,13 +76,6 @@ function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') { drawer.value = ''; searchOpen.value = false; navOpen.value = false }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); searchOpen.value = !searchOpen.value }
 }
-async function queryOrder() {
-  if (!orderId.value.trim()) { orderError.value = '请输入订单号。'; return }
-  orderLoading.value = true; orderError.value = ''; orderResult.value = ''
-  try { orderResult.value = JSON.stringify(await readOrder(orderId.value.trim()), null, 2) }
-  catch (error) { orderError.value = error instanceof Error ? error.message : '查询失败。' }
-  finally { orderLoading.value = false }
-}
 onMounted(() => { void loadSession(); window.addEventListener('hashchange', onPopState); window.addEventListener('keydown', onKey) })
 onUnmounted(() => { window.removeEventListener('hashchange', onPopState); window.removeEventListener('keydown', onKey) })
 watch(visiblePage, valid => { if (!valid && sessionState.value) go(visiblePages.value[0]?.id || 'overview') })
@@ -105,8 +95,8 @@ watch(visiblePage, valid => { if (!valid && sessionState.value) go(visiblePages.
     <section class="workspace"><header class="topbar"><div class="breadcrumb"><button class="mobile-menu icon-button" aria-label="打开导航" @click="navOpen = true">☰</button><span>运营工作台</span><i>/</i><b>{{ page.name }}</b></div><div class="top-actions"><span class="environment"><i></i>服务端会话</span><button class="icon-button search-shortcut" aria-label="查找功能" @click="searchOpen = true">⌕</button><button class="outline-button" @click="openDrawer('前台预览')">前台预览</button><button v-if="sessionState.capabilities.release" class="primary" disabled title="发布接口尚未接通">发布中心 · 未接通</button><button class="icon-button logout-top" aria-label="退出登录" @click="signOut">↪</button></div></header>
       <main class="content"><div v-if="apiError" class="alert error-banner" role="alert">{{ apiError }} <button class="text-button" @click="loadSession">重新连接</button></div><div class="page-heading"><div><p class="eyebrow">OPERATIONS / {{ page.code }}</p><h1>{{ page.name }}</h1><p class="description">{{ page.description }}</p></div><div class="heading-actions"><button class="outline-button" @click="goBack">返回</button><button v-if="sessionState.capabilities.draft && ['ai','content','catalog','assessment','retention','social'].includes(page.id)" class="primary" @click="openDraft">编辑草稿</button><button v-if="page.id === 'ai' || page.id === 'ai-settings'" class="outline-button" disabled>图像服务未接通</button></div></div>
         <section v-if="page.id === 'overview' || page.id === 'growth'" class="filter-panel"><div class="filter-controls"><div class="segmented"><button v-for="option in ['今日', '近 7 天', '近 30 天', '自定义']" :key="option" :class="{ selected: period === option }" @click="period = option">{{ option }}</button></div><select v-model="channel" aria-label="统计渠道"><option>全部渠道</option><option>微信小程序</option><option>小红书小程序</option><option>抖音小程序</option><option>公众号 H5</option></select><template v-if="period === '自定义'"><label class="date-label">从<input v-model="from" type="date" aria-label="开始日期"></label><label class="date-label">至<input v-model="to" type="date" aria-label="结束日期"></label></template></div><span>仅显示已接通服务的数据</span></section>
-        <section v-if="page.id === 'orders'" class="panel order-lookup"><div><p class="eyebrow">ORDER READ</p><h2>按订单号查询</h2><p class="muted">沿用现有运营订单读取接口和 mbti:orders:read 服务端权限。</p></div><form class="lookup-form" @submit.prevent="queryOrder"><input v-model="orderId" aria-label="订单号" placeholder="输入订单号" autocomplete="off"><button class="primary" :disabled="orderLoading">{{ orderLoading ? '查询中…' : '查询订单' }}</button></form><p v-if="orderError" class="error-text" role="alert">{{ orderError }}</p><pre v-if="orderResult" class="result-json">{{ orderResult }}</pre><div v-else class="empty-state compact"><span>▤</span><b>等待订单号</b><p>不会显示尚未授权读取的订单字段。</p></div></section>
-        <section v-else-if="page.id === 'overview' || page.id === 'growth'" class="metric-grid"><article v-for="title in (page.id === 'overview' ? ['净实收', '支付订单', '测评完成率', '分享回流新客'] : ['访问人次', '测评完成', '分享行为', '回流新客'])" :key="title" class="panel metric-card"><span>{{ title }}</span><b>—</b><small>业务数据服务尚未接通</small></article></section>
+        <OrdersPage v-if="page.id === 'orders' && visiblePage" @reauthenticate="loadSession" />
+        <section v-if="page.id === 'overview' || page.id === 'growth'" class="metric-grid"><article v-for="title in (page.id === 'overview' ? ['净实收', '支付订单', '测评完成率', '分享回流新客'] : ['访问人次', '测评完成', '分享行为', '回流新客'])" :key="title" class="panel metric-card"><span>{{ title }}</span><b>—</b><small>业务数据服务尚未接通</small></article></section>
         <section v-if="page.id !== 'orders'" class="panel list-shell"><div class="list-toolbar"><label>搜索当前页面<input placeholder="搜索当前页面" aria-label="搜索当前页面"></label><select aria-label="状态筛选"><option>全部状态</option><option>待处理</option><option>已完成</option></select><span>服务未连接 · 0 条记录</span></div><div class="empty-panel"><div class="empty-icon">{{ page.id === 'release' ? '◷' : '◇' }}</div><p class="eyebrow">{{ page.code }}</p><h2>{{ page.id === 'overview' || page.id === 'growth' ? '暂无线上数据' : '此模块尚未接通业务服务' }}</h2><p>{{ page.id === 'payment-settings' ? '支付渠道未配置。不会展示商户号、回调凭据或密钥引用。' : page.id === 'moderation' ? '服务连接后仅返回匿名举报信息，不读取私人联系方式、精确位置或私有作答。' : '当前页面保留原型路由与交互位置，数据和写入操作由后续业务卡接入。' }}</p><div class="status-line"><span class="status-dot"></span> {{ page.id === 'overview' || page.id === 'growth' ? '数据接口未连接' : 'UI_CONTRACT · 等待对应业务接口' }}</div></div><div class="pager"><span>第 {{ listPage }} 页 · 0 条记录</span><div><button class="outline-button" :disabled="listPage === 1" @click="listPage = Math.max(1, listPage - 1)">上一页</button> <select v-model.number="pageSize" aria-label="每页条数"><option :value="10">10 条/页</option><option :value="20">20 条/页</option><option :value="50">50 条/页</option></select> <button class="outline-button" disabled @click="listPage++">下一页</button></div></div></section>
         <section v-if="page.id !== 'orders'" class="panel control-panel"><div><p class="eyebrow">工作队列</p><h2>待处理事项</h2></div><div class="queue-empty"><span>✓</span><p>工作队列服务尚未接通</p></div></section>
         <p v-if="page.id === 'payment-settings'" class="security-note">支付商户和凭据引用仅对项目运营管理员授权显示；原始密钥永远不会返回浏览器。</p>

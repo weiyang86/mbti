@@ -20,5 +20,7 @@ test('operations UI has 14 ordered routes and never persists client role or toke
   const ids = [...source.matchAll(/id: '([a-z-]+)', name:/g)].map(match => match[1])
   assert.deepEqual(ids, ['overview','growth','orders','moderation','ai','content','catalog','assessment','retention','social','ai-settings','payment-settings','trade-settings','release'])
   assert.doesNotMatch(source, /localStorage|sessionStorage/)
-  assert.match(source, /mbti:orders:read/)
+  const orders = await readFile(new URL('../src/orders.vue', import.meta.url), 'utf8')
+  assert.match(orders, /mbti:orders:read/)
+  assert.doesNotMatch(orders, /localStorage|sessionStorage|\.role\b/)
 })
