@@ -1,0 +1,36 @@
+{
+  "files": [
+    {
+      "path": "docs/governance/W22_OWNER_ACCEPTANCE_20261108.json",
+      "sha256": "c340222b9ad7a0110aecaa19ee0309957cf9af6810f4ba03d51a21ed41e41d78"
+    },
+    {
+      "path": "scripts/verification/owner-acceptance-history.mjs",
+      "sha256": "e48ed66ec4365f84c4a6abcfa2bd6ee0b9bd22a0cb1c3e4b38a4741b2f8b10b5"
+    },
+    {
+      "path": "scripts/verification/owner-acceptance-history.test.mjs",
+      "sha256": "ac0b90d44368547a3ed80ba2f57787905f3b48489c4137e154de3175a4f828cc"
+    },
+    {
+      "path": "scripts/verification/auto-ai-program.mjs",
+      "sha256": "80df516e9f8c385802c6fb1e2ac1eefe95df4c0431958778aa9cdb5d77cb9e36"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W23/CONTRACT.md",
+      "sha256": "88c029d3d0d6bad93dae9e05eec4c7ec4cf998ffeece97be09f7be4941318909"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-223.md",
+      "sha256": "6d4568380a6a276f3b29c02c2866a41cc81033e409ca9cd84a5236e718eaac15"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-224.md",
+      "sha256": "396af93532bf02b39e7476356a8ac9c3852dc34cf1071d441ef5c9f25dda8531"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/AF-225.md",
+      "sha256": "39474aea67c2e9df1ef18681a8bf51e5d550aade6f5d601b1ab7cec8edbacf6f"
+    }
+  ]
+}

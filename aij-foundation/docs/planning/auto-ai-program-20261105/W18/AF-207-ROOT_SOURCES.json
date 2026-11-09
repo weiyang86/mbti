@@ -1,0 +1,106 @@
+{
+  "card": "AF-207",
+  "candidate": "a9d1be5f62d52b64902641d68113d49f009c0fea",
+  "actualI206Commit": "f7177233dbef31d81e32b23b2f22a7c6ca684925",
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-execution.controller.ts",
+      "sha256": "617c081bc7e381b47133b96c21385797da2fc29ab67f42403d65cb6936bf64d3"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-execution.dto.ts",
+      "sha256": "c2610f86f856eafaabc105ca956cd431f11677a5ec98fcd5f4abf018ca067b85"
+    },
+    {
+      "path": "packages/sdk/src/personal-workflow-execution.ts",
+      "sha256": "abc42e8c9759134173a2d1375e649ceca6d5998e2fb7bdddf8afdfda70aea8e1"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-execution-sdk.test.mjs",
+      "sha256": "212f26abad53c88f2bcaba269fcd9882eca655a6827ce0769d3b9d23e1637e61"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W18/AF-207-ROOT_WIRING.md",
+      "sha256": "161f11ae336aa5a1af2e7be45c3c60703c67117fee0908de5536fda85e68c44f"
+    },
+    {
+      "path": "docs/execution/AF-207-candidate.md",
+      "sha256": "bc4f2214b8779738c161935ee308f8835c12795070f963b0bbb8a71c05be99b6"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "facf053720fa45956eac256436941cd83fa59d7dc53d85b91111438ef7885ae0"
+    },
+    {
+      "path": "apps/api/src/bootstrap.ts",
+      "sha256": "32da69a95c89863b9777719d78541cea6768262d2c5fa4b9b651b07fbf1f862b"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "sha256": "f83700999e28ff3fde0f79d5e3c0fc513345bcbb6a424800e454d62a7612a664"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "340f3225d880061f17e3eff35d5d3809c4b470d1222cc3473b6fbfcb2e290c3c"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "dbdc4ee9e9e80a63ef0296f426c124b4ed3ead1eb441677334c0b46534365f75"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "85bfa2acec497bf23d14b767c7d2e450c2a3266a168d3da169fbd56f4f379991"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "f59c0ffe25d5922d3de36ca3ecec4ca4bb9f06d2fea7a29e9d748645e89e8d24"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "3e78e8ebeed1bafd01a223ba4d64a1db540d8c6f25cc7d0bb47d1ca1932cdebf"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "0f8d736f11a2d419eb7c58befd6b12106e97c5c1aa0f55cc2925f0b11c72f31c"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "56fbecabfa6149e93fe24a4af885ffdc1f3424d65591143870490c484a9b136c"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-http-acceptance.mjs",
+      "sha256": "4abe9103b922e395e39b01a23cc8d0cece462cc931442b48d7f7229b16ec6aa6"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-http-live.test.mjs",
+      "sha256": "d206398b7a3c1a0d98b2755077a41b3791a2e2f9b7bce1879cda071670f3167a"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-http-prerequisite.mjs",
+      "sha256": "58d6d96645897c4e13089c70b8fb82b9be362fcd354e2377fcc829a72b0182a5"
+    },
+    {
+      "path": "docs/development/PERSONAL_WORKFLOW_EXECUTION.md",
+      "sha256": "80c7cbcb5361d840ca0a8ae3cb78e4f13501847ed00ded3c9368f1bb34c955c9"
+    },
+    {
+      "path": "scripts/verification/registry.mjs",
+      "sha256": "b8a5244e9909f1980a82b4ed13e1bf335ee68719f9f46f95ab2e960dc132fecc"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-run.service.ts",
+      "sha256": "5e306ff5534f8483da0921dc0cd26bd104c500e06d04192fdb00b6df291434d2"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-center-client.controller.ts",
+      "sha256": "b6a6f8bef89d47029141d046129b3d7321601c3e890907f66dc62e4b9e2a2169"
+    }
+  ],
+  "reviewRepair": {
+    "messageId": "msg_f19489b8c089",
+    "taskId": "task_2db3b73cccfd",
+    "dispatchId": "ctx_38780e7b73a1",
+    "scope": "Public legacy workflow result/recovery/image exclusion; shared internal driver unchanged",
+    "previousManifestSha256": "14e132cca11382b6f67b5a23a299bf5ad099244a45c687b5d6525c60a0303c81"
+  }
+}

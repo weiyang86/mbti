@@ -1,0 +1,453 @@
+{
+  "schemaVersion": 1,
+  "kind": "ARCHITECTURE_ASSESSMENT_EVIDENCE",
+  "date": "2026-11-04",
+  "baseline": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd",
+  "productCodeChangedByAssessment": false,
+  "formalExecutionQueueChanged": false,
+  "ownerAcceptanceRecordsChanged": false,
+  "targetAssumption": "Multiple independent business products with an optional AI application/tool layer",
+  "scope": "Repository structure and critical architecture/runtime/delivery paths; not line-by-line security certification or production load test",
+  "freshChecks": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "rootTests": 84,
+      "apiTests": 8,
+      "failures": 0,
+      "skipped": 0,
+      "todo": 0,
+      "log": ".artifacts/architecture-review-20261104/default-tests.log"
+    },
+    {
+      "command": "pnpm --filter @aij/api build",
+      "exitCode": 0,
+      "log": ".artifacts/architecture-review-20261104/api-build.log"
+    },
+    {
+      "command": "node .artifacts/architecture-review-20261104/probes.mjs",
+      "exitCode": 0,
+      "observedProbes": 5,
+      "interpretation": "Successful observation means issue/limitation reproduced, not production acceptance passed",
+      "log": ".artifacts/architecture-review-20261104/probes-final.log"
+    }
+  ],
+  "observations": [
+    {
+      "id": "PROBE-CATALOG",
+      "observed": true,
+      "runtimeLoadsAI": true,
+      "defaultManagementCatalog": [
+        "aij-notification",
+        "aij-payment"
+      ],
+      "impact": "Default lifecycle management cannot obtain AI registration"
+    },
+    {
+      "id": "PROBE-HEALTH",
+      "observed": true,
+      "ready": true,
+      "workerHasError": true,
+      "lastPollAgeSeconds": 3600,
+      "impact": "Readiness ignores stale polling and worker error state"
+    },
+    {
+      "id": "PROBE-PROFILE",
+      "observed": true,
+      "profile": "aij-base",
+      "aiEnabledConfigRejected": true,
+      "impact": "Generated profile cannot enable AI through standard project CLI; no AI-standard profile exists"
+    },
+    {
+      "id": "PROBE-KNOWLEDGE-GATE",
+      "observed": true,
+      "installationStatus": "installed (not enabled)",
+      "sameWorkspaceAuthenticated": true,
+      "createStatus": 201,
+      "listStatus": 200,
+      "queryStatus": 200,
+      "sourceReturned": true,
+      "crossTenantAccessTested": false,
+      "impact": "Legacy knowledge CRUD/retrieval does not uniformly enforce plugin disable; this probe does not demonstrate cross-tenant access"
+    },
+    {
+      "id": "PROBE-STALE-LEASE",
+      "observed": true,
+      "method": "deterministic isolated-DB lease-expiry/takeover followed by overlapping executions",
+      "oneLogicalJob": true,
+      "oldAndNewClaimSameJob": true,
+      "syntheticHandlerInvocations": 2,
+      "externalNetworkCalls": 0,
+      "impact": "Orchestrated execution admits stale lease owner and already-processing idempotency row, allowing duplicate side effects"
+    }
+  ],
+  "testEnvironment": {
+    "logicalDatabases": "Random newly created AF-120 test acceptance databases on repository-owned test PostgreSQL",
+    "instance": "127.0.0.1:55433",
+    "syntheticOnly": true,
+    "externalProviderCalls": 0,
+    "existingDevOrSharedLogicalDatabaseWrites": false,
+    "temporaryHTTP": "OS-selected loopback ports, closed after probes"
+  },
+  "remoteReadback": {
+    "command": "git ls-remote --symref origin HEAD refs/heads/main",
+    "defaultBranch": "main",
+    "head": "00f0ae9e466d6c17e8fca680a59bdc95a3a02c95",
+    "meaning": "Current implementation is on dev; default branch still initial commit"
+  },
+  "inventory": {
+    "apiSourceFiles": 170,
+    "apiSourceLines": 10953,
+    "webAppFiles": 46,
+    "webAppLines": 2507,
+    "prismaModels": 50,
+    "prismaEnums": 21,
+    "migrations": 22,
+    "workspacePackages": 5,
+    "verificationFiles": 238,
+    "registryLines": 5476,
+    "queueJsonLines": 11872
+  },
+  "historicalEvidence": {
+    "file": "docs/review/REMAINING_DELIVERY_VERIFICATION_20261104.json",
+    "baselineSame": true,
+    "structuredTests": {
+      "tests": 50,
+      "passed": 50,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "includesParentTests": true
+    },
+    "reRunAllHistoricalSuitesThisAssessment": false
+  },
+  "sources": [
+    {
+      "findingId": "F01",
+      "path": "apps/api/src/async-runtime/job.service.ts",
+      "lines": [
+        172,
+        293,
+        334,
+        339
+      ],
+      "sha256": "8a1b3a0c7891297644ec5099c6adef9243e338b49a89e4687bbe9199155dcc23",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F02",
+      "path": "apps/api/src/plugin-runtime/plugin-management.module.ts",
+      "lines": [
+        13
+      ],
+      "sha256": "e4591ec3457e3cfa01a19a95d22dc8e445206fa8958f5ff8e4d7bb785ffe8301",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F02",
+      "path": "apps/api/src/plugin-runtime/plugin-runtime.module.ts",
+      "lines": [
+        11
+      ],
+      "sha256": "1c09fee92bd58e2e3284d88875955695f6139e20f023e0adf4eddbfe48e61201",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F03",
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge.service.ts",
+      "lines": [
+        104,
+        108,
+        115,
+        252
+      ],
+      "sha256": "8a942f1048fabb918d2c23a341ff669558f07e704b55a1720851b2eb182a539e",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F03",
+      "path": "apps/api/src/menus/menu-availability.service.ts",
+      "lines": [
+        6,
+        14
+      ],
+      "sha256": "fb624d3490ffa34a87b529a767e2509d57c20afa45f3a0f886200d88df191825",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F04",
+      "path": "apps/api/src/async-runtime/runtime-health.service.ts",
+      "lines": [
+        12,
+        21
+      ],
+      "sha256": "d3d6bdef3251084f42755f5d87e4bb3436acfc515a255c8c96a48adaee285d77",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F05",
+      "path": "scripts/project/cli.mjs",
+      "lines": [
+        10,
+        150,
+        215,
+        231
+      ],
+      "sha256": "9e10f446d80c8942640d1e2ddd88d099cb6b3022654f541f556b43ccf0dd67a2",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F06",
+      "path": "apps/api/src/client-auth/client-auth-notification.adapter.ts",
+      "lines": [
+        12,
+        19,
+        37
+      ],
+      "sha256": "601eec3c8300227fd2bcb10955f6171c9b8a746c9720475a5011a2d8c99e807b",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F06",
+      "path": "apps/api/src/plugins/aij-notification/notification-runtime.module.ts",
+      "lines": [
+        7
+      ],
+      "sha256": "8a79359f8248adb12da225ee42f471df59fa806030914c9b319a365a64312e45",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F07",
+      "path": "apps/api/src/app.module.ts",
+      "lines": [
+        35,
+        42
+      ],
+      "sha256": "6309dbd2a4cf3e59a0caff4cfcee4c55cd01dfe573fead4cf1944ba6233ebc60",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F07",
+      "path": "apps/api/src/client-workspaces/client-workspace-permissions.ts",
+      "lines": [
+        1
+      ],
+      "sha256": "51d4c14f50d19f6ab837f035eb5ff7e6754d60e585435b7afe656aa6a13cca6d",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F07",
+      "path": "apps/api/src/plugins/aij-ai/ai-plugin.ts",
+      "lines": [
+        5
+      ],
+      "sha256": "5cc5cf77a19e6a4347a9996541738f7fac554c9846d62a9769c2098c68085b99",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F07",
+      "path": "scripts/distribution/pack-aij-base.mjs",
+      "lines": [
+        17,
+        21,
+        40
+      ],
+      "sha256": "96f821fdfc2ef0e2fceae7a59f4a64597e1afab4f029f81eea7e240e83853e4b",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F08",
+      "path": "apps/api/src/plugins/aij-ai/ai-provider.ts",
+      "lines": [
+        5,
+        74,
+        99
+      ],
+      "sha256": "af6c15d1bcb67a581b7f2ae8eac8745cdd534fbd7ab9544943b160ddc849a9fa",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F08",
+      "path": "apps/api/src/plugins/aij-ai/ai-configuration.ts",
+      "lines": [
+        14
+      ],
+      "sha256": "d5b0cf6be25fb1c57095912bd834c4ecad6fe7fd58f6ea312a1403ad116440bb",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F08",
+      "path": "apps/api/src/plugins/aij-ai/deepseek-provider.ts",
+      "lines": [
+        26,
+        38
+      ],
+      "sha256": "80e8a41e4b71c99309cf40ca668eefe2b3d68b3918ad4ac4b71bd6379cfbc9c1",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F08",
+      "path": "apps/api/src/plugins/aij-ai/ai-evaluation-budget.service.ts",
+      "lines": [
+        8,
+        14,
+        21
+      ],
+      "sha256": "732acb3076334465d661c29be5d8b6b471521b857bcda2efacc2b43d33e542ca",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F09",
+      "path": "apps/api/src/plugins/aij-ai/ai-knowledge-retrieval.ts",
+      "lines": [
+        1,
+        68
+      ],
+      "sha256": "352bcbac1c9a6f1b7f8ab6f7cd96bb2234da4ce14590e1d01f5d55812cba8375",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F09",
+      "path": "scripts/verification/g19-knowledge-evaluation.cases.mjs",
+      "lines": [
+        1
+      ],
+      "sha256": "1d858973551c70e47d5198845ef153598d920e2a266b39ed876b89fe06d98b62",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F10",
+      "path": "apps/api/src/prisma/prisma.service.ts",
+      "lines": [
+        21,
+        32
+      ],
+      "sha256": "3fba295bf74a8c0badbe4593d687825ca41257aa676bab436ffd06ed481b3d1e",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F10",
+      "path": "apps/api/src/async-runtime/runtime-worker.service.ts",
+      "lines": [
+        20,
+        49
+      ],
+      "sha256": "5fce2d45e00626008dd22bf29ff4801c34dcc66c7c3b9803427bcd34406671ed",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F10",
+      "path": "scripts/runtime-environment.cjs",
+      "lines": [
+        78,
+        90
+      ],
+      "sha256": "53f6d3729e83d03c1049838d53fd1b0e7965a73fac4704b8df5a81070d0dd6a7",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F11",
+      "path": "package.json",
+      "lines": [
+        1
+      ],
+      "sha256": "7889a9be71da54ff6a8dd57f165e0b6ee8b86188323de7c9138ba9f8c9d3e3d2",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F12",
+      "path": "scripts/verification/registry.mjs",
+      "lines": [
+        770
+      ],
+      "sha256": "0197e216b8765edcc2d896e0b911c9773de6072d6a605f3e31edfc357de933c3",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F12",
+      "path": "scripts/verification/ai-evaluation-budget.test.mjs",
+      "lines": [
+        24
+      ],
+      "sha256": "4d169a669b9ddd74a7f544227144e9a4e0a7012e8646042ba1c4b900f4e336cc",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F12",
+      "path": "docs/current/ARCHITECTURE.md",
+      "lines": [
+        151
+      ],
+      "sha256": "c225fcf5cd5c58a87ae87ecc757648a41459647d9a1210a2736873f298454157",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F12",
+      "path": "docs/current/RELEASE_PROFILES.md",
+      "lines": [
+        1
+      ],
+      "sha256": "f6a48105341f06aee961920c77d65c5c474a02964c62172613267b04d4d544dd",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F13",
+      "path": "apps/api/src/client-workspaces/workspace-context.service.ts",
+      "lines": [
+        11
+      ],
+      "sha256": "ee215e48d36447558601581137b05157fdc95ccd167666cfca07c06acf643193",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F13",
+      "path": "apps/api/prisma/schema.prisma",
+      "lines": [
+        320
+      ],
+      "sha256": "a81886d8d3c62e5d24aaeaeebdca7452bb89a37b57d0ee760cd397a861755807",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F14",
+      "path": "packages/sdk/src/index.ts",
+      "lines": [
+        1,
+        16
+      ],
+      "sha256": "abbc3bd37989e6ab2964dcf37110c47b68491538dda61be2dfad7e124d53db3f",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    },
+    {
+      "findingId": "F14",
+      "path": "packages/ui/src/index.ts",
+      "lines": [
+        1
+      ],
+      "sha256": "1e7df997b81755e1f360cef929bd7b50e04429d79d107fff1c4ec7198176f0d4",
+      "baselineCommit": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd"
+    }
+  ],
+  "externalReferences": [
+    {
+      "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+      "checkedAt": "2026-11-04",
+      "use": "Prompt injection and code-enforced least privilege/approval"
+    },
+    {
+      "url": "https://ts.sdk.modelcontextprotocol.io/v2/serving/authorization",
+      "checkedAt": "2026-11-04",
+      "use": "Resource audience and scope at MCP boundary"
+    },
+    {
+      "url": "https://github.com/open-telemetry/semantic-conventions-genai",
+      "checkedAt": "2026-11-04",
+      "use": "Versioned GenAI telemetry; dedicated repository after move"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/16/ddl-rowsecurity.html",
+      "checkedAt": "2026-11-04",
+      "use": "RLS role/owner caveat; optional defense-in-depth evaluation"
+    }
+  ]
+}

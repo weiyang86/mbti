@@ -1,0 +1,31 @@
+{
+  "candidate": "811b2a24738faa0dc5a9d959ed89395c0506c84f",
+  "rootAdjustments": "Root genuine Linux trusted QA host bridge and dependency/source receipt only; production executor/Dockerfile/build tool remain exact stopped candidate; final full lint found control-regex and unsafe-finally: root uses equivalent codepoint checks and accumulates cleanup failure without throwing in finally; no isolation/ownership/test cases weakened",
+  "qaDockerCliSha256": "235ec1a4ea9e0909a2a85501c90187b0e2b30a48d7ea48aa3c02810d9e213f7a",
+  "files": [
+    {
+      "path": "ops/document-export/README.md",
+      "sha256": "842ec89e283f6f943408b037855b55183ad1622024b4924ac8ed71105d7e8ad7"
+    },
+    {
+      "path": "scripts/verification/document-export-executor-acceptance.mjs",
+      "sha256": "f01e22356c3519373b6ab0b0f7849c8f33c2b42083f70760a336e9dbe8ef92e1"
+    },
+    {
+      "path": "scripts/verification/document-export-executor-prerequisite.mjs",
+      "sha256": "716e942e93c2bcd6d70accc978cb2a1b2cab845f356c8bfe3556fb658439eef8"
+    },
+    {
+      "path": "scripts/verification/document-export-executor-proof.mjs",
+      "sha256": "a1763241a7356508b3927a41c09777a466b4c0d78542a9c9eff5ac1bfc095127"
+    },
+    {
+      "path": "apps/api/src/documents/document-export-executor.ts",
+      "sha256": "7b20e36fe2ad403866f93e8b31820793b35b6183ddd21a21ca027c6b9c3041ec"
+    },
+    {
+      "path": "scripts/verification/document-export-executor-live.test.mjs",
+      "sha256": "7798a1e53381cc1f78e00edce2410f02f349c86e4ca2c42490c30ee4d6fba1b9"
+    }
+  ]
+}

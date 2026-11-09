@@ -1,0 +1,96 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# AIJ F00: macOS sidecar metadata (preserve existing files; ignore future noise)
+._*
+.AppleDouble/
+.Spotlight-V100/
+.Trashes/
+
+# Independent workspace dependencies and generated output
+**/node_modules/
+**/dist/
+apps/api/.base-dev-dist/
+apps/web/.next-base-dev/
+apps/api/.ai-local-dist/
+apps/web/.next-ai-local/
+**/build/
+**/.next/
+apps/web/.next-af035/
+apps/web/.next-af036/
+apps/web/.next-af037/
+apps/web/.next-af038/
+apps/web/.next-af043/
+apps/web/.next-af048/
+apps/web/.next-af057/
+apps/web/.next-af058/
+apps/web/.next-af061/
+apps/web/.next-af062/
+apps/web/.next-af064/
+apps/web/.next-af065/
+apps/web/.next-af066/
+apps/web/.next-af086*/
+apps/web/.next-af087/
+apps/web/.next-af088/
+apps/web/.next-af101/
+apps/web/.next-af*/
+**/coverage/
+.artifacts/
+*.tgz
+
+# Real environment files; only reviewed examples are versionable
+.env*
+!.env.example
+!.env.*.example
+
+# Secrets, local storage and runtime data
+*.key
+*.p12
+*.pfx
+*.dump
+*.sql.gz
+*.sqlite*
+*.db
+*.log
+uploads/
+**/uploads/
+storage/
+**/storage/
+runtime-data/
+.local-data/
+backups/
+**/backups/

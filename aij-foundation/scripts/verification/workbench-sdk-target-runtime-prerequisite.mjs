@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+const folder = 'docs/planning/auto-ai-program-20261105/';
+const read = p => JSON.parse(readFileSync(p, 'utf8'));
+const hash = b => createHash('sha256').update(b).digest('hex');
+const git = (...args) => execFileSync('git', args);
+assert.equal(process.cwd(), '/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation');
+assert.equal(git('branch', '--show-current').toString().trim(), 'dev');
+assert.equal(git('remote', 'get-url', 'origin').toString().trim(), 'git@github.com:weiyang86/aij-foundation.git');
+const program = read(folder + 'program.json');
+const card = program.nextWaves.find(w => w.id === 'W16').cards.find(c => c.id === 'AF-198');
+assert.equal(card.candidateStopped, true); assert.equal(card.candidateReceipt, 'msg_9687449fe09b');
+assert.equal(card.candidateCommit, '540a09ca0bc3dea06b9ffb8b22458f804b4792e5');
+assert.equal(read('.artifacts/verification/AF-196/run-zWIKWV/report.json').status, 'PASS');
+assert.equal(read('.artifacts/auto-ai-program-20261105/AF-196/I-complete.json').result.status, 'completed');
+git('merge-base', '--is-ancestor', '9b414a57ace1a62d5794d22a9e6961454fac06b9', 'HEAD');
+const manifest = read(card.bootstrapManifest.path);
+assert.equal(hash(readFileSync(card.bootstrapManifest.path)), card.bootstrapManifest.sha256);
+for (const f of manifest.files) assert.equal(hash(git('show', card.bootstrapCommit + ':' + f.path)), f.sha256);
+assert.deepEqual(git('diff', '--name-only', card.bootstrapCommit, card.candidateCommit).toString().trim().split('\n').sort(), [...card.allowPaths].sort());
+const source = read(folder + 'W16/AF-198-ROOT_SOURCES.json');
+assert.equal(source.candidate, card.candidateCommit);
+for (const f of source.files) assert.equal(hash(readFileSync(f.path)), f.sha256);
+for (const p of card.allowPaths.filter(p => !source.files.some(f => f.path === p))) assert.deepEqual(readFileSync(p), git('show', card.candidateCommit + ':' + p));
+for (const p of ['package.json', 'apps/api/package.json', 'pnpm-lock.yaml', 'apps/api/prisma/schema.prisma', 'apps/api/src/bootstrap.ts', 'apps/api/src/plugins/aij-ai/ai-center-provider.ts', 'apps/api/src/async-runtime/job.service.ts', 'packages/sdk/src/index.ts']) assert.deepEqual(readFileSync(p), git('show', '9b414a57ace1a62d5794d22a9e6961454fac06b9:' + p));
+for (const e of manifest.integrationEvidence) {
+  assert.equal(read(e.report).status, 'PASS');
+  assert.equal(read('.artifacts/auto-ai-program-20261105/' + e.card + '/I-complete.json').result.status, 'completed');
+  git('merge-base', '--is-ancestor', e.commit, 'HEAD');
+}
+for (const f of read('.artifacts/auto-ai-program-20261105/W16/preserved-before.json').filter(f => f.path.includes('AF-191') || f.path.includes('workbench-sdk-target') || f.path.endsWith('AIJ-Base-1.0-Orca-Execution-Playbook.md'))) assert.equal(hash(readFileSync(f.path)), f.sha256, f.path);
+assert.ok(program.requirements.every(r => r.status === 'NOT_RUN_TARGET_ACCEPTANCE'));
+assert.equal(program.gitPolicy.pushCurrentLocalCommits, false);
+console.log(JSON.stringify({ status: 'PASS', task: 'AF-198', candidateFiles: 5, bootstrapFiles: manifest.files.length, sourceFreezeOnly: true, native14: 'NOT_RUN', vendorAcceptance: 'DEFERRED_NOT_PASSED' }));

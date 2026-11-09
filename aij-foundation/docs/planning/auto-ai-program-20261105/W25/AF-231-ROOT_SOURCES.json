@@ -1,0 +1,81 @@
+{
+  "parentCommit": "2bc136515e61d1b8102b6d7a052caf77b3d9b196",
+  "originalStop": "msg_a498a90401c9",
+  "candidate": "80574e5f0a8859588671c1308d93693f5a9456d8",
+  "bootstrap": "5dbb327ecd600427abb67394752984279f2cdbf9",
+  "candidateFiles": [
+    {
+      "path": "apps/web/app/components/client-personal-agent-request-journal.mjs",
+      "sha256": "e9a6bd901dfa3effabfac656fcb9897002174c4ef7d366b4adadf98a1173d91b"
+    },
+    {
+      "path": "apps/web/app/components/client-personal-agent-request-journal.d.mts",
+      "sha256": "e9fa444b930c48a98cf720a7c241df4df4247762066bef3d32493523a9cca8fe"
+    },
+    {
+      "path": "scripts/verification/client-personal-agent-request-journal.test.mjs",
+      "sha256": "6f6b0361f2a8ff071a73d175ba7f6257ea55c4de4fd0edfcdbaa02ed2ca4ce0f"
+    },
+    {
+      "path": "docs/execution/AF-231-candidate.md",
+      "sha256": "4f91da2e9097e8aeb23165717a1198d430e0a03287425017f845dd30bf86c1de"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W25/AF-231-ROOT_WIRING.md",
+      "sha256": "4cada18b3ca0d1039225a68dc729df4fe4375294a9eccba00bf1e77dc71641ff"
+    }
+  ],
+  "completedDependencies": [
+    "task_0b13cb98ad28",
+    "task_99e42f0b8b56",
+    "task_4d76852ccaad"
+  ],
+  "files": [
+    {
+      "path": "apps/web/app/components/client-personal-agent-request-journal.mjs",
+      "sha256": "e9a6bd901dfa3effabfac656fcb9897002174c4ef7d366b4adadf98a1173d91b"
+    },
+    {
+      "path": "apps/web/app/components/client-personal-agent-request-journal.d.mts",
+      "sha256": "e9fa444b930c48a98cf720a7c241df4df4247762066bef3d32493523a9cca8fe"
+    },
+    {
+      "path": "scripts/verification/client-personal-agent-request-journal.test.mjs",
+      "sha256": "6f6b0361f2a8ff071a73d175ba7f6257ea55c4de4fd0edfcdbaa02ed2ca4ce0f"
+    },
+    {
+      "path": "docs/execution/AF-231-candidate.md",
+      "sha256": "4f91da2e9097e8aeb23165717a1198d430e0a03287425017f845dd30bf86c1de"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W25/AF-231-ROOT_WIRING.md",
+      "sha256": "4cada18b3ca0d1039225a68dc729df4fe4375294a9eccba00bf1e77dc71641ff"
+    },
+    {
+      "path": "apps/web/app/components/client-personal-agent-run-state.mjs",
+      "sha256": "db3b9d8126015125ed41c7917d33d27c4c707a2d9f8ce164704e660b5ac9437c"
+    },
+    {
+      "path": "apps/web/app/components/client-personal-agent-run-state.d.mts",
+      "sha256": "ebfbfc1111c1054ee8bf2c0f346f51289f9f3d0bb29d0215e37853976b13cb8b"
+    },
+    {
+      "path": "scripts/verification/client-personal-agent-request-integration.test.mjs",
+      "sha256": "260759083fe686bc1931e6ec5e1c780dcb159ca0eb62c4464dcb16c6d49e365d"
+    },
+    {
+      "path": "scripts/verification/client-personal-agent-request-browser.test.mjs",
+      "sha256": "2c1aa528b62f854dde6fc2facac4df4ab6fc609060b71c3638f29adf5b52c99f"
+    },
+    {
+      "path": "scripts/verification/client-personal-agent-request-browser-acceptance.test.mjs",
+      "sha256": "3c9d4cf40f67fe8cc2989719a2f8c23d29df67c29462c5af8e0391cbfc9da3af"
+    },
+    {
+      "path": "scripts/verification/personal-agent-request-journal-prerequisite.mjs",
+      "sha256": "d6a46a9ce8539271a92b8dbaf123606454eb28692f8bb01d134ec8e305a5cb75"
+    }
+  ],
+  "workerHours": 0.29,
+  "productPgNative": "NOT_RUN_THIS_CARD_REQUIRED_AF232_AF233"
+}

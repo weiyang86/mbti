@@ -1,0 +1,99 @@
+{
+  "card": "AF-211",
+  "candidate": "6406657daa2f8dae72ce5ea39697d89bca10bd05",
+  "actualI210Commit": "ed4d1dfd71c69d61f584a7a74edcf4e2cf643b8b",
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-script-execution.controller.ts",
+      "sha256": "58c4e390aa5ec524d82eee1b4758071ebe4a9051204edb097aa870417f65b64a"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-script-execution.dto.ts",
+      "sha256": "4e1a45824a4aaa1624510601aa3194b6683aae4e079878ca4e5b70af0d2608e8"
+    },
+    {
+      "path": "packages/sdk/src/personal-script-execution.ts",
+      "sha256": "0cc80bd0ce8f82108f2774ea177d86b8bd88b2ba1f80fbbd1090ae45e78303ff"
+    },
+    {
+      "path": "scripts/verification/personal-script-api-sdk.test.mjs",
+      "sha256": "830dd2e66eab508b31abade1395e93a51a39ff5eca6ce766a1666fc017f38a05"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W19/AF-211-ROOT_WIRING.md",
+      "sha256": "af183c4a3bf2dc3d089bc2e92ff07dea8116488d7a55b566db1f1e9a283d7bde"
+    },
+    {
+      "path": "docs/execution/AF-211-candidate.md",
+      "sha256": "a3f517953ecec204e9428a28d62ac76a959bab4a7c1f0eb9f60dc8ce619a1e0d"
+    },
+    {
+      "path": "apps/api/src/bootstrap.ts",
+      "sha256": "4b599b6633439625395bf51c9b18a5dabedc0374567611535d416a2a7613378c"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "c47cd156fede48b18bb2b7083b8def7365474b71c817e761a6072bc57203ebf1"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "sha256": "774c12cb1b6069c606d44a1d5665f9f801115c410277929eab9c65d01aa392da"
+    },
+    {
+      "path": "scripts/verification/personal-script-http-live.test.mjs",
+      "sha256": "00c0e8807c8f41eedd8fe1b8483245f980e278a63caa573590b266a2a19e59d4"
+    },
+    {
+      "path": "scripts/verification/personal-script-http-acceptance.mjs",
+      "sha256": "8792fde425fce0b384e538ff59c18c5d3b45917947df8255357a489c53bc1dde"
+    },
+    {
+      "path": "scripts/verification/personal-script-http-prerequisite.mjs",
+      "sha256": "d13e834bd41f6ff18c7e8e7599fd68bd7be14fa55aa97fc5e6eb3c7e37eda811"
+    },
+    {
+      "path": "scripts/verification/registry.mjs",
+      "sha256": "03f14c23d19b655c560597cfcd51873a90cefe6c8a5045bb358114ba14f9e5b6"
+    },
+    {
+      "path": "scripts/verification/personal-skills.test.mjs",
+      "sha256": "d84134abc5c387b62380410b292ee9086cdea9cc8e292b7f238a9df6c734b7e9"
+    },
+    {
+      "path": "scripts/verification/personal-agents.test.mjs",
+      "sha256": "742276565cbd484f1861eaa4a15d0a1a7cdbb1624b8de7ec99dc305fc96b02b7"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "83b95a2952ebf8495b321f1b9c3520598e117a256aa5ad274a2df4dacdba5f5b"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "dd4008b8c44d9f2646fd05262cebee2e07147e0dfac64b14fa0c85efd4d208ed"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "d7b68fdb33d86afe9c04b1b56756044cfd516c95ef976c4485d8ea454a7d22dc"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "5db0c253877573a049bf857a154c8fce73863353d4bb958b368c7517b246e8e4"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "b73317a3de4e8806dd22a9b2534f3a4a3abcfe6240ee798522c0079ba4fbd9f8"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "381d5659cd1580d139ae77fbd65c3c3430db03c7c4d19988b5c7fc2f4342710b"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "5b28bc3ba6658a09e2420eaf32c0df279ee42782dae071049e45dd829f69d375"
+    },
+    {
+      "path": "scripts/verification/personal-script-runtime-live.test.mjs",
+      "sha256": "497d691cce64ad4b231ee810f0c9f640ade6519430dfe4d6842117d2c6290472"
+    }
+  ]
+}

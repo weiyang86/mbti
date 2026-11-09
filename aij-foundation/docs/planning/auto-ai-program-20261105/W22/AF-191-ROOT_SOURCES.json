@@ -1,0 +1,89 @@
+{
+  "task": "AF-191",
+  "stage": "UNVERIFIED_ROOT_INPUT_FREEZE",
+  "files": [
+    {
+      "path": "scripts/verification/workbench-sdk-target-root.mjs",
+      "sha256": "924449add6d06723bad48b6e93f96bdac7640c817dba31374e27101c957f3d90"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-native-driver.mjs",
+      "sha256": "776e43ae6d90af8f743ff6ca9c6c889b0d015bb1457450fc1f8fbe22d7373b39"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-host.mjs",
+      "sha256": "4d147f96b50322ff96be510c12f0c3cf8b8c2e49862c19662108b227aeff16a1"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-live.test.mjs",
+      "sha256": "0d9c40dfdfb3dfc36f2f0944a5f0bc2d822bfde8fb71877a540e69277af00383"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-proof.mjs",
+      "sha256": "72b28f8bf14110baba8f86bd2335e032f57fc6dd8285c953a152dbcbf3454dcd"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-consumer.mjs",
+      "sha256": "e1db77baa51ebc9903091cfe316d68158b781cf5c5c876dc45f3a03774a7a32e"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-runtime.mjs",
+      "sha256": "338d2b2db851b982dd235af885e4c0b6e616108378840dd5303b257c73383333"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-runtime.test.mjs",
+      "sha256": "00551fcbe811356f1bdc1feeac25c20d430cd6f033307943c9076818d97b0bd2"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-resumption-prerequisite.mjs",
+      "sha256": "d4d1fa850caa679d9ec055d0644ca6dab5cc9421e2800f86ac057978d538956c"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-acceptance.test.mjs",
+      "sha256": "f6fd17d1926f954356753f305e13febb016436564f92e9820676247be5ae1262"
+    },
+    {
+      "path": "scripts/verification/web-build-isolated.mjs",
+      "sha256": "f65b3c1f4eec0cb12ab1af6e2d6dd53cce513f441461a1597adb1b85747e3440"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-integration-prerequisite.mjs",
+      "sha256": "28ad4246c9c2d4165b1edb24c127935cee8913f9894b6ae9bb5ad2214b577b9d"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "077cf2840c03c77a5ce95ae0cd8730549ca78c779eb16c4e277fd10433e6663b"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "080708b7487a7fa5cc628497c8633b5bda0a88b97087373232af042942958482"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "de88ddf513728ca7a48ccd7ef1395e4160fe19c90cf017b4a538ad8e3184ca25"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "cf36c1ef5fd4a1df84ea3199da3b384ad9cebf7b8bc60bd75e29849da618118f"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "d9e8f71f5a088d5081bdba8145c361e3d8aa72133526fb96c3b683b1e0a207f9"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "632f4508a2cb4135f219a0ea5b0a1cbb8b02f9e7738a5b325a16ab2f188e1672"
+    },
+    {
+      "path": "scripts/verification/w22-native-chrome.mjs",
+      "sha256": "e2f758529e36a38bac249263f2e6e57683e62c37ae8a37ec70c8169dae7b0c2b"
+    },
+    {
+      "path": "scripts/verification/w21-native-browser.mjs",
+      "sha256": "c31667fc5cc499d8c7528e06609057a1a834c8daa9a7035fb66188d6bc07a3e5"
+    }
+  ],
+  "nativeDependency": "task_a89f862fbff4",
+  "nativeUtilityCommit": "cc2be35ace71e7a03e28b34258e7f17b28c66ae4",
+  "dependencyDeclarationsCommit": "95b34d45ec6861d39060d08607c3f3ad8f886021"
+}

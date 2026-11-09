@@ -1,0 +1,121 @@
+{
+  "candidate": "e3c818a7718ddd83275e1b3b239cc6bdda3fce59",
+  "bootstrap": "faac12db9cf71f1d41f330a4f5f2d43429c2b94b",
+  "originalStop": "msg_acda13a42349",
+  "workerHours": 0.25,
+  "completedDependencies": [
+    "task_99c0c174bf9e",
+    "task_f5c4ef57ec62",
+    "task_a89f862fbff4",
+    "task_1f770e22492a"
+  ],
+  "candidateFiles": [
+    {
+      "path": "apps/api/src/documents/personal-document-sections.ts",
+      "sha256": "24e36662a99be48d1c1ff8a96a530b76eaf8d3bcc11b250b0bf877f6c9a39fd3"
+    },
+    {
+      "path": "apps/api/src/documents/personal-document-sections.service.ts",
+      "sha256": "846520a3aedb56a582bbbd846ab8ef5757f3d1ba23cd5e730fc08f46491fe682"
+    },
+    {
+      "path": "apps/api/src/documents/personal-document-sections.controller.ts",
+      "sha256": "7b46a797a0ffe79b7d9fa7b8b39b8e1bb1491bbd49a0ca98584e18bb9d3aef6c"
+    },
+    {
+      "path": "apps/api/test/personal-document-sections.test.ts",
+      "sha256": "97b87a969cccd9f6498d1d9096c615ca5a84da52de0250acd7de0ca29215d1fc"
+    },
+    {
+      "path": "docs/execution/AF-223-candidate.md",
+      "sha256": "b64d01f318a985d548b1d8e703ec33e21e12e459e4ffcabe9ccd00d9dac499ca"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W23/AF-223-ROOT_WIRING.md",
+      "sha256": "685f261a118815d010eeeb645df9b248427978fc45903564695c5897e6ed473f"
+    }
+  ],
+  "files": [
+    {
+      "path": "apps/api/src/documents/personal-document-sections.ts",
+      "sha256": "24e36662a99be48d1c1ff8a96a530b76eaf8d3bcc11b250b0bf877f6c9a39fd3"
+    },
+    {
+      "path": "apps/api/src/documents/personal-document-sections.service.ts",
+      "sha256": "846520a3aedb56a582bbbd846ab8ef5757f3d1ba23cd5e730fc08f46491fe682"
+    },
+    {
+      "path": "apps/api/src/documents/personal-document-sections.controller.ts",
+      "sha256": "7b46a797a0ffe79b7d9fa7b8b39b8e1bb1491bbd49a0ca98584e18bb9d3aef6c"
+    },
+    {
+      "path": "apps/api/test/personal-document-sections.test.ts",
+      "sha256": "97b87a969cccd9f6498d1d9096c615ca5a84da52de0250acd7de0ca29215d1fc"
+    },
+    {
+      "path": "docs/execution/AF-223-candidate.md",
+      "sha256": "b64d01f318a985d548b1d8e703ec33e21e12e459e4ffcabe9ccd00d9dac499ca"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W23/AF-223-ROOT_WIRING.md",
+      "sha256": "685f261a118815d010eeeb645df9b248427978fc45903564695c5897e6ed473f"
+    },
+    {
+      "path": "apps/api/src/documents/personal-documents.module.ts",
+      "sha256": "ca05ebca8a2b29d90ddc39d4975ab9b96b9daca9406d46cc5ba2fbf191ed55ac"
+    },
+    {
+      "path": "apps/api/test/personal-document-sections.test.mjs",
+      "sha256": "4518f177e8cac9fe0a4b144e914997ce253b46415f5b41b12c11551cda6ae3a8"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-live.test.mjs",
+      "sha256": "10bcb808e7688319cf9113e2ac54a1b37d56b76733048a16a2dc60ebe302901f"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-acceptance.test.mjs",
+      "sha256": "e2fa47d27bebce81f62657392d5c35ca0f2ff8c286a539d67a0203d0b09bbbbe"
+    },
+    {
+      "path": "scripts/verification/personal-document-sections-prerequisite.mjs",
+      "sha256": "e7caf8b337c809ee97966cdb2baf6b40edccc8d84dbf8e2a802379f4da33dc4c"
+    }
+  ],
+  "sharedAdmissions": [
+    {
+      "path": "scripts/database/migration.mjs",
+      "literal": "AF-223",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "literal": "AF-223",
+      "count": 1
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "literal": "AF-223",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "literal": "AF-223",
+      "count": 3
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "literal": "AF-223",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "literal": "AF-223",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "literal": "AF-223",
+      "count": 3
+    }
+  ]
+}

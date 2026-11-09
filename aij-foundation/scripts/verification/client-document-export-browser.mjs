@@ -1,0 +1,47 @@
+// Root-only production Next host and real Orca driver. No cookie injection or fake DOM.
+import assert from 'node:assert/strict';import{createServer,request as relayRequest}from'node:http';import{createRequire}from'node:module';import{execFile}from'node:child_process';import{promisify}from'node:util';import{mkdir,readFile,writeFile,copyFile}from'node:fs/promises';import{join}from'node:path';
+const exec=promisify(execFile),root='/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation';const requireWeb=createRequire(join(root,'apps/web/package.json'));
+export async function prepareDocumentExportHost(consumer,folder){
+ await mkdir(folder,{recursive:true,mode:0o700});let base,nextApp,handler,held,lose=false,closed=false,context;const state={traffic:[],status:'PREPARING',phase:'preparing'};
+ const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});return{resolve,promise};};
+ const server=createServer((incoming,outgoing)=>{
+  if(incoming.url==='/af203-sdk'){
+   assert.ok(context);outgoing.setHeader('Content-Type','text/html; charset=utf-8');outgoing.setHeader('Cache-Control','private, no-store');outgoing.end(`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>AIJ SDK 跨域验收</title><script type="importmap">${JSON.stringify({imports:{'@aij/sdk':'/af203-sdk/sdk/index.mjs','@aij/contracts':'/af203-sdk/contracts/index.mjs'}})}</script><button id="read">读取并核验导出</button><output id="result"></output><script type="module">import{createClientApi,createPersonalDocumentExportsClient}from'@aij/sdk';const sdk=createPersonalDocumentExportsClient(createClientApi(()=>${JSON.stringify(base+'/api')}));document.querySelector('button').onclick=async()=>{try{const page=await sdk.list(${JSON.stringify(context.workspaceId)},${JSON.stringify({documentId:context.documentId,revision:1})});if(page.items.length!==2)throw Error();const rows=[];for(const meta of page.items){const r=await sdk.download(${JSON.stringify(context.workspaceId)},meta);rows.push({id:meta.id,size:r.bytes.length,checksum:r.checksum,format:meta.format});r.bytes.fill(0);}document.querySelector('output').textContent=JSON.stringify({status:'PASS',rows});}catch{document.querySelector('output').textContent='FAIL';}};</script></html>`);return;
+  }
+  const module=incoming.url?.match(/^\/af203-sdk\/(sdk|contracts)\/([a-z0-9-]+\.mjs)$/);if(module){void readFile(join(consumer,'node_modules/@aij',module[1],'dist',module[2])).then(bytes=>{outgoing.setHeader('content-type','text/javascript');outgoing.end(bytes);}).catch(()=>{outgoing.writeHead(404);outgoing.end();});return;}
+  if(incoming.url?.startsWith('/api/')){
+   if(!base){outgoing.writeHead(503);outgoing.end();return;}const target=new URL(base),parsed=new URL(incoming.url,'http://127.0.0.1'),path=parsed.pathname;const phase=state.phase,startedAt=Date.now();
+   const relay=relayRequest({hostname:'127.0.0.1',port:target.port,path:incoming.url,method:incoming.method,headers:{...incoming.headers,host:target.host}},response=>{
+    const lost=lose&&incoming.method==='POST'&&path==='/api/client/document-exports'&&response.statusCode===201;const observation={method:incoming.method,path,status:response.statusCode,cacheControl:response.headers['cache-control'],lostAfterCommit:lost,phase,startedAt,receivedAt:Date.now()};
+    if(incoming.method==='GET'&&path==='/api/client/documents'){
+      const limit=parsed.searchParams.get('limit');observation.queryLimit=limit&&/^\d{1,3}$/.test(limit)?Number(limit):null;
+      let size=0,chunks=[];response.on('data',chunk=>{size+=chunk.length;if(size<=1024*1024)chunks.push(chunk);else chunks=[];});
+      response.once('end',()=>{try{if(size<=1024*1024){const body=JSON.parse(Buffer.concat(chunks).toString('utf8'));observation.itemCount=Array.isArray(body.data?.items)?body.data.items.length:null;}}catch{observation.invalidJson=true;}finally{chunks=[];}});
+    }
+    state.traffic.push(observation);
+    if(lost){lose=false;const chunks=[];response.on('data',b=>chunks.push(b));response.once('end',()=>{const bytes=Buffer.concat(chunks);assert.ok(bytes.length>1);outgoing.writeHead(response.statusCode,response.headers);outgoing.flushHeaders();outgoing.write(bytes.subarray(0,1),()=>{const timer=setTimeout(()=>outgoing.destroy(),50);timer.unref();});});return;}
+    const barrier=held&&incoming.method==='GET'&&path===held.path&&(held.queryLimit===undefined||parsed.searchParams.get('limit')===String(held.queryLimit))?held:null;if(barrier){held=undefined;const bytes=[];response.on('data',b=>bytes.push(b));response.once('end',async()=>{barrier.ready.resolve();await barrier.release.promise;if(!outgoing.destroyed){outgoing.writeHead(response.statusCode,response.headers);outgoing.end(Buffer.concat(bytes));}});return;}
+    outgoing.writeHead(response.statusCode,response.headers);response.pipe(outgoing);
+   });relay.on('error',()=>{if(!outgoing.headersSent)outgoing.writeHead(502);outgoing.end();});incoming.pipe(relay);return;
+  }
+  if(handler){void handler(incoming,outgoing);return;}outgoing.writeHead(503);outgoing.end();
+ });await new Promise((yes,no)=>{server.once('error',no);server.listen(0,'127.0.0.1',yes);});
+ return{origin:'http://127.0.0.1:'+server.address().port,state,attach(value){base=value;},setContext(value){context=value;},armLoss(){lose=true;},hold(path,queryLimit){assert.equal(held,undefined);return held={path,queryLimit,ready:deferred(),release:deferred()};},
+  async startWeb(){const prior={NODE_ENV:process.env.NODE_ENV,AIJ_NEXT_DIST_DIR:process.env.AIJ_NEXT_DIST_DIR,AIJ_TEST_API_URL:process.env.AIJ_TEST_API_URL};Object.assign(process.env,{NODE_ENV:'production',AIJ_NEXT_DIST_DIR:'.next-af203',AIJ_TEST_API_URL:'/api'});try{nextApp=requireWeb('next')({dev:false,dir:join(root,'apps/web'),hostname:'127.0.0.1'});await nextApp.prepare();handler=nextApp.getRequestHandler();}finally{for(const[k,v]of Object.entries(prior))if(v===undefined)delete process.env[k];else process.env[k]=v;}},
+  async close(){if(closed)return;closed=true;held?.release.resolve();server.closeAllConnections();await new Promise(r=>server.close(r));await nextApp?.close();state.ownedSockets=await new Promise((yes,no)=>server.getConnections((e,n)=>e?no(e):yes(n)));assert.equal(state.ownedSockets,0);state.status='CLOSED';await writeFile(join(folder,'host-closed.json'),JSON.stringify(state,null,2));}
+ };
+}
+export function createDocumentExportDriver(origin,folder){
+ let page,url=origin+'/client/login',seq=0;const artifacts=[];
+ const native=async(action,args=[],privateInput=false)=>{let raw;try{raw=(await exec('/usr/local/bin/orca',[...(action==='create'?['tab','create']:action==='activate'?['tab','switch','--page',page,'--focus']:action==='close'?['tab','close','--page',page]:[action,'--page',page]),...args,...(['click','fill','keypress','focus'].includes(action)?['--expect-url',url]:[]),'--json'],{encoding:'utf8',maxBuffer:4*1024*1024,timeout:45000})).stdout;}catch(e){if(!privateInput&&e.stdout)await writeFile(join(folder,'failed-'+action+'.json'),e.stdout);throw Error('AF203_NATIVE_'+action);}
+  const receipt=JSON.parse(raw);assert.equal(receipt.ok,true,'AF203 native refused '+action);const result=receipt.result;if(action==='create')page=result.browserPageId;else url=result.url??result.effects?.url??url;if(!privateInput){const p=join(folder,String(++seq)+'-'+action+'.json');await writeFile(p,raw);artifacts.push(p);}return result;};
+ const read=async expression=>JSON.parse((await native('eval',['--expression','JSON.stringify('+expression+')'])).result);
+ const wait=async text=>native('wait',['--text',text]);
+ const observation=async()=>read(`({focus:document.hasFocus(),hidden:document.hidden,editor:!!document.querySelector('textarea[aria-label="文档正文"]'),listItems:document.querySelector('[aria-label="个人文档库"] ul')?.children.length??0})`);
+ const watch=async label=>writeFile(join(folder,'observation-'+label+'.json'),JSON.stringify(await observation(),null,2));
+ const ref=async(label,type='button',selector)=>{await native('wait',['--selector',selector??'body']);const snapshot=(await native('snapshot',['--interactive',...(selector?['--selector',selector]:[])])).snapshot;const lines=snapshot.split('\n').filter(l=>l.includes('- '+type+' "')&&!/\[disabled|disabled,/.test(l)&&l.slice(l.indexOf('"')+1,l.indexOf('"',l.indexOf('"')+1)).replace(/^loading /,'').replace(/\s/g,'')===label.replace(/\s/g,''));assert.equal(lines.length,1,'Unique enabled '+label);return'@'+lines[0].match(/\[.*?ref=(e\d+)/)[1];};
+ const click=async(label,selector)=>{await native('focus',['--element',await ref(label,'button',selector)]);assert.equal((await read('document.activeElement?.textContent')).replace(/\s/g,''),label.replace(/\s/g,''));return native('keypress',['--key','Enter']);};
+ const fill=async(label,value,secret=false)=>native('fill',['--element',await ref(label,'textbox'),'--value',value],secret);
+ const shot=async name=>{if(!await read('document.hasFocus()')) await native('activate');const before=await read('({focus:document.hasFocus(),hidden:document.hidden,editor:!!document.querySelector(`textarea[aria-label="文档正文"]`),panel:document.querySelector(`[aria-label="当前文档导出"]`)?.innerText})');await writeFile(join(folder,name+'-before.json'),JSON.stringify(before,null,2));const r=await native('screenshot'),p=join(folder,name+'.png');await copyFile(r.path??r.screenshotPath,p);artifacts.push(p);return p;};
+ return{native,read,wait,watch,observation,click,fill,shot,artifacts,page:()=>page,async close(){if(page)await native('close');}};
+}

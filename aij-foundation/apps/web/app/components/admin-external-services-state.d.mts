@@ -1,0 +1,16 @@
+import type { ExternalServiceField, ExternalServiceProvider, ExternalServiceView, ExternalServicesApi } from "@aij/sdk";
+export type Field = ExternalServiceField;
+export type Provider = ExternalServiceProvider;
+export type View = ExternalServiceView;
+export type Api = ExternalServicesApi;
+export type State = { providers: Provider[]; view: View | null; fields: Record<string, string>; refs: Record<string, string | null>; error: string; busy: boolean; blocked: boolean; latest: View | null; catalogFailed: boolean };
+declare function notify(state: State): void;
+declare function start(): Promise<void>;
+declare function open(code: string): Promise<void>;
+declare function field(key: string, value: string): void;
+declare function ref(key: string, value: string | null): void;
+declare function save(): Promise<void> | undefined;
+declare function reload(): Promise<void> | undefined;
+declare function confirm(): void;
+declare function dispose(): void;
+export declare function createExternalServicesState(api: Api, listener: typeof notify): { start: typeof start; open: typeof open; field: typeof field; ref: typeof ref; save: typeof save; reload: typeof reload; confirm: typeof confirm; dispose: typeof dispose };

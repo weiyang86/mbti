@@ -1,0 +1,80 @@
+// AF-159 PROPOSAL ONLY. Root applies after STOP ALL WRITING; AF-154 is prerequisite.
+// In BOTH existing MemberUser and ClientWorkspace append EXACTLY:
+//   personalAiAgents        AiPersonalAgent[]
+//   personalAiAgentVersions AiPersonalAgentVersion[]
+// In existing AiPersonalSkillVersion append EXACTLY:
+//   personalAgentBindings AiPersonalAgentSkillBinding[]
+//   @@unique([id, workspaceId, memberId], map: "ai_personal_skill_version_id_scope_key")
+// That is the ONLY new index on existing Skill tables. Do not rewrite AF-154 migration.
+// No binding backrelations on MemberUser/ClientWorkspace are needed: scope is carried
+// by the two composite FKs to version owners. No ProjectProfile or catalog relation.
+// Retain SQL-only field checks and identity/history/tombstone triggers in migration.
+model AiPersonalAgent {
+  id             String   @id @default(cuid())
+  workspaceId    String   @map("workspace_id")
+  memberId       String   @map("member_id")
+  code           String   @db.VarChar(63)
+  name           String   @db.VarChar(100)
+  instructions   String
+  enabled        Boolean  @default(false)
+  modelCode      String   @db.VarChar(63) @map("model_code")
+  modelRevision  Int      @map("model_revision")
+  catalogVersion Int      @map("catalog_version")
+  inputFields    Json     @map("input_fields")
+  outputFormat   String   @db.VarChar(4) @map("output_format")
+  outputFields   Json     @map("output_fields")
+  revision       Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  versions AiPersonalAgentVersion[]
+  @@unique([workspaceId, memberId, code], map: "ai_personal_agent_owner_code_key")
+  @@unique([id, workspaceId, memberId], map: "ai_personal_agent_id_scope_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_agent_owner_page_idx")
+  @@index([memberId], map: "ai_personal_agent_member_idx")
+  @@map("ai_personal_agent")
+}
+model AiPersonalAgentVersion {
+  id             String   @id @default(cuid())
+  workspaceId    String   @map("workspace_id")
+  memberId       String   @map("member_id")
+  code           String   @db.VarChar(63)
+  name           String   @db.VarChar(100)
+  instructions   String
+  enabled        Boolean  @default(false)
+  modelCode      String   @db.VarChar(63) @map("model_code")
+  modelRevision  Int      @map("model_revision")
+  catalogVersion Int      @map("catalog_version")
+  inputFields    Json     @map("input_fields")
+  outputFormat   String   @db.VarChar(4) @map("output_format")
+  outputFields   Json     @map("output_fields")
+  revision       Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at")
+  skillBindingCount Int @db.SmallInt @map("skill_binding_count")
+  agentId String @map("agent_id")
+  agent AiPersonalAgent @relation(fields: [agentId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_agent_version_agent_scope_fkey")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  skillBindings AiPersonalAgentSkillBinding[]
+  @@unique([id, workspaceId, memberId], map: "ai_personal_agent_version_id_scope_key")
+  @@unique([agentId, revision], map: "ai_personal_agent_version_revision_key")
+  @@index([workspaceId, memberId, agentId, revision], map: "ai_personal_agent_version_owner_idx")
+  @@index([memberId], map: "ai_personal_agent_version_member_idx")
+  @@map("ai_personal_agent_version")
+}
+model AiPersonalAgentSkillBinding {
+  id String @id @default(cuid())
+  agentVersionId String @map("agent_version_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  skillVersionId String @map("skill_version_id")
+  position Int @db.SmallInt
+  agentVersion AiPersonalAgentVersion @relation(fields: [agentVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_agent_binding_version_scope_fkey")
+  skillVersion AiPersonalSkillVersion @relation(fields: [skillVersionId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_agent_binding_skill_scope_fkey")
+  @@unique([agentVersionId, position], map: "ai_personal_agent_binding_position_key")
+  @@unique([agentVersionId, skillVersionId], map: "ai_personal_agent_binding_skill_key")
+  @@index([skillVersionId, workspaceId, memberId], map: "ai_personal_agent_binding_skill_scope_idx")
+  @@map("ai_personal_agent_skill_binding")
+}

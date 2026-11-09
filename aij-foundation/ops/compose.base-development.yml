@@ -1,0 +1,38 @@
+# AF-134: persistent, independent Base development database; no host dev/test resources.
+name: aij-base-dev
+services:
+  postgres:
+    container_name: aij-base-dev-postgres
+    image: postgres:16-alpine@sha256:e013e867e712fec275706a6c51c966f0bb0c93cfa8f51000f85a15f9865a28cb
+    network_mode: bridge
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aij_base_dev_development
+      POSTGRES_USER: aij_base_dev_development
+      POSTGRES_PASSWORD: "${AIJ_BASE_DB_PASSWORD:?Use base:dev init}"
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    ports:
+      - "127.0.0.1:55434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    labels:
+      io.aij.owner: aij-foundation
+      io.aij.project: aij-base-dev
+      io.aij.environment: development
+      io.aij.instance: "${AIJ_BASE_INSTANCE_ID:?Use base:dev init}"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "aij_base_dev_development", "-d", "aij_base_dev_development"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 3s
+    stop_grace_period: 20s
+volumes:
+  postgres_data:
+    name: aij-base-dev_postgres_data
+    labels:
+      io.aij.owner: aij-foundation
+      io.aij.project: aij-base-dev
+      io.aij.environment: development
+      io.aij.instance: "${AIJ_BASE_INSTANCE_ID:?Use base:dev init}"

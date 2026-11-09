@@ -1,0 +1,125 @@
+{
+  "parentCommit": "fb0823de491b30fd8f0974ce551f3d5a02229328",
+  "originalStop": "msg_aa392a04dfe2",
+  "candidate": "3b6e448561c3e9514fb7273d0586714452791a91",
+  "bootstrap": "e3bcd421c82006a6ba521f9d78a4d48cddad3c35",
+  "candidateFiles": [
+    {
+      "path": "apps/web/app/components/client-document-generation-state.mjs",
+      "sha256": "4f6a6f314004a1870f20eca6c4dcb0ad42e9818a5e789e3cd8b1c3f453c1d62c"
+    },
+    {
+      "path": "apps/web/app/components/client-document-generation-state.d.mts",
+      "sha256": "16e329844a2e9d1e24173a6bd1f1de1dde37a038561482660348f52d4541f73c"
+    },
+    {
+      "path": "scripts/verification/client-document-generation-state.test.mjs",
+      "sha256": "70cb3b89aa1732d314a0078e73a6e88934050df7809c84f986fd1546382034e5"
+    },
+    {
+      "path": "docs/execution/AF-232-candidate.md",
+      "sha256": "484163141b311524a02187dcc5b072f52c3d57077d6d415ac0209520aa7861b0"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W25/AF-232-ROOT_WIRING.md",
+      "sha256": "040ddd9033baec4c97a7f67ceebb13e1b73323165ea7ebbd546d2e16be3bf668"
+    }
+  ],
+  "completedDependencies": [
+    "task_0b13cb98ad28",
+    "task_11944e614359",
+    "task_cbc2517e9fbb"
+  ],
+  "files": [
+    {
+      "path": "apps/web/app/components/client-document-generation-state.mjs",
+      "sha256": "4f6a6f314004a1870f20eca6c4dcb0ad42e9818a5e789e3cd8b1c3f453c1d62c"
+    },
+    {
+      "path": "apps/web/app/components/client-document-generation-state.d.mts",
+      "sha256": "16e329844a2e9d1e24173a6bd1f1de1dde37a038561482660348f52d4541f73c"
+    },
+    {
+      "path": "scripts/verification/client-document-generation-state.test.mjs",
+      "sha256": "70cb3b89aa1732d314a0078e73a6e88934050df7809c84f986fd1546382034e5"
+    },
+    {
+      "path": "docs/execution/AF-232-candidate.md",
+      "sha256": "484163141b311524a02187dcc5b072f52c3d57077d6d415ac0209520aa7861b0"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W25/AF-232-ROOT_WIRING.md",
+      "sha256": "040ddd9033baec4c97a7f67ceebb13e1b73323165ea7ebbd546d2e16be3bf668"
+    },
+    {
+      "path": "apps/web/app/components/client-document-generation-access.ts",
+      "sha256": "6863558252012f75e0f8bc90586680ad7d6abe670899a0886e256c13446191c2"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W25/AF-232-ROOT_ADMISSION_DECISION.md",
+      "sha256": "140d6ff8a0424e0b97eedd6e8681f04056b292fe3ba9a27162127656fc56e582"
+    },
+    {
+      "path": "scripts/verification/client-document-generation-live.test.mjs",
+      "sha256": "eba6eb84e74059db135f8ee698f3c0c623d7c2ac637532e3422f359f02c2145c"
+    },
+    {
+      "path": "scripts/verification/client-document-generation-acceptance.test.mjs",
+      "sha256": "3eefb35ee3ba5aba7d3093984d3ac805941a2d9ef6fd93ce05e22149effd9160"
+    },
+    {
+      "path": "scripts/verification/document-generation-controller-prerequisite.mjs",
+      "sha256": "4be7dcf8015213c89f4e00d1548ae692836644ec1fd32cace71002f53cc18d7c"
+    }
+  ],
+  "sharedAdmissions": [
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "literal": "AF-232",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "literal": "AF-232",
+      "count": 1
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "literal": "AF-232",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "literal": "AF-232",
+      "count": 3
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "literal": "AF-232",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "literal": "AF-232",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "literal": "AF-232",
+      "count": 1
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-fixture.mjs",
+      "literal": "AF-232",
+      "count": 1
+    }
+  ],
+  "parentSources": [
+    "apps/web/app/components/client-personal-agent-request-journal.mjs",
+    "apps/web/app/components/client-personal-agent-request-journal.d.mts",
+    "apps/web/app/components/client-personal-agent-run-state.mjs",
+    "apps/web/app/components/client-personal-agent-run-state.d.mts"
+  ],
+  "workerHours": 0.31,
+  "productPageNative": "NOT_RUN_AF233"
+}
