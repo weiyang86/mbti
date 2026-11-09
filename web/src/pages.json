@@ -41,6 +41,30 @@
       "style": {
         "navigationBarTitleText": "记录详情"
       }
+    },
+    {
+      "path": "pages/pricing/pricing",
+      "style": {
+        "navigationBarTitleText": "商品目录"
+      }
+    },
+    {
+      "path": "pages/unlock/unlock",
+      "style": {
+        "navigationBarTitleText": "确认测试订单"
+      }
+    },
+    {
+      "path": "pages/order-status/order-status",
+      "style": {
+        "navigationBarTitleText": "订单状态"
+      }
+    },
+    {
+      "path": "pages/orders/orders",
+      "style": {
+        "navigationBarTitleText": "我的订单与权益"
+      }
     }
   ],
   "globalStyle": {

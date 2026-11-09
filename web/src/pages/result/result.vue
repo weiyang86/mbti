@@ -17,6 +17,7 @@
 
     <view class="btn-primary mt" @click="goShare">生成晒图预览</view>
     <view class="btn-secondary mt" @click="goHistory">查看阶段记录</view>
+    <view class="btn-secondary mt" @click="goCatalog">查看此结果的测试商品</view>
     <view class="btn-secondary mt" @click="goHome">再测一次</view>
     <view class="btn-secondary mt" @click="goHome">返回首页</view>
   </view>
@@ -66,6 +67,10 @@ function goShare() {
 
 function goHistory() {
   uni.navigateTo({ url: '/pages/history/list' })
+}
+
+function goCatalog() {
+  uni.navigateTo({ url: `/pages/pricing/pricing?result_id=${encodeURIComponent(resultId.value)}` })
 }
 
 function goHome() {

@@ -16,7 +16,7 @@ const clientCode = compile('../src/api/client.ts')
 const draftCode = compile('../src/store/quiz-draft.ts')
 const apiCode = compile('../src/api/index.ts')
 
-function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: { items: [], next_cursor: null } })) {
+function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: { items: [], next_cursor: null } }), globals = {}) {
   const calls = []
   const uni = {
     getStorageSync: (key) => structuredClone(storage.get(key)),
@@ -24,13 +24,17 @@ function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: 
     removeStorageSync: (key) => storage.delete(key),
     request(options) {
       calls.push(options)
-      queueMicrotask(() => options.success(options.url.endsWith('/auth/guest')
-        ? { statusCode: 201, data: { guest_token: 'synthetic-guest', expires_at: future } }
-        : respond(options)))
+      queueMicrotask(() => {
+        const response = options.url.endsWith('/auth/guest')
+          ? { statusCode: 201, data: { guest_token: 'synthetic-guest', expires_at: future } }
+          : respond(options)
+        if (response.networkError) options.fail(response.networkError)
+        else options.success(response)
+      })
     },
   }
   const load = (code) => {
-    const context = { module: { exports: {} }, uni, URLSearchParams }
+    const context = { module: { exports: {} }, uni, URLSearchParams, crypto, ...globals }
     vm.runInNewContext(code, context)
     return context.module.exports
   }
@@ -151,6 +155,97 @@ test('F2 synchronous share rejects pending jobs, missing URLs and local placehol
     const calls = b.load(apiCode)
     await assert.rejects(calls.createSharePreview({ result_id: 'owned' }), /分享预览未就绪/)
     assert.equal(b.calls.length, 2)
+  }
+})
+
+test('F3 a lost order response and refresh reuse the same intent key, with only allowed fields', async () => {
+  const b = browser(new Map(), () => ({ networkError: { errMsg: 'connection lost' } }))
+  const calls = b.load(apiCode)
+  const body = { result_id: 'owned', product_code: 'server-sku', amount: 1, status: 'paid', unlocked: true }
+  await assert.rejects(calls.createOrder(body))
+  assert.equal(b.calls.length, 2)
+  const originalKey = b.calls[1].header['Idempotency-Key']
+  assert.ok(originalKey)
+  const refreshed = browser(b.storage, () => ({ statusCode: 201, data: { id: 'persistent-order', status: 'pending', unlocked: false, amount: 990, currency: 'CNY' } }))
+  const result = await refreshed.load(apiCode).createOrder(body)
+  assert.equal(refreshed.calls.length, 1)
+  assert.equal(refreshed.calls[0].header['Idempotency-Key'], originalKey)
+  assert.deepEqual(JSON.parse(JSON.stringify(refreshed.calls[0].data)), { result_id: 'owned', product_code: 'server-sku' })
+  assert.equal(result.id, 'persistent-order')
+  assert.equal(result.status, 'pending')
+  assert.equal(result.unlocked, false)
+  assert.equal('order' in b.storage.get(`mbti_purchase_intent_v1:${api}`), false)
+})
+
+test('F3 changing result, product or guest starts another intent; concurrent attempts share one key', async () => {
+  const b = browser()
+  const calls = b.load(apiCode)
+  const body = { result_id: 'result-1', product_code: 'sku-1' }
+  const keys = await Promise.all([calls.preparePurchaseIntent(body), calls.preparePurchaseIntent(body)])
+  assert.equal(keys[0], keys[1])
+  const productKey = await calls.preparePurchaseIntent({ ...body, product_code: 'sku-2' })
+  assert.notEqual(productKey, keys[0])
+  const resultKey = await calls.preparePurchaseIntent({ ...body, result_id: 'result-2' })
+  assert.notEqual(resultKey, productKey)
+  const other = browser(new Map(b.storage))
+  other.storage.set(guestKey, { guest_token: 'another-guest', expires_at: future })
+  const otherKey = await other.load(apiCode).preparePurchaseIntent({ ...body, result_id: 'result-2' })
+  assert.notEqual(otherKey, resultKey)
+})
+
+test('F3 failure to persist the purchase intent prevents POST orders', async () => {
+  const b = browser(new Map([[guestKey, { guest_token: 'synthetic-guest', expires_at: future }]]))
+  b.uni.setStorageSync = () => { throw new Error('storage denied') }
+  await assert.rejects(b.load(apiCode).createOrder({ result_id: 'owned', product_code: 'sku' }), /storage denied/)
+  assert.equal(b.calls.length, 0)
+})
+
+test('F3 401 order creation is never replayed, replaced or treated as unlocked', async () => {
+  const b = browser(new Map(), () => ({ statusCode: 401, data: { code: 'guest_invalid', message: 'invalid' } }))
+  const calls = b.load(apiCode)
+  await assert.rejects(calls.createOrder({ result_id: 'owned', product_code: 'sku' }), (e) => e.status === 401)
+  await assert.rejects(calls.createOrder({ result_id: 'owned', product_code: 'sku' }), (e) => e.status === 401)
+  assert.equal(b.calls.length, 2)
+  assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  assert.equal(b.storage.get(guestKey).invalid, true)
+})
+
+test('F3 catalog, paginated orders, status and entitlements use the shared guest and server responses', async () => {
+  const b = browser(new Map(), (options) => ({ statusCode: 200, data: options.url.includes('/orders/')
+    ? { order_id: 'owned /?', status: 'pending', unlocked: false, payment_availability: 'unconfigured' }
+    : { items: [], next_cursor: null } }))
+  const calls = b.load(apiCode)
+  const [catalog, orders, status, entitlements] = await Promise.all([
+    calls.listProducts(), calls.listOrders({ limit: 20, cursor: 'next /?' }), calls.getOrderStatus('owned /?'), calls.getMyEntitlements(),
+  ])
+  assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  assert.ok(b.calls.slice(1).every((c) => c.header['X-Guest-Token'] === 'synthetic-guest'))
+  assert.deepEqual(b.calls.slice(1).map((c) => c.url.slice(api.length)).sort(),
+    ['/entitlements/me', '/orders/owned%20%2F%3F', '/orders?limit=20&cursor=next+%2F%3F', '/products'])
+  assert.equal(catalog.items.length + orders.items.length + entitlements.items.length, 0)
+  assert.equal(status.unlocked, false)
+  assert.equal(status.payment_availability, 'unconfigured')
+})
+
+test('F3 404/409/422/503 remain explicit failures with no local order or entitlement fallback', async () => {
+  for (const status of [404, 409, 422, 503]) {
+    const b = browser(new Map([['mbti_mock_orders_v1', [{ id: 'old', status: 'paid' }]], ['mbti_studio_v1', { tier: 2 }]]),
+      () => ({ statusCode: status, data: { code: 'rejected', message: `拒绝 ${status}` } }))
+    const calls = b.load(apiCode)
+    for (const action of [() => calls.listProducts(), () => calls.listOrders(), () => calls.getMyEntitlements(),
+      () => calls.getOrderStatus('old'), () => calls.createOrder({ result_id: 'owned', product_code: 'sku' })]) {
+      await assert.rejects(action(), (e) => e.status === status && e.message === `拒绝 ${status}`)
+    }
+    assert.equal(b.calls.length, 6)
+    assert.equal(b.storage.get('mbti_studio_v1').tier, 2)
+  }
+})
+
+test('F3 intent keys meet the candidate header format without secure-context randomUUID', async () => {
+  for (const unavailableCrypto of [{ getRandomValues: crypto.getRandomValues.bind(crypto) }, undefined]) {
+    const b = browser(new Map(), undefined, { crypto: unavailableCrypto })
+    const key = await b.load(apiCode).preparePurchaseIntent({ result_id: 'owned', product_code: 'sku' })
+    assert.match(key, /^[A-Za-z0-9_-]{16,128}$/)
   }
 })
 
