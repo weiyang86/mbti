@@ -5,6 +5,7 @@
 ## 范围与基线
 
 - 本树 `/Users/lei/orca/workspaces/mbti/mbti-web-api-f4-web`，分支 `weiyang86/mbti-web-api-f4-web`，基线 `42dc92b6bbbdda716c980b3f0ed0a6a3067a01ff`，已含总控验收的 F1/F2/F3 与开发运营初始化。
+- Web 实现提交 `5d3037828d3b1710ba731fc254181fe039f7374a`；后端重启后只读复验候选 `d0bdaa94130f590089617ccf2b6e48dac288085e`。本说明补证提交作为 Web 最终候选，范围仍仅 `web/` 17 文件。
 - 固定参考 PR20 `a39d99cf8537a6e54c34e965b2c3ff6c2691a21f`：读取 cards/buddies/card-exchanges/types-social，核对 card/public/discover/buddies detail/exchanges/account 的真实消费；没有整体合入 PR20。
 - 读过根、web、aij-foundation AGENTS，输入 RUNBOOK/API-REVIEW/cards/F4，内部准备 [MBTI-F4-candidate.md](../docs/integration/MBTI-F4-candidate.md) 与 F3 交付说明。
 - 后端 runtime candidate 来自后端树 `docs/integration/MBTI-F4-runtime-candidate.openapi.yaml` 与 examples；已逐字段核对，本树仅修改 Web 与本说明，不修改后端、Prisma 或 `docs/api/`。
@@ -47,6 +48,7 @@ F4 复用原 `request`/共享初始化游客 client，未改游客、交易意�
 | `VITE_USE_MOCK=false VITE_API_BASE_URL=http://127.0.0.1:4156/api/v1 npm run build:h5` | 0；沿用 UniApp/Sass 的现有 deprecation 警告，无编译失败 |
 | `git diff --check` | 0 |
 | `/tmp/mbti-f4-browser.py`、`/tmp/mbti-f4-stage2.py`、`/tmp/mbti-f4-stage3a.py`、`/tmp/mbti-f4-stage3b.py`（`python3` 执行） | 各 0；通过 Orca CLI 驱动实际浏览器 UI，并用同浏览器 client 做越权/非法输入请求；不是 Mock 服务 |
+| `python3 /tmp/mbti-f4-restart-read.py` | 0；原 A/B/C 重启后保号、保卡、隐私与关系持久化、F1/F3 只读回归、401 与 no-store 实测 |
 
 ## A/B/C 真实 Network 与界面证据
 
@@ -77,13 +79,17 @@ F4 复用原 `request`/共享初始化游客 client，未改游客、交易意�
 
 关系序列：`exchange_QxRevZklRo57AbIhUcteD-5qbNVfc0tY` 首建→B 接受→A 撤回；`exchange_VFSNIrp_0pgNiUlDFZDXNLQE13IfAgOz` 新建→B 拒绝；`exchange__3MSJR9AdUDv16AC3mXcJ_Z6MwBAikaN` 新建→A 撤回。后续 `exchange_4m_kkC9pXCPi8ka8CBB_T2TK8DupwDuj` 接受后因屏蔽 revoked，解除后原 ID 仍 revoked。
 
-本次去敏 Network 捕获 A=141、B=86、C=45 条 API 请求（包含 OPTIONS），实际状态集合有 200/201/204/404/409/422；contacts/contact-requests 请求数均 0。只记录方法、URL、状态、时间及合成对象/UI 文本，未保存 header/token。原始工具输出、截图与临时验收脚本留在本机临时目录，不提交日志或构建产物。390×844 手机宽度实看公开页及桌面截图无溢出；全页面移动端逐页视觉检查未执行。
+写操作结束时去敏 Network 捕获 A=141、B=86、C=45 条 API 请求（包含 OPTIONS），实际状态集合有 200/201/204/404/409/422；contacts/contact-requests 请求数均 0。只记录方法、URL、状态、时间及合成对象/UI 文本，未保存 header/token。原始工具输出、截图与临时验收脚本留在本机临时目录，不提交日志或构建产物。390×844 手机宽度实看公开页及桌面截图无溢出；全页面移动端逐页视觉检查未执行。
+
+实际 UTC 界面/响应检查时点：三卡保存/主动公开分别 `04:22:18`、`04:22:24`、`04:22:30`；发起 `04:48:12`、收到 `04:48:13`、接受 `04:48:15`；隐藏后详情/公开/内嵌收紧 `04:48:17–18`；已接受撤回 `04:48:19`、拒绝 `04:48:21`；屏蔽管理 `04:49:40`、解除 `04:49:44`、原 ID revoked 读回 `04:49:45`；原三身份刷新 `04:49:46–48`。对应日期均为 2026-11-09，实际 Network 时间范围 `04:18:47–04:49:48`，状态/方法/路径来自浏览器捕获而非预期值。
+
+重启只读复验完成于 UTC `04:54:59`；最终捕获 A=150、B=95、C=73 条 API 请求，新增实际 401 证据；捕获期间三 profile 的 auth/guest 发行请求均为 0，使用已有身份。后续没有 Web 写请求。
 
 ## 重启、回归与未验
 
-- 已按总控指定窗口停止 Web 写请求，并通知可短重启 4156。原三 profile 重启后只读复验：`NOT_RUN`，等待总控 READY 通知，未轮询/换号。
-- F1/F3 真实只读回归：`NOT_RUN`，等待重启完成；原有 22 项隔离测试仍通过，交易/游客/原题库恢复代码未改。
-- API 缺身份 401、并发 pair 锁/唯一约束、双向同时 block/respond、后端服务重启由后端 Writer 主验；本 Web 尚未把这些后端结果计为自身通过。
+- 已按总控指定窗口停止 Web 写请求；收到后端 stop/start 后 READY 与候选 SHA 后，用原三 profile 刷新并只读复验通过。没有重新领号或清记录：A/B/C 的凭证摘要、card ID、类型、公开状态不变，B 四项隐藏保留，A/B 五条关系（四 revoked、一 declined）方向/对方和终态保留，C 无私密关系；三人的本人 blocked 列表仍空。公开页与内嵌 buddy 仍匿名且无 B canary；已接受后 block 的原 ID 仍 revoked。
+- F1/F3 真实只读回归通过：C 原身份 GET 当前题库 200，`qb-v0.4-prototype-1`、12 题；本人结果 200 空列表；商品 200 与页面一致（990 分可售、1990 分未开放），本人订单/权益均 200 空列表，页面没有假购买/解锁。没有创建新订单或测试会话；交易意图与原题库恢复代码未改，原有 22 项隔离测试仍通过。
+- 浏览器实际缺 token `GET /cards/me` 401 `GUEST_UNAUTHORIZED`；有 token `GET /card-exchanges` 200，实际 `Cache-Control: no-store`。并发 pair 锁/唯一约束、双向同时 block/respond 由后端 Writer 主验，本 Web 未把后端专属测试计为自身通过。
 - 真实浏览器 401 不换号/重放故障注入、422 输入失败页面、微信端、另一物理设备、全移动布局：`NOT_RUN`；25 项隔离测试覆盖 client 的 401 保号、404/409/422 不回退与按钮角色。真实 404/409 页面已测，422 真实 HTTP 已测，二者不混称页面通过。
 - F5 授权链、真实联系方式、F6 位置/计数均 `NOT_RUN`，没有调用占位接口或显示假授权。
 - 正式发布仍需审阅 U01–U12 与本轮候选；本说明不消除 `needs_human_review`。
