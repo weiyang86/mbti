@@ -1,0 +1,2394 @@
+{
+  "status": "candidate / needs_human_review",
+  "source_revision": "a8d458e11bdc9cdf6b487b84bc5b2fbe605cc36a",
+  "base": "http://192.168.0.200:4156/api/v1",
+  "redaction": "No contact values, tokens, owner IDs, object keys, hashes, raw request/response bodies or API logs. Actual requests are grouped by route template.",
+  "prepare": {
+    "http_responses": 257,
+    "assertions": 639,
+    "outcome": "passed",
+    "status_counts": {
+      "201": 33,
+      "200": 96,
+      "404": 53,
+      "422": 23,
+      "400": 4,
+      "409": 11,
+      "204": 24,
+      "503": 4,
+      "401": 9
+    }
+  },
+  "restart": {
+    "http_responses": 48,
+    "assertions": 131,
+    "outcome": "passed",
+    "status_counts": {
+      "200": 35,
+      "404": 13
+    }
+  },
+  "operations": [
+    {
+      "requirement": 36,
+      "method": "GET",
+      "path": "/contacts/me",
+      "observed_status_counts": {
+        "200": 4,
+        "422": 1,
+        "503": 1,
+        "401": 2
+      },
+      "evidence": [
+        {
+          "id": "P002",
+          "actor": "A",
+          "label": "/contacts/me",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P006",
+          "actor": "B",
+          "label": "/contacts/me",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P010",
+          "actor": "C",
+          "label": "/contacts/me",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P029",
+          "actor": "A",
+          "label": "no owner query",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P124",
+          "actor": "B",
+          "label": "/contacts/me",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P195",
+          "actor": "B",
+          "label": "private read fault",
+          "status": 503,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P215",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P223",
+          "actor": "invalid",
+          "label": "invalid guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        }
+      ]
+    },
+    {
+      "requirement": 37,
+      "method": "PUT",
+      "path": "/contacts/me",
+      "observed_status_counts": {
+        "200": 12,
+        "422": 9,
+        "400": 4,
+        "503": 2,
+        "401": 1
+      },
+      "evidence": [
+        {
+          "id": "P004",
+          "actor": "A",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P008",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P012",
+          "actor": "C",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P016",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P017",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P018",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P019",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P020",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P021",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P022",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P023",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P024",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P025",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P026",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 400,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P027",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 400,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P028",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 400,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P046",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P048",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P115",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P120",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P126",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P130",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P192",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P197",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 503,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P201",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 503,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P202",
+          "actor": "B",
+          "label": "own full replacement",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P216",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": null,
+          "actor": "A",
+          "label": "malformed JSON",
+          "status": 400,
+          "passed": true,
+          "no_store": null
+        }
+      ]
+    },
+    {
+      "requirement": 38,
+      "method": "DELETE",
+      "path": "/contacts/me",
+      "observed_status_counts": {
+        "422": 1,
+        "204": 4,
+        "401": 1
+      },
+      "evidence": [
+        {
+          "id": "P015",
+          "actor": "A",
+          "label": "clear has no owner selector",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P122",
+          "actor": "B",
+          "label": "clear",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P123",
+          "actor": "B",
+          "label": "clear idempotent",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P189",
+          "actor": "B",
+          "label": "clear race",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P200",
+          "actor": "B",
+          "label": "clear before isolated write fault",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P217",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        }
+      ]
+    },
+    {
+      "requirement": 39,
+      "method": "GET",
+      "path": "/contact-requests",
+      "observed_status_counts": {
+        "422": 1,
+        "200": 9,
+        "401": 1
+      },
+      "evidence": [
+        {
+          "id": "P030",
+          "actor": "A",
+          "label": "no duplicate query",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P055",
+          "actor": "B",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P056",
+          "actor": "A",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P057",
+          "actor": "C",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P058",
+          "actor": "B",
+          "label": "/contact-requests?buddy_id={public_card_id}",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P139",
+          "actor": "A",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P152",
+          "actor": "A",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P218",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P235",
+          "actor": "A",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P244",
+          "actor": "B",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P253",
+          "actor": "C",
+          "label": "/contact-requests",
+          "status": 200,
+          "passed": true,
+          "no_store": true
+        }
+      ]
+    },
+    {
+      "requirement": 40,
+      "method": "POST",
+      "path": "/contact-requests",
+      "observed_status_counts": {
+        "404": 5,
+        "409": 4,
+        "422": 9,
+        "201": 23,
+        "200": 8,
+        "401": 1
+      },
+      "evidence": [
+        {
+          "id": "P014",
+          "actor": "D",
+          "label": "no-card sender cannot request",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P031",
+          "actor": "A",
+          "label": "base exchange required",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P037",
+          "actor": "A",
+          "label": "strict channel validation",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P038",
+          "actor": "A",
+          "label": "strict channel validation",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P039",
+          "actor": "A",
+          "label": "strict channel validation",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P040",
+          "actor": "A",
+          "label": "strict channel validation",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P041",
+          "actor": "A",
+          "label": "strict channel validation",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P042",
+          "actor": "A",
+          "label": "strict channel validation",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P043",
+          "actor": "A",
+          "label": "strict channel validation",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P044",
+          "actor": "A",
+          "label": "no self request",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P045",
+          "actor": "A",
+          "label": "no forged sender",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P047",
+          "actor": "A",
+          "label": "missing recipient channel generic conflict",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P049",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P053",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P054",
+          "actor": "A",
+          "label": "different pending set conflict",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P069",
+          "actor": "A",
+          "label": "accepted duplicate",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P071",
+          "actor": "B",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "qq"
+          ]
+        },
+        {
+          "id": "P080",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P084",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P088",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P092",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P096",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P097",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P098",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P099",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P100",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P101",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P102",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P103",
+          "actor": "A",
+          "label": "parallel directed create",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "phone"
+          ]
+        },
+        {
+          "id": "P105",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P109",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P114",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P118",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P128",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P132",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P136",
+          "actor": "A",
+          "label": "blocked create hidden",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P145",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P149",
+          "actor": "A",
+          "label": "blocked create hidden",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P158",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P165",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P169",
+          "actor": "A",
+          "label": "private create denied",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P172",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P176",
+          "actor": "A",
+          "label": "private create denied",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P179",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P187",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P193",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P203",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "qq",
+            "phone"
+          ]
+        },
+        {
+          "id": "P207",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P214",
+          "actor": "A",
+          "label": "create directional request",
+          "status": 201,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "phone"
+          ]
+        },
+        {
+          "id": "P219",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        }
+      ]
+    },
+    {
+      "requirement": 41,
+      "method": "POST",
+      "path": "/contact-requests/{id}/respond",
+      "observed_status_counts": {
+        "409": 6,
+        "404": 5,
+        "422": 2,
+        "200": 17,
+        "401": 1
+      },
+      "evidence": [
+        {
+          "id": "P059",
+          "actor": "A",
+          "label": "respond pending recipient",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P060",
+          "actor": "C",
+          "label": "respond pending recipient",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P062",
+          "actor": "C",
+          "label": "third party before body",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P063",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P064",
+          "actor": "B",
+          "label": "no partial expansion",
+          "status": 422,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P065",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P070",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P073",
+          "actor": "A",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "qq"
+          ]
+        },
+        {
+          "id": "P089",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P093",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P106",
+          "actor": "B",
+          "label": "race accept",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P107",
+          "actor": "B",
+          "label": "race decline",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P111",
+          "actor": "B",
+          "label": "triple accept",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P112",
+          "actor": "B",
+          "label": "triple decline",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P116",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P119",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P129",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P133",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P137",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P146",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P150",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P159",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P166",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P173",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P180",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P188",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P194",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P204",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "qq",
+            "phone"
+          ]
+        },
+        {
+          "id": "P208",
+          "actor": "B",
+          "label": "respond pending recipient",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P220",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P224",
+          "actor": "A",
+          "label": "unknown request",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        }
+      ]
+    },
+    {
+      "requirement": 42,
+      "method": "DELETE",
+      "path": "/contact-requests/{id}",
+      "observed_status_counts": {
+        "404": 4,
+        "204": 13,
+        "409": 1,
+        "401": 1
+      },
+      "evidence": [
+        {
+          "id": "P061",
+          "actor": "C",
+          "label": "both parties revoke",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P075",
+          "actor": "B",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P076",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P079",
+          "actor": "B",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P081",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P082",
+          "actor": "B",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P085",
+          "actor": "B",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P086",
+          "actor": "B",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P091",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 409,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P094",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P104",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P108",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P110",
+          "actor": "A",
+          "label": "triple revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P138",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P151",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P199",
+          "actor": "A",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P206",
+          "actor": "B",
+          "label": "both parties revoke",
+          "status": 204,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P221",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P225",
+          "actor": "A",
+          "label": "unknown request",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        }
+      ]
+    },
+    {
+      "requirement": 43,
+      "method": "GET",
+      "path": "/contact-requests/{id}/granted",
+      "observed_status_counts": {
+        "404": 34,
+        "200": 6,
+        "503": 1,
+        "401": 1
+      },
+      "evidence": [
+        {
+          "id": "P036",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P050",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P051",
+          "actor": "B",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P052",
+          "actor": "C",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P066",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P067",
+          "actor": "B",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P068",
+          "actor": "C",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P072",
+          "actor": "B",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P074",
+          "actor": "B",
+          "label": "sender exact grant",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "qq"
+          ]
+        },
+        {
+          "id": "P077",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P078",
+          "actor": "B",
+          "label": "sender exact grant",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "qq"
+          ]
+        },
+        {
+          "id": "P083",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P087",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P090",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P095",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P113",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P117",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P121",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P125",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P127",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P131",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P135",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P141",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P144",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P148",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P154",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P157",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P161",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P164",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P168",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P171",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P175",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P178",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P182",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P183",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P190",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P191",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P196",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 503,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P198",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat"
+          ]
+        },
+        {
+          "id": "P205",
+          "actor": "A",
+          "label": "sender exact grant",
+          "status": 200,
+          "passed": true,
+          "no_store": true,
+          "channels": [
+            "wechat",
+            "qq",
+            "phone"
+          ]
+        },
+        {
+          "id": "P222",
+          "actor": "none",
+          "label": "eight missing guest",
+          "status": 401,
+          "passed": true,
+          "no_store": true
+        },
+        {
+          "id": "P226",
+          "actor": "A",
+          "label": "unknown request",
+          "status": 404,
+          "passed": true,
+          "no_store": true
+        }
+      ]
+    }
+  ],
+  "concurrency": [
+    {
+      "id": "P096",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 201,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P097",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P098",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P099",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P100",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P101",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P102",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P103",
+      "actor": "A",
+      "method": "POST",
+      "label": "parallel directed create",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat",
+        "phone"
+      ]
+    },
+    {
+      "id": "P106",
+      "actor": "B",
+      "method": "POST",
+      "label": "race accept",
+      "status": 200,
+      "passed": true,
+      "no_store": true,
+      "channels": [
+        "wechat"
+      ]
+    },
+    {
+      "id": "P107",
+      "actor": "B",
+      "method": "POST",
+      "label": "race decline",
+      "status": 409,
+      "passed": true,
+      "no_store": true
+    },
+    {
+      "id": "P110",
+      "actor": "A",
+      "method": "DELETE",
+      "label": "triple revoke",
+      "status": 204,
+      "passed": true,
+      "no_store": true
+    },
+    {
+      "id": "P111",
+      "actor": "B",
+      "method": "POST",
+      "label": "triple accept",
+      "status": 409,
+      "passed": true,
+      "no_store": true
+    },
+    {
+      "id": "P112",
+      "actor": "B",
+      "method": "POST",
+      "label": "triple decline",
+      "status": 409,
+      "passed": true,
+      "no_store": true
+    },
+    {
+      "id": "P181",
+      "actor": "A",
+      "method": "POST",
+      "label": "block invalidates",
+      "status": 200,
+      "passed": true,
+      "no_store": true
+    },
+    {
+      "id": "P182",
+      "actor": "A",
+      "method": "GET",
+      "label": "sender exact grant",
+      "status": 404,
+      "passed": true,
+      "no_store": true
+    },
+    {
+      "id": "P189",
+      "actor": "B",
+      "method": "DELETE",
+      "label": "clear race",
+      "status": 204,
+      "passed": true,
+      "no_store": true
+    },
+    {
+      "id": "P190",
+      "actor": "A",
+      "method": "GET",
+      "label": "sender exact grant",
+      "status": 404,
+      "passed": true,
+      "no_store": true
+    }
+  ],
+  "semantic_privacy_assertions": [
+    {
+      "label": "HTTP has no internal storage/owner identifiers",
+      "passed": true
+    },
+    {
+      "label": "public projection contains no contact canary",
+      "passed": true
+    },
+    {
+      "label": "new own contacts empty",
+      "passed": true
+    },
+    {
+      "label": "own PUT own values only",
+      "passed": true
+    },
+    {
+      "label": "error exact code/message only",
+      "passed": true
+    },
+    {
+      "label": "identical normalized PUT version idempotent",
+      "passed": true
+    },
+    {
+      "label": "base acceptance alone gives no grant",
+      "passed": true
+    },
+    {
+      "label": "PUT omitted fields removed",
+      "passed": true
+    },
+    {
+      "label": "pending404",
+      "passed": true
+    },
+    {
+      "label": "recipient404",
+      "passed": true
+    },
+    {
+      "label": "C404",
+      "passed": true
+    },
+    {
+      "label": "pending retry same ID",
+      "passed": true
+    },
+    {
+      "label": "incoming buddy sender card",
+      "passed": true
+    },
+    {
+      "label": "outgoing buddy recipient card",
+      "passed": true
+    },
+    {
+      "label": "C cannot list request",
+      "passed": true
+    },
+    {
+      "label": "buddy filter exact",
+      "passed": true
+    },
+    {
+      "label": "only exact wechat no QQ phone",
+      "passed": true
+    },
+    {
+      "label": "recipient cannot granted",
+      "passed": true
+    },
+    {
+      "label": "C cannot granted",
+      "passed": true
+    },
+    {
+      "label": "reverse not autoaccepted",
+      "passed": true
+    },
+    {
+      "label": "reverse exact QQ grant independent",
+      "passed": true
+    },
+    {
+      "label": "recipient revoke immediate",
+      "passed": true
+    },
+    {
+      "label": "sender pending cancel",
+      "passed": true
+    },
+    {
+      "label": "recipient pending revoke",
+      "passed": true
+    },
+    {
+      "label": "declined no grant",
+      "passed": true
+    },
+    {
+      "label": "sender accepted revoke",
+      "passed": true
+    },
+    {
+      "label": "parallel one ID one201",
+      "passed": true
+    },
+    {
+      "label": "fixed channel order",
+      "passed": true
+    },
+    {
+      "label": "one pending response wins",
+      "passed": true
+    },
+    {
+      "label": "replies never both succeed",
+      "passed": true
+    },
+    {
+      "label": "race terminal unauthorized",
+      "passed": true
+    },
+    {
+      "label": "pending old epoch rejected",
+      "passed": true
+    },
+    {
+      "label": "cleared own {}",
+      "passed": true
+    },
+    {
+      "label": "clear invalidates accepted",
+      "passed": true
+    },
+    {
+      "label": "refill no revival",
+      "passed": true
+    },
+    {
+      "label": "change cannot disclose new values",
+      "passed": true
+    },
+    {
+      "label": "either direction block",
+      "passed": true
+    },
+    {
+      "label": "blocked list omits",
+      "passed": true
+    },
+    {
+      "label": "unblock no revival",
+      "passed": true
+    },
+    {
+      "label": "new base no revival",
+      "passed": true
+    },
+    {
+      "label": "base revoke denies grant",
+      "passed": true
+    },
+    {
+      "label": "new reverse base no revival",
+      "passed": true
+    },
+    {
+      "label": "private optout",
+      "passed": true
+    },
+    {
+      "label": "republic no revival",
+      "passed": true
+    },
+    {
+      "label": "post block race denies",
+      "passed": true
+    },
+    {
+      "label": "post clear race denies",
+      "passed": true
+    },
+    {
+      "label": "read fault PUT preserves ref epoch",
+      "passed": true
+    },
+    {
+      "label": "actual write fault commits no reference epoch",
+      "passed": true
+    },
+    {
+      "label": "all requested channels exact canonical order",
+      "passed": true
+    },
+    {
+      "label": "private mode0600",
+      "passed": true
+    },
+    {
+      "label": "guessed public file route denies bytes",
+      "passed": true
+    },
+    {
+      "label": "anonymous Foundation route denies key",
+      "passed": true
+    },
+    {
+      "label": "precise CORS",
+      "passed": true
+    },
+    {
+      "label": "malformed JSON400 no-store",
+      "passed": true
+    },
+    {
+      "label": "API log canary scan: absent",
+      "passed": true
+    },
+    {
+      "label": "DB references only, no contact columns",
+      "passed": true
+    },
+    {
+      "label": "auxiliary DB directed active uniqueness",
+      "passed": true
+    }
+  ],
+  "restart_assertions": [
+    {
+      "label": "HTTP has no internal storage/owner identifiers",
+      "passed": true
+    },
+    {
+      "label": "public projection contains no contact canary",
+      "passed": true
+    },
+    {
+      "label": "original guest/card identity persists",
+      "passed": true
+    },
+    {
+      "label": "original own contacts persist",
+      "passed": true
+    },
+    {
+      "label": "valid grant persists exact set",
+      "passed": true
+    },
+    {
+      "label": "error exact code/message only",
+      "passed": true
+    },
+    {
+      "label": "invalid grant remains invalid after restart",
+      "passed": true
+    },
+    {
+      "label": "recipient cannot granted after restart",
+      "passed": true
+    },
+    {
+      "label": "C cannot granted after restart",
+      "passed": true
+    },
+    {
+      "label": "pending persists without grant",
+      "passed": true
+    },
+    {
+      "label": "pending never grants",
+      "passed": true
+    },
+    {
+      "label": "API log canary scan: absent",
+      "passed": true
+    },
+    {
+      "label": "DB references only, no contact columns",
+      "passed": true
+    },
+    {
+      "label": "auxiliary DB directed active uniqueness",
+      "passed": true
+    }
+  ],
+  "layout_compatibility": {
+    "first_run": {
+      "copied": 2,
+      "already_compatible": 0,
+      "references_unchanged": true,
+      "integrity": true,
+      "originals_retained": true
+    }
+  },
+  "public_route_denials": [
+    {
+      "method": "GET",
+      "path": "/public-guessed-object-route",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "method": "GET",
+      "path": "/public-guessed-object-route",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "method": "GET",
+      "path": "/public-guessed-object-route",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/client/files/<redacted-key>",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/files/<redacted-key>",
+      "status": 404,
+      "passed": true
+    }
+  ]
+}
