@@ -5,7 +5,7 @@ import { createApplication } from "./bootstrap";
 async function bootstrap() {
   const runtime = loadRuntimeEnvironment();
   const app = await createApplication();
-  await app.listen(runtime.apiPort, "127.0.0.1");
+  await app.listen(runtime.apiPort, runtime.projectId === "mbti-foundation" ? "0.0.0.0" : "127.0.0.1");
   Logger.log(`AIJ Foundation API listening on ${runtime.apiUrl}; /health is liveness, /ready checks the database`, "Bootstrap");
 }
 

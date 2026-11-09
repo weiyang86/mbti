@@ -1,3 +1,4 @@
+import { mbtiParserErrorMiddleware } from "./mbti/mbti.http";
 import { documentGenerationPrivateMiddleware, documentGenerationJsonVerify, documentGenerationParserErrorMiddleware } from './plugins/aij-ai/ai-personal-document-generation.http';
 import { documentExportNoStore } from "./documents/personal-document-exports.controller";
 import type { ExpressAdapter } from "@nestjs/platform-express";
@@ -13,7 +14,7 @@ import { personalMemoryNoStore } from "./plugins/aij-ai/ai-personal-memories.con
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { UnsupportedMediaTypeException, ValidationPipe } from "@nestjs/common";
-import { loadRuntimeEnvironment } from "../../../scripts/runtime-environment.cjs";
+import { loadRuntimeEnvironment, readApplicationEnvironment } from "../../../scripts/runtime-environment.cjs";
 import { AppModule } from "./app.module";
 import { PluginCatalog } from "./plugin-runtime/plugin-catalog";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
@@ -63,7 +64,10 @@ export async function createApplication(options: { testBrowserOrigin?: string; p
   });
   if (runtime.trustProxyHops > 0) app.getHttpAdapter().getInstance().set("trust proxy", runtime.trustProxyHops);
   app.setGlobalPrefix("api");
-  app.enableCors({ origin, credentials: true, exposedHeaders: ["Content-Disposition", "X-Content-Type-Options", "X-AIJ-Document-Id", "X-AIJ-Document-Revision", "X-AIJ-Export-Id", "X-AIJ-Checksum-Sha256", "X-AIJ-Renderer-Version", "Content-Length", "X-AIJ-Script-Run-Id", "X-AIJ-Script-Version-Id", "X-AIJ-Asset-Id"] });
+  const mbtiOrigins: string[] = runtime.projectId === "mbti-foundation" ? JSON.parse(readApplicationEnvironment().MBTI_H5_ORIGINS || JSON.stringify([origin])) : [origin];
+  if (!Array.isArray(mbtiOrigins) || mbtiOrigins.some(value => typeof value !== "string" || new URL(value).origin !== value || !["http:", "https:"].includes(new URL(value).protocol))) throw new Error("MBTI_H5_ORIGINS must contain exact HTTP origins");
+  app.use("/api/v1", (_request: IncomingMessage, response: ServerResponse, next: () => void) => { response.setHeader("Cache-Control", "no-store"); next(); });
+  app.enableCors({ origin: runtime.projectId === "mbti-foundation" ? mbtiOrigins : origin, credentials: true, exposedHeaders: ["Content-Disposition", "X-Content-Type-Options", "X-AIJ-Document-Id", "X-AIJ-Document-Revision", "X-AIJ-Export-Id", "X-AIJ-Checksum-Sha256", "X-AIJ-Renderer-Version", "Content-Length", "X-AIJ-Script-Run-Id", "X-AIJ-Script-Version-Id", "X-AIJ-Asset-Id"] });
   app.use((request: IncomingMessage & { correlationId?: string }, response: ServerResponse, next: () => void) => { correlateRequest(request, response); next(); });
   // Same JSON limit/raw-body contract as the host; verify duplicate workflow keys before parsing.
   // Nest's rawBody option replaces a verify hook, so explicitly preserve the buffer here.
@@ -85,6 +89,7 @@ export async function createApplication(options: { testBrowserOrigin?: string; p
     personalDocumentJsonVerify(buffer);
   } });
   httpAdapter.useBodyParser("json", false, workflowParserOptions);
+  app.use(mbtiParserErrorMiddleware);
   app.use(documentGenerationParserErrorMiddleware);
   app.use(knowledgeWebImportParserErrorMiddleware);
   app.use(knowledgeCitationParserErrorMiddleware);

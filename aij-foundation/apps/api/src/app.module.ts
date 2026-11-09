@@ -1,3 +1,4 @@
+import { MbtiModule } from "./mbti/mbti.module";
 import { GeneratedFileAssetsModule } from "./files/generated-file-assets.module";
 import { DynamicModule, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
@@ -42,6 +43,7 @@ export class AppModule {
         ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true, load: [() => runtime] }),
         ...(runtime.enabledPlugins.includes("aij-ai") ? [KnowledgeWebImportModule.forRoot(runtime, testKnowledgeWebImportTransport)] : []),
         PluginRuntimeModule.forRoot(runtime.enabledPlugins), PrismaModule,
+        ...(runtime.projectId === "mbti-foundation" && runtime.capabilities.database ? [MbtiModule] : []),
         ...(runtime.capabilities.database && runtime.capabilities.storage ? [GeneratedFileAssetsModule] : []),
         ...(runtime.capabilities.auth ? [AdminUsersModule, MenusModule, DictionariesModule, ConfigurationModule, AuditQueryModule, ...(runtime.capabilities.storage ? [AdminFilesModule] : [])] : []),
         ...(runtime.capabilities.auth && runtime.capabilities.clientAuth ? [AdminClientDirectoryModule] : []),

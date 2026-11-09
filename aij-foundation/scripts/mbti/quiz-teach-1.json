@@ -1,0 +1,197 @@
+{
+  "question_bank_version": "qb-v0.4-teach-1",
+  "questions": [
+    {
+      "id": "q1",
+      "index": 1,
+      "dimension": "EI",
+      "prompt": "最近四周，更常从独处中恢复精力？",
+      "options": [
+        {
+          "id": "e",
+          "label": "更贴近 E 侧（同意/是）"
+        },
+        {
+          "id": "i",
+          "label": "更贴近 I 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "index": 2,
+      "dimension": "EI",
+      "prompt": "小组讨论时，你更习惯先听再说？",
+      "options": [
+        {
+          "id": "e",
+          "label": "更贴近 E 侧（同意/是）"
+        },
+        {
+          "id": "i",
+          "label": "更贴近 I 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "index": 3,
+      "dimension": "EI",
+      "prompt": "社交活动结束后，你需要 alone time？",
+      "options": [
+        {
+          "id": "e",
+          "label": "更贴近 E 侧（同意/是）"
+        },
+        {
+          "id": "i",
+          "label": "更贴近 I 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "index": 4,
+      "dimension": "SN",
+      "prompt": "你更关注眼前可验证的细节？",
+      "options": [
+        {
+          "id": "s",
+          "label": "更贴近 S 侧（同意/是）"
+        },
+        {
+          "id": "n",
+          "label": "更贴近 N 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "index": 5,
+      "dimension": "SN",
+      "prompt": "说明方案时，你偏好举具体例子？",
+      "options": [
+        {
+          "id": "s",
+          "label": "更贴近 S 侧（同意/是）"
+        },
+        {
+          "id": "n",
+          "label": "更贴近 N 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "index": 6,
+      "dimension": "SN",
+      "prompt": "你对“可能性和联想”耐心有限？",
+      "options": [
+        {
+          "id": "s",
+          "label": "更贴近 S 侧（同意/是）"
+        },
+        {
+          "id": "n",
+          "label": "更贴近 N 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "index": 7,
+      "dimension": "TF",
+      "prompt": "做决定时，你优先看逻辑一致性？",
+      "options": [
+        {
+          "id": "t",
+          "label": "更贴近 T 侧（同意/是）"
+        },
+        {
+          "id": "f",
+          "label": "更贴近 F 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "index": 8,
+      "dimension": "TF",
+      "prompt": "冲突时，你更先理清对错而非情绪？",
+      "options": [
+        {
+          "id": "t",
+          "label": "更贴近 T 侧（同意/是）"
+        },
+        {
+          "id": "f",
+          "label": "更贴近 F 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "index": 9,
+      "dimension": "TF",
+      "prompt": "评价方案时，“是否合理”比“是否舒服”更重要？",
+      "options": [
+        {
+          "id": "t",
+          "label": "更贴近 T 侧（同意/是）"
+        },
+        {
+          "id": "f",
+          "label": "更贴近 F 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "index": 10,
+      "dimension": "JP",
+      "prompt": "你更喜欢计划先于行动？",
+      "options": [
+        {
+          "id": "j",
+          "label": "更贴近 J 侧（同意/是）"
+        },
+        {
+          "id": "p",
+          "label": "更贴近 P 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "index": 11,
+      "dimension": "JP",
+      "prompt": "临时改计划会让你略感不安？",
+      "options": [
+        {
+          "id": "j",
+          "label": "更贴近 J 侧（同意/是）"
+        },
+        {
+          "id": "p",
+          "label": "更贴近 P 侧（不同意/否）"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "index": 12,
+      "dimension": "JP",
+      "prompt": "你倾向把待办清掉再放松？",
+      "options": [
+        {
+          "id": "j",
+          "label": "更贴近 J 侧（同意/是）"
+        },
+        {
+          "id": "p",
+          "label": "更贴近 P 侧（不同意/否）"
+        }
+      ]
+    }
+  ]
+}

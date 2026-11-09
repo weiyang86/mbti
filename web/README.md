@@ -4,7 +4,7 @@ Vue 3 + Vite + uni-app 骨架，覆盖带教闭环：**测 → 结果 → 晒预
 
 ## 前置
 
-- Node.js 18+（推荐 LTS）
+- Node.js 24（本轮使用 v24.21.0），使用本目录锁文件安装依赖
 - 可选：[HBuilderX](https://www.dcloud.io/hbuilderx.html) 导入本目录运行
 
 API 契约见仓库 [`../docs/api/`](../docs/api/)（**draft / pending Remy 定稿**）。Agent 规则见 [`AGENTS.md`](./AGENTS.md)。
@@ -32,19 +32,19 @@ API 契约见仓库 [`../docs/api/`](../docs/api/)（**draft / pending Remy 定�
 ### 推荐测法
 
 - UI/mock：开发者本机 `npm run dev:h5` + mock
-- 真联调/常驻预览：联调机 `cd /www/wwwroot/mbti/web && npm install && npm run dev:h5`（需按 `.env.example` 配 mock）
+- 真联调/常驻预览：以本轮 [F1 联调说明](./F1-INTEGRATION.md) 的实际地址与启动命令为准；上述云主机信息不作为本轮通过证据
 - 生产：`main`（勿在联调机当生产）
 
 ## 安装与运行（CLI / Trae）
 
 ```bash
 cd web
-cp .env.example .env.development   # 已提交默认 mock；可按需改
-npm install
-npm run dev:h5
+cp .env.example .env.development.local
+npm ci
+npm run dev:h5 -- --host 0.0.0.0 --port 5173 --strictPort
 ```
 
-浏览器访问终端输出的本地 H5 地址。默认 `VITE_USE_MOCK=true`，无需后端即可走通页面流。
+浏览器访问终端输出的 H5 地址。环境示例使用 `VITE_USE_MOCK=false` 连接本轮开发 API；离线 UI 演示需显式设置 `VITE_USE_MOCK=true`。Mock 运行不代表真实 API 通过。
 
 ## 环境变量
 
@@ -52,7 +52,8 @@ npm run dev:h5
 |------|------|
 | `VITE_API_BASE_URL` | 后端根路径，含 `/api/v1` |
 | `VITE_USE_MOCK` | `true` 时使用 `src/api/mock` |
-| `VITE_GUEST_TOKEN` | 非 mock 联调可选 stub 头 |
+
+非 Mock 请求会自动执行 `POST /auth/guest` 并在浏览器本机保存凭证；同一运行实例的并发初始化共享一次请求，刷新复用原身份。所有普通请求携带 `X-Guest-Token`，不再读取共享构建 token。过期或 401 会明确提示会话失效，并保留失效标记，不自动换号或重放写入。只有首页的「重新建立游客会话」经明确确认后才创建新身份，新身份无法访问原身份的历史结果。
 
 ## 页面
 
@@ -70,6 +71,8 @@ npm run dev:h5
 
 ```bash
 npm run build:h5
+npm run type-check
+npm run test:api
 npm run dev:mp-weixin   # 微信小程序 dev（需微信开发者工具）
 ```
 
