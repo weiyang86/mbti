@@ -14,7 +14,7 @@
         @load="imageLoaded = true"
         @error="imageFailed"
       />
-      <text class="muted block preview-url" v-if="previewUrl" selectable>preview_url: {{ previewUrl }}</text>
+      <text class="muted block preview-url" v-if="previewUrl" selectable>分享图片链接：{{ previewUrl }}</text>
     </view>
     <view v-if="loadError" class="btn-primary mt" @click="generate">重试生成</view>
     <view class="btn-secondary mt" @click="back">返回结果</view>
