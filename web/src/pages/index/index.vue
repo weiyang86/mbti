@@ -7,25 +7,108 @@
     </view>
 
     <view class="actions">
-      <view class="btn-primary" @click="startQuiz">测一测（12 题）</view>
+      <view class="btn-primary" @click="startQuiz">{{ starting ? '正在准备题目…' : '测一测（12 题）' }}</view>
+      <view v-if="sessionExpired" class="btn-secondary mt" @click="renewGuest">重新建立游客会话</view>
       <view class="btn-secondary mt" @click="goSelfSelect">我已经知道类型</view>
       <view class="btn-secondary mt" @click="goHistory">阶段记录</view>
     </view>
 
-    <text class="muted foot">API 契约：draft / pending Remy 定稿 · mock 模式默认开启</text>
+    <text v-if="latest" class="muted foot">最近结果：{{ latest.type_code }}</text>
+    <text class="muted foot">趣味倾向体验 · {{ mockMode ? 'Mock 演示' : '在线测评' }}</text>
   </view>
 </template>
 
 <script setup lang="ts">
-import { createQuizSession } from '@/api/quiz'
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { createQuizSession, getCurrentQuizVersion } from '@/api/quiz'
+import { listResults } from '@/api/results'
+import type { ResultSnapshotSummary } from '@/api/types'
+import { isGuestSessionExpired, requestErrorMessage, startNewGuestSession, useMock } from '@/api/client'
+import { clearQuizDraft, createQuizDraft, isRestorableDraft, loadQuizDraft, recoveryMessage } from '@/store/quiz-draft'
+
+const starting = ref(false)
+const sessionExpired = ref(false)
+const latest = ref<ResultSnapshotSummary | null>(null)
+const mockMode = useMock()
+
+onShow(async () => {
+  sessionExpired.value = isGuestSessionExpired()
+  try {
+    const response = await listResults({ limit: 1 })
+    latest.value = response.items[0] || null
+  } catch (error) {
+    sessionExpired.value = isGuestSessionExpired()
+    uni.showToast({ title: requestErrorMessage(error, '暂时无法读取阶段记录，可稍后重试'), icon: 'none' })
+  }
+})
 
 async function startQuiz() {
-  try {
-    const session = await createQuizSession()
-    uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${session.id}` })
-  } catch (e) {
-    uni.showToast({ title: '无法开始测验', icon: 'none' })
+  if (starting.value) return
+  if (isGuestSessionExpired()) {
+    sessionExpired.value = true
+    uni.showToast({ title: '游客会话已失效，请先重新建立会话', icon: 'none' })
+    return
   }
+  const draft = loadQuizDraft()
+  if (draft) {
+    uni.showModal({
+      title: isRestorableDraft(draft) ? '还有一份没完成的测验' : '需要重新开始',
+      content: isRestorableDraft(draft) ? '可以继续上次答题，也可以重新开始。已有历史结果会保留。' : recoveryMessage,
+      confirmText: isRestorableDraft(draft) ? '继续答题' : '重新开始',
+      cancelText: isRestorableDraft(draft) ? '重新开始' : '暂不开始',
+      success: (response) => {
+        if (response.confirm && isRestorableDraft(draft)) {
+          uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${encodeURIComponent(draft.sessionId)}` })
+        } else if ((response.cancel && isRestorableDraft(draft)) || (response.confirm && !isRestorableDraft(draft))) {
+          clearQuizDraft()
+          beginQuiz()
+        }
+      },
+    })
+    return
+  }
+  await beginQuiz()
+}
+
+async function beginQuiz() {
+  if (starting.value) return
+  starting.value = true
+  try {
+    const questionBank = await getCurrentQuizVersion()
+    const session = await createQuizSession({ question_bank_version: questionBank.question_bank_version })
+    createQuizDraft(session, questionBank)
+    uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${encodeURIComponent(session.id)}` })
+  } catch (e) {
+    sessionExpired.value = isGuestSessionExpired()
+    uni.showToast({ title: requestErrorMessage(e, '无法开始测验，请重试'), icon: 'none' })
+  } finally {
+    starting.value = false
+  }
+}
+
+function renewGuest() {
+  if (starting.value) return
+  uni.showModal({
+    title: '建立新的游客会话？',
+    content: '原游客历史结果仍保留在服务端，新游客无法访问。本次操作会放弃未完成的答题，之后可重新测评。',
+    confirmText: '建立新会话',
+    success: async (response) => {
+      if (!response.confirm) return
+      starting.value = true
+      try {
+        await startNewGuestSession()
+        clearQuizDraft()
+        latest.value = null
+        sessionExpired.value = false
+        uni.showToast({ title: '新会话已建立', icon: 'none' })
+      } catch (error) {
+        uni.showToast({ title: requestErrorMessage(error, '无法建立会话，请重试'), icon: 'none' })
+      } finally {
+        starting.value = false
+      }
+    },
+  })
 }
 
 function goSelfSelect() {

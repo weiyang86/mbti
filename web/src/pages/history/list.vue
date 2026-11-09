@@ -22,12 +22,17 @@ import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import type { ResultSnapshotSummary } from '@/api/types'
 import { listResults } from '@/api/results'
+import { requestErrorMessage } from '@/api/client'
 
 const items = ref<ResultSnapshotSummary[]>([])
 
 async function load() {
-  const res = await listResults({ limit: 50 })
-  items.value = res.items
+  try {
+    const res = await listResults({ limit: 50 })
+    items.value = res.items
+  } catch (error) {
+    uni.showToast({ title: requestErrorMessage(error, '读取阶段记录失败，请重试'), icon: 'none' })
+  }
 }
 
 onShow(() => {

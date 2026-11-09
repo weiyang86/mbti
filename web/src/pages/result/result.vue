@@ -16,7 +16,12 @@
 
     <view class="btn-primary mt" @click="goShare">生成晒图预览</view>
     <view class="btn-secondary mt" @click="goHistory">查看阶段记录</view>
+    <view class="btn-secondary mt" @click="goHome">再测一次</view>
     <view class="btn-secondary mt" @click="goHome">返回首页</view>
+  </view>
+  <view class="page" v-else>
+    <text class="muted">{{ loadError || '正在读取结果…' }}</text>
+    <view v-if="loadError" class="btn-secondary mt" @click="goHome">返回首页</view>
   </view>
 </template>
 
@@ -24,18 +29,30 @@
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot } from '@/api/types'
-import { getResult } from '@/api/results'
+import { getResult, listResults } from '@/api/results'
+import { requestErrorMessage } from '@/api/client'
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
+const loadError = ref('')
 
 onLoad((q) => {
   resultId.value = (q?.id as string) || ''
 })
 
 onMounted(async () => {
-  if (!resultId.value) return
-  result.value = await getResult(resultId.value)
+  if (!resultId.value) {
+    loadError.value = '缺少结果编号，请从阶段记录打开'
+    return
+  }
+  try {
+    result.value = await getResult(resultId.value)
+    // A fresh guest's empty history must not block rendering their current result.
+    await listResults({ limit: 1 })
+  } catch (error) {
+    loadError.value = requestErrorMessage(error, '读取结果失败，请稍后重试')
+    uni.showToast({ title: loadError.value, icon: 'none' })
+  }
 })
 
 const sourceLabel = computed(() =>
