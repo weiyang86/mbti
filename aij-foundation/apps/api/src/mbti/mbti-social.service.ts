@@ -39,9 +39,23 @@ export class MbtiSocialService {
   private snapshot<T>(work: (tx: Tx) => Promise<T>) {
     return this.prisma.$transaction(work, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 20000 });
   }
-  private async pairLock(tx: Tx, a: string, b: string) {
+  async pairLock(tx: Tx, a: string, b: string) {
     // DB transaction lock spans create/respond/revoke/block/unblock, including across processes.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`mbti-social-pair:${pairKey(a, b)}`}, 0))`;
+  }
+  /** Shared with F5: public opt-out and private epochs serialize with pair-authorized reads/writes.
+   * Pair operations acquire pair first, then ordered owners; owner-only updates never acquire pair.
+   */
+  async lockOwners(tx: Tx, ...owners: string[]) {
+    for (const owner of [...new Set(owners)].sort()) {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`mbti-social-owner:${owner}`}, 0))`;
+    }
+  }
+  async contactCards(tx: Tx, a: string, b: string) {
+    const first = await tx.mbtiCard.findUnique({ where: { ownerId: a } });
+    const second = await tx.mbtiCard.findUnique({ where: { ownerId: b } });
+    if (!first || !second || !await this.visible(tx, b, first) || !await this.visible(tx, a, second)) return null;
+    return { first, second };
   }
   private async ownCard(tx: Tx, ownerId: string) {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`mbti-card:${ownerId}`}, 0))`;
@@ -92,9 +106,13 @@ export class MbtiSocialService {
       }
     }
     return this.prisma.$transaction(async tx => {
+      await this.lockOwners(tx, ownerId);
       // Column-level patch plus owner lock prevents concurrent visibility subkey lost updates.
       const row = await this.ownCard(tx, ownerId);
       if ((body.discoverable ?? row.discoverable) && !meta((body.type_code ?? row.typeCode) as string)) invalid();
+      if (body.discoverable === false) {
+        await tx.mbtiContactRequest.updateMany({ where: { OR: [{ senderId: ownerId }, { recipientId: ownerId }], status: { in: ["pending", "accepted"] } }, data: { status: "revoked" } });
+      }
       return this.mine(tx, await tx.mbtiCard.update({ where: { ownerId }, data }));
     });
   }
@@ -189,6 +207,7 @@ export class MbtiSocialService {
       if (!existing?.active) await tx.mbtiSocialBlock.upsert({ where: { blockerId_blockedId: { blockerId: ownerId, blockedId: target.ownerId } },
         create: { blockerId: ownerId, blockedId: target.ownerId }, update: { active: true, lastBlockedAt: new Date() } });
       await tx.mbtiCardExchange.updateMany({ where: { pairKey: pairKey(ownerId, target.ownerId), status: { in: ["pending", "accepted"] } }, data: { status: "revoked" } });
+      await tx.mbtiContactRequest.updateMany({ where: { OR: [{ senderId: ownerId, recipientId: target.ownerId }, { senderId: target.ownerId, recipientId: ownerId }], status: { in: ["pending", "accepted"] } }, data: { status: "revoked" } });
       return { blocked: true };
     });
   }
@@ -271,6 +290,7 @@ export class MbtiSocialService {
       if (row.status === "revoked") return;
       if (row.status !== "pending" && row.status !== "accepted") conflict();
       await tx.mbtiCardExchange.update({ where: { id }, data: { status: "revoked" } });
+      await tx.mbtiContactRequest.updateMany({ where: { exchangeId: id, status: { in: ["pending", "accepted"] } }, data: { status: "revoked" } });
     });
   }
 }

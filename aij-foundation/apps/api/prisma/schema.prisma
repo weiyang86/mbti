@@ -1786,6 +1786,9 @@ model MbtiGuest {
   results   MbtiResult[]
   orders    MbtiOrder[]
   card      MbtiCard?
+  contacts MbtiPrivateContacts?
+  contactRequestsSent MbtiContactRequest[] @relation("MbtiContactSender")
+  contactRequestsReceived MbtiContactRequest[] @relation("MbtiContactRecipient")
   socialBlocksSent MbtiSocialBlock[] @relation("MbtiBlockSender")
   socialBlocksReceived MbtiSocialBlock[] @relation("MbtiBlockTarget")
   cardExchangesSent MbtiCardExchange[] @relation("MbtiExchangeSender")
@@ -1927,7 +1930,38 @@ model MbtiCardExchange {
   updatedAt DateTime @updatedAt
   sender MbtiGuest @relation("MbtiExchangeSender", fields: [senderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   recipient MbtiGuest @relation("MbtiExchangeRecipient", fields: [recipientId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  contactRequests MbtiContactRequest[]
   @@index([pairKey, createdAt(sort: Desc), id(sort: Desc)])
   @@index([senderId, createdAt(sort: Desc), id(sort: Desc)])
   @@index([recipientId, createdAt(sort: Desc), id(sort: Desc)])
+}
+
+// F5 private immutable object references only. Channel values never enter ordinary DB JSON/FileAsset.
+model MbtiPrivateContacts {
+  ownerId String @id
+  epoch BigInt @default(0)
+  objectKey String? @unique
+  checksum String?
+  size Int @default(0)
+  updatedAt DateTime @updatedAt
+  owner MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+}
+
+model MbtiContactRequest {
+  id String @id
+  senderId String
+  recipientId String
+  exchangeId String
+  contactEpoch BigInt
+  channels String[]
+  status String @default("pending")
+  respondedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sender MbtiGuest @relation("MbtiContactSender", fields: [senderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  recipient MbtiGuest @relation("MbtiContactRecipient", fields: [recipientId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  exchange MbtiCardExchange @relation(fields: [exchangeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@index([senderId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([recipientId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([exchangeId])
 }

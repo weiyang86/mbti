@@ -1,3 +1,6 @@
+import { MbtiContactStorage } from "./mbti-contact-storage.service";
+import { MbtiContactsController } from "./mbti-contacts.controller";
+import { MbtiContactsService } from "./mbti-contacts.service";
 import { DynamicModule, Module } from "@nestjs/common";
 import { MbtiController } from "./mbti.controller";
 import { MbtiGuestGuard } from "./mbti.http";
@@ -32,9 +35,9 @@ export class MbtiModule {
     }
     return { module: MbtiModule,
       imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule] : []), ...(secret ? [PluginRuntimeAccessModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController] : []),
+      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiSocialService, ...(secret ? [
+      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiSocialService, MbtiContactsService, MbtiContactStorage, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },
         { provide: PAYMENT_CREDENTIAL_RESOLVER, useValue: { async resolve(reference: string) {
           if (reference !== "test-only:mbti-f3-payment") throw new Error("Controlled fixture credential rejected");
