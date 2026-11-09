@@ -161,7 +161,17 @@ async function main() {
   const publicOrigin = process.env.MBTI_PUBLIC_ORIGIN || new URL(env.NEXT_PUBLIC_API_URL).origin;
   const publicUrl = new URL(publicOrigin);
   if (publicUrl.origin !== publicOrigin || !["http:", "https:"].includes(publicUrl.protocol) || publicUrl.username || publicUrl.password) throw new Error("MBTI_PUBLIC_ORIGIN must be an exact HTTP origin");
-  const child = spawn(process.execPath, [entry], { cwd: resolve(sourceRoot, "apps/api"), env: { ...process.env, ...env,
+  const testOverrides = {};
+  if (process.env.MBTI_F3_TEST_FIXTURE === "1") {
+    if (mode !== "test") throw new Error("Controlled auth/payment fixtures are test-only");
+    const fixturePath = resolve(sourceRoot, ".artifacts/mbti-f3-test-fixture.json");
+    if (lstatSync(fixturePath).isSymbolicLink() || !lstatSync(fixturePath).isFile() || (lstatSync(fixturePath).mode & 0o077)) throw new Error("Fixture must be a private regular local file");
+    const fixture = JSON.parse(readFileSync(fixturePath, "utf8"));
+    if (fixture.root !== sourceRoot || fixture.project !== "mbti-foundation" || fixture.environment !== "test" ||
+        !/^[a-f0-9]{96}$/.test(fixture.jwtSecret) || !/^[a-f0-9]{96}$/.test(fixture.paymentSecret)) throw new Error("Controlled fixture ownership mismatch");
+    Object.assign(testOverrides, { AUTH_ENABLED: "true", JWT_SECRET: fixture.jwtSecret, MBTI_F3_TEST_PAYMENT_SECRET: fixture.paymentSecret });
+  }
+  const child = spawn(process.execPath, [entry], { cwd: resolve(sourceRoot, "apps/api"), env: { ...process.env, ...env, ...testOverrides,
     MBTI_PUBLIC_ORIGIN: publicOrigin, MBTI_H5_ORIGINS: process.env.MBTI_H5_ORIGINS || env.MBTI_H5_ORIGINS
   }, detached: true, stdio: ["ignore", log, log] });
   writeFileSync(pidFile, JSON.stringify({ pid: child.pid, root, entry }), { mode: 0o600 });

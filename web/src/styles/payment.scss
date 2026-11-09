@@ -1,0 +1,13 @@
+.commerce-page {
+  .heading { display: block; font-size: 40rpx; font-weight: 700; margin-bottom: 20rpx; }
+  .section { display: block; font-size: 30rpx; font-weight: 600; margin: 32rpx 0 20rpx; }
+  .line { display: block; margin-top: 14rpx; line-height: 1.6; }
+  .identifier { display: block; margin-top: 14rpx; font-size: 24rpx; overflow-wrap: anywhere; }
+  .price { display: block; color: #7560df; font-size: 36rpx; font-weight: 700; margin-top: 20rpx; }
+  .mt { margin-top: 24rpx; }
+  .error { display: block; color: #a43b3b; margin: 24rpx 0; line-height: 1.6; }
+  .notice { display: block; color: #77727e; font-size: 24rpx; line-height: 1.7; margin: 20rpx 0; }
+  button { width: 100%; line-height: 1.5; margin-left: 0; margin-right: 0; }
+  button::after { border: 0; }
+  button[disabled] { opacity: .6; }
+}

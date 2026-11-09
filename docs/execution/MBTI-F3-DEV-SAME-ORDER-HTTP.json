@@ -1,0 +1,278 @@
+{
+  "environment": "development",
+  "note": "Real LAN H5 creation and retry metadata plus post-restart Foundation operations HTTP. No credentials or bodies from browser capture.",
+  "h5_origin": "http://192.168.0.200:5173",
+  "secure_context": false,
+  "randomUUID_available": false,
+  "getRandomValues_available": true,
+  "browser_order_count": 1,
+  "browser_entitlement_count": 0,
+  "two_order_posts": [
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders",
+      "method": "POST",
+      "status": 201,
+      "mimeType": "application/json",
+      "timestamp": 1794196793342
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders",
+      "method": "POST",
+      "status": 201,
+      "mimeType": "application/json",
+      "timestamp": 1794196851217
+    }
+  ],
+  "browser_api_network": [
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196774442
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196774442
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196785701
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196785701
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196785741
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders",
+      "method": "POST",
+      "status": 201,
+      "mimeType": "application/json",
+      "timestamp": 1794196793342
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196793342
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196793342
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196793342
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196804642
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196804642
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196850520
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196850520
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/products",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196850820
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders",
+      "method": "POST",
+      "status": 201,
+      "mimeType": "application/json",
+      "timestamp": 1794196851217
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196851217
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196851320
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196851320
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders?limit=20",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196863519
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/entitlements/me",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196863519
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders?limit=20",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196863519
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/entitlements/me",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196863519
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders?limit=20",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196921418
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/entitlements/me",
+      "method": "GET",
+      "status": 200,
+      "mimeType": "application/json",
+      "timestamp": 1794196921418
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/orders?limit=20",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196921418
+    },
+    {
+      "url": "http://192.168.0.200:4056/api/v1/entitlements/me",
+      "method": "OPTIONS",
+      "status": 204,
+      "mimeType": "",
+      "timestamp": 1794196921418
+    }
+  ],
+  "post_restart_operations": {
+    "environment": "development",
+    "origin": "http://192.168.0.200:4056",
+    "order": {
+      "id": "MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+      "result_id": "4b177e28-89d8-410f-ad90-b111a9e66e83",
+      "product_code": "studio_tier_1",
+      "amount": 990,
+      "currency": "CNY",
+      "status": "pending",
+      "unlocked": false,
+      "created_at": "2026-11-09T03:59:53.267Z",
+      "payment_availability": "unconfigured",
+      "pricing_mode": "controlled_test_fixture"
+    },
+    "receipts": [
+      {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/mbti/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "status": 401
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/guest",
+        "status": 201
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/mbti/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/mbti/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "status": 403
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/mbti/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/orders/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "status": 404
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/mbti/test-payments/MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "status": 404
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/payments/controlled-test/callback",
+        "status": 404
+      }
+    ]
+  }
+}

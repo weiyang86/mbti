@@ -11,6 +11,8 @@
       <view v-if="sessionExpired" class="btn-secondary mt" @click="renewGuest">重新建立游客会话</view>
       <view class="btn-secondary mt" @click="goSelfSelect">我已经知道类型</view>
       <view class="btn-secondary mt" @click="goHistory">阶段记录</view>
+      <view class="btn-secondary mt" @click="goCatalog">商品目录</view>
+      <view class="btn-secondary mt" @click="goOrders">我的订单与权益</view>
     </view>
 
     <text v-if="latest" class="muted foot">最近结果：{{ latest.type_code }}</text>
@@ -118,6 +120,9 @@ function goSelfSelect() {
 function goHistory() {
   uni.navigateTo({ url: '/pages/history/list' })
 }
+
+function goCatalog() { uni.navigateTo({ url: '/pages/pricing/pricing' }) }
+function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
 </script>
 
 <style scoped lang="scss">
