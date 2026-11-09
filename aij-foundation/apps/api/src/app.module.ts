@@ -43,7 +43,7 @@ export class AppModule {
         ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true, load: [() => runtime] }),
         ...(runtime.enabledPlugins.includes("aij-ai") ? [KnowledgeWebImportModule.forRoot(runtime, testKnowledgeWebImportTransport)] : []),
         PluginRuntimeModule.forRoot(runtime.enabledPlugins), PrismaModule,
-        ...(runtime.projectId === "mbti-foundation" && runtime.capabilities.database ? [MbtiModule] : []),
+        ...(runtime.projectId === "mbti-foundation" && runtime.capabilities.database ? [MbtiModule.forRoot(runtime)] : []),
         ...(runtime.capabilities.database && runtime.capabilities.storage ? [GeneratedFileAssetsModule] : []),
         ...(runtime.capabilities.auth ? [AdminUsersModule, MenusModule, DictionariesModule, ConfigurationModule, AuditQueryModule, ...(runtime.capabilities.storage ? [AdminFilesModule] : [])] : []),
         ...(runtime.capabilities.auth && runtime.capabilities.clientAuth ? [AdminClientDirectoryModule] : []),

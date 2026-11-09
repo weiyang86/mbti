@@ -490,6 +490,7 @@ model ProjectProfile {
 
 // G18-02 / AF-104: payment ledger owns request/attempt state; payable ownership remains external.
 model PaymentOrder {
+  mbtiOrder             MbtiOrder?
   id                    String             @id @default(cuid())
   projectId             String             @map("project_id")
   workspaceId           String             @map("workspace_id")
@@ -1783,6 +1784,7 @@ model MbtiGuest {
   createdAt DateTime @default(now())
   sessions  MbtiQuizSession[]
   results   MbtiResult[]
+  orders    MbtiOrder[]
 }
 
 model MbtiQuestionBank {
@@ -1840,4 +1842,36 @@ model MbtiShareAsset {
   createdAt DateTime @default(now())
   result    MbtiResult @relation(fields: [resultId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   @@index([resultId])
+}
+
+// Business purchase intent/snapshot, not a second payment transaction ledger.
+// resultId deliberately is an immutable reference without a cascading relation: F2 may delete results.
+model MbtiOrder {
+  id                 String @id
+  ownerId            String
+  resultId           String
+  productCode        String
+  amount             Int
+  currency           String @db.Char(3)
+  pricingMode        String @default("controlled_test_fixture")
+  idempotencyKeyHash  String @db.Char(64)
+  requestFingerprint String @db.Char(64)
+  status             String @default("pending")
+  createdAt          DateTime @default(now())
+  paidAt             DateTime?
+  paymentOrderId     String? @unique
+  owner              MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  paymentOrder       PaymentOrder? @relation(fields: [paymentOrderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  entitlement        MbtiEntitlement?
+  @@unique([ownerId, idempotencyKeyHash])
+  @@index([ownerId, createdAt(sort: Desc), id(sort: Desc)])
+}
+
+model MbtiEntitlement {
+  id          String @id @default(uuid())
+  orderId     String @unique
+  kind        String
+  scope       String @default("controlled_test")
+  grantedAt   DateTime @default(now())
+  order       MbtiOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
 }
