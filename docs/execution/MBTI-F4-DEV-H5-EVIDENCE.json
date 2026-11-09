@@ -1,0 +1,207 @@
+{
+  "phase": "F4",
+  "environment": "development",
+  "base": "http://192.168.0.200:4056/api/v1",
+  "h5": "http://192.168.0.200:5173/#/",
+  "integration_tree": "3d1e0725430377322cee5a6be882e4d37d4b9644",
+  "backend_source": "74c546cc4e1de602eaf26a0421729808399c653d",
+  "web_source": "5d3037828d3b1710ba731fc254181fe039f7374a",
+  "guest_profile_ids": {
+    "A": "95aa28d3-b176-4bda-9281-92c7706cab13",
+    "B": "a03a080b-5a9e-4141-896f-6d17d0bc431f",
+    "C": "72e2afa8-2653-456c-b132-c360d129697f"
+  },
+  "browser_page_ids": {
+    "A": "2831cadd-9bc5-4574-bfa2-a000af17d530",
+    "B": "af8dce10-1752-4bfc-ac1e-8ffd90ada583",
+    "C": "77b2eec1-b743-493e-9ce6-f438e69904a9",
+    "originalA": "5ba747e6-3e6f-461a-9573-bff7a120abf4"
+  },
+  "outcome": "passed",
+  "dev_reboot_passed": true,
+  "steps": [
+    {
+      "at": "2026-11-09T05:04:01.623926+00:00",
+      "label": "A home to private card",
+      "data": {
+        "card_id": "card_c1r6G_HdGduSXvgEuqPbbOUB9yTzUtEe",
+        "type_unset": true,
+        "private": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:04:02.603815+00:00",
+      "label": "B home to private card",
+      "data": {
+        "card_id": "card_OEcriwR5yOPdyfT9J6hDiajltLi3gWuu",
+        "type_unset": true,
+        "private": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:04:03.614591+00:00",
+      "label": "C home to private card",
+      "data": {
+        "card_id": "card_KO01OPUU2yGL4gvVf87dNhutOadWmOK5",
+        "type_unset": true,
+        "private": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:04:05.897515+00:00",
+      "label": "dev private untyped sender rejected",
+      "data": {
+        "status": 404,
+        "receiver_pending_unchanged": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:04:07.692073+00:00",
+      "label": "dev typed private sender rejected",
+      "data": {
+        "status": 404,
+        "receiver_pending_unchanged": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:04:11.459752+00:00",
+      "label": "dev discovery UI",
+      "data": "发现搭子\n按名片更新时间展示已公开的搭子。是否交换，由双方选择。\n推荐搭子\n同型 ESTJ\n刷新搭子列表\nF4-dev-B · INFP\n调停者\n内在理想\n阅读DEV_B_PRIVATE_INTEREST\n尚未交换\n查看搭子详情\n匿名搭子 · ESTJ\n总经理\n组织落实\n尚未交换\n查看搭子详情\n我的名片\n我的名片夹\n屏蔽管理"
+    },
+    {
+      "at": "2026-11-09T05:05:03.733374+00:00",
+      "label": "dev visible request accepted by recipient",
+      "data": {
+        "id": "exchange_I7FfdXJGVl1sbda-c1ZarZTGusag8EC1",
+        "sender_retry_status": 200,
+        "wrong_role_status": 409,
+        "third_person_status": 404,
+        "recipient_ui": "我的名片夹\n显示当前身份的收发记录。名片关系不会授予联系方式，联系方式功能尚未开放。\n刷新名片夹\n匿名搭子 · ESTJ\n收到的申请 · 已互换名片\n组织落实\n创建时间：2026-11-09T05:04:11.985Z\n查看搭子详情\n发现搭子\n我的名片\n屏蔽管理"
+      }
+    },
+    {
+      "at": "2026-11-09T05:05:06.151058+00:00",
+      "label": "dev four fields hidden across projections",
+      "data": {
+        "public": true,
+        "buddy": true,
+        "embedded": true,
+        "ui": "我的名片夹\n显示当前身份的收发记录。名片关系不会授予联系方式，联系方式功能尚未开放。\n刷新名片夹\n匿名搭子 · INFP\n发出的申请 · 已互换名片\n内在理想\n创建时间：2026-11-09T05:04:11.985Z\n撤回已接受的交换\n查看搭子详情\n发现搭子\n我的名片\n屏蔽管理"
+      }
+    },
+    {
+      "at": "2026-11-09T05:05:08.047081+00:00",
+      "label": "dev decline/new ID UI",
+      "data": {
+        "id": "exchange_TEJwqEPyG9_jMLGzkhXxDP51LI46SlUy",
+        "different_from_revoked": true,
+        "ui": "我的名片夹\n显示当前身份的收发记录。名片关系不会授予联系方式，联系方式功能尚未开放。\n刷新名片夹\n匿名搭子 · ESTJ\n收到的申请 · 已拒绝\n组织落实\n创建时间：2026-11-09T05:05:06.924Z\n查看搭子详情\n匿名搭子 · ESTJ\n收到的申请 · 已撤回\n组织落实\n创建时间：2026-11-09T05:04:11.985Z\n查看搭子详情\n发现搭子\n我的名片\n屏蔽管理"
+      }
+    },
+    {
+      "at": "2026-11-09T05:05:56.835781+00:00",
+      "label": "dev UI block denies both directions",
+      "data": {
+        "public_status": 404,
+        "create_status": 404,
+        "respond_status": 404,
+        "ui": "屏蔽管理\n只显示由你发起的屏蔽。管理标签用于区分记录，不展示对方私密资料。解除后旧交换不会恢复。\n刷新屏蔽列表\n已屏蔽搭子 1\n管理编号：card_OEcriwR5yOPdyfT9J6hDiajltLi3gWuu\n解除此项屏蔽\n返回发现搭子\n我的名片"
+      }
+    },
+    {
+      "at": "2026-11-09T05:06:31.239783+00:00",
+      "label": "dev reload same identities and no resurrection",
+      "data": {
+        "card_ids": [
+          "card_c1r6G_HdGduSXvgEuqPbbOUB9yTzUtEe",
+          "card_OEcriwR5yOPdyfT9J6hDiajltLi3gWuu",
+          "card_KO01OPUU2yGL4gvVf87dNhutOadWmOK5"
+        ],
+        "fresh_guest_after_reload": 0,
+        "unblock_old_status": "revoked",
+        "old_response": 409
+      }
+    },
+    {
+      "at": "2026-11-09T05:07:17.496949+00:00",
+      "label": "A dev API reboot persisted",
+      "data": {
+        "same_card_and_visibility": true,
+        "status_codes": [
+          200,
+          201,
+          204,
+          404,
+          409
+        ],
+        "same_exchange_states": true,
+        "fresh_guest_count": 0
+      }
+    },
+    {
+      "at": "2026-11-09T05:07:18.469798+00:00",
+      "label": "B dev API reboot persisted",
+      "data": {
+        "same_card_and_visibility": true,
+        "status_codes": [
+          200,
+          204,
+          404,
+          409
+        ],
+        "same_exchange_states": true,
+        "fresh_guest_count": 0
+      }
+    },
+    {
+      "at": "2026-11-09T05:07:19.410360+00:00",
+      "label": "C dev API reboot persisted",
+      "data": {
+        "same_card_and_visibility": true,
+        "status_codes": [
+          200,
+          204,
+          404
+        ],
+        "same_exchange_states": true,
+        "fresh_guest_count": 0
+      }
+    },
+    {
+      "at": "2026-11-09T05:07:19.533950+00:00",
+      "label": "original A result still readable after F4 reboot",
+      "data": {
+        "id": "8a3d4793-93ab-43e4-8988-d3b6962d4b32",
+        "type_code": "ESTJ",
+        "status": 200
+      }
+    },
+    {
+      "at": "2026-11-09T05:07:19.661728+00:00",
+      "label": "original A result still readable after F4 reboot",
+      "data": {
+        "id": "4b177e28-89d8-410f-ad90-b111a9e66e83",
+        "type_code": "INFP",
+        "status": 200
+      }
+    },
+    {
+      "at": "2026-11-09T05:07:35.153725+00:00",
+      "label": "original F3 order still readable after F4 API reboot",
+      "data": {
+        "id": "MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "amount": 990,
+        "status": "pending",
+        "unlocked": false,
+        "status_endpoint": {
+          "order_id": "MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+          "payment_availability": "unconfigured",
+          "status": "pending",
+          "unlocked": false
+        }
+      }
+    }
+  ],
+  "cross_physical_device": "NOT_RUN",
+  "wechat": "NOT_RUN"
+}
