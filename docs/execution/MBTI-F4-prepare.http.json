@@ -1,8 +1,8 @@
 {
   "phase": "prepare",
   "base": "http://192.168.0.200:4156/api/v1",
-  "revision": "d0bdaa94130f590089617ccf2b6e48dac288085e",
-  "started_at": "2026-11-09T04:53:55.388Z",
+  "revision": "74c546cc4e1de602eaf26a0421729808399c653d",
+  "started_at": "2026-11-09T05:00:15.894Z",
   "checks": [
     {
       "label": "fresh guest A",
@@ -14,7 +14,7 @@
       "evidence_id": "P001",
       "response_sample": {
         "guest_token": "[omitted]",
-        "expires_at": "2027-02-07T04:53:55.399Z"
+        "expires_at": "2027-02-07T05:00:15.905Z"
       }
     },
     {
@@ -32,11 +32,11 @@
       "no_store": true,
       "evidence_id": "P002",
       "response_sample": {
-        "id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
+        "id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
         "source": "self_select",
         "type_code": "ESTJ",
         "question_bank_version": "self-select-v1",
-        "submitted_at": "2026-11-09T04:53:55.410Z",
+        "submitted_at": "2026-11-09T05:00:15.916Z",
         "life_stage": "F4_PRIVATE_STAGE_CANARY",
         "recent_status": "F4_PRIVATE_STATUS_CANARY"
       }
@@ -50,7 +50,7 @@
       "no_store": true,
       "evidence_id": "P003",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -65,8 +65,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.418Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:15.924Z"
       }
     },
     {
@@ -79,7 +79,7 @@
       "evidence_id": "P004",
       "response_sample": {
         "guest_token": "[omitted]",
-        "expires_at": "2027-02-07T04:53:55.423Z"
+        "expires_at": "2027-02-07T05:00:15.926Z"
       }
     },
     {
@@ -97,11 +97,11 @@
       "no_store": true,
       "evidence_id": "P005",
       "response_sample": {
-        "id": "c1ddf3b3-5cbe-49c2-8d74-23ac277679b2",
+        "id": "f8648d24-9e57-4512-9cbf-c4c1c34e5fee",
         "source": "self_select",
         "type_code": "INFP",
         "question_bank_version": "self-select-v1",
-        "submitted_at": "2026-11-09T04:53:55.439Z",
+        "submitted_at": "2026-11-09T05:00:15.929Z",
         "life_stage": "F4_PRIVATE_STAGE_CANARY",
         "recent_status": "F4_PRIVATE_STATUS_CANARY"
       }
@@ -115,7 +115,7 @@
       "no_store": true,
       "evidence_id": "P006",
       "response_sample": {
-        "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "nickname": "",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -130,8 +130,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c1ddf3b3-5cbe-49c2-8d74-23ac277679b2",
-        "updated_at": "2026-11-09T04:53:55.446Z"
+        "latest_result_id": "f8648d24-9e57-4512-9cbf-c4c1c34e5fee",
+        "updated_at": "2026-11-09T05:00:15.932Z"
       }
     },
     {
@@ -144,7 +144,7 @@
       "evidence_id": "P007",
       "response_sample": {
         "guest_token": "[omitted]",
-        "expires_at": "2027-02-07T04:53:55.448Z"
+        "expires_at": "2027-02-07T05:00:15.933Z"
       }
     },
     {
@@ -162,11 +162,11 @@
       "no_store": true,
       "evidence_id": "P008",
       "response_sample": {
-        "id": "c5a39eb6-9251-4a1f-8a65-c5029d611a47",
+        "id": "052d0836-f84a-4598-a487-e80f2dfb1b25",
         "source": "self_select",
         "type_code": "ESTJ",
         "question_bank_version": "self-select-v1",
-        "submitted_at": "2026-11-09T04:53:55.467Z",
+        "submitted_at": "2026-11-09T05:00:15.936Z",
         "life_stage": "F4_PRIVATE_STAGE_CANARY",
         "recent_status": "F4_PRIVATE_STATUS_CANARY"
       }
@@ -180,7 +180,7 @@
       "no_store": true,
       "evidence_id": "P009",
       "response_sample": {
-        "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+        "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -195,8 +195,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c5a39eb6-9251-4a1f-8a65-c5029d611a47",
-        "updated_at": "2026-11-09T04:53:55.486Z"
+        "latest_result_id": "052d0836-f84a-4598-a487-e80f2dfb1b25",
+        "updated_at": "2026-11-09T05:00:15.939Z"
       }
     },
     {
@@ -209,7 +209,7 @@
       "evidence_id": "P010",
       "response_sample": {
         "guest_token": "[omitted]",
-        "expires_at": "2027-02-07T04:53:55.489Z"
+        "expires_at": "2027-02-07T05:00:15.940Z"
       }
     },
     {
@@ -221,7 +221,7 @@
       "no_store": true,
       "evidence_id": "P011",
       "response_sample": {
-        "id": "card_C_3NFSiBWDFamzLo9avWMUviLl4L0rIV",
+        "id": "card_FQU4aaVX1jcMfkfFETpqdoVb3RKbyr7a",
         "nickname": "",
         "type_code": "",
         "type_name": "",
@@ -236,7 +236,7 @@
           "manual": false
         },
         "has_visual_set": false,
-        "updated_at": "2026-11-09T04:53:55.512Z"
+        "updated_at": "2026-11-09T05:00:15.944Z"
       }
     },
     {
@@ -272,7 +272,7 @@
       "label": "private public route incl self",
       "actor": "A",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 404,
       "no_store": true,
       "evidence_id": "P014",
@@ -285,7 +285,7 @@
       "label": "private public route incl self",
       "actor": "B",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 404,
       "no_store": true,
       "evidence_id": "P015",
@@ -298,7 +298,7 @@
       "label": "private public route incl self",
       "actor": "C",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 404,
       "no_store": true,
       "evidence_id": "P016",
@@ -339,7 +339,7 @@
       "no_store": true,
       "evidence_id": "P018",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -356,8 +356,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.541Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:15.958Z"
       }
     },
     {
@@ -379,7 +379,7 @@
       "no_store": true,
       "evidence_id": "P019",
       "response_sample": {
-        "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "nickname": "F4_HIDDEN_NAME_B",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -396,8 +396,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c1ddf3b3-5cbe-49c2-8d74-23ac277679b2",
-        "updated_at": "2026-11-09T04:53:55.546Z"
+        "latest_result_id": "f8648d24-9e57-4512-9cbf-c4c1c34e5fee",
+        "updated_at": "2026-11-09T05:00:15.962Z"
       }
     },
     {
@@ -419,7 +419,7 @@
       "no_store": true,
       "evidence_id": "P020",
       "response_sample": {
-        "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+        "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
         "nickname": "F4_HIDDEN_NAME_C",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -436,20 +436,20 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c5a39eb6-9251-4a1f-8a65-c5029d611a47",
-        "updated_at": "2026-11-09T04:53:55.549Z"
+        "latest_result_id": "052d0836-f84a-4598-a487-e80f2dfb1b25",
+        "updated_at": "2026-11-09T05:00:15.965Z"
       }
     },
     {
       "label": "hidden public B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P021",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -462,12 +462,12 @@
       "label": "hidden buddy B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P022",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -491,10 +491,10 @@
       "no_store": true,
       "evidence_id": "P023",
       "response_sample": {
-        "observed_item_count": 11,
+        "observed_item_count": 18,
         "items_owned_fixture_only": [
           {
-            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+            "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -503,6 +503,34 @@
             "tagline": "组织落实",
             "interests": [],
             "same_type": false,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
+          {
+            "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
+            "nickname": "",
+            "type_code": "ESTJ",
+            "type_name": "总经理",
+            "avatar_text": "ES",
+            "avatar_color": "#53677a",
+            "tagline": "组织落实",
+            "interests": [],
+            "same_type": false,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
+          {
+            "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "nickname": "",
+            "type_code": "INFP",
+            "type_name": "调停者",
+            "avatar_text": "IN",
+            "avatar_color": "#53677a",
+            "tagline": "内在理想",
+            "interests": [],
+            "same_type": true,
             "shared_interests": [],
             "exchange_status": "none",
             "is_demo": false
@@ -522,35 +550,7 @@
             "is_demo": false
           },
           {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
-            "nickname": "",
-            "type_code": "INFP",
-            "type_name": "调停者",
-            "avatar_text": "IN",
-            "avatar_color": "#53677a",
-            "tagline": "内在理想",
-            "interests": [],
-            "same_type": true,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
-            "nickname": "",
-            "type_code": "ESTJ",
-            "type_name": "总经理",
-            "avatar_text": "ES",
-            "avatar_color": "#53677a",
-            "tagline": "组织落实",
-            "interests": [],
-            "same_type": false,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -583,12 +583,12 @@
       "label": "hidden public C->A",
       "actor": "C",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P025",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -601,12 +601,12 @@
       "label": "hidden buddy C->A",
       "actor": "C",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P026",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -630,8 +630,36 @@
       "no_store": true,
       "evidence_id": "P027",
       "response_sample": {
-        "observed_item_count": 11,
+        "observed_item_count": 18,
         "items_owned_fixture_only": [
+          {
+            "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
+            "nickname": "",
+            "type_code": "INFP",
+            "type_name": "调停者",
+            "avatar_text": "IN",
+            "avatar_color": "#53677a",
+            "tagline": "内在理想",
+            "interests": [],
+            "same_type": false,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
+          {
+            "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
+            "nickname": "",
+            "type_code": "ESTJ",
+            "type_name": "总经理",
+            "avatar_text": "ES",
+            "avatar_color": "#53677a",
+            "tagline": "组织落实",
+            "interests": [],
+            "same_type": true,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
           {
             "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
             "nickname": "",
@@ -661,35 +689,7 @@
             "is_demo": false
           },
           {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
-            "nickname": "",
-            "type_code": "INFP",
-            "type_name": "调停者",
-            "avatar_text": "IN",
-            "avatar_color": "#53677a",
-            "tagline": "内在理想",
-            "interests": [],
-            "same_type": false,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
-            "nickname": "",
-            "type_code": "ESTJ",
-            "type_name": "总经理",
-            "avatar_text": "ES",
-            "avatar_color": "#53677a",
-            "tagline": "组织落实",
-            "interests": [],
-            "same_type": true,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -1084,7 +1084,7 @@
       "no_store": true,
       "evidence_id": "P050",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1101,8 +1101,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.636Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.031Z"
       }
     },
     {
@@ -1133,7 +1133,7 @@
       "no_store": true,
       "evidence_id": "P052",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1150,8 +1150,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.642Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.035Z"
       }
     },
     {
@@ -1168,7 +1168,7 @@
       "no_store": true,
       "evidence_id": "P053",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1185,8 +1185,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.648Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.039Z"
       }
     },
     {
@@ -1203,7 +1203,7 @@
       "no_store": true,
       "evidence_id": "P054",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1220,8 +1220,8 @@
           "manual": true
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.660Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.041Z"
       }
     },
     {
@@ -1233,7 +1233,7 @@
       "no_store": true,
       "evidence_id": "P055",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1250,20 +1250,20 @@
           "manual": true
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.660Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.041Z"
       }
     },
     {
       "label": "only explicit name/manual visible",
       "actor": "C",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P056",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1292,7 +1292,7 @@
       "no_store": true,
       "evidence_id": "P057",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1309,20 +1309,20 @@
           "manual": true
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.676Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.049Z"
       }
     },
     {
       "label": "all explicitly allowed fields visible",
       "actor": "C",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P058",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1342,12 +1342,12 @@
       "label": "visible buddy fields",
       "actor": "C",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P059",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1381,7 +1381,7 @@
       "no_store": true,
       "evidence_id": "P060",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1398,20 +1398,20 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.693Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.058Z"
       }
     },
     {
       "label": "hidden public C->A",
       "actor": "C",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P061",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1424,12 +1424,12 @@
       "label": "hidden buddy C->A",
       "actor": "C",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P062",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1453,10 +1453,10 @@
       "no_store": true,
       "evidence_id": "P063",
       "response_sample": {
-        "observed_item_count": 11,
+        "observed_item_count": 18,
         "items_owned_fixture_only": [
           {
-            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -1465,6 +1465,20 @@
             "tagline": "组织落实",
             "interests": [],
             "same_type": true,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
+          {
+            "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
+            "nickname": "",
+            "type_code": "INFP",
+            "type_name": "调停者",
+            "avatar_text": "IN",
+            "avatar_color": "#53677a",
+            "tagline": "内在理想",
+            "interests": [],
+            "same_type": false,
             "shared_interests": [],
             "exchange_status": "none",
             "is_demo": false
@@ -1484,21 +1498,7 @@
             "is_demo": false
           },
           {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
-            "nickname": "",
-            "type_code": "INFP",
-            "type_name": "调停者",
-            "avatar_text": "IN",
-            "avatar_color": "#53677a",
-            "tagline": "内在理想",
-            "interests": [],
-            "same_type": false,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -1512,7 +1512,7 @@
             "is_demo": false
           },
           {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -1554,11 +1554,11 @@
       "no_store": true,
       "evidence_id": "P065",
       "response_sample": {
-        "id": "1938dbe8-5e06-402b-a4c8-8c17816f661d",
+        "id": "efab2946-6b63-442f-b70c-01d9822cde30",
         "source": "self_select",
         "type_code": "INTJ",
         "question_bank_version": "self-select-v1",
-        "submitted_at": "2026-11-09T04:53:55.721Z"
+        "submitted_at": "2026-11-09T05:00:16.081Z"
       }
     },
     {
@@ -1570,7 +1570,7 @@
       "no_store": true,
       "evidence_id": "P066",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1587,7 +1587,7 @@
           "manual": false
         },
         "has_visual_set": false,
-        "updated_at": "2026-11-09T04:53:55.693Z"
+        "updated_at": "2026-11-09T05:00:16.058Z"
       }
     },
     {
@@ -1602,7 +1602,7 @@
       "no_store": true,
       "evidence_id": "P067",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -1619,7 +1619,7 @@
           "manual": false
         },
         "has_visual_set": false,
-        "updated_at": "2026-11-09T04:53:55.728Z"
+        "updated_at": "2026-11-09T05:00:16.087Z"
       }
     },
     {
@@ -1631,7 +1631,7 @@
       "no_store": true,
       "evidence_id": "P068",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -1648,7 +1648,7 @@
           "manual": false
         },
         "has_visual_set": false,
-        "updated_at": "2026-11-09T04:53:55.728Z"
+        "updated_at": "2026-11-09T05:00:16.087Z"
       }
     },
     {
@@ -1663,7 +1663,7 @@
       "no_store": true,
       "evidence_id": "P069",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "INTJ",
         "type_name": "建筑师",
@@ -1680,8 +1680,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "1938dbe8-5e06-402b-a4c8-8c17816f661d",
-        "updated_at": "2026-11-09T04:53:55.736Z"
+        "latest_result_id": "efab2946-6b63-442f-b70c-01d9822cde30",
+        "updated_at": "2026-11-09T05:00:16.092Z"
       }
     },
     {
@@ -1693,7 +1693,7 @@
       "no_store": true,
       "evidence_id": "P070",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "INTJ",
         "type_name": "建筑师",
@@ -1710,15 +1710,15 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "1938dbe8-5e06-402b-a4c8-8c17816f661d",
-        "updated_at": "2026-11-09T04:53:55.736Z"
+        "latest_result_id": "efab2946-6b63-442f-b70c-01d9822cde30",
+        "updated_at": "2026-11-09T05:00:16.092Z"
       }
     },
     {
       "label": "F2 delete still works",
       "actor": "A",
       "method": "DELETE",
-      "path": "/results/1938dbe8-5e06-402b-a4c8-8c17816f661d",
+      "path": "/results/efab2946-6b63-442f-b70c-01d9822cde30",
       "status": 204,
       "no_store": true,
       "evidence_id": "P071"
@@ -1732,7 +1732,7 @@
       "no_store": true,
       "evidence_id": "P072",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "INTJ",
         "type_name": "建筑师",
@@ -1749,7 +1749,7 @@
           "manual": false
         },
         "has_visual_set": false,
-        "updated_at": "2026-11-09T04:53:55.736Z"
+        "updated_at": "2026-11-09T05:00:16.092Z"
       }
     },
     {
@@ -1764,7 +1764,7 @@
       "no_store": true,
       "evidence_id": "P073",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -1781,24 +1781,24 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.746Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.101Z"
       }
     },
     {
-      "label": "/results/e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
+      "label": "/results/db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
       "actor": "A",
       "method": "GET",
-      "path": "/results/e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
+      "path": "/results/db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
       "status": 200,
       "no_store": true,
       "evidence_id": "P074",
       "response_sample": {
-        "id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
+        "id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
         "source": "self_select",
         "type_code": "ESTJ",
         "question_bank_version": "self-select-v1",
-        "submitted_at": "2026-11-09T04:53:55.410Z",
+        "submitted_at": "2026-11-09T05:00:15.916Z",
         "life_stage": "F4_PRIVATE_STAGE_CANARY",
         "recent_status": "F4_PRIVATE_STATUS_CANARY"
       }
@@ -1812,38 +1812,38 @@
       "no_store": true,
       "evidence_id": "P075",
       "response_sample": {
-        "observed_item_count": 7,
+        "observed_item_count": 12,
         "items_owned_fixture_only": [
           {
+            "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
+            "nickname": "",
+            "type_code": "ESTJ",
+            "type_name": "总经理",
+            "avatar_text": "ES",
+            "avatar_color": "#53677a",
+            "tagline": "组织落实",
+            "interests": [],
+            "same_type": true,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
+          {
+            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "nickname": "",
+            "type_code": "ESTJ",
+            "type_name": "总经理",
+            "avatar_text": "ES",
+            "avatar_color": "#53677a",
+            "tagline": "组织落实",
+            "interests": [],
+            "same_type": true,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
+          {
             "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
-            "nickname": "",
-            "type_code": "ESTJ",
-            "type_name": "总经理",
-            "avatar_text": "ES",
-            "avatar_color": "#53677a",
-            "tagline": "组织落实",
-            "interests": [],
-            "same_type": true,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
-            "nickname": "",
-            "type_code": "ESTJ",
-            "type_name": "总经理",
-            "avatar_text": "ES",
-            "avatar_color": "#53677a",
-            "tagline": "组织落实",
-            "interests": [],
-            "same_type": true,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -1985,10 +1985,10 @@
       "no_store": true,
       "evidence_id": "P085",
       "response_sample": {
-        "observed_item_count": 4,
+        "observed_item_count": 6,
         "items_owned_fixture_only": [
           {
-            "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "nickname": "",
             "type_code": "INFP",
             "type_name": "调停者",
@@ -2002,7 +2002,7 @@
             "is_demo": false
           },
           {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
+            "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
             "nickname": "",
             "type_code": "INFP",
             "type_name": "调停者",
@@ -2025,7 +2025,7 @@
       "path": "/card-exchanges",
       "status": 422,
       "request": {
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-"
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn"
       },
       "no_store": true,
       "evidence_id": "P086",
@@ -2041,7 +2041,7 @@
       "path": "/card-exchanges",
       "status": 422,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "senderId": "forged"
       },
       "no_store": true,
@@ -2058,15 +2058,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P088",
       "response_sample": {
-        "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2081,7 +2081,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:55.776Z",
+        "created_at": "2026-11-09T05:00:16.135Z",
         "simulated": false
       }
     },
@@ -2097,10 +2097,10 @@
         "observed_item_count": 1,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -2115,7 +2115,7 @@
             },
             "direction": "incoming",
             "status": "pending",
-            "created_at": "2026-11-09T04:53:55.776Z",
+            "created_at": "2026-11-09T05:00:16.135Z",
             "simulated": false
           }
         ]
@@ -2138,7 +2138,7 @@
       "label": "third party response",
       "actor": "C",
       "method": "POST",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4/respond",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si/respond",
       "status": 404,
       "request": {
         "action": "accept"
@@ -2154,7 +2154,7 @@
       "label": "third party revoke",
       "actor": "C",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
       "status": 404,
       "no_store": true,
       "evidence_id": "P092",
@@ -2167,7 +2167,7 @@
       "label": "sender cannot respond",
       "actor": "A",
       "method": "POST",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4/respond",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si/respond",
       "status": 409,
       "request": {
         "action": "accept"
@@ -2183,7 +2183,7 @@
       "label": "recipient cannot revoke",
       "actor": "B",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
       "status": 409,
       "no_store": true,
       "evidence_id": "P094",
@@ -2196,7 +2196,7 @@
       "label": "bad action",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4/respond",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si/respond",
       "status": 422,
       "request": {
         "action": "nonsense"
@@ -2212,7 +2212,7 @@
       "label": "ownership before role/input",
       "actor": "C",
       "method": "POST",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4/respond",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si/respond",
       "status": 404,
       "request": {
         "action": "bad",
@@ -2232,15 +2232,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P097",
       "response_sample": {
-        "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2255,7 +2255,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:55.776Z",
+        "created_at": "2026-11-09T05:00:16.135Z",
         "simulated": false
       }
     },
@@ -2266,7 +2266,7 @@
       "path": "/card-exchanges",
       "status": 409,
       "request": {
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-"
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn"
       },
       "no_store": true,
       "evidence_id": "P098",
@@ -2279,7 +2279,7 @@
       "label": "respond",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4/respond",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si/respond",
       "status": 200,
       "request": {
         "action": "accept"
@@ -2287,10 +2287,10 @@
       "no_store": true,
       "evidence_id": "P099",
       "response_sample": {
-        "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "buddy": {
-          "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+          "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
           "nickname": "",
           "type_code": "ESTJ",
           "type_name": "总经理",
@@ -2305,8 +2305,8 @@
         },
         "direction": "incoming",
         "status": "accepted",
-        "created_at": "2026-11-09T04:53:55.776Z",
-        "responded_at": "2026-11-09T04:53:55.809Z",
+        "created_at": "2026-11-09T05:00:16.135Z",
+        "responded_at": "2026-11-09T05:00:16.167Z",
         "simulated": false
       }
     },
@@ -2314,7 +2314,7 @@
       "label": "accepted replay conflict",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4/respond",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si/respond",
       "status": 409,
       "request": {
         "action": "accept"
@@ -2333,7 +2333,7 @@
       "path": "/card-exchanges",
       "status": 409,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P101",
@@ -2349,7 +2349,7 @@
       "path": "/card-exchanges",
       "status": 409,
       "request": {
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-"
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn"
       },
       "no_store": true,
       "evidence_id": "P102",
@@ -2362,12 +2362,12 @@
       "label": "hidden public B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P103",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -2380,12 +2380,12 @@
       "label": "hidden buddy B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P104",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -2409,10 +2409,10 @@
       "no_store": true,
       "evidence_id": "P105",
       "response_sample": {
-        "observed_item_count": 11,
+        "observed_item_count": 18,
         "items_owned_fixture_only": [
           {
-            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -2426,7 +2426,7 @@
             "is_demo": false
           },
           {
-            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+            "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -2440,7 +2440,7 @@
             "is_demo": false
           },
           {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
+            "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
             "nickname": "",
             "type_code": "INFP",
             "type_name": "调停者",
@@ -2454,7 +2454,7 @@
             "is_demo": false
           },
           {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -2468,7 +2468,7 @@
             "is_demo": false
           },
           {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -2496,10 +2496,10 @@
         "observed_item_count": 1,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -2514,8 +2514,8 @@
             },
             "direction": "incoming",
             "status": "accepted",
-            "created_at": "2026-11-09T04:53:55.776Z",
-            "responded_at": "2026-11-09T04:53:55.809Z",
+            "created_at": "2026-11-09T05:00:16.135Z",
+            "responded_at": "2026-11-09T05:00:16.167Z",
             "simulated": false
           }
         ]
@@ -2525,7 +2525,7 @@
       "label": "revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
       "status": 204,
       "no_store": true,
       "evidence_id": "P107"
@@ -2534,7 +2534,7 @@
       "label": "revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
       "status": 204,
       "no_store": true,
       "evidence_id": "P108"
@@ -2543,7 +2543,7 @@
       "label": "revoked terminal",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4/respond",
+      "path": "/card-exchanges/exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si/respond",
       "status": 409,
       "request": {
         "action": "decline"
@@ -2562,15 +2562,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P110",
       "response_sample": {
-        "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2585,7 +2585,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.510Z",
+        "created_at": "2026-11-09T05:00:16.214Z",
         "simulated": false
       }
     },
@@ -2593,7 +2593,7 @@
       "label": "respond",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo/respond",
+      "path": "/card-exchanges/exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K/respond",
       "status": 200,
       "request": {
         "action": "decline"
@@ -2601,10 +2601,10 @@
       "no_store": true,
       "evidence_id": "P111",
       "response_sample": {
-        "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "buddy": {
-          "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+          "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
           "nickname": "",
           "type_code": "ESTJ",
           "type_name": "总经理",
@@ -2619,8 +2619,8 @@
         },
         "direction": "incoming",
         "status": "declined",
-        "created_at": "2026-11-09T04:53:56.510Z",
-        "responded_at": "2026-11-09T04:53:56.515Z",
+        "created_at": "2026-11-09T05:00:16.214Z",
+        "responded_at": "2026-11-09T05:00:16.218Z",
         "simulated": false
       }
     },
@@ -2628,7 +2628,7 @@
       "label": "declined cannot revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
+      "path": "/card-exchanges/exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
       "status": 409,
       "no_store": true,
       "evidence_id": "P112",
@@ -2641,7 +2641,7 @@
       "label": "decline replay",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo/respond",
+      "path": "/card-exchanges/exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K/respond",
       "status": 409,
       "request": {
         "action": "decline"
@@ -2660,15 +2660,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P114",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2683,7 +2683,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2694,15 +2694,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P115",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2717,7 +2717,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2728,15 +2728,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P116",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2751,7 +2751,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2762,15 +2762,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P117",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2785,7 +2785,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2796,15 +2796,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P118",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2819,7 +2819,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2830,15 +2830,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P119",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2853,7 +2853,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2864,15 +2864,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P120",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2887,7 +2887,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2898,15 +2898,15 @@
       "path": "/card-exchanges",
       "status": 200,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P121",
       "response_sample": {
-        "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2921,7 +2921,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.532Z",
+        "created_at": "2026-11-09T05:00:16.236Z",
         "simulated": false
       }
     },
@@ -2929,7 +2929,7 @@
       "label": "revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
+      "path": "/card-exchanges/exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
       "status": 204,
       "no_store": true,
       "evidence_id": "P122"
@@ -2941,15 +2941,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P123",
       "response_sample": {
-        "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_cxY9wNWWOcV-K_H4mZsTYUy1zVPQuIgQ",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -2964,7 +2964,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.579Z",
+        "created_at": "2026-11-09T05:00:16.282Z",
         "simulated": false
       }
     },
@@ -2975,7 +2975,7 @@
       "path": "/card-exchanges",
       "status": 409,
       "request": {
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-"
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn"
       },
       "no_store": true,
       "evidence_id": "P124",
@@ -2988,7 +2988,7 @@
       "label": "revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
+      "path": "/card-exchanges/exchange_cxY9wNWWOcV-K_H4mZsTYUy1zVPQuIgQ",
       "status": 204,
       "no_store": true,
       "evidence_id": "P125"
@@ -3000,15 +3000,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P126",
       "response_sample": {
-        "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -3023,7 +3023,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.593Z",
+        "created_at": "2026-11-09T05:00:16.302Z",
         "simulated": false
       }
     },
@@ -3031,7 +3031,7 @@
       "label": "accept race",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz/respond",
+      "path": "/card-exchanges/exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs/respond",
       "status": 200,
       "request": {
         "action": "accept"
@@ -3039,10 +3039,10 @@
       "no_store": true,
       "evidence_id": "P127",
       "response_sample": {
-        "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "buddy": {
-          "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+          "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
           "nickname": "",
           "type_code": "ESTJ",
           "type_name": "总经理",
@@ -3057,8 +3057,8 @@
         },
         "direction": "incoming",
         "status": "accepted",
-        "created_at": "2026-11-09T04:53:56.593Z",
-        "responded_at": "2026-11-09T04:53:56.599Z",
+        "created_at": "2026-11-09T05:00:16.302Z",
+        "responded_at": "2026-11-09T05:00:16.308Z",
         "simulated": false
       }
     },
@@ -3066,7 +3066,7 @@
       "label": "decline race",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz/respond",
+      "path": "/card-exchanges/exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs/respond",
       "status": 409,
       "request": {
         "action": "decline"
@@ -3090,10 +3090,10 @@
         "observed_item_count": 5,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3108,15 +3108,15 @@
             },
             "direction": "outgoing",
             "status": "accepted",
-            "created_at": "2026-11-09T04:53:56.593Z",
-            "responded_at": "2026-11-09T04:53:56.599Z",
+            "created_at": "2026-11-09T05:00:16.302Z",
+            "responded_at": "2026-11-09T05:00:16.308Z",
             "simulated": false
           },
           {
-            "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_cxY9wNWWOcV-K_H4mZsTYUy1zVPQuIgQ",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3131,14 +3131,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.579Z",
+            "created_at": "2026-11-09T05:00:16.282Z",
             "simulated": false
           },
           {
-            "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3153,14 +3153,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.532Z",
+            "created_at": "2026-11-09T05:00:16.236Z",
             "simulated": false
           },
           {
-            "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3175,15 +3175,15 @@
             },
             "direction": "outgoing",
             "status": "declined",
-            "created_at": "2026-11-09T04:53:56.510Z",
-            "responded_at": "2026-11-09T04:53:56.515Z",
+            "created_at": "2026-11-09T05:00:16.214Z",
+            "responded_at": "2026-11-09T05:00:16.218Z",
             "simulated": false
           },
           {
-            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3198,8 +3198,8 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:55.776Z",
-            "responded_at": "2026-11-09T04:53:55.809Z",
+            "created_at": "2026-11-09T05:00:16.135Z",
+            "responded_at": "2026-11-09T05:00:16.167Z",
             "simulated": false
           }
         ]
@@ -3209,7 +3209,7 @@
       "label": "revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
+      "path": "/card-exchanges/exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
       "status": 204,
       "no_store": true,
       "evidence_id": "P130"
@@ -3221,15 +3221,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P131",
       "response_sample": {
-        "id": "exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -3244,7 +3244,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.618Z",
+        "created_at": "2026-11-09T05:00:16.326Z",
         "simulated": false
       }
     },
@@ -3252,7 +3252,7 @@
       "label": "triple revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
+      "path": "/card-exchanges/exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe",
       "status": 204,
       "no_store": true,
       "evidence_id": "P132"
@@ -3261,7 +3261,7 @@
       "label": "triple accept",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp/respond",
+      "path": "/card-exchanges/exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe/respond",
       "status": 409,
       "request": {
         "action": "accept"
@@ -3277,7 +3277,7 @@
       "label": "triple decline",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp/respond",
+      "path": "/card-exchanges/exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe/respond",
       "status": 409,
       "request": {
         "action": "decline"
@@ -3301,10 +3301,10 @@
         "observed_item_count": 6,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3319,14 +3319,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.618Z",
+            "created_at": "2026-11-09T05:00:16.326Z",
             "simulated": false
           },
           {
-            "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3341,15 +3341,15 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.593Z",
-            "responded_at": "2026-11-09T04:53:56.599Z",
+            "created_at": "2026-11-09T05:00:16.302Z",
+            "responded_at": "2026-11-09T05:00:16.308Z",
             "simulated": false
           },
           {
-            "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_cxY9wNWWOcV-K_H4mZsTYUy1zVPQuIgQ",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3364,14 +3364,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.579Z",
+            "created_at": "2026-11-09T05:00:16.282Z",
             "simulated": false
           },
           {
-            "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3386,14 +3386,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.532Z",
+            "created_at": "2026-11-09T05:00:16.236Z",
             "simulated": false
           },
           {
-            "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3408,15 +3408,15 @@
             },
             "direction": "outgoing",
             "status": "declined",
-            "created_at": "2026-11-09T04:53:56.510Z",
-            "responded_at": "2026-11-09T04:53:56.515Z",
+            "created_at": "2026-11-09T05:00:16.214Z",
+            "responded_at": "2026-11-09T05:00:16.218Z",
             "simulated": false
           },
           {
-            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -3431,8 +3431,8 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:55.776Z",
-            "responded_at": "2026-11-09T04:53:55.809Z",
+            "created_at": "2026-11-09T05:00:16.135Z",
+            "responded_at": "2026-11-09T05:00:16.167Z",
             "simulated": false
           }
         ]
@@ -3445,15 +3445,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P136",
       "response_sample": {
-        "id": "exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -3468,7 +3468,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.647Z",
+        "created_at": "2026-11-09T05:00:16.349Z",
         "simulated": false
       }
     },
@@ -3476,7 +3476,7 @@
       "label": "block A->B",
       "actor": "A",
       "method": "POST",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 200,
       "no_store": true,
       "evidence_id": "P137",
@@ -3488,7 +3488,7 @@
       "label": "block respond race",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh/respond",
+      "path": "/card-exchanges/exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j/respond",
       "status": 404,
       "request": {
         "action": "accept"
@@ -3504,7 +3504,7 @@
       "label": "blocked old public ID",
       "actor": "A",
       "method": "GET",
-      "path": "/cards/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+      "path": "/cards/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
       "status": 404,
       "no_store": true,
       "evidence_id": "P139",
@@ -3517,7 +3517,7 @@
       "label": "reverse blocked old public ID",
       "actor": "B",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 404,
       "no_store": true,
       "evidence_id": "P140",
@@ -3530,7 +3530,7 @@
       "label": "reverse blocked detail",
       "actor": "B",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 404,
       "no_store": true,
       "evidence_id": "P141",
@@ -3546,7 +3546,7 @@
       "path": "/card-exchanges",
       "status": 404,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P142",
@@ -3562,7 +3562,7 @@
       "path": "/card-exchanges",
       "status": 404,
       "request": {
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-"
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn"
       },
       "no_store": true,
       "evidence_id": "P143",
@@ -3575,7 +3575,7 @@
       "label": "blocked old response",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh/respond",
+      "path": "/card-exchanges/exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j/respond",
       "status": 404,
       "request": {
         "action": "accept"
@@ -3591,7 +3591,7 @@
       "label": "blocked old revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh",
+      "path": "/card-exchanges/exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j",
       "status": 404,
       "no_store": true,
       "evidence_id": "P145",
@@ -3630,7 +3630,7 @@
       "label": "block A->B",
       "actor": "A",
       "method": "POST",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 200,
       "no_store": true,
       "evidence_id": "P148",
@@ -3650,7 +3650,7 @@
         "observed_item_count": 1,
         "items_owned_fixture_only": [
           {
-            "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "nickname": "匿名搭子",
             "type_code": "",
             "type_name": "",
@@ -3683,7 +3683,7 @@
       "label": "block B->A",
       "actor": "B",
       "method": "POST",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-/block",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn/block",
       "status": 200,
       "no_store": true,
       "evidence_id": "P151",
@@ -3695,7 +3695,7 @@
       "label": "unblock A->B",
       "actor": "A",
       "method": "DELETE",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 204,
       "no_store": true,
       "evidence_id": "P152"
@@ -3704,7 +3704,7 @@
       "label": "unblock A->B",
       "actor": "A",
       "method": "DELETE",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 204,
       "no_store": true,
       "evidence_id": "P153"
@@ -3713,7 +3713,7 @@
       "label": "one unblock cannot remove reverse",
       "actor": "A",
       "method": "GET",
-      "path": "/cards/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+      "path": "/cards/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
       "status": 404,
       "no_store": true,
       "evidence_id": "P154",
@@ -3726,7 +3726,7 @@
       "label": "unblock B->A",
       "actor": "B",
       "method": "DELETE",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-/block",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn/block",
       "status": 204,
       "no_store": true,
       "evidence_id": "P155"
@@ -3743,10 +3743,10 @@
         "observed_item_count": 7,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -3761,14 +3761,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.647Z",
+            "created_at": "2026-11-09T05:00:16.349Z",
             "simulated": false
           },
           {
-            "id": "exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -3783,14 +3783,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.618Z",
+            "created_at": "2026-11-09T05:00:16.326Z",
             "simulated": false
           },
           {
-            "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -3805,15 +3805,15 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.593Z",
-            "responded_at": "2026-11-09T04:53:56.599Z",
+            "created_at": "2026-11-09T05:00:16.302Z",
+            "responded_at": "2026-11-09T05:00:16.308Z",
             "simulated": false
           },
           {
-            "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_cxY9wNWWOcV-K_H4mZsTYUy1zVPQuIgQ",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -3828,14 +3828,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.579Z",
+            "created_at": "2026-11-09T05:00:16.282Z",
             "simulated": false
           },
           {
-            "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -3850,14 +3850,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.532Z",
+            "created_at": "2026-11-09T05:00:16.236Z",
             "simulated": false
           },
           {
-            "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -3872,15 +3872,15 @@
             },
             "direction": "incoming",
             "status": "declined",
-            "created_at": "2026-11-09T04:53:56.510Z",
-            "responded_at": "2026-11-09T04:53:56.515Z",
+            "created_at": "2026-11-09T05:00:16.214Z",
+            "responded_at": "2026-11-09T05:00:16.218Z",
             "simulated": false
           },
           {
-            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -3895,8 +3895,8 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:55.776Z",
-            "responded_at": "2026-11-09T04:53:55.809Z",
+            "created_at": "2026-11-09T05:00:16.135Z",
+            "responded_at": "2026-11-09T05:00:16.167Z",
             "simulated": false
           }
         ]
@@ -3906,7 +3906,7 @@
       "label": "old revoked after unblock",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh/respond",
+      "path": "/card-exchanges/exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j/respond",
       "status": 409,
       "request": {
         "action": "accept"
@@ -3922,12 +3922,12 @@
       "label": "hidden public B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P158",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -3940,12 +3940,12 @@
       "label": "hidden buddy B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P159",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -3969,10 +3969,10 @@
       "no_store": true,
       "evidence_id": "P160",
       "response_sample": {
-        "observed_item_count": 11,
+        "observed_item_count": 18,
         "items_owned_fixture_only": [
           {
-            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -3986,7 +3986,7 @@
             "is_demo": false
           },
           {
-            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+            "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -4000,7 +4000,7 @@
             "is_demo": false
           },
           {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
+            "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
             "nickname": "",
             "type_code": "INFP",
             "type_name": "调停者",
@@ -4014,7 +4014,7 @@
             "is_demo": false
           },
           {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -4028,7 +4028,7 @@
             "is_demo": false
           },
           {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -4056,10 +4056,10 @@
         "observed_item_count": 7,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4074,14 +4074,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.647Z",
+            "created_at": "2026-11-09T05:00:16.349Z",
             "simulated": false
           },
           {
-            "id": "exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4096,14 +4096,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.618Z",
+            "created_at": "2026-11-09T05:00:16.326Z",
             "simulated": false
           },
           {
-            "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4118,15 +4118,15 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.593Z",
-            "responded_at": "2026-11-09T04:53:56.599Z",
+            "created_at": "2026-11-09T05:00:16.302Z",
+            "responded_at": "2026-11-09T05:00:16.308Z",
             "simulated": false
           },
           {
-            "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_cxY9wNWWOcV-K_H4mZsTYUy1zVPQuIgQ",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4141,14 +4141,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.579Z",
+            "created_at": "2026-11-09T05:00:16.282Z",
             "simulated": false
           },
           {
-            "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4163,14 +4163,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.532Z",
+            "created_at": "2026-11-09T05:00:16.236Z",
             "simulated": false
           },
           {
-            "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4185,15 +4185,15 @@
             },
             "direction": "incoming",
             "status": "declined",
-            "created_at": "2026-11-09T04:53:56.510Z",
-            "responded_at": "2026-11-09T04:53:56.515Z",
+            "created_at": "2026-11-09T05:00:16.214Z",
+            "responded_at": "2026-11-09T05:00:16.218Z",
             "simulated": false
           },
           {
-            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4208,8 +4208,8 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:55.776Z",
-            "responded_at": "2026-11-09T04:53:55.809Z",
+            "created_at": "2026-11-09T05:00:16.135Z",
+            "responded_at": "2026-11-09T05:00:16.167Z",
             "simulated": false
           }
         ]
@@ -4227,7 +4227,7 @@
       "no_store": true,
       "evidence_id": "P162",
       "response_sample": {
-        "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "nickname": "F4_HIDDEN_NAME_B",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -4244,15 +4244,15 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c1ddf3b3-5cbe-49c2-8d74-23ac277679b2",
-        "updated_at": "2026-11-09T04:53:56.824Z"
+        "latest_result_id": "f8648d24-9e57-4512-9cbf-c4c1c34e5fee",
+        "updated_at": "2026-11-09T05:00:16.449Z"
       }
     },
     {
       "label": "opt-out old detail",
       "actor": "A",
       "method": "GET",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
       "status": 404,
       "no_store": true,
       "evidence_id": "P163",
@@ -4268,7 +4268,7 @@
       "path": "/card-exchanges",
       "status": 404,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P164",
@@ -4294,7 +4294,7 @@
       "label": "self opt-out public denied",
       "actor": "B",
       "method": "GET",
-      "path": "/cards/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+      "path": "/cards/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
       "status": 404,
       "no_store": true,
       "evidence_id": "P166",
@@ -4315,7 +4315,7 @@
       "no_store": true,
       "evidence_id": "P167",
       "response_sample": {
-        "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "nickname": "F4_HIDDEN_NAME_B",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -4332,15 +4332,15 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c1ddf3b3-5cbe-49c2-8d74-23ac277679b2",
-        "updated_at": "2026-11-09T04:53:56.853Z"
+        "latest_result_id": "f8648d24-9e57-4512-9cbf-c4c1c34e5fee",
+        "updated_at": "2026-11-09T05:00:16.460Z"
       }
     },
     {
       "label": "block A->B",
       "actor": "A",
       "method": "POST",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 200,
       "no_store": true,
       "evidence_id": "P168",
@@ -4360,7 +4360,7 @@
         "observed_item_count": 1,
         "items_owned_fixture_only": [
           {
-            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+            "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -4380,7 +4380,7 @@
       "label": "unblock A->B",
       "actor": "A",
       "method": "DELETE",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 204,
       "no_store": true,
       "evidence_id": "P170"
@@ -4389,7 +4389,7 @@
       "label": "block A->B",
       "actor": "A",
       "method": "POST",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 200,
       "no_store": true,
       "evidence_id": "P171",
@@ -4404,7 +4404,7 @@
       "path": "/card-exchanges",
       "status": 404,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P172",
@@ -4420,7 +4420,7 @@
       "path": "/card-exchanges",
       "status": 404,
       "request": {
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-"
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn"
       },
       "no_store": true,
       "evidence_id": "P173",
@@ -4433,7 +4433,7 @@
       "label": "unblock A->B",
       "actor": "A",
       "method": "DELETE",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 204,
       "no_store": true,
       "evidence_id": "P174"
@@ -4450,10 +4450,10 @@
         "observed_item_count": 7,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_6LnP62FcxcbqnvdVUxsPFQiLnnoAz79j",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -4468,14 +4468,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.647Z",
+            "created_at": "2026-11-09T05:00:16.349Z",
             "simulated": false
           },
           {
-            "id": "exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_YRl3DnsNWDVhRfv_YEjxBEB5EoIcQUOe",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -4490,14 +4490,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.618Z",
+            "created_at": "2026-11-09T05:00:16.326Z",
             "simulated": false
           },
           {
-            "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_vpKvOeUJ4epZ_EoZFbldyRmkLpf0zISs",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -4512,15 +4512,15 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.593Z",
-            "responded_at": "2026-11-09T04:53:56.599Z",
+            "created_at": "2026-11-09T05:00:16.302Z",
+            "responded_at": "2026-11-09T05:00:16.308Z",
             "simulated": false
           },
           {
-            "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_cxY9wNWWOcV-K_H4mZsTYUy1zVPQuIgQ",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -4535,14 +4535,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.579Z",
+            "created_at": "2026-11-09T05:00:16.282Z",
             "simulated": false
           },
           {
-            "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_RMfROTUJ0b1_YqbXJtDZIAN0aFf7vEq2",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -4557,14 +4557,14 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:56.532Z",
+            "created_at": "2026-11-09T05:00:16.236Z",
             "simulated": false
           },
           {
-            "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_fpe_S-ta12oqOCVMvxOX_jQjvl_Gko3K",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -4579,15 +4579,15 @@
             },
             "direction": "outgoing",
             "status": "declined",
-            "created_at": "2026-11-09T04:53:56.510Z",
-            "responded_at": "2026-11-09T04:53:56.515Z",
+            "created_at": "2026-11-09T05:00:16.214Z",
+            "responded_at": "2026-11-09T05:00:16.218Z",
             "simulated": false
           },
           {
-            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
-            "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+            "id": "exchange_uilIlbMme-5GXU-9b6MU_-ElYxyH_5si",
+            "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
             "buddy": {
-              "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+              "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
               "nickname": "",
               "type_code": "INFP",
               "type_name": "调停者",
@@ -4602,8 +4602,8 @@
             },
             "direction": "outgoing",
             "status": "revoked",
-            "created_at": "2026-11-09T04:53:55.776Z",
-            "responded_at": "2026-11-09T04:53:55.809Z",
+            "created_at": "2026-11-09T05:00:16.135Z",
+            "responded_at": "2026-11-09T05:00:16.167Z",
             "simulated": false
           }
         ]
@@ -4616,15 +4616,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d"
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg"
       },
       "no_store": true,
       "evidence_id": "P176",
       "response_sample": {
-        "id": "exchange_kiQAueFwpr42MqOnOgaQ-9VyadNYSO2-",
-        "buddy_id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "exchange_jeBPdTA4xiTo1DH946fKduGOfprZ3swE",
+        "buddy_id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "buddy": {
-          "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+          "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
           "nickname": "",
           "type_code": "INFP",
           "type_name": "调停者",
@@ -4639,7 +4639,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.901Z",
+        "created_at": "2026-11-09T05:00:16.495Z",
         "simulated": false
       }
     },
@@ -4647,7 +4647,7 @@
       "label": "respond",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_kiQAueFwpr42MqOnOgaQ-9VyadNYSO2-/respond",
+      "path": "/card-exchanges/exchange_jeBPdTA4xiTo1DH946fKduGOfprZ3swE/respond",
       "status": 200,
       "request": {
         "action": "accept"
@@ -4655,10 +4655,10 @@
       "no_store": true,
       "evidence_id": "P177",
       "response_sample": {
-        "id": "exchange_kiQAueFwpr42MqOnOgaQ-9VyadNYSO2-",
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "exchange_jeBPdTA4xiTo1DH946fKduGOfprZ3swE",
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "buddy": {
-          "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+          "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
           "nickname": "",
           "type_code": "ESTJ",
           "type_name": "总经理",
@@ -4673,8 +4673,8 @@
         },
         "direction": "incoming",
         "status": "accepted",
-        "created_at": "2026-11-09T04:53:56.901Z",
-        "responded_at": "2026-11-09T04:53:56.907Z",
+        "created_at": "2026-11-09T05:00:16.495Z",
+        "responded_at": "2026-11-09T05:00:16.499Z",
         "simulated": false
       }
     },
@@ -4682,7 +4682,7 @@
       "label": "block A->B",
       "actor": "A",
       "method": "POST",
-      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
+      "path": "/buddies/card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg/block",
       "status": 200,
       "no_store": true,
       "evidence_id": "P178",
@@ -4697,15 +4697,15 @@
       "path": "/card-exchanges",
       "status": 201,
       "request": {
-        "buddy_id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f"
+        "buddy_id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj"
       },
       "no_store": true,
       "evidence_id": "P179",
       "response_sample": {
-        "id": "exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW",
-        "buddy_id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+        "id": "exchange_w99l16lDAM1Wx6FFaSPo0tBpLAyAopvg",
+        "buddy_id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
         "buddy": {
-          "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+          "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
           "nickname": "",
           "type_code": "ESTJ",
           "type_name": "总经理",
@@ -4720,7 +4720,7 @@
         },
         "direction": "outgoing",
         "status": "pending",
-        "created_at": "2026-11-09T04:53:56.918Z",
+        "created_at": "2026-11-09T05:00:16.508Z",
         "simulated": false
       }
     },
@@ -4728,7 +4728,7 @@
       "label": "respond",
       "actor": "C",
       "method": "POST",
-      "path": "/card-exchanges/exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW/respond",
+      "path": "/card-exchanges/exchange_w99l16lDAM1Wx6FFaSPo0tBpLAyAopvg/respond",
       "status": 200,
       "request": {
         "action": "accept"
@@ -4736,10 +4736,10 @@
       "no_store": true,
       "evidence_id": "P180",
       "response_sample": {
-        "id": "exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW",
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "exchange_w99l16lDAM1Wx6FFaSPo0tBpLAyAopvg",
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "buddy": {
-          "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+          "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
           "nickname": "",
           "type_code": "ESTJ",
           "type_name": "总经理",
@@ -4754,8 +4754,8 @@
         },
         "direction": "incoming",
         "status": "accepted",
-        "created_at": "2026-11-09T04:53:56.918Z",
-        "responded_at": "2026-11-09T04:53:56.924Z",
+        "created_at": "2026-11-09T05:00:16.508Z",
+        "responded_at": "2026-11-09T05:00:16.513Z",
         "simulated": false
       }
     },
@@ -4763,12 +4763,12 @@
       "label": "hidden public C->A",
       "actor": "C",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P181",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -4781,12 +4781,12 @@
       "label": "hidden buddy C->A",
       "actor": "C",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 200,
       "no_store": true,
       "evidence_id": "P182",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -4810,8 +4810,36 @@
       "no_store": true,
       "evidence_id": "P183",
       "response_sample": {
-        "observed_item_count": 11,
+        "observed_item_count": 18,
         "items_owned_fixture_only": [
+          {
+            "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
+            "nickname": "",
+            "type_code": "INFP",
+            "type_name": "调停者",
+            "avatar_text": "IN",
+            "avatar_color": "#53677a",
+            "tagline": "内在理想",
+            "interests": [],
+            "same_type": false,
+            "shared_interests": [],
+            "exchange_status": "none",
+            "is_demo": false
+          },
+          {
+            "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
+            "nickname": "",
+            "type_code": "ESTJ",
+            "type_name": "总经理",
+            "avatar_text": "ES",
+            "avatar_color": "#53677a",
+            "tagline": "组织落实",
+            "interests": [],
+            "same_type": true,
+            "shared_interests": [],
+            "exchange_status": "accepted",
+            "is_demo": false
+          },
           {
             "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
             "nickname": "",
@@ -4837,39 +4865,11 @@
             "interests": [],
             "same_type": true,
             "shared_interests": [],
-            "exchange_status": "accepted",
-            "is_demo": false
-          },
-          {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
-            "nickname": "",
-            "type_code": "INFP",
-            "type_name": "调停者",
-            "avatar_text": "IN",
-            "avatar_color": "#53677a",
-            "tagline": "内在理想",
-            "interests": [],
-            "same_type": false,
-            "shared_interests": [],
             "exchange_status": "none",
             "is_demo": false
           },
           {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
-            "nickname": "",
-            "type_code": "ESTJ",
-            "type_name": "总经理",
-            "avatar_text": "ES",
-            "avatar_color": "#53677a",
-            "tagline": "组织落实",
-            "interests": [],
-            "same_type": true,
-            "shared_interests": [],
-            "exchange_status": "none",
-            "is_demo": false
-          },
-          {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -4897,10 +4897,10 @@
         "observed_item_count": 1,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW",
-            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+            "id": "exchange_w99l16lDAM1Wx6FFaSPo0tBpLAyAopvg",
+            "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
             "buddy": {
-              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+              "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -4915,8 +4915,8 @@
             },
             "direction": "incoming",
             "status": "accepted",
-            "created_at": "2026-11-09T04:53:56.918Z",
-            "responded_at": "2026-11-09T04:53:56.924Z",
+            "created_at": "2026-11-09T05:00:16.508Z",
+            "responded_at": "2026-11-09T05:00:16.513Z",
             "simulated": false
           }
         ]
@@ -4953,7 +4953,7 @@
       "label": "12-operation missing guest",
       "actor": "none",
       "method": "GET",
-      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/cards/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 401,
       "no_store": true,
       "evidence_id": "P187",
@@ -4992,7 +4992,7 @@
       "label": "12-operation missing guest",
       "actor": "none",
       "method": "GET",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
       "status": 401,
       "no_store": true,
       "evidence_id": "P190",
@@ -5005,7 +5005,7 @@
       "label": "12-operation missing guest",
       "actor": "none",
       "method": "POST",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-/block",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn/block",
       "status": 401,
       "no_store": true,
       "evidence_id": "P191",
@@ -5018,7 +5018,7 @@
       "label": "12-operation missing guest",
       "actor": "none",
       "method": "DELETE",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-/block",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn/block",
       "status": 401,
       "no_store": true,
       "evidence_id": "P192",
@@ -5047,7 +5047,7 @@
       "path": "/card-exchanges",
       "status": 401,
       "request": {
-        "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-"
+        "buddy_id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn"
       },
       "no_store": true,
       "evidence_id": "P194",
@@ -5060,7 +5060,7 @@
       "label": "12-operation missing guest",
       "actor": "none",
       "method": "POST",
-      "path": "/card-exchanges/exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW/respond",
+      "path": "/card-exchanges/exchange_w99l16lDAM1Wx6FFaSPo0tBpLAyAopvg/respond",
       "status": 401,
       "request": {
         "action": "accept"
@@ -5076,7 +5076,7 @@
       "label": "12-operation missing guest",
       "actor": "none",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW",
+      "path": "/card-exchanges/exchange_w99l16lDAM1Wx6FFaSPo0tBpLAyAopvg",
       "status": 401,
       "no_store": true,
       "evidence_id": "P196",
@@ -5183,7 +5183,7 @@
       "label": "self block denied",
       "actor": "A",
       "method": "POST",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-/block",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn/block",
       "status": 422,
       "no_store": true,
       "evidence_id": "P204",
@@ -5196,7 +5196,7 @@
       "label": "self unblock denied",
       "actor": "A",
       "method": "DELETE",
-      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-/block",
+      "path": "/buddies/card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn/block",
       "status": 422,
       "no_store": true,
       "evidence_id": "P205",
@@ -5259,7 +5259,7 @@
       "no_store": true,
       "evidence_id": "P210",
       "response_sample": {
-        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
+        "id": "card_quDNmHbhiTR4AX59lO4icD5Henfm_7Gn",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -5276,8 +5276,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
-        "updated_at": "2026-11-09T04:53:55.746Z"
+        "latest_result_id": "db2f7155-0ee6-48d3-af49-cdc2fa0a529e",
+        "updated_at": "2026-11-09T05:00:16.101Z"
       }
     },
     {
@@ -5289,7 +5289,7 @@
       "no_store": true,
       "evidence_id": "P211",
       "response_sample": {
-        "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
+        "id": "card_MehrpFPxK0jVDpmBdRht6mfbNbHxXyqg",
         "nickname": "F4_HIDDEN_NAME_B",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -5306,8 +5306,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c1ddf3b3-5cbe-49c2-8d74-23ac277679b2",
-        "updated_at": "2026-11-09T04:53:56.853Z"
+        "latest_result_id": "f8648d24-9e57-4512-9cbf-c4c1c34e5fee",
+        "updated_at": "2026-11-09T05:00:16.460Z"
       }
     },
     {
@@ -5319,7 +5319,7 @@
       "no_store": true,
       "evidence_id": "P212",
       "response_sample": {
-        "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
+        "id": "card_iMFVQX4FTv_0Sr4jUfM0JKEQL_H_M2yj",
         "nickname": "F4_HIDDEN_NAME_C",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -5336,8 +5336,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "c5a39eb6-9251-4a1f-8a65-c5029d611a47",
-        "updated_at": "2026-11-09T04:53:55.549Z"
+        "latest_result_id": "052d0836-f84a-4598-a487-e80f2dfb1b25",
+        "updated_at": "2026-11-09T05:00:15.965Z"
       }
     }
   ],
@@ -5417,6 +5417,6 @@
     "auxiliary SQL unique active pair"
   ],
   "outcome": "passed",
-  "finished_at": "2026-11-09T04:53:57.003Z",
+  "finished_at": "2026-11-09T05:00:16.569Z",
   "evidence_note": "Actual HTTP status/request traces; credentials omitted. List response samples contain only this verification cohort; observed_item_count retains the actual list size. Privacy assertions operated on complete HTTP responses before minimization. Synthetic test data only. Restart phase uses the original pre-restart cohort; final prepare phase uses a new cohort on the same candidate binary."
 }

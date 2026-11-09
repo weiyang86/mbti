@@ -5,7 +5,7 @@
 - Run：`run_594d408d15de`；Task：`task_ee60b8ce8251`；Dispatch：`ctx_04d1f774b1ea`。
 - 独立树：`/Users/lei/orca/workspaces/mbti/mbti-web-api-f4`；分支：`weiyang86/mbti-web-api-f4`。
 - 实际基线：`42dc92b6bbbdda716c980b3f0ed0a6a3067a01ff`，Orca 创建时 baseRef 为已集成 F2/F3 的 `weiyang86/mbti-web-api-fast-integration`。
-- 运行源码候选：`d0bdaa94130f590089617ccf2b6e48dac288085e`。后续交付提交仅完善候选 HTTP 400 描述与本回执/最小化证据；Worker 完成消息给出完整树最终 SHA 和范围。
+- 运行源码最终候选：`74c546cc4e1de602eaf26a0421729808399c653d`，追加修复交换发起方公开条件；原始实现 `d0bdaa94130f590089617ccf2b6e48dac288085e` 与首版交付记录 `d2620d004ad130299e001162d93cf0a77761033f` 保留，未改写。后续提交只更新本回执/最小化证据；Worker 完成消息给出完整树最终 SHA 和范围。
 - 固定 PR20：`a39d99cf8537a6e54c34e965b2c3ff6c2691a21f`，已通过 `git show` 读取 cards/buddies/card-exchanges/types-social/manual；消费者逐字段依据沿用 [准备记录](../integration/MBTI-F4-candidate.md)。已读根/web/foundation AGENTS 及指定输入包 RUNBOOK/API-REVIEW/cards/F4。
 - 本轮 test API：`http://192.168.0.200:4156/api/v1`。原交付 dev `4056`、H5 `5173`、dev55436、开发运营初始化均未操作，未 push/merge/main。
 
@@ -20,14 +20,14 @@
 - `discoverable` 控制整个公开/发现；私密本人只走 `/cards/me`。公开类型只随明确 opt-in 开放；其余四字段按 visibility 投影。隐藏 nickname/declaration 为空串，interests/shared_interests 为空数组，manual 省略。avatar/tagline/hint 仅公开类型或中性静态文案；manual 为 PR20 按类型静态文案。真实 is_demo/simulated 均 false。
 - PUT 顶层及 visibility 子键白名单；按子字段合并并持有 owner 事务锁。候选限额按 Unicode codepoint：昵称 40、宣言 160、兴趣最多 10、每项 24，trim/去重/移除空兴趣。字段 null/错误类型/未知键 422；顶层 null 被现有 strict JSON parser 拒绝为 400，畸形 JSON 也是 400，未改全局 parser。
 - recommend 默认 updatedAt/id 稳定倒序；合法 type_code 只过滤公开类型。same 使用服务端本人卡类型，无类型或与 query 冲突 422。limit 默认 20，1–100；SQL 可见性/双向 block 过滤在 take 前执行。静态 cards/me、buddies/blocked 先注册。
-- exchange.direction 相对于当前观察者；buddy 总是对方。接收方 pending accept/decline；发起方 pending/accepted revoke；第三人 404，合法当事人角色/状态冲突 409。同向 pending 重试 200 同 ID，反向 pending 或已有 accepted 409，首建 201；declined/revoked 后创建新 ID，旧 ID 不复活。回应重放 409，原发起方重复撤回 revoked 204。
+- exchange.direction 相对于当前观察者；buddy 总是对方。新建/同向重试均在 pair 事务锁内校验发起方和目标已存在合法类型且 discoverable=true；发起方无卡/空类型/私密同形 404，不创建不可达 pending。接收方 pending accept/decline；发起方 pending/accepted revoke；第三人 404，合法当事人角色/状态冲突 409。同向 pending 重试 200 同 ID，反向 pending 或已有 accepted 409，首建 201；declined/revoked 后创建新 ID，旧 ID 不复活。回应重放 409，原发起方重复撤回 revoked 204。
 - create/respond/revoke/block/unblock 共用 canonical pair 的 PostgreSQL advisory transaction lock，数据库部分唯一索引兜底每 pair 最多一条 pending/accepted。summary 优先当前有效关系，否则最近 createdAt/id；列表按 createdAt/id 倒序。并发 discovery opt-out 导致投影失效时回滚写入并 404，避免 null 成功体。
 - 任一方向 active block 即时隐藏公开页/详情/发现/交换列表并拒绝新交换/回应；block 同事务将 pending/accepted 置 revoked。unblock 只改自己方向、保留 lastBlockedAt、不复活旧关系。已知公开 ID 的 block/unblock 管理操作可在对方私密/反向 block 后继续执行；只返回管理布尔或 204，不返回私密投影。自己 active blocked 列表仅保留公开 ID、匿名标签及空敏感字段。
 - 200 GET/PUT/block/respond，201 首次 exchange/200 同向 pending 重试，204 两种 DELETE；缺/无效身份 401，未知/不可见/被屏蔽/第三人 404，角色状态 409，输入 422。裸业务对象及既有 `{code,message}`，全部 F4 响应 no-store。
 
 ## 实际成功与拒绝矩阵
 
-最终完整 HTTP 验证在运行候选 d0bdaa9 上执行：**212 次真实 HTTP（含前置游客/结果及预检），73 项语义/隐私断言，退出 0**。P 编号链接 [prepare 请求证据](MBTI-F4-prepare.http.json)。完整响应先在测试中校验，提交的列表样例只保留本轮合成 cohort，并保留 observed_item_count；没有提交凭证、其他记录的资料或原始运行日志。
+最终完整 HTTP 验证在运行候选 74c546c 上重新执行：**212 次真实 HTTP（含前置游客/结果及预检），73 项语义/隐私断言，退出 0**。P 编号链接 [prepare 请求证据](MBTI-F4-prepare.http.json)。完整响应先在测试中校验，提交的列表样例只保留本轮合成 cohort，并保留 observed_item_count；没有提交凭证、其他记录的资料或原始运行日志。另有 [发起方公开条件回归](MBTI-F4-sender-visibility.http.json) 55 次真实 HTTP、23 项断言，全部退出 0。
 
 | # | 方法/路径（省略 /api/v1） | 实际成功证据 | 实际拒绝与边界证据 |
 | --- | --- | --- | --- |
@@ -40,7 +40,7 @@
 | 30 | POST /buddies/{id}/block | P137/P148：200 blocked=true，重复幂等；P178 将 accepted 撤回；R017 重启后管理正常 | P199 未知 404，P204 自己 422，P191 无身份 401；双向读/新交换/旧回应均被收紧 |
 | 31 | DELETE /buddies/{id}/block | P152/P153 重复 204；P155 另一方解除后可读；R009 重启后解除 204 | P154 仅解除己方仍因反向 block 404；P200 未知 404，P205 自己 422，P192 无身份 401；旧申请仍 revoked |
 | 32 | GET /card-exchanges | P089 A→B 在 B 视图 incoming/buddy=A；P090 C 无该记录；P106 accepted 后嵌入投影仍无 canary | P146–147 block 后双方隐藏对方；P165 opt-out 隐藏旧嵌入；P193 无身份 401；内部身份和联系方式均未出响应 |
-| 33 | POST /card-exchanges | P088 首建 201；P097 同向 pending 重试 200 同 ID；P114–121 并发同向一 201 + 七 200；终态后新 ID | P086 自己/P087 sender 注入 422；P098 反向 pending 409；P101–102 accepted 409；P142–143 block 404；P164 私密 404；P194 无身份 401 |
+| 33 | POST /card-exchanges | P088 首建 201；P097 同向 pending 重试 200 同 ID；P114–121 并发同向一 201 + 七 200；终态后新 ID | P086 自己/P087 sender 注入 422；P098 反向 pending 409；P101–102 accepted 409；P142–143 block 404；P164 私密 404；P194 无身份 401；S005/S023/S041 无卡/空类型/私密发起方 404，不落 pending |
 | 34 | POST /card-exchanges/{id}/respond | P099 接收方 accept 200；P111 decline 200；P127–128 竞争一个 200、一个 409 | P091/P096 第三人 404（先归属再 body）；P093 发起方 409；P095 action 422；P100/P113 终态重放 409；P144 屏蔽后旧 ID 404；P195 无身份 401 |
 | 35 | DELETE /card-exchanges/{id} | P107 accepted→revoked 204，P108 原发起方重试 204；P122 pending 撤回 204；R012 重启后重试 204 | P092 第三人 404、P094 接收方 409、P112 declined 冲突 409；P145 block 后旧 ID 404；P196 缺身份 401；旧记录不可回应/复活 |
 
@@ -53,7 +53,21 @@
 - block/respond P137–138：block 200、respond 404；block/create P171–172：block 200、create 404；之后所有相关旧 ID/新申请受拒绝，解除后旧 revoked 仍 409。交换接受不会生成联系方式授权，全部 F4 对象扫描无渠道值/内部 owner/历史结果/答案/阶段/凭证。
 - canary 在公开 card、buddy、discovery、exchange 嵌入和 blocked 管理中扫描；name/interests/declaration/manual 分别 opt-in 可显示、关闭立即隐藏。tagline 不复用私密 declaration，avatar 不从隐藏 nickname 派生。
 - 两个实际来源 `http://127.0.0.1:4155`、`http://192.168.0.200:4155` OPTIONS 204 且 ACAO 精确匹配；evil 来源 204 无 ACAO（P206–208），真实带 guest 请求同时已到后端。
-- 在总控明确“现在可短重启4156”窗口后 stop/start，同库不清数据；[restart 请求证据](MBTI-F4-restart.http.json) **17 次请求、8 项断言、退出 0**。原 A/B/C card ID/字段一致，原 AC accepted 仍可读；A→B block 仍生效，旧 card/buddy 404，解除后旧 AB 为 revoked、回应 409、原发起方重撤 204，随后恢复合成 A→B block 状态。重启 cohort 来自第一轮 prepared；最终 212 请求使用新 cohort 在同一候选二进制再验证，二者不会混称同一批 ID。
+- 在总控明确“现在可短重启4156”窗口后 stop/start，同库不清数据；[restart 请求证据](MBTI-F4-restart.http.json) **17 次请求、8 项断言、退出 0**。原 A/B/C card ID/字段一致，原 AC accepted 仍可读；A→B block 仍生效，旧 card/buddy 404，解除后旧 AB 为 revoked、回应 409、原发起方重撤 204，随后恢复合成 A→B block 状态。重启 cohort 来自重启前上一轮 prepared；最终 212 请求使用新 cohort 在同一候选二进制再验证，二者不会混称同一批 ID。
+
+## 总控复核缺陷与追加修复
+
+总控在初始 d0bdaa9 上实测发现：发起方未公开/无类型仍可向已公开对象 POST 得到 201，但接收方列表看不到该 pending、回应 404。初始 212 项没有覆盖“发起方自己私密”的前置条件，故不能以其通过掩盖此遗漏。已追加 74c546c，在 pair 锁内同时校验双方当前公开投影，且在查询/返回同向 pending 重试之前校验；发起方缺卡时不会懒创建名片或待办。
+
+独立 HTTP 回归 `verify-f4-sender-visibility.mjs` 在最终候选运行，**55 请求 / 23 断言 / 退出 0**：
+
+| 合成发起方 | 拒绝且接收方前后列表无新增 | 明确公开后 | 再私密后的重试 / 再公开 |
+| --- | --- | --- | --- |
+| 从未 GET/PUT 名片 | S005 404，S004/S006 列表相同 | S008 201、S009 同 ID 200、S010 incoming、S011 接收方 accept 200 | S015 404、S016 incoming 隐藏；S018 公开后同 ID 200 |
+| 懒建空类型、未公开 | S023 404，S022/S024 列表相同 | S026 201、S027 同 ID 200、S028 incoming、S029 接收方 accept 200 | S033 404、S034 incoming 隐藏；S036 公开后同 ID 200 |
+| 已有合法类型、未公开 | S041 404，S040/S042 列表相同 | S044 201、S045 同 ID 200、S046 incoming、S047 接收方 accept 200 | S051 404、S052 incoming 隐藏；S054 公开后同 ID 200 |
+
+这些操作全部通过 HTTP；没有用 SQL 创建或转换关系。随后已重跑完整 212/73、明确第二窗口重启后的 17/8，以及 API 79/79；本文件 P/R/S 证据的 revision 均为 74c546c。F2/F3 回归在 d0bdaa9 运行，追加 fix 只改 social service/专用回归脚本/候选说明，这些模块及共享认证账本未变。
 
 ## 实际命令与退出码
 
@@ -73,9 +87,10 @@
 | `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti-local.mjs migrate test` | 0，41 migrations，只新增 `20261109000100_mbti_f4_social_candidate` |
 | `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/seed-f3-test.mjs` | 0，本树独立 0600 test fixture；不搬到 dev |
 | `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/verify-f4.mjs prepare` | 0，212 HTTP / 73 断言；原 token 只保留 ignored 0600 状态 |
+| `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/verify-f4-sender-visibility.mjs` | 0，最终 74c546c 上 55 HTTP / 23 断言；三类私密发起方拒绝/公开后接收方可处理及公开状态重试检查 |
 | `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/verify-f4.mjs restart` | 0，明确窗口重启后 17 HTTP / 8 断言 |
-| `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/verify-f2.mjs` | 0，64 检查，包含归属/比较/删除/真实 SVG 和存储失败重试 |
-| `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/verify-f3.mjs` | 0，121 检查；本树 Auth/RBAC 同测试订单及受控协议回归，非真实外部支付 |
+| `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/verify-f2.mjs` | 0，d0bdaa9 上 64 检查，包含归属/比较/删除/真实 SVG 和存储失败重试；最终 fix 没有改这些模块 |
+| `MBTI_LOCAL_OWNER_ROOT=... node scripts/mbti/verify-f3.mjs` | 0，d0bdaa9 上 121 检查；本树 Auth/RBAC 同测试订单及受控协议回归，非真实外部支付 |
 | `python3 /Volumes/Lexar/日常工作/2026/mbti/demo/mbti/orca-inputs/MBTI-WebAPI-Fastlane/smoke.py --base http://192.168.0.200:4156/api/v1 --phase F2` | 0，含 F1，题库 qb-v0.4-prototype-1；结果 6b15f719-01a7-4bd7-b4e4-6a4f75b6f043 / f00730ef-ce2c-48e7-8d52-67c4492fd7bb，B 404、submit 201/409、F2 图片/比较/删除通过 |
 | `git diff --check` / `git diff --cached --check` | 0；精确暂存显式路径 |
 
@@ -101,6 +116,7 @@ node scripts/mbti-local.mjs migrate test
 node scripts/mbti/seed-f3-test.mjs
 # prepare 只创建新合成 cohort，不清除 Web 或其他人的数据；秘密保留 ignored 0600 状态。
 node scripts/mbti/verify-f4.mjs prepare
+node scripts/mbti/verify-f4-sender-visibility.mjs
 # 收到明确短重启窗口后：
 node scripts/mbti-local.mjs stop test
 node scripts/mbti-local.mjs start test

@@ -1,8 +1,8 @@
 {
   "phase": "restart",
   "base": "http://192.168.0.200:4156/api/v1",
-  "revision": "d0bdaa94130f590089617ccf2b6e48dac288085e",
-  "started_at": "2026-11-09T04:53:23.532Z",
+  "revision": "74c546cc4e1de602eaf26a0421729808399c653d",
+  "started_at": "2026-11-09T05:00:15.089Z",
   "checks": [
     {
       "label": "restart same guest A",
@@ -13,7 +13,7 @@
       "no_store": true,
       "evidence_id": "R001",
       "response_sample": {
-        "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
         "nickname": "F4_HIDDEN_NAME_A",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -30,8 +30,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "26ee6ece-689a-43ac-a108-5a15bbd5b37b",
-        "updated_at": "2026-11-09T04:51:07.259Z"
+        "latest_result_id": "e7c58cda-4606-46d5-b9a8-b708fe4cae8c",
+        "updated_at": "2026-11-09T04:53:55.746Z"
       }
     },
     {
@@ -43,7 +43,7 @@
       "no_store": true,
       "evidence_id": "R002",
       "response_sample": {
-        "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
+        "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
         "nickname": "F4_HIDDEN_NAME_B",
         "type_code": "INFP",
         "type_name": "调停者",
@@ -60,8 +60,8 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "8b61dd1e-e5ba-4267-9652-dab5514d3dc4",
-        "updated_at": "2026-11-09T04:51:07.552Z"
+        "latest_result_id": "c1ddf3b3-5cbe-49c2-8d74-23ac277679b2",
+        "updated_at": "2026-11-09T04:53:56.853Z"
       }
     },
     {
@@ -73,7 +73,7 @@
       "no_store": true,
       "evidence_id": "R003",
       "response_sample": {
-        "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+        "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
         "nickname": "F4_HIDDEN_NAME_C",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -90,15 +90,15 @@
           "manual": false
         },
         "has_visual_set": false,
-        "latest_result_id": "ba46b67e-5f46-45b3-a18c-5d216495417c",
-        "updated_at": "2026-11-09T04:51:07.178Z"
+        "latest_result_id": "c5a39eb6-9251-4a1f-8a65-c5029d611a47",
+        "updated_at": "2026-11-09T04:53:55.549Z"
       }
     },
     {
       "label": "restart old blocked card",
       "actor": "A",
       "method": "GET",
-      "path": "/cards/card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
+      "path": "/cards/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
       "status": 404,
       "no_store": true,
       "evidence_id": "R004",
@@ -111,7 +111,7 @@
       "label": "restart reverse block",
       "actor": "B",
       "method": "GET",
-      "path": "/buddies/card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
       "status": 404,
       "no_store": true,
       "evidence_id": "R005",
@@ -132,7 +132,7 @@
         "observed_item_count": 1,
         "items_owned_fixture_only": [
           {
-            "id": "card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie",
+            "id": "card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d",
             "nickname": "匿名搭子",
             "type_code": "",
             "type_name": "",
@@ -160,10 +160,10 @@
         "observed_item_count": 1,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_XbAMEZ9YPVv8QxVdq5XYmWK-gmdDn-VC",
-            "buddy_id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW",
+            "buddy_id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "buddy": {
-              "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+              "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -178,8 +178,8 @@
             },
             "direction": "outgoing",
             "status": "accepted",
-            "created_at": "2026-11-09T04:51:07.596Z",
-            "responded_at": "2026-11-09T04:51:07.600Z",
+            "created_at": "2026-11-09T04:53:56.918Z",
+            "responded_at": "2026-11-09T04:53:56.924Z",
             "simulated": false
           }
         ]
@@ -189,7 +189,7 @@
       "label": "restart terminal replay",
       "actor": "C",
       "method": "POST",
-      "path": "/card-exchanges/exchange_XbAMEZ9YPVv8QxVdq5XYmWK-gmdDn-VC/respond",
+      "path": "/card-exchanges/exchange_oi4RQZduLzz_XHI_C763NFUeNFpu6CqW/respond",
       "status": 409,
       "request": {
         "action": "decline"
@@ -205,7 +205,7 @@
       "label": "unblock A->B",
       "actor": "A",
       "method": "DELETE",
-      "path": "/buddies/card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie/block",
+      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
       "status": 204,
       "no_store": true,
       "evidence_id": "R009"
@@ -222,10 +222,10 @@
         "observed_item_count": 8,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_6rpSPALlwrxTfmWQG9KkU6EGBR9dp_6I",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_kiQAueFwpr42MqOnOgaQ-9VyadNYSO2-",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -240,15 +240,15 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.583Z",
-            "responded_at": "2026-11-09T04:51:07.587Z",
+            "created_at": "2026-11-09T04:53:56.901Z",
+            "responded_at": "2026-11-09T04:53:56.907Z",
             "simulated": false
           },
           {
-            "id": "exchange_4r-S_wBUBu2U3h6dDg1jAcSKZcSDisGF",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -263,14 +263,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.459Z",
+            "created_at": "2026-11-09T04:53:56.647Z",
             "simulated": false
           },
           {
-            "id": "exchange_dzTHYfPK1ViUuztt5FErbkueJENq-jJP",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -285,14 +285,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.439Z",
+            "created_at": "2026-11-09T04:53:56.618Z",
             "simulated": false
           },
           {
-            "id": "exchange_f9gxDD2qOrFtu8WrProQAz13ThY4XIUh",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -307,15 +307,15 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.418Z",
-            "responded_at": "2026-11-09T04:51:07.422Z",
+            "created_at": "2026-11-09T04:53:56.593Z",
+            "responded_at": "2026-11-09T04:53:56.599Z",
             "simulated": false
           },
           {
-            "id": "exchange_Lf_GcwUPebBWfAPqw78e6xAf_uSmRj4x",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -330,14 +330,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.407Z",
+            "created_at": "2026-11-09T04:53:56.579Z",
             "simulated": false
           },
           {
-            "id": "exchange_p0ibnX6s57mFlLLOXn5Lx00qssWj4laK",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -352,14 +352,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.371Z",
+            "created_at": "2026-11-09T04:53:56.532Z",
             "simulated": false
           },
           {
-            "id": "exchange_lnKtGp_WUfBq6VEMP3MAFl47hNnvJ3Kz",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -374,15 +374,15 @@
             },
             "direction": "incoming",
             "status": "declined",
-            "created_at": "2026-11-09T04:51:07.353Z",
-            "responded_at": "2026-11-09T04:51:07.358Z",
+            "created_at": "2026-11-09T04:53:56.510Z",
+            "responded_at": "2026-11-09T04:53:56.515Z",
             "simulated": false
           },
           {
-            "id": "exchange_NS59KM1Rrr8qYwGVCXTBq7wZk07otnT1",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -397,8 +397,8 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.282Z",
-            "responded_at": "2026-11-09T04:51:07.317Z",
+            "created_at": "2026-11-09T04:53:55.776Z",
+            "responded_at": "2026-11-09T04:53:55.809Z",
             "simulated": false
           }
         ]
@@ -408,7 +408,7 @@
       "label": "restart revoked never revives",
       "actor": "B",
       "method": "POST",
-      "path": "/card-exchanges/exchange_6rpSPALlwrxTfmWQG9KkU6EGBR9dp_6I/respond",
+      "path": "/card-exchanges/exchange_kiQAueFwpr42MqOnOgaQ-9VyadNYSO2-/respond",
       "status": 409,
       "request": {
         "action": "accept"
@@ -424,7 +424,7 @@
       "label": "revoke",
       "actor": "A",
       "method": "DELETE",
-      "path": "/card-exchanges/exchange_6rpSPALlwrxTfmWQG9KkU6EGBR9dp_6I",
+      "path": "/card-exchanges/exchange_kiQAueFwpr42MqOnOgaQ-9VyadNYSO2-",
       "status": 204,
       "no_store": true,
       "evidence_id": "R012"
@@ -433,12 +433,12 @@
       "label": "hidden public B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/cards/card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+      "path": "/cards/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
       "status": 200,
       "no_store": true,
       "evidence_id": "R013",
       "response_sample": {
-        "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -451,12 +451,12 @@
       "label": "hidden buddy B->A",
       "actor": "B",
       "method": "GET",
-      "path": "/buddies/card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+      "path": "/buddies/card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
       "status": 200,
       "no_store": true,
       "evidence_id": "R014",
       "response_sample": {
-        "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+        "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
         "nickname": "",
         "type_code": "ESTJ",
         "type_name": "总经理",
@@ -480,10 +480,10 @@
       "no_store": true,
       "evidence_id": "R015",
       "response_sample": {
-        "observed_item_count": 8,
+        "observed_item_count": 11,
         "items_owned_fixture_only": [
           {
-            "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -497,7 +497,7 @@
             "is_demo": false
           },
           {
-            "id": "card_n-77q3hs_UK1vqLXaOhlwUFwb334drsD",
+            "id": "card_JKxo49cAx_hB1ifv7teQXeoW-TVbkW3f",
             "nickname": "",
             "type_code": "ESTJ",
             "type_name": "总经理",
@@ -525,10 +525,10 @@
         "observed_item_count": 8,
         "items_owned_fixture_only": [
           {
-            "id": "exchange_6rpSPALlwrxTfmWQG9KkU6EGBR9dp_6I",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_kiQAueFwpr42MqOnOgaQ-9VyadNYSO2-",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -543,15 +543,15 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.583Z",
-            "responded_at": "2026-11-09T04:51:07.587Z",
+            "created_at": "2026-11-09T04:53:56.901Z",
+            "responded_at": "2026-11-09T04:53:56.907Z",
             "simulated": false
           },
           {
-            "id": "exchange_4r-S_wBUBu2U3h6dDg1jAcSKZcSDisGF",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_pqOiYnPSoiiLosVggG7IN752IiuhB9qh",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -566,14 +566,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.459Z",
+            "created_at": "2026-11-09T04:53:56.647Z",
             "simulated": false
           },
           {
-            "id": "exchange_dzTHYfPK1ViUuztt5FErbkueJENq-jJP",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_IAAFfMXXZS_B4pF9qbobm10QjaOhoGcp",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -588,14 +588,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.439Z",
+            "created_at": "2026-11-09T04:53:56.618Z",
             "simulated": false
           },
           {
-            "id": "exchange_f9gxDD2qOrFtu8WrProQAz13ThY4XIUh",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_8Hey41uSYtzx-PqkeYjhbnDg7DqothNz",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -610,15 +610,15 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.418Z",
-            "responded_at": "2026-11-09T04:51:07.422Z",
+            "created_at": "2026-11-09T04:53:56.593Z",
+            "responded_at": "2026-11-09T04:53:56.599Z",
             "simulated": false
           },
           {
-            "id": "exchange_Lf_GcwUPebBWfAPqw78e6xAf_uSmRj4x",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_tJn67eiL_olbQcQ2gpFqUnSaDgDWc0FG",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -633,14 +633,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.407Z",
+            "created_at": "2026-11-09T04:53:56.579Z",
             "simulated": false
           },
           {
-            "id": "exchange_p0ibnX6s57mFlLLOXn5Lx00qssWj4laK",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_p3nTk3H2InbAH6gtnx9esK8OitDdzLl7",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -655,14 +655,14 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.371Z",
+            "created_at": "2026-11-09T04:53:56.532Z",
             "simulated": false
           },
           {
-            "id": "exchange_lnKtGp_WUfBq6VEMP3MAFl47hNnvJ3Kz",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_W_f8t45FUhdN8M26on8aEC986-Hn7WFo",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -677,15 +677,15 @@
             },
             "direction": "incoming",
             "status": "declined",
-            "created_at": "2026-11-09T04:51:07.353Z",
-            "responded_at": "2026-11-09T04:51:07.358Z",
+            "created_at": "2026-11-09T04:53:56.510Z",
+            "responded_at": "2026-11-09T04:53:56.515Z",
             "simulated": false
           },
           {
-            "id": "exchange_NS59KM1Rrr8qYwGVCXTBq7wZk07otnT1",
-            "buddy_id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+            "id": "exchange_0A07pxz3uMHxVoszl4Wu2oGbig6Kyuy4",
+            "buddy_id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
             "buddy": {
-              "id": "card_N57WHKSAZEgEFYLjSDlaKdBR3B_U0_3l",
+              "id": "card_OFeNqxiSXuO9VhzwN_WUDNk1wWKRnE_-",
               "nickname": "",
               "type_code": "ESTJ",
               "type_name": "总经理",
@@ -700,8 +700,8 @@
             },
             "direction": "incoming",
             "status": "revoked",
-            "created_at": "2026-11-09T04:51:07.282Z",
-            "responded_at": "2026-11-09T04:51:07.317Z",
+            "created_at": "2026-11-09T04:53:55.776Z",
+            "responded_at": "2026-11-09T04:53:55.809Z",
             "simulated": false
           }
         ]
@@ -711,7 +711,7 @@
       "label": "block A->B",
       "actor": "A",
       "method": "POST",
-      "path": "/buddies/card_PGTY9JxSC5-SrRXy39chqoHXzsBJ9Aie/block",
+      "path": "/buddies/card_p3pZ_rIR4PtIoWPZw94huZt9Wi7twZ1d/block",
       "status": 200,
       "no_store": true,
       "evidence_id": "R017",
@@ -731,6 +731,6 @@
     "safe derived buddy fields"
   ],
   "outcome": "passed",
-  "finished_at": "2026-11-09T04:53:23.682Z",
+  "finished_at": "2026-11-09T05:00:15.245Z",
   "evidence_note": "Actual HTTP status/request traces; credentials omitted. List response samples contain only this verification cohort; observed_item_count retains the actual list size. Privacy assertions operated on complete HTTP responses before minimization. Synthetic test data only. Restart phase uses the original pre-restart cohort; final prepare phase uses a new cohort on the same candidate binary."
 }
