@@ -1,0 +1,1383 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MBTI F4 runtime candidate (NOT official contract)",
+    "version": "0.4.0-f4-candidate.1",
+    "description": "PR20 fixed a39d99cf8537a6e54c34e965b2c3ff6c2691a21f fields plus explicit coordinator runtime selections. needs_human_review for formal publication. JSON encoding is valid YAML."
+  },
+  "x-status": "candidate / needs_human_review",
+  "x-run": "run_594d408d15de",
+  "x-baseline": "42dc92b6bbbdda716c980b3f0ed0a6a3067a01ff",
+  "x-unknowns-runtime-selections": [
+    "U01: public card ID = buddy ID; private me route only; all routes require existing guest auth.",
+    "U02: lazy card, discoverable=false, empty nickname/declaration/interests, four visibility=false, illustration. Empty type unless latest own result at creation. Public type is disclosed only on explicit discovery opt-in; empty type cannot opt in.",
+    "U03: persisted card type never silently overwritten. PUT selects legal 16 type; type_name from TYPE_METAS. latest_result_id only when current latest own result matches card type. has_visual_set=false until delivered visual fact exists.",
+    "U04: recommend orders updatedAt/id descending; same uses server card type, missing/mismatched query=422; recommend type_code is a public filter. Visibility/block filtering precedes limit.",
+    "U05: strict top-level and visibility whitelist; trim/codepoint length nickname<=40/declaration<=160, interests<=10 each<=24 trim/dedupe. Wrong types/null/unknown keys=422. Partial visibility keys merge under owner transaction lock.",
+    "U06: hidden nickname/declaration => empty string; interests/shared_interests => []; manual omitted. Avatar/type tagline only public type or neutral static. No private cached derived copy. Real is_demo=false/simulated=false.",
+    "U07/U08: observer direction incoming/outgoing, buddy is other card; recipient pending accept/decline, sender pending/accepted revoke. No contact grant.",
+    "U09: same pending retry=200 same ID; reverse pending/active accepted=409; first create=201. declined/revoked creates new ID; respond terminal replay=409; own revoked DELETE=204. Canonical pair transaction lock + partial unique pending/accepted. Lists latest createdAt/id descending; summary most recent relation.",
+    "U10: either active block hides public/detail/discovery/exchange lists and denies new/respond/revoke with 404. Block revokes pending/accepted atomically. Unblock does not revive. Active/history lastBlockedAt retained internally. Management block/unblock uses known public card ID without sensitive projection and can handle reverse-blocked/private target; self=422/unknown=404. Block=200 true, unblock=204 idempotent. Own active blocked list contains only safe ID + anonymous management label; type/name/interests not exposed.",
+    "U11: F5/F6 not implemented; no contacts/grants/location/fake counts. Expired guest retention and final release policy remain needs_human_review.",
+    "U12: candidate statuses 200 GET/PUT/block/respond, 201 first exchange/200 retry, 204 DELETE; 401 auth, 404 unknown/invisible/third, 409 role/state, 422 input, parser 400. Bare objects + existing {code,message}; ISO UTC timestamps; no-store. Queries other than documented keys rejected. Bodyless operations reject nonempty body.",
+    "PublicCard/Buddy/Exchange embed target only if discoverable and no bidirectional block, even when observer is target owner. Exchanges list only participants. No Prisma serialization, owners/credentials/private results never public."
+  ],
+  "servers": [
+    {
+      "url": "http://192.168.0.200:4156/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "GuestToken": []
+    }
+  ],
+  "paths": {
+    "/cards/me": {
+      "get": {
+        "operationId": "getMyCard",
+        "x-requirement-number": 24,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyCard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateMyCard",
+        "x-requirement-number": 25,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyCard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCardBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cards/{card_id}": {
+      "get": {
+        "operationId": "getPublicCard",
+        "x-requirement-number": 26,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/buddies": {
+      "get": {
+        "operationId": "listBuddies",
+        "x-requirement-number": 27,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BuddySummary"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "recommend",
+                "same"
+              ],
+              "default": "recommend"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type_code",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "INTJ",
+                "INTP",
+                "ENTJ",
+                "ENTP",
+                "INFJ",
+                "INFP",
+                "ENFJ",
+                "ENFP",
+                "ISTJ",
+                "ISFJ",
+                "ESTJ",
+                "ESFJ",
+                "ISTP",
+                "ISFP",
+                "ESTP",
+                "ESFP"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ]
+      }
+    },
+    "/buddies/blocked": {
+      "get": {
+        "operationId": "listBlockedBuddies",
+        "x-requirement-number": 28,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BuddySummary"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/buddies/{id}": {
+      "get": {
+        "operationId": "getBuddy",
+        "x-requirement-number": 29,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuddyDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/buddies/{id}/block": {
+      "post": {
+        "operationId": "blockBuddy",
+        "x-requirement-number": 30,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "blocked": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "blocked"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "unblockBuddy",
+        "x-requirement-number": 31,
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No body, including idempotent own retry"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/card-exchanges": {
+      "get": {
+        "operationId": "listCardExchanges",
+        "x-requirement-number": 32,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CardExchange"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createCardExchange",
+        "x-requirement-number": 33,
+        "responses": {
+          "200": {
+            "description": "Same-direction pending retry returns same ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardExchange"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardExchange"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "buddy_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "buddy_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/card-exchanges/{id}/respond": {
+      "post": {
+        "operationId": "respondCardExchange",
+        "x-requirement-number": 34,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardExchange"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "accept",
+                      "decline"
+                    ]
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/card-exchanges/{id}": {
+      "delete": {
+        "operationId": "revokeCardExchange",
+        "x-requirement-number": 35,
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No body, including idempotent own retry"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "GuestToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Guest-Token"
+      }
+    },
+    "schemas": {
+      "CardVisibility": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "boolean"
+          },
+          "interests": {
+            "type": "boolean"
+          },
+          "declaration": {
+            "type": "boolean"
+          },
+          "manual": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "interests",
+          "declaration",
+          "manual"
+        ]
+      },
+      "CardManual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "recharge": {
+            "type": "string"
+          },
+          "communication": {
+            "type": "string"
+          },
+          "care": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "recharge",
+          "communication",
+          "care"
+        ]
+      },
+      "MyCard": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "declaration": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "illustration",
+              "editorial",
+              "game"
+            ]
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/CardVisibility"
+          },
+          "discoverable": {
+            "type": "boolean"
+          },
+          "has_visual_set": {
+            "type": "boolean"
+          },
+          "latest_result_id": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "declaration",
+          "interests",
+          "style",
+          "visibility",
+          "discoverable",
+          "has_visual_set",
+          "updated_at"
+        ]
+      },
+      "PublicCard": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "declaration": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "illustration",
+              "editorial",
+              "game"
+            ]
+          },
+          "manual": {
+            "$ref": "#/components/schemas/CardManual"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "declaration",
+          "interests",
+          "style"
+        ]
+      },
+      "BuddySummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "avatar_text": {
+            "type": "string"
+          },
+          "avatar_color": {
+            "type": "string"
+          },
+          "tagline": {
+            "type": "string"
+          },
+          "same_type": {
+            "type": "boolean"
+          },
+          "shared_interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exchange_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "is_demo": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "interests",
+          "avatar_text",
+          "avatar_color",
+          "tagline",
+          "same_type",
+          "shared_interests",
+          "exchange_status",
+          "is_demo"
+        ]
+      },
+      "BuddyDetail": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "avatar_text": {
+            "type": "string"
+          },
+          "avatar_color": {
+            "type": "string"
+          },
+          "tagline": {
+            "type": "string"
+          },
+          "same_type": {
+            "type": "boolean"
+          },
+          "shared_interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exchange_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "is_demo": {
+            "type": "boolean"
+          },
+          "compatibility_hint": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "interests",
+          "avatar_text",
+          "avatar_color",
+          "tagline",
+          "same_type",
+          "shared_interests",
+          "exchange_status",
+          "is_demo",
+          "compatibility_hint"
+        ]
+      },
+      "CardExchange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buddy_id": {
+            "type": "string"
+          },
+          "buddy": {
+            "$ref": "#/components/schemas/BuddySummary"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "incoming",
+              "outgoing"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "responded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "simulated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "buddy_id",
+          "buddy",
+          "direction",
+          "status",
+          "created_at",
+          "simulated"
+        ]
+      },
+      "UpdateCardBody": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "type_code": {
+            "type": "string",
+            "enum": [
+              "INTJ",
+              "INTP",
+              "ENTJ",
+              "ENTP",
+              "INFJ",
+              "INFP",
+              "ENFJ",
+              "ENFP",
+              "ISTJ",
+              "ISFJ",
+              "ESTJ",
+              "ESFJ",
+              "ISTP",
+              "ISFP",
+              "ESTP",
+              "ESFP"
+            ]
+          },
+          "declaration": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "interests": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "maxLength": 24
+            }
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "illustration",
+              "editorial",
+              "game"
+            ]
+          },
+          "visibility": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "boolean"
+              },
+              "interests": {
+                "type": "boolean"
+              },
+              "declaration": {
+                "type": "boolean"
+              },
+              "manual": {
+                "type": "boolean"
+              }
+            },
+            "required": []
+          },
+          "discoverable": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      }
+    }
+  }
+}

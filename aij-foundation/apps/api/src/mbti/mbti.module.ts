@@ -5,6 +5,8 @@ import { MbtiService } from "./mbti.service";
 import { MbtiShareService } from "./mbti-share.service";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { MbtiOrdersAdminController, MbtiOrdersController } from "./mbti-orders.controller";
+import { MbtiSocialController } from "./mbti-social.controller";
+import { MbtiSocialService } from "./mbti-social.service";
 import { RbacModule } from "../rbac/rbac.module";
 import { AuthModule } from "../auth/auth.module";
 import { loadRuntimeEnvironment, readApplicationEnvironment } from "../../../../scripts/runtime-environment.cjs";
@@ -30,9 +32,9 @@ export class MbtiModule {
     }
     return { module: MbtiModule,
       imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule] : []), ...(secret ? [PluginRuntimeAccessModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController] : []),
+      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, ...(secret ? [
+      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiSocialService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },
         { provide: PAYMENT_CREDENTIAL_RESOLVER, useValue: { async resolve(reference: string) {
           if (reference !== "test-only:mbti-f3-payment") throw new Error("Controlled fixture credential rejected");
@@ -40,6 +42,6 @@ export class MbtiModule {
         } } },
         { provide: PaymentProviderRegistry, useFactory: () => new PaymentProviderRegistry([new MbtiControlledTestProvider()]) },
         PaymentService, PaymentCallbackService, MbtiTestPaymentService
-      ] : [])], exports: [MbtiService, MbtiGuestGuard] };
+      ] : [])], exports: [MbtiService, MbtiGuestGuard, MbtiSocialService] };
   }
 }
