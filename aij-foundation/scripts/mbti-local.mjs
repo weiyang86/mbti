@@ -157,7 +157,13 @@ async function main() {
   const { openSync, closeSync } = await import("node:fs");
   const log = openSync(resolve(directory, "api.log"), "a", 0o600);
   const entry = resolve(sourceRoot, "apps/api/dist/main.js");
-  const child = spawn(process.execPath, [entry], { cwd: resolve(sourceRoot, "apps/api"), env: { ...process.env, ...env }, detached: true, stdio: ["ignore", log, log] });
+  // Explicit non-secret deployment overrides; owner credentials/configuration stay untouched.
+  const publicOrigin = process.env.MBTI_PUBLIC_ORIGIN || new URL(env.NEXT_PUBLIC_API_URL).origin;
+  const publicUrl = new URL(publicOrigin);
+  if (publicUrl.origin !== publicOrigin || !["http:", "https:"].includes(publicUrl.protocol) || publicUrl.username || publicUrl.password) throw new Error("MBTI_PUBLIC_ORIGIN must be an exact HTTP origin");
+  const child = spawn(process.execPath, [entry], { cwd: resolve(sourceRoot, "apps/api"), env: { ...process.env, ...env,
+    MBTI_PUBLIC_ORIGIN: publicOrigin, MBTI_H5_ORIGINS: process.env.MBTI_H5_ORIGINS || env.MBTI_H5_ORIGINS
+  }, detached: true, stdio: ["ignore", log, log] });
   writeFileSync(pidFile, JSON.stringify({ pid: child.pid, root, entry }), { mode: 0o600 });
   child.unref(); closeSync(log);
   for (let attempt = 0; attempt < 40; attempt++) {

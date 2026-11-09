@@ -3,6 +3,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { MbtiAnswer, MbtiQuizSession, MbtiResult, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { reject } from "./mbti.http";
+import { TYPE_METAS } from "./mbti.types";
 
 export const CURRENT_BANK = "qb-v0.4-prototype-1";
 type Answer = { question_id: string; option_id: string };
@@ -106,6 +107,32 @@ export class MbtiService {
     const row = await this.prisma.mbtiResult.findFirst({ where: { id, ownerId } });
     if (!row) reject(404, "NOT_FOUND", "资源不存在");
     return this.resultPayload(row);
+  }
+  types() { return { items: TYPE_METAS }; }
+  async selfSelect(ownerId: string, input: unknown) {
+    const body = object(input);
+    if (body.source !== "self_select" || !TYPE_METAS.some(meta => meta.type_code === body.type_code)) reject(422, "INVALID_SELF_SELECT", "请选择有效的自选类型与来源");
+    // Project only explicit input fields. A caller cannot inject session IDs, versions or counts.
+    return this.resultPayload(await this.prisma.mbtiResult.create({ data: {
+      ownerId, source: "self_select", typeCode: body.type_code as string, bankVersion: "self-select-v1",
+      lifeStage: label(body.life_stage), recentStatus: label(body.recent_status)
+    } }));
+  }
+  async deleteResult(ownerId: string, id: string) {
+    const removed = await this.prisma.mbtiResult.deleteMany({ where: { id, ownerId } });
+    if (!removed.count) reject(404, "NOT_FOUND", "资源不存在");
+  }
+  async compare(ownerId: string, baselineId: unknown, targetId: unknown) {
+    if (typeof baselineId !== "string" || !baselineId || typeof targetId !== "string" || !targetId) reject(422, "INVALID_COMPARISON", "请选择两条结果");
+    const rows = await this.prisma.mbtiResult.findMany({ where: { ownerId, id: { in: [baselineId, targetId] } } });
+    const baseline = rows.find(row => row.id === baselineId), target = rows.find(row => row.id === targetId);
+    // Never reveal comparability until BOTH snapshots have passed ownership checks.
+    if (!baseline || !target) reject(404, "NOT_FOUND", "资源不存在");
+    if (baseline.source !== "quiz" || target.source !== "quiz" || baseline.bankVersion !== target.bankVersion || !baseline.dimensionCounts || !target.dimensionCounts) reject(422, "INCOMPARABLE_RESULTS", "仅可对比同一题库版本的测评结果");
+    const before = baseline.dimensionCounts as Record<string, number>, after = target.dimensionCounts as Record<string, number>;
+    return { baseline_id: baselineId, target_id: targetId, question_bank_version: baseline.bankVersion,
+      type_changed: baseline.typeCode !== target.typeCode, baseline_type_code: baseline.typeCode, target_type_code: target.typeCode,
+      dimension_deltas: Object.fromEntries("EISNTFJP".split("").map(letter => [letter, after[letter] - before[letter]])) };
   }
   async results(ownerId: string, limitInput?: string, cursor?: string) {
     if (limitInput !== undefined && typeof limitInput !== "string" || cursor !== undefined && (typeof cursor !== "string" || cursor.length > 200)) reject(422, "INVALID_PAGINATION", "分页参数无效");
