@@ -26,6 +26,7 @@ async function req(actor, method, path, body, expected = 200, label = path, raw 
   report.checks.push({ id: `${phase === "prepare" ? "P" : "R"}${String(report.checks.length + 1).padStart(3, "0")}`,
     actor, method, path: path.replace(/card_[A-Za-z0-9_-]+/g, "{card_id}").replace(/contact_[A-Za-z0-9_-]+/g, "{contact_request_id}").replace(/exchange_[A-Za-z0-9_-]+/g, "{exchange_id}"), label, status: response.status, expected, passed,
     no_store: response.headers.get("cache-control") === "no-store", ...(data?.code ? { code: data.code } : {}) });
+  writeFileSync(resolve(directory, "mbti-f6-inflight-evidence.json"), JSON.stringify(report, null, 2), { mode: 0o600 });
   assert.ok(passed, `${label}: status ${response.status}, expected ${expected}`);
   if (path !== "/auth/guest") ok("HTTP no-store", response.headers.get("cache-control") === "no-store");
   if (expected >= 400) ok("error exact code/message", !!data?.code && typeof data.message === "string" && Object.keys(data).sort().join(",") === "code,message");
@@ -101,7 +102,10 @@ try {
     await Promise.all(Array.from({ length: 8 }, () => choice("A", true)));
     const after = (await db.query('SELECT * FROM "MbtiRadarParticipation" WHERE "ownerId"=$1', [s.owners.A])).rows;
     ok("same-value concurrent PUT unique row and stable timestamps", after.length === 1 && JSON.stringify(before) === JSON.stringify(after[0]));
-    // Deterministic real HTTP lock ordering: hold owner lock, queue true then false, release.
+    // Deterministic real HTTP ordering: first PUT waits on the shared owner lock.
+    // The host has one Prisma connection; second guard queues behind that transaction.
+    // Waiting for two DB lock waiters would deadlock the test harness until its timeout.
+    await choice("B", false);
     const inspector = new pg.Client({ connectionString: env.TEST_DATABASE_URL }); await inspector.connect();
     await db.query("BEGIN");
     await db.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", ["mbti-social-owner:" + s.owners.B]);
@@ -117,8 +121,8 @@ try {
       throw new Error("ordered HTTP requests did not wait on shared owner lock");
     }
     try {
-      const first = choice("B", true); await waiting(1);
-      const second = choice("B", false); await waiting(2);
+      const first = choice("B", true); first.catch(() => {}); await waiting(1);
+      const second = choice("B", false); second.catch(() => {});
       await db.query("COMMIT");
       ok("ordered concurrent responses are committed facts", (await first).enrolled === true && (await second).enrolled === false);
     } finally { await db.query("ROLLBACK"); await inspector.end(); }
@@ -203,4 +207,9 @@ try {
   const path = resolve(directory, `mbti-f6-${phase}-evidence.json`);
   writeFileSync(path, JSON.stringify(report, null, 2), { mode: 0o600 });
   console.log(`PASS F6 ${phase}: ${report.checks.length} real HTTP, ${report.assertions.length} assertions; sanitized evidence ${path}; real aggregation blocked`);
+} catch (error) {
+  report.outcome = "failed"; report.error = error.message;
+  writeFileSync(resolve(directory, "mbti-f6-failed-evidence.json"), JSON.stringify(report, null, 2), { mode: 0o600 });
+  writeFileSync(resolve(directory, "mbti-f6-failed-state.json"), JSON.stringify(s), { mode: 0o600 });
+  throw error;
 } finally { await db.end(); }
