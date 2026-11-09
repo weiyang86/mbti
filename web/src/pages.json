@@ -65,6 +65,42 @@
       "style": {
         "navigationBarTitleText": "我的订单与权益"
       }
+    },
+    {
+      "path": "pages/card/card",
+      "style": {
+        "navigationBarTitleText": "我的名片"
+      }
+    },
+    {
+      "path": "pages/card/public",
+      "style": {
+        "navigationBarTitleText": "公开名片"
+      }
+    },
+    {
+      "path": "pages/discover/discover",
+      "style": {
+        "navigationBarTitleText": "发现搭子"
+      }
+    },
+    {
+      "path": "pages/buddies/detail",
+      "style": {
+        "navigationBarTitleText": "搭子详情"
+      }
+    },
+    {
+      "path": "pages/exchanges/exchanges",
+      "style": {
+        "navigationBarTitleText": "我的名片夹"
+      }
+    },
+    {
+      "path": "pages/buddies/blocked",
+      "style": {
+        "navigationBarTitleText": "屏蔽管理"
+      }
     }
   ],
   "globalStyle": {

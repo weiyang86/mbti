@@ -1785,6 +1785,11 @@ model MbtiGuest {
   sessions  MbtiQuizSession[]
   results   MbtiResult[]
   orders    MbtiOrder[]
+  card      MbtiCard?
+  socialBlocksSent MbtiSocialBlock[] @relation("MbtiBlockSender")
+  socialBlocksReceived MbtiSocialBlock[] @relation("MbtiBlockTarget")
+  cardExchangesSent MbtiCardExchange[] @relation("MbtiExchangeSender")
+  cardExchangesReceived MbtiCardExchange[] @relation("MbtiExchangeRecipient")
 }
 
 model MbtiQuestionBank {
@@ -1874,4 +1879,55 @@ model MbtiEntitlement {
   scope       String @default("controlled_test")
   grantedAt   DateTime @default(now())
   order       MbtiOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+}
+
+// F4 internal runtime candidate. Public card IDs never reuse the private guest ID.
+model MbtiCard {
+  id String @id
+  ownerId String @unique
+  nickname String @default("")
+  typeCode String @default("")
+  declaration String @default("")
+  interests String[] @default([])
+  style String @default("illustration")
+  discoverable Boolean @default(false)
+  visibilityName Boolean @default(false)
+  visibilityInterests Boolean @default(false)
+  visibilityDeclaration Boolean @default(false)
+  visibilityManual Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@index([discoverable, updatedAt(sort: Desc), id(sort: Desc)])
+}
+
+// Directional active flag retains lastBlockedAt for later F5 invalidation; unblock never erases history.
+model MbtiSocialBlock {
+  blockerId String
+  blockedId String
+  active Boolean @default(true)
+  lastBlockedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blocker MbtiGuest @relation("MbtiBlockSender", fields: [blockerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  blocked MbtiGuest @relation("MbtiBlockTarget", fields: [blockedId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@id([blockerId, blockedId])
+  @@index([blockedId, active])
+}
+
+// Partial unique active-pair index and canonical-pair checks live in the additive migration.
+model MbtiCardExchange {
+  id String @id
+  pairKey String
+  senderId String
+  recipientId String
+  status String @default("pending")
+  respondedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sender MbtiGuest @relation("MbtiExchangeSender", fields: [senderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  recipient MbtiGuest @relation("MbtiExchangeRecipient", fields: [recipientId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@index([pairKey, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([senderId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([recipientId, createdAt(sort: Desc), id(sort: Desc)])
 }

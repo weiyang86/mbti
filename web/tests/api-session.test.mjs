@@ -15,6 +15,7 @@ const compile = (entry) => buildSync({
 const clientCode = compile('../src/api/client.ts')
 const draftCode = compile('../src/store/quiz-draft.ts')
 const apiCode = compile('../src/api/index.ts')
+const socialDisplayCode = compile('../src/utils/social-display.ts')
 
 function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: { items: [], next_cursor: null } }), globals = {}) {
   const calls = []
@@ -246,6 +247,58 @@ test('F3 intent keys meet the candidate header format without secure-context ran
     const b = browser(new Map(), undefined, { crypto: unavailableCrypto })
     const key = await b.load(apiCode).preparePurchaseIntent({ result_id: 'owned', product_code: 'sku' })
     assert.match(key, /^[A-Za-z0-9_-]{16,128}$/)
+  }
+})
+
+test('F4 concurrent pages share one guest; all twelve operations use real routes and preserve partial visibility', async () => {
+  const b = browser(new Map(), (options) => ({ statusCode: options.method === 'DELETE' ? 204 : 200, data: options.method === 'DELETE' ? '' : { items: [] } }))
+  const calls = b.load(apiCode)
+  await Promise.all([calls.getMyCard(), calls.listCardExchanges(), calls.listBlockedBuddies()])
+  await calls.updateMyCard({ discoverable: false, visibility: { name: false } })
+  await calls.getPublicCard('public /?')
+  await calls.listBuddies({ mode: 'same', limit: 20 })
+  await calls.getBuddy('public /?')
+  await calls.blockBuddy('public /?')
+  await calls.unblockBuddy('public /?')
+  await calls.createCardExchange({ buddy_id: 'public /?' })
+  await calls.respondCardExchange('exchange /?', 'decline')
+  await calls.revokeCardExchange('exchange /?')
+  assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  assert.ok(b.calls.slice(1).every((c) => c.header['X-Guest-Token'] === 'synthetic-guest'))
+  assert.deepEqual(b.calls.slice(1).map((c) => [c.method, c.url.slice(api.length)]), [
+    ['GET', '/cards/me'], ['GET', '/card-exchanges'], ['GET', '/buddies/blocked'],
+    ['PUT', '/cards/me'], ['GET', '/cards/public%20%2F%3F'], ['GET', '/buddies?mode=same&limit=20'],
+    ['GET', '/buddies/public%20%2F%3F'], ['POST', '/buddies/public%20%2F%3F/block'], ['DELETE', '/buddies/public%20%2F%3F/block'],
+    ['POST', '/card-exchanges'], ['POST', '/card-exchanges/exchange%20%2F%3F/respond'], ['DELETE', '/card-exchanges/exchange%20%2F%3F'],
+  ])
+  assert.deepEqual(JSON.parse(JSON.stringify(b.calls[4].data)), { discoverable: false, visibility: { name: false } })
+})
+
+test('F4 failures stay failures despite old demo data; 401 never changes identity or replays a response', async () => {
+  for (const status of [401, 404, 409, 422]) {
+    const b = browser(new Map([['mbti_studio_v1', { hasCard: true, customQuote: 'private cached text' }]]),
+      () => ({ statusCode: status, data: { code: 'rejected', message: '服务端拒绝' } }))
+    const calls = b.load(apiCode)
+    await assert.rejects(calls.respondCardExchange('private-exchange', 'accept'), (e) => e.status === status)
+    if (status === 401) {
+      await assert.rejects(calls.respondCardExchange('private-exchange', 'accept'), (e) => e.status === 401)
+      assert.equal(b.calls.length, 2)
+    } else {
+      await assert.rejects(calls.getPublicCard('private-card'), (e) => e.status === status)
+      assert.equal(b.calls.length, 3)
+    }
+    assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+    assert.ok(b.calls.every((c) => !c.url.includes('contacts')))
+  }
+})
+
+test('F4 action visibility follows incoming/outgoing and pending/accepted state, never a guessed actor', () => {
+  const display = browser().load(socialDisplayCode)
+  for (const direction of ['incoming', 'outgoing', undefined]) {
+    for (const status of ['pending', 'accepted', 'declined', 'revoked']) {
+      assert.equal(display.canRespond({ direction, status }), direction === 'incoming' && status === 'pending')
+      assert.equal(display.canRevoke({ direction, status }), direction === 'outgoing' && ['pending', 'accepted'].includes(status))
+    }
   }
 })
 
