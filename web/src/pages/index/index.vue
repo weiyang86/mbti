@@ -69,9 +69,9 @@
         <view class="tool-tile radar-tile" @click="goRadar">
           <text class="tool-icon">◎</text>
           <text class="tool-name">同型雷达</text>
-          <text class="tool-desc">周边 500 米</text>
-          <text class="tool-desc">有多少同型搭子？</text>
-          <text class="tool-note">人数为模拟数据 ↗</text>
+          <text class="tool-desc">统计暂不可用</text>
+          <text class="tool-desc">周边同型人数待接通</text>
+          <text class="tool-note">不会显示虚构人数 ↗</text>
         </view>
         <view class="tool-tile" @click="goCompat">
           <text class="tool-icon">✧</text>
@@ -80,10 +80,23 @@
           <text class="tool-desc">找个舒服的相处方式</text>
           <text class="tool-note">趣味建议，无配对分数 ↗</text>
         </view>
+        <view class="tool-tile" @click="goContacts">
+          <text class="tool-icon">✉</text>
+          <text class="tool-name">我的联系方式</text>
+          <text class="tool-desc">微信 / QQ / 电话</text>
+          <text class="tool-desc">只在本人批准后单向授权</text>
+          <text class="tool-note">私密字段不落本机 ↗</text>
+        </view>
+        <view class="tool-tile" @click="goContactRequests">
+          <text class="tool-icon">⇄</text>
+          <text class="tool-name">联系方式请求</text>
+          <text class="tool-desc">收到的申请与授权状态</text>
+          <text class="tool-note">查看本人请求 ↗</text>
+        </view>
       </view>
     </view>
 
-    <text class="demo-fine">V0.4 交互原型 · 人物、订单、推荐与附近人数均为示例</text>
+    <text class="demo-fine">V0.4 交互原型 · 人物与订单均为示例</text>
     <text class="foot">MBTI搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
@@ -168,6 +181,14 @@ function goRadar() {
 
 function goCompat() {
   uni.navigateTo({ url: '/pages/compat/compat' })
+}
+
+function goContacts() {
+  uni.navigateTo({ url: '/pages/contacts/contacts' })
+}
+
+function goContactRequests() {
+  uni.navigateTo({ url: '/pages/contact-request/contact-request' })
 }
 
 function showChannels() {

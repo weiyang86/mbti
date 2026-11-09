@@ -1,0 +1,938 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MBTI F5 runtime candidate",
+    "version": "f5-candidate-1"
+  },
+  "x-status": "candidate / needs_human_review",
+  "x-reference-pr20": "a39d99cf8537a6e54c34e965b2c3ff6c2691a21f",
+  "x-pr20-consumers": {
+    "contacts.ts": "all eight methods/shapes preserved",
+    "types-social.ts": "MyContacts, ContactRequest, GrantedChannel preserved; direction added",
+    "contacts/contacts.vue": "three trim fields, regex, full form PUT, clear",
+    "contact-request/contact-request.vue": "PR20 own-contact choices and simulated recipient need Web replacement for one-way recipient grant",
+    "exchanges/exchanges.vue": "accepted indicators must use direction; no mutual grant inference",
+    "buddies/detail.vue": "accepted exchange enters contact request"
+  },
+  "x-candidate-decisions": [
+    "PUT replaces all channels; trim; absent/empty removes. GET own only, empty {}. DELETE idempotent 204.",
+    "Candidate regex wechat ^[a-zA-Z][a-zA-Z0-9_-]{5,19}$; qq ^[1-9]\\d{4,11}$; phone ^1[3-9]\\d{9}$. Reject null/array/unknown fields 422; strict JSON primitive/null/malformed 400.",
+    "Private LocalStorageAdapter, no FileAsset/public URL. DB reference/version/size/checksum only; IO faults 503, no stale cache. Only own GET/PUT and original requester granted expose values.",
+    "Actual change/clear increases recipient version, revokes old pending/accepted; identical normalized replacement preserves version. Refill never revives.",
+    "Create/respond/granted require both legal discoverable F4 cards, shared live isBlocked and same accepted F4 exchange. Bind internal exchange ID; F4 withdrawal, block and discoverable opt-out permanently revoke contact requests. Re-public/new exchange/unblock never revives.",
+    "ContactRequest adds observer direction, buddy_id always other public card; stable createdAt/id DESC; optional buddy_id filter; only participants; invisible/blocked omitted; stale items project revoked.",
+    "channels nonempty distinct 1..3, duplicates REJECT 422, normalize fixed wechat/qq/phone order. Missing requested recipient channel generic 409. accept/decline only; exact requested set accepted, no partial fields.",
+    "Per directed sender/recipient one active pending/accepted DB unique constraint. Same pending set retry 200 same ID; first create 201; different pending set or accepted duplicate 409. Reverse independent, never auto accept.",
+    "Only pending recipient respond; sender 409; third party 404 before input. DELETE BOTH participants pending/accepted, revoked retry 204, declined 409. Unknown/invisible/blocked 404.",
+    "granted only original sender, accepted/current version/live bound exchange/visible/unblocked. Other states, recipient, C 404. Return {channels:[{channel,value}]} exact set only.",
+    "All eight operations success/error no-store; GuestGuard 401, bare objects / {code,message}; no silent identity reset. Precise test4155 CORS."
+  ],
+  "unknowns": [
+    {
+      "needs_human_review": true,
+      "topic": "Formal policy/publication, validation ranges, private orphan retention/GC and guest expiry retention"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://192.168.0.200:4156/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "GuestToken": []
+    }
+  ],
+  "paths": {
+    "/contacts/me": {
+      "get": {
+        "operationId": "getContacts",
+        "x-requirement-number": 36,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyContacts"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateContacts",
+        "x-requirement-number": 37,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyContacts"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "wechat": {
+                    "type": "string",
+                    "description": "Trim; omitted or empty removes. Candidate validation range."
+                  },
+                  "qq": {
+                    "type": "string",
+                    "description": "Trim; omitted or empty removes. Candidate validation range."
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "Trim; omitted or empty removes. Candidate validation range."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "clearContacts",
+        "x-requirement-number": 38,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Candidate success; Cache-Control: no-store"
+          }
+        }
+      }
+    },
+    "/contact-requests": {
+      "get": {
+        "operationId": "listContactRequests",
+        "x-requirement-number": 39,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactRequestList"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "buddy_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Other public card ID only"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createContactRequest",
+        "x-requirement-number": 40,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactRequest"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Identical normalized pending retry, same ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactRequest"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "buddy_id",
+                  "channels"
+                ],
+                "properties": {
+                  "buddy_id": {
+                    "type": "string"
+                  },
+                  "channels": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "wechat",
+                        "qq",
+                        "phone"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contact-requests/{id}/respond": {
+      "post": {
+        "operationId": "respondContactRequest",
+        "x-requirement-number": 41,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactRequest"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "accept",
+                      "decline"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/contact-requests/{id}": {
+      "delete": {
+        "operationId": "revokeContactRequest",
+        "x-requirement-number": 42,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Candidate success; Cache-Control: no-store"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/contact-requests/{id}/granted": {
+      "get": {
+        "operationId": "getGrantedContacts",
+        "x-requirement-number": 43,
+        "responses": {
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantedContacts"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "GuestToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Guest-Token"
+      }
+    },
+    "schemas": {
+      "MyContacts": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "wechat": {
+            "type": "string",
+            "description": "Trim; omitted or empty removes. Candidate validation range."
+          },
+          "qq": {
+            "type": "string",
+            "description": "Trim; omitted or empty removes. Candidate validation range."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Trim; omitted or empty removes. Candidate validation range."
+          }
+        }
+      },
+      "ContactRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "buddy_id",
+          "direction",
+          "status",
+          "channels",
+          "created_at",
+          "simulated"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buddy_id": {
+            "type": "string",
+            "description": "Other public card ID"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "incoming",
+              "outgoing"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "wechat",
+                "qq",
+                "phone"
+              ]
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "responded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": false
+          }
+        }
+      },
+      "ContactRequestList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactRequest"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "GrantedContacts": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "channels"
+        ],
+        "properties": {
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "channel",
+                "value"
+              ],
+              "properties": {
+                "channel": {
+                  "type": "string",
+                  "enum": [
+                    "wechat",
+                    "qq",
+                    "phone"
+                  ]
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

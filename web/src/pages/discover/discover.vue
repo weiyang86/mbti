@@ -22,6 +22,7 @@
       <button class="btn-secondary" @click="openBuddy(buddy.id)">查看搭子详情</button>
     </view>
     <button class="btn-secondary mt" @click="go('/pages/card/card')">我的名片</button>
+    <button class="btn-secondary mt" @click="go('/pages/radar/radar')">同型雷达</button>
     <button class="btn-secondary mt" @click="go('/pages/exchanges/exchanges')">我的名片夹</button>
     <button class="btn-secondary mt" @click="go('/pages/buddies/blocked')">屏蔽管理</button>
   </view>

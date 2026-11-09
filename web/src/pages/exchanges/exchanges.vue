@@ -1,7 +1,8 @@
 <template>
   <view class="page social-page">
     <text class="heading">我的名片夹</text>
-    <text class="notice">显示当前身份的收发记录。名片关系不会授予联系方式，联系方式功能尚未开放。</text>
+    <text class="notice">显示当前身份的收发记录。名片关系不会授予联系方式，请另行申请并由对方本人批准。</text>
+    <button class="btn-secondary mt" @click="go('/pages/contact-request/contact-request')">联系方式请求</button>
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
     <button class="btn-secondary" :disabled="loading || busy" @click="load">刷新名片夹</button>
@@ -19,6 +20,7 @@
       </view>
       <button v-if="canRevoke(item)" class="btn-secondary mt" :disabled="busy || loading" @click="revoke(item)">{{ item.status === 'accepted' ? '撤回已接受的交换' : '撤回申请' }}</button>
       <button class="btn-secondary mt" @click="go(`/pages/buddies/detail?id=${encodeURIComponent(item.buddy_id)}`)">查看搭子详情</button>
+      <button v-if="item.status === 'accepted'" class="btn-secondary mt" :disabled="busy || loading" @click="go(`/pages/contact-request/contact-request?id=${encodeURIComponent(item.buddy_id)}`)">申请对方联系方式</button>
     </view>
     <button class="btn-secondary mt" @click="go('/pages/discover/discover')">发现搭子</button>
     <button class="btn-secondary mt" @click="go('/pages/card/card')">我的名片</button>

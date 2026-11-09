@@ -17,6 +17,9 @@ const clientCode = compile('../src/api/client.ts')
 const draftCode = compile('../src/store/quiz-draft.ts')
 const apiCode = compile('../src/api/index.ts')
 const socialDisplayCode = compile('../src/utils/social-display.ts')
+const contactDisplayCode = compile('../src/utils/contact-display.ts')
+const privateScopeCode = compile('../src/utils/private-page.ts')
+const radarStateCode = compile('../src/utils/radar-state.ts')
 
 function browser(storage = new Map(), respond = () => ({ statusCode: 200, data: { items: [], next_cursor: null } }), globals = {}) {
   const calls = []
@@ -301,6 +304,282 @@ test('F4 action visibility follows incoming/outgoing and pending/accepted state,
       assert.equal(display.canRevoke({ direction, status }), direction === 'outgoing' && ['pending', 'accepted'].includes(status))
     }
   }
+})
+
+test('F5 all eight operations share one identity; values never enter persistent storage', async () => {
+  const b = browser(new Map(), (o) => ({ statusCode: o.method === 'DELETE' ? 204 : 200, data: o.method === 'DELETE' ? '' : {} }))
+  const calls = b.load(apiCode)
+  await Promise.all([calls.getContacts(), calls.listContactRequests('card /?')])
+  await calls.updateContacts({ wechat: 'synthetic_private' })
+  await calls.clearContacts()
+  await calls.createContactRequest({ buddy_id: 'card /?', channels: ['wechat'] })
+  await calls.respondContactRequest('request /?', 'accept')
+  await calls.revokeContactRequest('request /?')
+  await calls.getGrantedContacts('request /?')
+  assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  assert.deepEqual(b.calls.slice(1).map((c) => [c.method, c.url.slice(api.length)]), [
+    ['GET', '/contacts/me'], ['GET', '/contact-requests?buddy_id=card%20%2F%3F'],
+    ['PUT', '/contacts/me'], ['DELETE', '/contacts/me'], ['POST', '/contact-requests'],
+    ['POST', '/contact-requests/request%20%2F%3F/respond'], ['DELETE', '/contact-requests/request%20%2F%3F'],
+    ['GET', '/contact-requests/request%20%2F%3F/granted'],
+  ])
+  assert.deepEqual([...b.storage.keys()], [guestKey])
+  assert.equal(JSON.stringify([...b.storage]).includes('synthetic_private'), false)
+  assert.ok(b.calls.every((c) => !c.url.includes('synthetic_private')))
+})
+
+test('F5 revoked/unapproved/input/conflict failures never read a stored grant or replay writes', async () => {
+  for (const status of [401, 404, 409, 422, 503]) {
+    const b = browser(new Map([['mbti_mock_contacts', { wechat: 'stale_private' }]]),
+      () => ({ statusCode: status, data: { code: 'denied', message: 'server denial' } }))
+    const calls = b.load(apiCode)
+    await assert.rejects(calls.getGrantedContacts('old'), (e) => e.status === status)
+    await assert.rejects(calls.updateContacts({}), (e) => e.status === status)
+    assert.equal(b.calls.length, status === 401 ? 2 : 3)
+    assert.equal(b.calls.filter((c) => c.url.endsWith('/auth/guest')).length, 1)
+  }
+})
+
+test('F5 recipient alone responds, both participants can revoke active requests, incoming is never mutual grant', () => {
+  const display = browser().load(contactDisplayCode)
+  for (const direction of ['incoming', 'outgoing', undefined]) {
+    for (const status of ['pending', 'accepted', 'declined', 'revoked']) {
+      assert.equal(display.canRespondContact({ direction, status }), direction === 'incoming' && status === 'pending')
+      assert.equal(display.canRevokeContact({ direction, status }), !!direction && ['pending', 'accepted'].includes(status))
+    }
+  }
+})
+
+test('F5 leaving or refreshing invalidates a delayed private response, including after reentry', () => {
+  let value = 'visible-private-value'
+  const scope = browser().load(privateScopeCode).createPrivateScope(() => { value = '' })
+  scope.enter()
+  assert.equal(value, '')
+  const slowRead = scope.begin()
+  assert.equal(scope.current(slowRead), true)
+  value = 'new-value'
+  const refresh = scope.begin()
+  assert.equal(value, '')
+  assert.equal(scope.current(slowRead), false)
+  scope.leave()
+  assert.equal(scope.current(refresh), false)
+  scope.enter()
+  assert.equal(scope.current(refresh), false)
+  assert.equal(value, '')
+})
+
+test('F5 errors never interpolate private response details; candidate format validates trimmed full form', () => {
+  const b = browser()
+  const display = b.load(contactDisplayCode)
+  // Compile together so instanceof uses the same HttpError constructor.
+  const code = buildSync({ stdin: { contents: `export { HttpError } from './src/api/client'; export { contactErrorMessage } from './src/utils/contact-display'`, resolveDir: fileURLToPath(new URL('..', import.meta.url)) }, bundle: true, write: false, platform: 'node', format: 'cjs', define: { 'import.meta.env': JSON.stringify(env) } }).outputFiles[0].text
+  const combined = b.load(code)
+  for (const status of [401, 404, 409, 422, 503]) {
+    const message = combined.contactErrorMessage(new combined.HttpError(status, { message: 'private-canary' }), '读取失败')
+    assert.equal(message.includes('private-canary'), false)
+  }
+  assert.equal(display.validateContacts({ wechat: ' synthetic_ok ', qq: '', phone: '' }), '')
+  assert.ok(display.validateContacts({ wechat: '1bad' }))
+  assert.ok(display.validateContacts({ qq: '01234' }))
+  assert.ok(display.validateContacts({ phone: '123' }))
+})
+
+test('F6 all three operations use the shared identity and no local participation cache', async () => {
+  const b = browser(new Map([['mbti_mock_radar_v1', { enrolled: true }]]), (o) => ({
+    statusCode: 200, data: o.url.includes('/same-type')
+      ? { count: null, status: 'unavailable', reason: 'location_source_not_configured' }
+      : { enrolled: o.method === 'PUT' ? o.data.enrolled : false },
+  }))
+  const calls = b.load(apiCode)
+  assert.equal((await calls.getRadarParticipation()).enrolled, false)
+  assert.equal((await calls.updateRadarParticipation({ enrolled: true, owner_id: 'forged' })).enrolled, true)
+  assert.equal((await calls.getSameTypeCount({ type_code: 'ESTJ', radius_m: 1000 })).reason, 'location_source_not_configured')
+  await calls.getSameTypeCount()
+  assert.equal(b.calls.filter((o) => o.url.endsWith('/auth/guest')).length, 1)
+  assert.deepEqual(b.calls.slice(1).map((o) => [o.method, o.url.slice(api.length)]), [
+    ['GET', '/radar/participation'], ['PUT', '/radar/participation'],
+    ['GET', '/radar/same-type?type_code=ESTJ&radius_m=1000'], ['GET', '/radar/same-type'],
+  ])
+  assert.deepEqual(JSON.parse(JSON.stringify(b.calls[2].data)), { enrolled: true })
+  assert.deepEqual([...b.storage.keys()], ['mbti_mock_radar_v1', guestKey])
+  assert.ok(b.calls.slice(1).every((o) => o.header['X-Guest-Token'] === 'synthetic-guest'))
+})
+
+test('F6 malformed successes, unsupported counts/status/reasons never become low sample or unavailable', async () => {
+  for (const response of [null, {}, { count: null }, { count: 0, status: 'available', reason: null },
+    { count: null, status: 'low_sample', reason: 'below_minimum_sample' },
+    { count: null, status: 'unavailable', reason: 'unknown' },
+    { count: null, status: 'unavailable', reason: 'not_enrolled', owner_id: 'unexpected' }]) {
+    const b = browser(new Map(), () => ({ statusCode: 200, data: response }))
+    await assert.rejects(b.load(apiCode).getSameTypeCount(), /响应格式/)
+  }
+  for (const response of [{}, { enrolled: 'false' }, { enrolled: false, extra: true }, []]) {
+    const b = browser(new Map(), () => ({ statusCode: 200, data: response }))
+    await assert.rejects(b.load(apiCode).getRadarParticipation(), /响应格式/)
+  }
+})
+
+test('F6 401/404/422/503 stay failures, never mint a replacement identity or replay PUT', async () => {
+  for (const status of [401, 404, 422, 503]) {
+    const b = browser(new Map(), () => ({ statusCode: status, data: { code: 'denied', message: 'rejected' } }))
+    const api = b.load(apiCode)
+    await assert.rejects(api.updateRadarParticipation({ enrolled: true }), (e) => e.status === status)
+    await assert.rejects(api.getRadarParticipation(), (e) => e.status === status)
+    await assert.rejects(api.getSameTypeCount(), (e) => e.status === status)
+    assert.equal(b.calls.filter((o) => o.method === 'PUT').length, 1)
+    assert.equal(b.calls.filter((o) => o.url.endsWith('/auth/guest')).length, 1)
+    assert.equal(b.calls.length, status === 401 ? 2 : 4)
+  }
+})
+
+const deferred = () => {
+  let resolve, reject
+  const promise = new Promise((yes, no) => { resolve = yes; reject = no })
+  return { promise, resolve, reject }
+}
+const flush = () => new Promise(setImmediate)
+const unavailable = { count: null, status: 'unavailable', reason: 'location_source_not_configured' }
+function radarHarness(overrides = {}) {
+  let enrolled = false
+  let type = 'ESTJ'
+  const writes = []
+  const queries = []
+  const api = {
+    getMyCard: async () => ({ type_code: type }),
+    getRadarParticipation: async () => ({ enrolled }),
+    updateRadarParticipation: async (body) => { writes.push(body.enrolled); enrolled = body.enrolled; return { enrolled } },
+    getSameTypeCount: async (params) => { queries.push(params); return unavailable },
+    ...overrides,
+  }
+  const controller = browser().load(radarStateCode).createRadarController(api)
+  return { ...controller, writes, queries, setType: (next) => { type = next }, setEnrolled: (next) => { enrolled = next } }
+}
+
+test('F6 view separates no type, not enrolled, loading, unavailable and failure; missing type never uses an example', async () => {
+  const h = radarHarness()
+  h.setType('')
+  await h.enter()
+  assert.equal(h.state.statistics.kind, 'missing_type')
+  await h.save(true)
+  assert.deepEqual(h.writes, [])
+  assert.equal(h.state.typeCode, '')
+  h.setType('INFP')
+  await h.load()
+  assert.equal(h.state.statistics.kind, 'not_enrolled')
+  await h.save(true)
+  assert.equal(h.state.statistics.kind, 'unavailable')
+  assert.equal(h.state.enrolled, true)
+  assert.equal(h.queries[0].type_code, 'INFP')
+  h.setType('')
+  await h.load()
+  await h.save(false)
+  assert.equal(h.state.enrolled, false)
+  assert.deepEqual(h.writes, [true, false])
+})
+
+test('F6 PUT locks duplicate clicks, consumes confirmed response, and requires GET after an uncertain failure', async () => {
+  const pending = deferred()
+  let writes = 0
+  const h = radarHarness({ updateRadarParticipation: () => { ++writes; return pending.promise } })
+  await h.enter()
+  const save = h.save(true)
+  await h.save(true)
+  assert.equal(writes, 1)
+  assert.equal(h.state.enrolled, false)
+  pending.reject(new Error('lost response after commit'))
+  await save
+  assert.equal(h.state.enrolled, false)
+  assert.equal(h.state.needsReload, true)
+  assert.match(h.state.error, /保留上次确认状态/)
+  await h.save(true)
+  assert.equal(writes, 1)
+  h.setEnrolled(true)
+  await h.load()
+  assert.equal(h.state.enrolled, true)
+  assert.equal(h.state.statistics.kind, 'unavailable')
+  const response = radarHarness({ updateRadarParticipation: async () => ({ enrolled: false }) })
+  await response.enter()
+  await response.save(true)
+  assert.equal(response.state.enrolled, false)
+  assert.equal(response.state.statistics.kind, 'not_enrolled')
+})
+
+test('F6 exit clears statistics immediately and late count responses cannot restore it', async () => {
+  const slow = deferred()
+  const h = radarHarness({ getSameTypeCount: () => slow.promise })
+  await h.enter()
+  const join = h.save(true)
+  // PUT resolved; statistics request is now in flight.
+  await flush()
+  assert.equal(h.state.statistics.kind, 'loading')
+  await h.save(false)
+  assert.equal(h.state.enrolled, false)
+  assert.equal(h.state.statistics.kind, 'not_enrolled')
+  slow.resolve(unavailable)
+  await join
+  assert.equal(h.state.statistics.kind, 'not_enrolled')
+})
+
+test('F6 radius, reload/type changes and page lifecycle invalidate old statistics responses', async () => {
+  const pending = []
+  const h = radarHarness({ getSameTypeCount: (params) => {
+    const d = deferred(); pending.push({ ...d, params }); return d.promise
+  } })
+  await h.enter()
+  const join = h.save(true)
+  await flush()
+  const radius = h.setRadius(1000)
+  pending[0].resolve(unavailable)
+  await join
+  assert.equal(h.state.statistics.kind, 'loading')
+  assert.equal(pending[1].params.radius_m, 1000)
+  h.setType('ENTJ')
+  const reload = h.load()
+  await flush()
+  pending[1].reject(new Error('stale HTTP failure'))
+  await radius
+  assert.equal(h.state.typeCode, 'ENTJ')
+  assert.equal(h.state.statistics.kind, 'loading')
+  h.leave()
+  pending[2].resolve(unavailable)
+  await reload
+  assert.equal(h.state.statistics.kind, 'idle')
+  const reenter = h.enter()
+  await flush()
+  assert.equal(h.state.statistics.kind, 'loading')
+  pending[3].resolve(unavailable)
+  await reenter
+  assert.equal(h.state.statistics.kind, 'unavailable')
+})
+
+test('F6 requests failing or disagreeing with confirmed participation remain explicit errors', async () => {
+  for (const result of ['failure', 'not_enrolled']) {
+    const h = radarHarness({ getSameTypeCount: async () => {
+      if (result === 'failure') throw new Error('network unavailable')
+      return { count: null, status: 'unavailable', reason: 'not_enrolled' }
+    } })
+    await h.enter(); await h.save(true)
+    assert.equal(h.state.enrolled, true)
+    assert.equal(h.state.statistics.kind, 'error')
+    assert.match(h.state.statistics.message, /重新读取/)
+  }
+})
+
+test('F6 hidden PUT completion after reentry reconciles with GET and never replays the write', async () => {
+  const d = deferred()
+  let writes = 0
+  const h = radarHarness({ updateRadarParticipation: () => { ++writes; return d.promise } })
+  await h.enter()
+  const saving = h.save(true)
+  h.leave(); await h.enter()
+  assert.equal(h.state.saving, true)
+  h.setEnrolled(true)
+  d.resolve({ enrolled: true })
+  await saving
+  assert.equal(h.state.enrolled, true)
+  assert.equal(h.state.needsReload, false)
+  assert.equal(h.state.statistics.kind, 'unavailable')
+  assert.equal(writes, 1)
 })
 
 const bank = {

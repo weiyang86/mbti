@@ -1,0 +1,1010 @@
+openapi: 3.0.3
+info:
+  title: MBTI 搭子 Web API · 首两批内部联调
+  version: 0.4.0-fastlane-candidate.1
+  description: 供实习生与后端对接的候选契约。F1 首批 8 项，F2 新增 5 项。先选择可访问的开发环境，使用真实 /api/v1 基址。响应为裸业务对象。以各批交付回执判断是否可请求。
+  contact:
+    name: Remy (contract owner)
+servers:
+- url: /api/v1
+  description: Relative to deployment host
+tags:
+- name: health
+- name: auth
+  description: 独立游客身份
+- name: quiz
+- name: results
+- name: types
+- name: share
+paths:
+  /health:
+    get:
+      tags:
+      - health
+      summary: Health check
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - status
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  version:
+                    type: string
+                    example: 0.1-draft
+      x-intake-number: 1
+      x-delivery-wave: F1
+  /auth/guest:
+    post:
+      tags:
+      - auth
+      operationId: createGuestSession
+      summary: 创建一个独立的浏览器游客身份
+      description: 无需请求体。HTTP 201 返回新游客凭证；客户端仅在没有本机身份时调用，避免并发初始化。
+      security: []
+      responses:
+        '201':
+          description: 游客身份已建立
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestSession'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      x-intake-number: 2
+      x-delivery-wave: F1
+  /quiz/versions/current:
+    get:
+      tags:
+      - quiz
+      summary: Current question bank and 12 questions
+      operationId: getCurrentQuizVersion
+      responses:
+        '200':
+          description: Current bank
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizVersionPayload'
+              example:
+                question_bank_version: qb-v0.4-prototype-1
+                questions:
+                - id: q1
+                  index: 1
+                  dimension: EI
+                  prompt: 忙完一周，你更想用哪种方式恢复电量？
+                  options:
+                  - id: e
+                    label: 和熟悉的人一起吃饭、出门
+                  - id: i
+                    label: 给自己一段安静独处的时间
+                - id: q2
+                  index: 2
+                  dimension: SN
+                  prompt: 去一个没去过的地方，你通常先关注什么？
+                  options:
+                  - id: s
+                    label: 路线、环境、吃住这些具体信息
+                  - id: n
+                    label: 它有什么故事，还有哪些新可能
+                - id: q3
+                  index: 3
+                  dimension: TF
+                  prompt: 朋友和你商量一个难题，你更习惯先做什么？
+                  options:
+                  - id: t
+                    label: 梳理事实，找出可执行的办法
+                  - id: f
+                    label: 了解他的感受和真正的在意
+                - id: q4
+                  index: 4
+                  dimension: JP
+                  prompt: 准备周末出游，你更舒服的方式是？
+                  options:
+                  - id: j
+                    label: 先定好安排，到了照着走
+                  - id: p
+                    label: 留出弹性，到时看心情
+                - id: q5
+                  index: 5
+                  dimension: EI
+                  prompt: 来到一个不太熟悉的聚会，你通常会？
+                  options:
+                  - id: e
+                    label: 主动找人认识，在互动中进入状态
+                  - id: i
+                    label: 先观察，找到合适的人再靠近
+                - id: q6
+                  index: 6
+                  dimension: SN
+                  prompt: 开始学习一件新事，你更想先看到？
+                  options:
+                  - id: s
+                    label: 清楚的步骤和具体示范
+                  - id: n
+                    label: 整体思路和背后的原理
+                - id: q7
+                  index: 7
+                  dimension: TF
+                  prompt: 意见不一致时，你更希望讨论围绕什么？
+                  options:
+                  - id: t
+                    label: 依据是否充分，方案是否合理
+                  - id: f
+                    label: 各方在意什么，怎样彼此尊重
+                - id: q8
+                  index: 8
+                  dimension: JP
+                  prompt: 一件事有截止日期，你更倾向于？
+                  options:
+                  - id: j
+                    label: 拆好步骤，提前完成
+                  - id: p
+                    label: 保留调整空间，灵感来了集中完成
+                - id: q9
+                  index: 9
+                  dimension: EI
+                  prompt: 有一个新想法时，你更常？
+                  options:
+                  - id: e
+                    label: 先说出来，和别人一起理清
+                  - id: i
+                    label: 先自己想清楚，再与人分享
+                - id: q10
+                  index: 10
+                  dimension: SN
+                  prompt: 听别人讲经历，什么更吸引你？
+                  options:
+                  - id: s
+                    label: 实际发生的细节与体验
+                  - id: n
+                    label: 这段经历带来的联想与意义
+                - id: q11
+                  index: 11
+                  dimension: TF
+                  prompt: 必须做一个取舍时，你通常优先考虑？
+                  options:
+                  - id: t
+                    label: 尽量一致的标准与逻辑
+                  - id: f
+                    label: 它对具体人的影响与感受
+                - id: q12
+                  index: 12
+                  dimension: JP
+                  prompt: 原定计划临时有变，你更接近哪种反应？
+                  options:
+                  - id: j
+                    label: 先重新整理安排，再继续
+                  - id: p
+                    label: 顺势看看有没有更有趣的选择
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 4
+      x-delivery-wave: F1
+      description: 客户端缓存这份题库并用同版标识创建会话，完成期间保持题目与计分版本一致。
+  /quiz/sessions:
+    post:
+      tags:
+      - quiz
+      summary: Create quiz session
+      operationId: createQuizSession
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question_bank_version:
+                  type: string
+                  description: Optional pin; defaults to current if omitted
+            example:
+              question_bank_version: qb-v0.4-prototype-1
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizSession'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: 请求的题库版本无法用于新建会话；重新获取当前版本
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 5
+      x-delivery-wave: F1
+  /quiz/sessions/{session_id}/answers:
+    put:
+      tags:
+      - quiz
+      summary: Upsert answers for in-progress session
+      operationId: updateQuizSessionAnswers
+      parameters:
+      - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - answers
+              properties:
+                answers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Answer'
+            examples:
+              partial:
+                summary: 保存一题
+                value:
+                  answers:
+                  - question_id: q1
+                    option_id: e
+              complete:
+                summary: 保存 12 题
+                value:
+                  answers:
+                  - question_id: q1
+                    option_id: e
+                  - question_id: q2
+                    option_id: s
+                  - question_id: q3
+                    option_id: t
+                  - question_id: q4
+                    option_id: j
+                  - question_id: q5
+                    option_id: e
+                  - question_id: q6
+                    option_id: s
+                  - question_id: q7
+                    option_id: t
+                  - question_id: q8
+                    option_id: j
+                  - question_id: q9
+                    option_id: e
+                  - question_id: q10
+                    option_id: s
+                  - question_id: q11
+                    option_id: t
+                  - question_id: q12
+                    option_id: j
+      responses:
+        '200':
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizSession'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 目标资源不存在或不属于当前游客
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: 答案不属于该版本题库，或提交时题目尚未答满
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: 会话已经提交
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 6
+      x-delivery-wave: F1
+      description: 按 question_id 更新传入项。逐题和整批提交都可用；未传题目保持原值。
+  /quiz/sessions/{session_id}/submit:
+    post:
+      tags:
+      - quiz
+      summary: Submit session once; creates immutable result snapshot
+      operationId: submitQuizSession
+      parameters:
+      - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                life_stage:
+                  type: string
+                  description: Optional background label only
+                recent_status:
+                  type: string
+                  description: Optional background label only
+      responses:
+        '201':
+          description: Result snapshot created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultSnapshot'
+        '409':
+          description: 会话已经提交
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 目标资源不存在或不属于当前游客
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: 答案不属于该版本题库，或提交时题目尚未答满
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 7
+      x-delivery-wave: F1
+  /results:
+    get:
+      tags:
+      - results
+      summary: List result snapshots for current user
+      operationId: listResults
+      parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Snapshot list
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ResultSnapshotSummary'
+                  next_cursor:
+                    type: string
+                    nullable: true
+              example:
+                items: []
+                next_cursor: null
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 8
+      x-delivery-wave: F1
+      description: 首次访问可返回空 items。列表按提交时间倒序并以 ID 稳定断序，只返回本人记录。
+    post:
+      tags:
+      - results
+      summary: Create self-selected type snapshot
+      operationId: createSelfSelectResult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - type_code
+              - source
+              properties:
+                type_code:
+                  type: string
+                  pattern: ^[EI][SN][TF][JP]$
+                  example: INFP
+                source:
+                  type: string
+                  enum:
+                  - self_select
+                life_stage:
+                  type: string
+                recent_status:
+                  type: string
+            example:
+              source: self_select
+              type_code: INFP
+      responses:
+        '201':
+          description: Snapshot created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultSnapshot'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: 未知的自选类型或来源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 12
+      x-delivery-wave: F2
+  /results/compare:
+    get:
+      tags:
+      - results
+      summary: Compare two snapshots with same question_bank_version
+      operationId: compareResults
+      parameters:
+      - name: baseline_id
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: target_id
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Comparison
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompareResult'
+        '422':
+          description: Version mismatch or incomparable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 目标资源不存在或不属于当前游客
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 11
+      x-delivery-wave: F2
+      description: 先检查两项归属，再判是否可比。同版本测评快照可比，自选或版本不同返回 422。
+  /results/{id}:
+    get:
+      tags:
+      - results
+      summary: Get result snapshot by id
+      operationId: getResult
+      parameters:
+      - $ref: '#/components/parameters/ResultId'
+      responses:
+        '200':
+          description: Snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultSnapshot'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 目标资源不存在或不属于当前游客
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 9
+      x-delivery-wave: F1
+    delete:
+      tags:
+      - results
+      summary: Delete user snapshot
+      operationId: deleteResult
+      parameters:
+      - $ref: '#/components/parameters/ResultId'
+      responses:
+        '204':
+          description: Deleted
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 目标资源不存在或不属于当前游客
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 10
+      x-delivery-wave: F2
+  /types:
+    get:
+      tags:
+      - types
+      summary: Sixteen type metadata for self-select and display
+      operationId: listTypes
+      responses:
+        '200':
+          description: Type list
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TypeMeta'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 14
+      x-delivery-wave: F2
+  /share/preview:
+    post:
+      tags:
+      - share
+      summary: 同步生成一张可访问的分享预览
+      operationId: createSharePreview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - result_id
+              properties:
+                result_id:
+                  type: string
+                template_id:
+                  type: string
+                  description: Visual template key; optional in draft
+                scene:
+                  type: string
+                  enum:
+                  - moments
+                  - avatar
+                  - meet_card
+                  description: Product scene selector
+            example:
+              result_id: REPLACE_WITH_OWN_RESULT_ID
+              scene: moments
+      responses:
+        '200':
+          description: 图片已就绪
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - status
+                - preview_url
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - ready
+                  preview_url:
+                    type: string
+                    format: uri
+                    description: 可加载的绝对 HTTP(S) 图片地址。
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: 缺少、过期或无效的业务凭证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 目标资源不存在或不属于当前游客
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: 预览暂不可用，可稍后重试
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-intake-number: 17
+      x-delivery-wave: F2
+      description: 仅本人结果可生成。响应返回可打开的去隐私图片 URL；暂不可用时返回结构化错误。
+components:
+  securitySchemes:
+    guestToken:
+      type: apiKey
+      in: header
+      name: X-Guest-Token
+      description: 通过 POST /auth/guest 获取当前浏览器专用凭证。每次受保护请求携带 X-Guest-Token。
+  parameters:
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: string
+    ResultId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    ErrorResponse:
+      description: Error envelope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+    Question:
+      type: object
+      required:
+      - id
+      - index
+      - dimension
+      - prompt
+      - options
+      properties:
+        id:
+          type: string
+        index:
+          type: integer
+          minimum: 1
+          maximum: 12
+        dimension:
+          type: string
+          enum:
+          - EI
+          - SN
+          - TF
+          - JP
+        prompt:
+          type: string
+        options:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required:
+            - id
+            - label
+            properties:
+              id:
+                type: string
+              label:
+                type: string
+    Answer:
+      type: object
+      required:
+      - question_id
+      - option_id
+      properties:
+        question_id:
+          type: string
+        option_id:
+          type: string
+    QuizSession:
+      type: object
+      required:
+      - id
+      - question_bank_version
+      - status
+      - answers
+      properties:
+        id:
+          type: string
+        question_bank_version:
+          type: string
+          description: 会话创建后冻结。
+        status:
+          type: string
+          enum:
+          - in_progress
+          - submitted
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    QuizVersionPayload:
+      type: object
+      required:
+      - question_bank_version
+      - questions
+      properties:
+        question_bank_version:
+          type: string
+          example: qb-v0.4-teach-1
+        lookback_hint:
+          type: string
+          description: UX copy only — recent 4 weeks
+          example: 请按最近四周的通常状态作答
+        questions:
+          type: array
+          minItems: 12
+          maxItems: 12
+          items:
+            $ref: '#/components/schemas/Question'
+    DimensionCounts:
+      type: object
+      required:
+      - E
+      - I
+      - S
+      - N
+      - T
+      - F
+      - J
+      - P
+      properties:
+        E:
+          type: integer
+          minimum: 0
+          maximum: 3
+        I:
+          type: integer
+          minimum: 0
+          maximum: 3
+        S:
+          type: integer
+          minimum: 0
+          maximum: 3
+        N:
+          type: integer
+          minimum: 0
+          maximum: 3
+        T:
+          type: integer
+          minimum: 0
+          maximum: 3
+        F:
+          type: integer
+          minimum: 0
+          maximum: 3
+        J:
+          type: integer
+          minimum: 0
+          maximum: 3
+        P:
+          type: integer
+          minimum: 0
+          maximum: 3
+    ResultSnapshot:
+      type: object
+      required:
+      - id
+      - source
+      - type_code
+      - question_bank_version
+      - submitted_at
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+          enum:
+          - quiz
+          - self_select
+        type_code:
+          type: string
+          pattern: ^[EI][SN][TF][JP]$
+        dimension_counts:
+          $ref: '#/components/schemas/DimensionCounts'
+        question_bank_version:
+          type: string
+          description: 真实测评为所用题库版本。自选使用不与测评比较的独立标识。
+        submitted_at:
+          type: string
+          format: date-time
+        life_stage:
+          type: string
+        recent_status:
+          type: string
+        session_id:
+          type: string
+          description: Present when source=quiz
+      oneOf:
+      - type: object
+        properties:
+          source:
+            type: string
+            enum:
+            - quiz
+        required:
+        - dimension_counts
+      - type: object
+        properties:
+          source:
+            type: string
+            enum:
+            - self_select
+        not:
+          required:
+          - dimension_counts
+    ResultSnapshotSummary:
+      type: object
+      required:
+      - id
+      - source
+      - type_code
+      - question_bank_version
+      - submitted_at
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+          enum:
+          - quiz
+          - self_select
+        type_code:
+          type: string
+        question_bank_version:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+        life_stage:
+          type: string
+    TypeMeta:
+      type: object
+      required:
+      - type_code
+      - name_zh
+      - tagline
+      properties:
+        type_code:
+          type: string
+        name_zh:
+          type: string
+        tagline:
+          type: string
+        description:
+          type: string
+    CompareResult:
+      type: object
+      required:
+      - baseline_id
+      - target_id
+      - question_bank_version
+      - type_changed
+      properties:
+        baseline_id:
+          type: string
+        target_id:
+          type: string
+        question_bank_version:
+          type: string
+        type_changed:
+          type: boolean
+        baseline_type_code:
+          type: string
+        target_type_code:
+          type: string
+        dimension_deltas:
+          type: object
+          additionalProperties:
+            type: integer
+        stability_notes:
+          type: array
+          items:
+            type: string
+    GuestSession:
+      type: object
+      required:
+      - guest_token
+      - expires_at
+      properties:
+        guest_token:
+          type: string
+          minLength: 1
+          description: 高熵不透明凭证。仅入本机存储，避免日志、URL 和截图。
+        expires_at:
+          type: string
+          format: date-time
+          description: 凭证有效期，UTC ISO 8601。
+security:
+- guestToken: []
