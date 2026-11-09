@@ -101,7 +101,10 @@
       "style": {
         "navigationBarTitleText": "屏蔽管理"
       }
-    }
+    },
+    { "path": "pages/contacts/contacts", "style": { "navigationBarTitleText": "我的联系方式" } },
+    { "path": "pages/contact-request/contact-request", "style": { "navigationBarTitleText": "联系方式请求" } },
+    { "path": "pages/contact-request/granted", "style": { "navigationBarTitleText": "当前授权读取" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

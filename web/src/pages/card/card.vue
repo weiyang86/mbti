@@ -40,7 +40,8 @@
     <button class="btn-secondary mt" @click="go('/pages/discover/discover')">发现搭子</button>
     <button class="btn-secondary mt" @click="go('/pages/exchanges/exchanges')">我的名片夹</button>
     <button class="btn-secondary mt" @click="go('/pages/buddies/blocked')">屏蔽管理</button>
-    <text class="notice">名片交换不会授予联系方式。联系方式功能尚未开放。</text>
+    <button class="btn-secondary mt" @click="go('/pages/contacts/contacts')">本人联系方式</button>
+    <text class="notice">名片交换不会授予联系方式，需另行申请并由对方本人批准所选渠道。</text>
   </view>
 </template>
 
