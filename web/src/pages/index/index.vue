@@ -15,6 +15,7 @@
       <view class="btn-secondary mt" @click="goOrders">我的订单与权益</view>
       <view class="btn-secondary mt" @click="goCard">我的名片</view>
       <view class="btn-secondary mt" @click="goDiscover">发现搭子</view>
+      <view class="btn-secondary mt" @click="goRadar">同型雷达</view>
       <view class="btn-secondary mt" @click="goExchanges">我的名片夹</view>
       <view class="btn-secondary mt" @click="goBlocked">屏蔽管理</view>
       <view class="btn-secondary mt" @click="goContacts">本人联系方式</view>
@@ -131,6 +132,7 @@ function goCatalog() { uni.navigateTo({ url: '/pages/pricing/pricing' }) }
 function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
 function goCard() { uni.navigateTo({ url: '/pages/card/card' }) }
 function goDiscover() { uni.navigateTo({ url: '/pages/discover/discover' }) }
+function goRadar() { uni.navigateTo({ url: '/pages/radar/radar' }) }
 function goExchanges() { uni.navigateTo({ url: '/pages/exchanges/exchanges' }) }
 function goBlocked() { uni.navigateTo({ url: '/pages/buddies/blocked' }) }
 function goContacts() { uni.navigateTo({ url: '/pages/contacts/contacts' }) }
