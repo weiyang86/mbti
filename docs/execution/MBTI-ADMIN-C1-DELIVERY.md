@@ -98,12 +98,12 @@ rollback 从同作用域可用历史快照复制内容，作为新的发布序�
 | `node --test scripts/verification/plugin-manifest.test.mjs` | exit0，15/15 |
 | `pnpm build` | exit0；workspace packages、Nest API、Next web，含 `/plugins/mbti-config/settings` |
 | `cd ../admin && pnpm lint && pnpm typecheck && pnpm test && pnpm build` | exit0，57/57既有运营UI测试，生产构建通过；consumer 仍 unavailable |
-| `node --test scripts/verification/plugin-manifest.test.mjs scripts/verification/configuration-schema.test.mjs` | exit1，38/39；唯一失败为导入遗留配置关系白名单未列 ClientAuthSession.personalScriptRuns→AiPersonalScriptRun；不是 C1 schema 变更 |
+| `node --test scripts/verification/plugin-manifest.test.mjs scripts/verification/configuration-schema.test.mjs` | 初始 exit1，38/39；后续补齐导入仓库既有关系白名单后分别重跑：manifest 15/15、configuration-schema 24/24 |
 | `git diff --check` | exit0 |
 
 初次在 workspace 包尚未 build 时 typecheck/定向test 报缺 dist；补齐依赖产物后修复。开发中定向测试暴露过 fixture 路径、题目 index 和 Nest fixture 认证注入问题，均在最终通过前修正。build 会重建 dist，因此最终验证不与依赖这些输出的测试并发执行。
 
-遗留 schema 断言的当前 schema 与 `HEAD` B5 基线 git blob 完全相同：`8fd18089c4d6e11ac8a395f1b76859ab29b92398`（`git rev-parse HEAD:aij-foundation/apps/api/prisma/schema.prisma` 与 `git hash-object` 一致）。没有为了变绿放宽上游历史测试或改 schema。optional 原数据库集成 `plugin-lifecycle-core`、`configuration`、`remaining-delivery.integration` 等需要旧 AF owner，均 NOT_RUN；仅将后者原有硬编码三插件断言更新为当前 whitelist 长度，未运行其中模型/数据库流程。
+遗留 schema 断言的当前 schema 与 `HEAD` B5 基线 git blob 完全相同：`8fd18089c4d6e11ac8a395f1b76859ab29b92398`（`git rev-parse HEAD:aij-foundation/apps/api/prisma/schema.prisma` 与 `git hash-object` 一致）。初始失败是维护性 helper 未列出当前导入 schema 已存在的三个反向关系：`ClientAuthSession.personalScriptRuns → AiPersonalScriptRun`、`ProjectProfile.documentExports → PersonalDocumentExport`、`ProjectProfile.personalScriptVersions → AiPersonalScriptVersion`。总控只将这三个确切 schema 关系补入 `ownerExtensions` 白名单，没有修改 schema 或放宽校验；`configuration-schema` 随后24/24通过。optional 原数据库集成 `plugin-lifecycle-core`、`configuration`、`remaining-delivery.integration` 等需要旧 AF owner，均 NOT_RUN；仅将后者原有硬编码三插件断言更新为当前 whitelist 长度，未运行其中模型/数据库流程。
 
 C1 的测试替身只实现 ScopedConfig / ConfigurationChange / AuditLog / PluginInstallation / PluginOperation、项目与权限/SecretReference 元数据访问，没有业务模型、系统菜单或角色授权写 owner。ManagementAccess、PermissionsService、PluginRuntimeAccessService、PluginLifecycleService 均用真实实现。事务替身串行提交、异常丢弃整份 pending state；它可证明业务事务调用边界，不能证明 PostgreSQL 的锁、回滚或跨进程持久化实现。
 
@@ -114,7 +114,7 @@ C1 的测试替身只实现 ScopedConfig / ConfigurationChange / AuditLog / Plug
 - **运行验收阻塞**：指定 `/Users/lei/orca/workspaces/mbti/mbti-web-api-f1/aij-foundation` 原 test55437 owner 尚未恢复。没有接触其他库或已有账号/配置。需总控取得真实原 owner、marker、数据库归属、当前会话/角色及端口证据后，再补真实 DB install/enable/disable、跨会话 CAS、audit 原子性、重启持久化、Cookie/CSRF、两个浏览器与直接越权操作验收。
 - **人审 unknowns**：Remy 确认候选字段/ID/角色、plugin 权限、商户/模型字段和 SecretRef 投影后，C2 才能定稿 adapter；本次未添加任何猜测 MBTI 权限或 grants。发布说明自由文本、商户凭据族、provider/model/gateway、公开用户投影均未定义。
 - **C2/业务兼容未测**：根 admin/H5 尚未连接该配置源；旧业务默认/快照不改，不从服务候选证明新订单/测评采用新配置。B1/B2 blockers、真实图像/模型、收款/webhook、位置、指标和消息未解决。没有对外地址或真实验收账号可交付。
-- **历史静态验证问题**：上述配置关系白名单1项失败保留，需原 owner 另行维护；C1 没有修改既有 Prisma schema 或迁移。
+- **静态验证**：上述配置关系白名单已按实际已有 schema 关系维护，专项检查通过；C1 没有修改既有 Prisma schema 或迁移。
 - 初始工作树除输入包外有大量 AppleDouble `._*` 未跟踪文件，Git 报 `._pack-…idx` 的 non-monotonic index 警告；未清理/修复 Git 元数据或把这些文件纳入提交。
 
 精确路径提交只包含 mbti-config、必要 registry/lifecycle/launch/runtime/audit 适配、最小 Foundation web 入口、关联测试与本文/coverage。提交后停止写入，交由总控决定 C2 续派及真实 owner 恢复；worker 回执按未完成运行验收报告失败/阻塞，不把可编译候选当作整张验收通过。
