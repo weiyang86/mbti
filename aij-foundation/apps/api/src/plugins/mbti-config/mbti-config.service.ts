@@ -11,6 +11,8 @@ import { PluginRuntimeAccessService } from "../../plugin-runtime/plugin-runtime-
 import { assertOwnedRef } from "../../secret-center/secret-ref";
 import { MBTI_CATEGORIES, MBTI_UNKNOWN, MbtiCategory, MbtiSnapshot, canonical, category, emptySnapshot, exactBody, projectSnapshot, revision, validateCategory, validateSnapshot } from "./mbti-config.schema";
 
+import { MbtiChannel, projectPublicPublished } from "./mbti-config.public";
+
 export const MBTI_PLUGIN = "mbti-config";
 const ACTIVE = "release.active", DRAFT = "release.draft", SNAPSHOT = "release.version.";
 const systemCategory = (key: string) => ["aiRuntime", "payments", "trade"].includes(key);
@@ -49,7 +51,7 @@ export class MbtiConfigService {
   private diff(before: MbtiSnapshot, after: MbtiSnapshot): MbtiCategory[] { return MBTI_CATEGORIES.filter(k => canonical(before[k]) !== canonical(after[k])); }
   private view(c: Context, s: Awaited<ReturnType<MbtiConfigService["state"]>>, view: "draft" | "published") {
     return { schema: "mbti-config-candidate/v1", state: s.pointer ? "published" : "UNCONFIGURED", expectedVersion: s.pointer?.version ?? 0,
-      expectedDraftVersion: s.draft?.version ?? 0, view, source: { scope: "project", projectId: c.projectId, environment: this.runtime.getOrThrow<string>("environment"), pluginCode: MBTI_PLUGIN }, categories: projectSnapshot(view === "draft" ? s.candidate : s.snapshot, c.system),
+      expectedDraftVersion: s.draft?.version ?? 0, authorization: { canSaveDraft: true, canPublish: c.system, canReadSystem: c.system }, view, source: { scope: "project", projectId: c.projectId, environment: this.runtime.getOrThrow<string>("environment"), pluginCode: MBTI_PLUGIN }, categories: projectSnapshot(view === "draft" ? s.candidate : s.snapshot, c.system),
       diff: this.diff(s.snapshot, s.candidate).filter(k => c.system || !systemCategory(k)), ...MBTI_UNKNOWN };
   }
   private read<T>(operator: string, operation: (tx: Prisma.TransactionClient, c: Context) => Promise<T>) {
@@ -65,6 +67,16 @@ export class MbtiConfigService {
       }
       return this.view(c, await this.state(tx, c), "draft");
     });
+  }
+  /** No public route calls this until separate human approval and wiring review. Always fresh, no draft/cache. */
+  publicCandidate(channel: MbtiChannel) {
+    return this.access.database(() => this.prisma.$transaction(async tx => {
+      if (this.runtime.getOrThrow<string>("projectId") !== "mbti-foundation") throw new ForbiddenException("MBTI project required");
+      const projectId = await this.plugins.projectId(tx);
+      await this.plugins.assertEnabledInTransaction(tx, projectId, MBTI_PLUGIN);
+      const live = await this.live(tx, { projectId, system: false });
+      return projectPublicPublished(live.snapshot, projectId, channel, live.pointer?.version ?? 0);
+    }, { maxWait: 3000, timeout: 5000 }));
   }
   saveDraft(operator: string, keyInput: string, input: unknown, correlationId?: string) {
     const key = category(keyInput), body = exactBody(input, ["value", "expectedDraftVersion"]), expected = revision(body.expectedDraftVersion), value = validateCategory(key, body.value);
@@ -140,6 +152,7 @@ export class MbtiConfigService {
   version(operator: string, targetInput: string) {
     const target = Number(targetInput); if (!/^[1-9][0-9]{0,9}$/.test(targetInput)) throw new BadRequestException("Invalid version"); revision(target);
     return this.read(operator, async (tx, c) => {
+      if (!c.system) throw new ForbiddenException("Platform administrator and secret permission required for release history");
       const change = await tx.configurationChange.findFirst({ where: { scope: "project", scopeId: c.projectId, pluginCode: MBTI_PLUGIN, configKey: ACTIVE, configVersion: target, deletedAt: null, status: "recorded" } });
       const key = (change?.changeMetadata as { snapshotKey?: string } | null)?.snapshotKey;
       if (!key?.startsWith(SNAPSHOT)) throw new NotFoundException("Published version not found");
@@ -150,6 +163,7 @@ export class MbtiConfigService {
   }
   audit(operator: string) {
     return this.read(operator, async (tx, c) => {
+      if (!c.system) throw new ForbiddenException("Platform administrator and secret permission required for release history");
       const rows = await tx.configurationChange.findMany({ where: { scope: "project", scopeId: c.projectId, pluginCode: MBTI_PLUGIN, deletedAt: null, status: "recorded" }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 100 });
       return rows.map(row => ({ id: row.id, event: row.eventType, version: row.configVersion, auditLogId: row.auditLogId, createdAt: row.createdAt,
         categories: ((row.changeMetadata as { categories?: string[] } | null)?.categories ?? []).filter(k => MBTI_CATEGORIES.includes(k as MbtiCategory) && (c.system || !systemCategory(k))) }));
@@ -157,6 +171,7 @@ export class MbtiConfigService {
   }
   versions(operator: string) {
     return this.read(operator, async (tx, c) => {
+      if (!c.system) throw new ForbiddenException("Platform administrator and secret permission required for release history");
       const changes = await tx.configurationChange.findMany({ where: { scope: "project", scopeId: c.projectId, pluginCode: MBTI_PLUGIN, configKey: ACTIVE, deletedAt: null, status: "recorded" },
         orderBy: [{ configVersion: "desc" }], take: 100 });
       return changes.map(row => ({ version: row.configVersion, event: row.eventType, auditLogId: row.auditLogId, createdAt: row.createdAt,

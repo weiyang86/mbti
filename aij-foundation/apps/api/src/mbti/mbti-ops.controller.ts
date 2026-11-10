@@ -19,7 +19,7 @@ export class MbtiOpsController {
     return { user: request.user, platformSuperAdmin: current.isSuperAdmin,
       role: allowed.systemWrite ? "owner" : allowed.draft ? "editor" : allowed.fulfillment ? "support" : "reader",
       capabilities: allowed,
-      permissions: current.effectivePermissions.filter(code => Object.values(grants).includes(code)),
+      permissions: current.effectivePermissions.filter(code => [...Object.values(grants), "admin.config.manage", "admin.secret.manage"].includes(code)),
       businessStage: "UI_CONTRACT" };
   }
 

@@ -159,10 +159,10 @@ test('actual app routes mount B5 and shared dirty guard blocks sidebar, direct h
   const h = host(), navigations = [], confirmations = []; let allow = false, logouts = 0
   h.window.confirm = message => { confirmations.push(message); return allow }
   const location = { hash: '#/ai-settings' }, history = { replaceState: (_a, _b, url) => navigations.push(url), back() {} }
-  const session = { user: { id: 'component-only', username: 'component-only', realName: '组件验收', isSuperAdmin: false }, role: 'owner', platformSuperAdmin: false, capabilities: Object.fromEntries(['access', 'orders', 'draft', 'systemRead', 'systemWrite', 'release', 'export', 'moderation'].map(k => [k, true])) }
+  const session = { user: { id: 'component-only', username: 'component-only', realName: '组件验收', isSuperAdmin: false }, role: 'owner', platformSuperAdmin: false, permissions: [], capabilities: Object.fromEntries(['access', 'orders', 'draft', 'systemRead', 'systemWrite', 'release', 'export', 'moderation'].map(k => [k, true])) }
   const B5 = component({ document: h.document, window: h.window })
   const Stub = { render: () => null }
-  const Ops = evaluate(opsCode, { vue: Vue, './ops-api': { session: async () => session, logout: async () => { logouts++ }, login: async () => session }, './orders.vue': { default: Stub }, './workspace.vue': { default: Stub }, './config.vue': { default: Stub }, './b4.vue': { default: Stub }, './b5.vue': { default: B5 } }, { document: h.document, window: h.window, location, history }).default
+  const Ops = evaluate(opsCode, { vue: Vue, './ops-api': { session: async () => session, logout: async () => { logouts++ }, login: async () => session }, './config-server.vue': { default: Stub }, './orders.vue': { default: Stub }, './workspace.vue': { default: Stub }, './config.vue': { default: Stub }, './b4.vue': { default: Stub }, './b5.vue': { default: B5 } }, { document: h.document, window: h.window, location, history }).default
   const app = h.renderer.createApp(Ops); app.mount(h.root); const p = inspection(app, h); await flush()
   const nav = label => p.nodes().find(n => n.type === 'button' && n.children.some(c => c.type === '#text' && c.text.includes(label)))
   for (const [label, field] of [['支付参数配置', '交易环境'], ['交易与售后规则', '付款时限（分钟）'], ['发布与日志', '发布说明'], ['AI 参数配置', '运行模式']]) { assert.ok(nav(label), label); nav(label).props.onClick(); await flush(); assert.ok(p.control(field), field) }

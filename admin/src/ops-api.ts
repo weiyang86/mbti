@@ -18,7 +18,7 @@ export class OpsApiError extends Error {
   constructor(readonly status: number, message: string, readonly code?: 'INVALID_ORDER_RESPONSE') { super(message) }
 }
 
-async function request<T>(path: string, init: RequestInit = {}, retry = true, raw = false): Promise<T> {
+export async function request<T>(path: string, init: RequestInit = {}, retry = true, raw = false): Promise<T> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs)
   try {

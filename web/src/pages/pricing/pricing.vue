@@ -4,6 +4,10 @@
     <text class="notice">当前为受控测试商品与测试价格，可创建待支付订单。基础测评结果仍可免费查看。</text>
     <button class="btn-secondary" @click="goOrders">我的订单与权益</button>
 
+    <view v-if="config?.products.length" class="card mt">
+      <text class="section">商品展示预览</text><text class="notice">配置展示文案；下单商品与金额以业务服务为准。</text>
+      <view v-for="item in config.products" :key="item.id"><text class="section">{{ item.title }}</text><text>{{ item.desc }}</text></view>
+    </view>
     <text class="section">选择本人的结果</text>
     <text v-if="resultsLoading" class="muted">正在读取结果…</text>
     <text v-else-if="resultsError" class="error">{{ resultsError }}</text>
@@ -35,12 +39,17 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { onLoad, onShow } from '@dcloudio/uni-app'
+import { onHide, onLoad, onShow } from '@dcloudio/uni-app'
 import { listProducts, type PaymentProduct } from '@/api/payment'
 import { getResult, listResults } from '@/api/results'
 import { requestErrorMessage } from '@/api/client'
 import { formatMoney } from '@/utils/payment-display'
 
+import { readPublishedPreview, publicChannel, type PublishedPreview } from '@/api/published-config'
+const config = ref<PublishedPreview | null>(null)
+let configRead = 0, channelName = '公众号 H5'
+onHide(() => { configRead++; config.value = null })
+async function loadConfiguration() { const token = ++configRead; config.value = null; const value = await readPublishedPreview(channelName); if (token === configRead) config.value = value }
 const products = ref<PaymentProduct[]>([])
 const results = ref<{ id: string; label: string }[]>([])
 const selectedId = ref('')
@@ -51,11 +60,11 @@ const resultsError = ref('')
 const selectedIndex = computed(() => results.value.findIndex((item) => item.id === selectedId.value))
 const selectedResult = computed(() => results.value.find((item) => item.id === selectedId.value))
 
-onLoad((q) => { selectedId.value = (q?.result_id as string) || '' })
+onLoad((q) => { selectedId.value = (q?.result_id as string) || ''; if (q?.channel !== undefined) channelName = publicChannel(q.channel) ? String(q.channel) : '' })
 onShow(load)
 
 async function load() {
-  await Promise.all([loadProducts(), loadResults()])
+  await Promise.all([loadProducts(), loadResults(), loadConfiguration()])
 }
 
 async function loadProducts() {
@@ -95,7 +104,7 @@ function checkout(product: PaymentProduct) {
   uni.navigateTo({ url: `/pages/unlock/unlock?result_id=${encodeURIComponent(selectedId.value)}&product_code=${encodeURIComponent(product.code)}` })
 }
 function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
-function goHome() { uni.reLaunch({ url: '/pages/index/index' }) }
+function goHome() { uni.reLaunch({ url: `/pages/index/index?channel=${encodeURIComponent(channelName)}` }) }
 </script>
 
 <style scoped lang="scss">

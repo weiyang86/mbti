@@ -2,12 +2,14 @@
   <view class="page">
     <view class="hero card">
       <text class="eyebrow">TEST · CREATE · CONNECT</text>
-      <text class="h1">MBTI搭子</text>
-      <text class="lead muted">趣味倾向体验，非临床测评。带教闭环：测 → 结果 → 晒预览 → 阶段记录。</text>
+      <text class="h1">{{ config?.content ? config.content.headline + config.content.accent : 'MBTI搭子' }}</text>
+      <text class="lead muted">{{ config?.content?.sub || '趣味倾向体验，非临床测评。带教闭环：测 → 结果 → 晒预览 → 阶段记录。' }}</text>
+      <text v-if="config?.entry" class="muted">{{ config.entry.badge }}</text>
     </view>
 
     <view class="actions">
-      <view class="btn-primary" @click="startQuiz">{{ starting ? '正在准备题目…' : '测一测（12 题）' }}</view>
+      <view v-if="config?.entry" class="btn-secondary" @click="goChannelEntry">{{ config.entry.name }}入口</view>
+      <view class="btn-primary" @click="startQuiz">{{ starting ? '正在准备题目…' : config?.content?.cta || '测一测（12 题）' }}</view>
       <view v-if="sessionExpired" class="btn-secondary mt" @click="renewGuest">重新建立游客会话</view>
       <view class="btn-secondary mt" @click="goSelfSelect">我已经知道类型</view>
       <view class="btn-secondary mt" @click="goHistory">阶段记录</view>
@@ -29,19 +31,28 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onHide, onLoad, onShow } from '@dcloudio/uni-app'
 import { createQuizSession, getCurrentQuizVersion } from '@/api/quiz'
 import { listResults } from '@/api/results'
 import type { ResultSnapshotSummary } from '@/api/types'
 import { isGuestSessionExpired, requestErrorMessage, startNewGuestSession, useMock } from '@/api/client'
 import { clearQuizDraft, createQuizDraft, isRestorableDraft, loadQuizDraft, recoveryMessage } from '@/store/quiz-draft'
 
+import { landingRoutes, readPublishedPreview, publicChannel, type PublishedPreview } from '@/api/published-config'
+
+const config = ref<PublishedPreview | null>(null)
+let channelName = '公众号 H5', configRead = 0
+onLoad(q => { if (q?.channel !== undefined) channelName = publicChannel(q.channel) ? String(q.channel) : '' })
+onHide(() => { configRead++; config.value = null })
+function goChannelEntry() { const route = config.value?.entry && landingRoutes[config.value.entry.landing]; if (route) uni.navigateTo({ url: `${route}?channel=${encodeURIComponent(channelName)}` }) }
+async function loadConfiguration() { const token = ++configRead; config.value = null; const value = await readPublishedPreview(channelName); if (token === configRead) config.value = value }
 const starting = ref(false)
 const sessionExpired = ref(false)
 const latest = ref<ResultSnapshotSummary | null>(null)
 const mockMode = useMock()
 
 onShow(async () => {
+  void loadConfiguration()
   sessionExpired.value = isGuestSessionExpired()
   try {
     const response = await listResults({ limit: 1 })
@@ -128,7 +139,7 @@ function goHistory() {
   uni.navigateTo({ url: '/pages/history/list' })
 }
 
-function goCatalog() { uni.navigateTo({ url: '/pages/pricing/pricing' }) }
+function goCatalog() { uni.navigateTo({ url: `/pages/pricing/pricing?channel=${encodeURIComponent(channelName)}` }) }
 function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
 function goCard() { uni.navigateTo({ url: '/pages/card/card' }) }
 function goDiscover() { uni.navigateTo({ url: '/pages/discover/discover' }) }
