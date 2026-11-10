@@ -216,6 +216,68 @@ test("projection uses current permissions; system refs require owned metadata an
   await assert.rejects(f.service.saveDraft("root", "aiRuntime", { value: { ...ai, credentialRef: "local://mbti-foundation/test/UNKNOWN_REF" }, expectedDraftVersion: 2 }), status(400));
 });
 
+test("permission matrix covers every category family for denied/editor/publisher/root without unlocking public H5", async () => {
+  const f = fixture(); await f.enable();
+  const SYSTEM = ["aiRuntime", "payments", "trade"] as const;
+  const NORMAL = MBTI_CATEGORIES.filter(key => !(SYSTEM as readonly string[]).includes(key));
+  const systemValues = {
+    aiRuntime: { mode: "UNCONFIGURED", size: "960*1280", timeout: 90 },
+    payments: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, { enabled: false, mode: "UNCONFIGURED", merchantLabel: "MBTI搭子体验店" }])),
+    trade: { ttl: 30, redeem: false, selfRefund: "support", refundDays: 7 },
+  } as const;
+  const normalValues = {
+    content: content("矩阵"),
+    channels: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, { name: "入口", landing: "home", badge: "标签" }])),
+    imageRecipes: { recipe: "balanced" },
+    retention: { tags: ["回访"], days: [7, 30] },
+    discovery: { order: "same", daily: 5, radar: false, radius: 500, minimum: 10 },
+  } as const;
+  for (const actor of ["denied", "editor", "publisher"] as const) {
+    await assert.rejects(f.service.publish(actor, { expectedVersion: 0, expectedDraftVersion: 0 }), status(403));
+    await assert.rejects(f.service.versions(actor), status(403));
+    await assert.rejects(f.service.version(actor, "1"), status(403));
+    await assert.rejects(f.service.audit(actor), status(403));
+    await assert.rejects(f.service.rollback(actor, "1", { expectedVersion: 0 }), status(403));
+  }
+  await assert.rejects(f.service.readView("denied", "draft"), status(403));
+  for (const key of Object.keys(normalValues) as (keyof typeof normalValues)[]) {
+    await assert.rejects(f.service.saveDraft("denied", key, { value: normalValues[key], expectedDraftVersion: 0 }), status(403));
+  }
+  for (const key of SYSTEM) {
+    await assert.rejects(f.service.saveDraft("denied", key, { value: systemValues[key], expectedDraftVersion: 0 }), status(403));
+  }
+  const editor = await f.service.readView("editor", "draft");
+  assert.equal(editor.authorization.canPublish, false); assert.equal(editor.authorization.canReadSystem, false);
+  assert.deepEqual(Object.keys(editor.categories).sort(), [...NORMAL].sort());
+  for (const key of SYSTEM) {
+    assert.equal(Object.hasOwn(editor.categories, key), false);
+    await assert.rejects(f.service.saveDraft("editor", key, { value: systemValues[key], expectedDraftVersion: 0 }), status(403));
+    await assert.rejects(f.service.saveDraft("publisher", key, { value: systemValues[key], expectedDraftVersion: 0 }), status(403));
+  }
+  let draftVersion = 0;
+  for (const key of Object.keys(normalValues) as (keyof typeof normalValues)[]) {
+    await f.service.saveDraft("editor", key, { value: normalValues[key], expectedDraftVersion: draftVersion });
+    draftVersion += 1;
+  }
+  const publisher = await f.service.readView("publisher", "draft");
+  assert.equal(publisher.authorization.canPublish, false); assert.equal(publisher.authorization.canReadSystem, false);
+  assert.equal(Object.hasOwn(publisher.categories, "aiRuntime"), false);
+  const root = await f.service.readView("root", "draft");
+  assert.equal(root.authorization.canPublish, true); assert.equal(root.authorization.canReadSystem, true);
+  assert.deepEqual(Object.keys(root.categories).sort(), [...MBTI_CATEGORIES].sort());
+  for (const key of SYSTEM) await f.service.saveDraft("root", key, { value: systemValues[key], expectedDraftVersion: draftVersion++ });
+  assert.equal(MBTI_PUBLIC_APPROVED, false);
+  assert.deepEqual([...MBTI_PUBLIC_CATEGORIES].sort(), ["assessment", "catalog", "channels", "content", "discovery", "imageRecipes", "personas", "retention"]);
+  for (const key of SYSTEM) assert.equal((MBTI_PUBLIC_CATEGORIES as readonly string[]).includes(key), false);
+  for (const channel of ["wechat", "mp", "douyin", "xhs"] as const) {
+    const projected = projectPublicPublished(emptySnapshot(), "project-test", channel, 0);
+    assert.equal(projected.status, "needs_human_review");
+    assert.equal(Object.hasOwn(projected.categories, "aiRuntime"), false);
+    assert.equal(Object.hasOwn(projected.categories, "payments"), false);
+    assert.equal(Object.hasOwn(projected.categories, "trade"), false);
+  }
+});
+
 test("disabled and missing installations reject reads, writes and publication", async () => {
   const f = fixture(); await assert.rejects(f.service.readView("root", "draft"), status(404));
   await f.enable(); await f.save("停用", 0); await f.lifecycle.disable("mbti-config", "root");

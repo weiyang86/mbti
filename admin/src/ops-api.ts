@@ -80,8 +80,8 @@ export async function readOrderSummary(from: string, to: string, channel: string
   const value = await request<unknown>('/admin/mbti/orders/summary' + orderQuery({ from, to, channel }), {}, true, true)
   try { return projectOrderSummary(value) } catch { throw new OpsApiError(502, '订单汇总响应格式不正确。') }
 }
-export function saveOrdersCsv(csv: string) {
+export function saveOrdersCsv(csv: string, filename = 'mbti-orders.csv') {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
-  const link = document.createElement('a'); link.href = url; link.download = 'mbti-orders.csv'
+  const link = document.createElement('a'); link.href = url; link.download = filename
   document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url)
 }

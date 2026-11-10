@@ -42,10 +42,10 @@ test('invalid, missing, reversed and future dates cannot become a query window',
   }
 })
 
-// Real component, in-memory renderer; overview may call the summary client with synthetic fixtures only.
-function mountPage(page, canExport = false, canModerate = false, readOrderSummary = async () => summaryFixture) {
-  const listeners = new Map(), navigation = [], summaryCalls = []
-  const document = { activeElement: null, addEventListener: (key, fn) => listeners.set(key, fn), removeEventListener: key => listeners.delete(key) }
+// Real component, in-memory renderer; overview may call summary/export clients with synthetic fixtures only.
+function mountPage(page, canExport = false, canModerate = false, readOrderSummary = async () => summaryFixture, exportOrders = async () => { throw new Error('export unused') }) {
+  const listeners = new Map(), navigation = [], summaryCalls = [], exportCalls = [], saved = []
+  const document = { activeElement: null, body: { appendChild() {}, removeChild() {} }, createElement: () => ({ click() {}, remove() {} }), addEventListener: (key, fn) => listeners.set(key, fn), removeEventListener: key => listeners.delete(key) }
   globalThis.document = document
   class Element {}
   const node = (type, text = '') => ({ type, text, props: {}, children: [], parent: null, tagName: type.toUpperCase(), value: '', get options() { return this.children.filter(n => n.type === 'option') }, addEventListener() {}, removeEventListener() {}, focus() { document.activeElement = this } })
@@ -59,8 +59,13 @@ function mountPage(page, canExport = false, canModerate = false, readOrderSummar
   })
   const forbidden = () => { throw new Error('Workspace UI must not send a request or create a ledger') }
   class OpsApiError extends Error { constructor(status, message) { super(message); this.status = status } }
-  const api = { OpsApiError, async readOrderSummary(from, to, channel) { summaryCalls.push({ from, to, channel }); return readOrderSummary(from, to, channel) } }
-  const component = evaluate(componentCode, { vue: Vue, './ops-workspace': model, './ops-api': api, './ops-orders-collection': collection, './workspace.css': {} }, { document, HTMLElement: Element, fetch: forbidden, localStorage: new Proxy({}, { get: forbidden }), sessionStorage: new Proxy({}, { get: forbidden }) }).default
+  const api = {
+    OpsApiError,
+    async readOrderSummary(from, to, channel) { summaryCalls.push({ from, to, channel }); return readOrderSummary(from, to, channel) },
+    async exportOrders(filters) { exportCalls.push(filters); return exportOrders(filters) },
+    saveOrdersCsv(csv, filename) { saved.push({ csv, filename }) },
+  }
+  const component = evaluate(componentCode, { vue: Vue, './ops-workspace': model, './ops-api': api, './ops-orders-collection': collection, './workspace.css': {} }, { document, HTMLElement: Element, URL: { createObjectURL: () => 'blob:synthetic', revokeObjectURL() {} }, Blob, fetch: forbidden, localStorage: new Proxy({}, { get: forbidden }), sessionStorage: new Proxy({}, { get: forbidden }) }).default
   const root = node('root')
   const app = renderer.createApp(component, { page, canExport, canModerate, onNavigate: id => navigation.push(id) })
   app.mount(root)
@@ -69,7 +74,7 @@ function mountPage(page, canExport = false, canModerate = false, readOrderSummar
   const button = label => nodes().find(n => n.type === 'button' && n.text === label)
   const control = label => nodes().find(n => n.props['aria-label'] === label)
   const set = async (label, value) => { control(label).props['onUpdate:modelValue'](value); await Vue.nextTick() }
-  return { app, nodes, text, button, control, set, listeners, navigation, summaryCalls }
+  return { app, nodes, text, button, control, set, listeners, navigation, summaryCalls, exportCalls, saved }
 }
 const flush = async () => { await Vue.nextTick(); await Vue.nextTick(); await Promise.resolve(); await Vue.nextTick() }
 const disabled = node => node.props.disabled === true || node.props.disabled === ''
@@ -124,19 +129,41 @@ test('overview marks channel-filtered summary unavailable instead of inventing a
   assert.ok(p.nodes().filter(n => n.props['aria-label'] === '数据不可得').length >= 4)
   p.app.unmount()
 })
-test('export and moderation remain disabled with any presentation capability; no client write path', async () => {
+test('overview order CSV exports same date window when permitted; channel and growth stay blocked', async () => {
+  const denied = mountPage('overview', false, false)
+  await flush()
+  assert.ok(disabled(denied.button('导出报表 CSV')))
+  assert.match(denied.button('导出报表 CSV').props.title, /mbti:ops:export/)
+  denied.app.unmount()
+  const p = mountPage('overview', true, true, async () => summaryFixture, async filters => '\uFEFF"id"\r\n')
+  await flush()
+  // Default preset is 近7天 relative to Shanghai today; export uses those applied dates only.
+  assert.equal(disabled(p.button('导出报表 CSV')), false)
+  await p.button('导出报表 CSV').props.onClick(); await flush(); await flush()
+  assert.equal(p.exportCalls.length, 1)
+  assert.match(p.exportCalls[0].from, /^\d{4}-\d{2}-\d{2}$/)
+  assert.match(p.exportCalls[0].to, /^\d{4}-\d{2}-\d{2}$/)
+  assert.equal(Object.hasOwn(p.exportCalls[0], 'channel'), false)
+  assert.equal(p.saved.length, 1)
+  assert.match(p.saved[0].filename, /^mbti-orders-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.csv$/)
+  assert.match(p.text(), /订单 CSV 已交给浏览器下载/)
+  await p.set('统计渠道', 'wechat'); await flush()
+  assert.ok(disabled(p.button('导出报表 CSV')))
+  assert.match(p.button('导出报表 CSV').props.title, /渠道归因不可得/)
+  p.app.unmount()
+  const growth = mountPage('growth', true, true)
+  await flush()
+  assert.ok(disabled(growth.button('导出渠道表 · 未接通')))
+  assert.match(growth.button('导出渠道表 · 未接通').props.title, /缺同筛选渠道表/)
+  growth.app.unmount()
+})
+test('moderation remains disabled with any presentation capability; no client write path', async () => {
   for (const capability of [false, true]) {
-    for (const [page, label] of [['overview', '导出报表 · 未接通'], ['growth', '导出渠道表 · 未接通']]) {
-      const p = mountPage(page, capability, capability)
-      await flush()
-      assert.ok(disabled(p.button(label))); assert.match(p.button(label).props.title, /缺同筛选/)
-      if (!capability) assert.match(p.button(label).props.title, /mbti:ops:export/)
-      if (page === 'overview') {
-        assert.equal(disabled(p.button('查看治理 →')), !capability)
-        if (capability) { p.button('查看治理 →').props.onClick(); assert.deepEqual(p.navigation, ['moderation']) }
-      }
-      p.app.unmount()
-    }
+    const overview = mountPage('overview', capability, capability)
+    await flush()
+    assert.equal(disabled(overview.button('查看治理 →')), !capability)
+    if (capability) { overview.button('查看治理 →').props.onClick(); assert.deepEqual(overview.navigation, ['moderation']) }
+    overview.app.unmount()
     const p = mountPage('moderation', capability, capability)
     await flush()
     assert.ok(disabled(p.button('查看处理 · 未接通'))); assert.ok(disabled(p.button('查看记录 · 未接通')))

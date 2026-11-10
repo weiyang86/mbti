@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { OpsApiError, readOrderSummary } from './ops-api'
+import { OpsApiError, exportOrders, readOrderSummary, saveOrdersCsv } from './ops-api'
 import type { OrderSummary } from './ops-orders-collection'
 import { channels, dateWindow, definitions, presetRange, shanghaiToday, type Period, type WorkspacePage } from './ops-workspace'
 import './workspace.css'
@@ -21,8 +21,17 @@ const moderationMetrics = ['互换申请', '名片同意率', '联系授权完�
 const summary = ref<OrderSummary | null>(null)
 const summaryState = ref<'idle' | 'loading' | 'success' | 'error' | 'unauthenticated'>('idle')
 const summaryError = ref('')
-let summaryVersion = 0
-const exportReason = computed(() => `${props.canExport ? '' : '当前会话未授予 mbti:ops:export；'}UI_CONTRACT：缺同筛选报表查询、CSV 导出及服务端授权端点。`)
+const exportState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+const exportError = ref('')
+let summaryVersion = 0, exportVersion = 0
+const canExportOverview = computed(() => props.page === 'overview' && props.canExport && !windowRange.value.error && channel.value === 'all')
+const exportReason = computed(() => {
+  if (props.page === 'growth') return `${props.canExport ? '' : '当前会话未授予 mbti:ops:export；'}UI_CONTRACT：缺同筛选渠道表查询、CSV 导出及服务端授权端点。`
+  if (!props.canExport) return '当前会话未授予 mbti:ops:export；服务端仍会拒绝无权限导出。'
+  if (windowRange.value.error) return windowRange.value.error
+  if (channel.value !== 'all') return '渠道归因不可得；订单报表仅支持「全部渠道」，不会把未归因订单导出为单渠道。'
+  return '导出当前日期范围内的订单白名单 CSV（与列表/export 同筛选语义，最多5000笔）；不含净实收或渠道列。'
+})
 const moderationReason = computed(() => `${props.canModerate ? '' : '当前会话未授予 mbti:ops:moderation:write；'}UI_CONTRACT：缺匿名工单读取、处置、幂等及审计端点。`)
 const drawer = ref<'' | 'definitions' | 'case'>('')
 const dialog = ref<HTMLElement | null>(null)
@@ -76,6 +85,25 @@ const overviewCards = computed(() => {
       note: metrics && fen === null ? '多币种并存，合计不可得；仅展示分币种事实时需另查列表' : pendingNote },
   ]
 })
+async function downloadOverviewCsv() {
+  if (!canExportOverview.value || exportState.value === 'loading') return
+  const current = ++exportVersion
+  exportState.value = 'loading'; exportError.value = ''
+  try {
+    // Same durable order collection as /orders export; date window only, no channel invention.
+    const csv = await exportOrders({ from: from.value, to: to.value })
+    if (current !== exportVersion || !canExportOverview.value) return
+    saveOrdersCsv(csv, `mbti-orders-${from.value}_${to.value}.csv`)
+    exportState.value = 'success'
+  } catch (error) {
+    if (current !== exportVersion) return
+    const status = error instanceof OpsApiError ? error.status : 0
+    exportState.value = 'error'
+    exportError.value = status === 401 ? '登录已失效，请重新核验登录。' : status === 403 ? '服务端拒绝导出，请核对 mbti:ops:access 与 mbti:ops:export。'
+      : status === 422 ? '日期无效或导出超过5000笔；请缩小范围后重试。'
+        : status >= 500 ? '订单导出服务暂不可用，请重试。' : error instanceof OpsApiError ? error.message : '订单导出失败，请重试。'
+  }
+}
 async function openDrawer(value: 'definitions' | 'case') {
   returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
   drawer.value = value
@@ -92,17 +120,24 @@ function keydown(event: KeyboardEvent) {
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
   }
 }
-watch([() => props.page, from, to, channel], loadSummary, { flush: 'post' })
+watch([() => props.page, from, to, channel], () => { exportVersion++; exportState.value = 'idle'; exportError.value = ''; loadSummary() }, { flush: 'post' })
+watch(() => props.canExport, () => { exportVersion++; exportState.value = 'idle'; exportError.value = '' })
 onMounted(() => { document.addEventListener('keydown', keydown, true); loadSummary() })
-onUnmounted(() => { summaryVersion++; document.removeEventListener('keydown', keydown, true) })
+onUnmounted(() => { summaryVersion++; exportVersion++; document.removeEventListener('keydown', keydown, true) })
 </script>
 
 <template>
   <div class="workspace-page">
     <div class="ws-actions">
-      <span class="ws-badge">{{ page === 'overview' ? '订单 KPI 接 summary · 其余 UI_CONTRACT' : 'UI_CONTRACT · 业务服务未接通' }}</span>
-      <div><button class="text-button" @click="openDrawer('definitions')">指标口径</button><button v-if="page !== 'moderation'" class="outline-button" disabled :title="exportReason">{{ page === 'overview' ? '导出报表' : '导出渠道表' }} · 未接通</button></div>
+      <span class="ws-badge">{{ page === 'overview' ? '订单 KPI / 订单 CSV · 其余 UI_CONTRACT' : 'UI_CONTRACT · 业务服务未接通' }}</span>
+      <div>
+        <button class="text-button" @click="openDrawer('definitions')">指标口径</button>
+        <button v-if="page === 'overview'" class="outline-button" :disabled="!canExportOverview || exportState === 'loading'" :title="exportReason" @click="downloadOverviewCsv">{{ exportState === 'loading' ? '导出中…' : '导出报表 CSV' }}</button>
+        <button v-else-if="page === 'growth'" class="outline-button" disabled :title="exportReason">导出渠道表 · 未接通</button>
+      </div>
     </div>
+    <p v-if="page === 'overview' && exportError" class="error-text" role="alert">{{ exportError }} <button v-if="exportError.includes('登录已失效')" class="text-button" @click="emit('reauthenticate')">重新核验登录</button><button v-else class="text-button" @click="downloadOverviewCsv">重试导出</button></p>
+    <p v-else-if="page === 'overview' && exportState === 'success'" class="ws-window" role="status">订单 CSV 已交给浏览器下载（白名单字段，非净实收报表）。</p>
     <section class="filter-panel ws-filters" aria-label="统计筛选">
       <div class="filter-controls">
         <div class="segmented" role="group" aria-label="统计周期"><button v-for="option in (['今日', '近 7 天', '近 30 天', '自定义'] as const)" :key="option" :class="{ selected: period === option }" :aria-pressed="period === option" @click="selectPeriod(option)">{{ option }}</button></div>
