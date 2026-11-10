@@ -12,7 +12,16 @@ import { MbtiOpsOrdersService } from "./mbti-ops-orders.service";
 import { MbtiOpsRefundService } from "./mbti-ops-refund.service";
 import { MbtiOpsRedeemService } from "./mbti-ops-redeem.service";
 import { MbtiOpsRedeemController } from "./mbti-ops-redeem.controller";
+import { MbtiOpsGenerationService } from "./mbti-ops-generation.service";
+import { MbtiOpsGenerationController } from "./mbti-ops-generation.controller";
+import { MbtiOpsModerationService } from "./mbti-ops-moderation.service";
+import { MbtiOpsModerationController } from "./mbti-ops-moderation.controller";
+import { MbtiOpsGrowthService } from "./mbti-ops-growth.service";
+import { MbtiOpsGrowthController } from "./mbti-ops-growth.controller";
+import { MbtiOpsRetentionService } from "./mbti-ops-retention.service";
+import { MbtiOpsRetentionController } from "./mbti-ops-retention.controller";
 import { MbtiOrdersAdminController, MbtiOrdersController } from "./mbti-orders.controller";
+
 import { MbtiSocialController } from "./mbti-social.controller";
 import { MbtiSocialService } from "./mbti-social.service";
 import { MbtiRadarController } from "./mbti-radar.controller";
@@ -42,9 +51,15 @@ export class MbtiModule {
     }
     return { module: MbtiModule,
       imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController, MbtiOpsController, MbtiOpsRedeemController] : []),
+      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [
+        MbtiOrdersAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
+        MbtiOpsModerationController, MbtiOpsGrowthController, MbtiOpsRetentionController,
+      ] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [MbtiOpsRefundService, MbtiOpsRedeemService] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
+      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
+        MbtiOpsRefundService, MbtiOpsRedeemService, MbtiOpsGenerationService, MbtiOpsModerationService,
+        MbtiOpsGrowthService, MbtiOpsRetentionService,
+      ] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },
         { provide: PAYMENT_CREDENTIAL_RESOLVER, useValue: { async resolve(reference: string) {
           if (reference !== "test-only:mbti-f3-payment") throw new Error("Controlled fixture credential rejected");

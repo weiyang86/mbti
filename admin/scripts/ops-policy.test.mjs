@@ -11,8 +11,9 @@ test('B1 role grants follow ADMIN-COVERAGE policy without superadmin grants', ()
   assert.ok(roles.owner.includes(grants.systemWrite) && roles.owner.includes(grants.release) && roles.owner.includes(grants.redemption))
   assert.ok(roles.editor.includes(grants.draft) && roles.editor.includes(grants.moderation) && !roles.editor.includes(grants.systemWrite))
   assert.ok(roles.support.includes(grants.fulfillment) && roles.support.includes(grants.moderation) && !roles.support.includes(grants.release))
-  assert.deepEqual(roles.reader, [grants.access, grants.orders, grants.systemRead])
-  assert.deepEqual(capabilities(roles.reader), Object.fromEntries(Object.keys(grants).map(key => [key, ['access', 'orders', 'systemRead'].includes(key)])))
+  assert.deepEqual(roles.reader, [grants.access, grants.orders, grants.systemRead, grants.moderationRead])
+  assert.deepEqual(capabilities(roles.reader), Object.fromEntries(Object.keys(grants).map(key => [key, ['access', 'orders', 'systemRead', 'moderationRead'].includes(key)])))
+  assert.ok(roles.support.includes(grants.generationRetry))
 })
 
 test('operations UI has 14 ordered routes and never persists client role or token', async () => {

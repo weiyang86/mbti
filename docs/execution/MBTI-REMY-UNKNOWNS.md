@@ -32,7 +32,7 @@
 
 | # | 议题 | 候选现状 | 需要拍板 |
 |---|---|---|---|
-| C1 | 解闸开关 | `MBTI_PUBLIC_APPROVED = false`；有效渠道 404 | 批准公开字段集与渠道后由 Remy 显式改码；禁止 env 旁路 |
+| C1 | 解闸开关 | **已解闸（2026-11-10）**：`MBTI_PUBLIC_APPROVED = true` + publicCandidate；见 Intern 说明 | 正式字段定稿仍 ASK；禁止 env 旁路 |
 | C2 | 公开类目 | 仅 8 类非系统；`channels` 按单渠道切片 | 是否再砍字段（价格、题干、雷达半径等） |
 | C3 | Intern 消费 | web 未接；永远回退 | 解闸时契约说明路径/字段/缓存键；**web 改动归实习生** |
 | C4 | revision adapter | C1 整数 version ≠ consumer opaque revision | C2 adapter 定稿时机与破坏性 |
@@ -46,7 +46,7 @@
 | D1 | 商户 SecretRef 族 | payments 恒 `enabled:false` + `UNCONFIGURED` | 获批商户/证书/沙箱；凭据投影白名单 |
 | D2 | 退款写路径 | **已批准（2026-11-10）**：权限 A（`mbti:orders:read`+`admin.payment.refund.request`）；reason 自由文本；**不**自动吊销权益；复用 AF-106 `pending_manual_review` | 通过后如何回写 MbtiOrder / entitlement 仍 ASK |
 | D3 | 体验兑换码 | **运营账本已批准落地**：可售商品、一次核销上限、哈希存储、`mbti:ops:redemption:write` | 访客核销路径/与 entitlement 发放仍 ASK |
-| D4 | 净实收 | overview 恒 null；毛额 ≠ 净额 | 退款归属日、币种隔离、是否进 summary |
+| D4 | 净实收 | **条件可得**：有已入账 refund 交易才算净额；否则 null | 按日趋势日桶、多币种合计策略 |
 
 ---
 
@@ -54,10 +54,10 @@
 
 | # | 议题 | 候选现状 | 需要拍板 |
 |---|---|---|---|
-| E1 | 生成任务队列 | 不把 `unlocked` 当交付 | 任务持久化模型、与订单关系、重试幂等 |
-| E2 | 匿名治理工单 | 禁用 guest 社交当运营源 | 匿名字段白名单；只读 vs `moderation:write` |
-| E3 | 渠道经营报表 | MBTI 订单表无渠道字段 | 访问/分享事件表是否建；禁止用支付 provider 冒充渠道 |
-| E4 | 复测/成熟队列 | retention 页口径呈现 only | cohort 定义与渠道时间归属 |
+| E1 | 生成任务队列 | **已落地候选** list/enqueue/retry | 真模型 worker / 额度 |
+| E2 | 匿名治理工单 | **已落地候选** 独立表 + read/write | 授权汇总指标 |
+| E3 | 渠道经营报表 | **事件表+summary**；空表 unavailable | 事件写入源、CSV 导出 |
+| E4 | 复测/成熟队列 | **全站 cohort API** | 分渠道时间归属 |
 
 ---
 

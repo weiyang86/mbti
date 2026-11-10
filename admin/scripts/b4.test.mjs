@@ -115,7 +115,14 @@ function mountPage(page, canEdit = true, imageOverrides = {}) {
   globalThis.document = document
   const node=(type,text='')=>({type,text,children:[],props:{},parent:null,tagName:type.toUpperCase(),value:'',get options(){return this.children.filter(n=>n.type==='option')},addEventListener(){},removeEventListener(){},focus(){document.activeElement=this}})
   const renderer=Vue.createRenderer({createElement:type=>node(type),createText:text=>node('#text',text),createComment:text=>node('#comment',text),insert(el,parent,anchor=null){if(el.parent)this.remove(el);el.parent=parent;const i=parent.children.indexOf(anchor);parent.children.splice(i<0?parent.children.length:i,0,el)},remove(el){const i=el.parent?.children.indexOf(el)??-1;if(i>=0)el.parent.children.splice(i,1);el.parent=null},setText(el,t){el.text=t},setElementText(el,t){el.text=t;el.children=[]},parentNode:el=>el.parent,nextSibling:el=>el.parent?.children[el.parent.children.indexOf(el)+1]??null,patchProp(el,k,_old,v){el.props[k]=v;if(k==='value')el.value=v}})
-  const component=evaluate(componentCode,{vue:Vue,'./b4-model':model,'./b4-image':{...image,...imageOverrides},'./config-contract-v1':contract,'./config.css':{},'./b4.css':{}},{document,window:trap('window')}).default
+  class OpsApiError extends Error { constructor(status, message) { super(message); this.status = status } }
+  const api = {
+    OpsApiError,
+    async readRetentionCohorts() {
+      return { as_of: '2026-11-10', eligible_first_tests: 0, same_bank_retakes: 0, retake_rate: null, channel_attribution_unavailable: true }
+    },
+  }
+  const component=evaluate(componentCode,{vue:Vue,'./b4-model':model,'./b4-image':{...image,...imageOverrides},'./ops-api':api,'./config-contract-v1':contract,'./config.css':{},'./b4.css':{}},{document,window:trap('window')}).default
   const root=node('root'), props=Vue.reactive({page,canEdit}), app=renderer.createApp({render:()=>Vue.h(component,{...props,onDirty:v=>dirty.push(v)})}); app.mount(root)
   const nodes=()=>{const a=[];const walk=n=>{a.push(n);n.children.forEach(walk)};walk(root);return a}
   const button=label=>nodes().find(n=>n.type==='button'&&n.text===label), control=label=>nodes().find(n=>n.props['aria-label']===label)

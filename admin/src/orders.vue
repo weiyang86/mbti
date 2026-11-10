@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import {
-  createOrderRefundRequest, createRedeemCodes, disableRedeemCode, listRedeemCodes, OpsApiError, readOrder,
-  type RedeemCodeRow, type RefundRequestResult,
+  createOrderRefundRequest, createRedeemCodes, disableRedeemCode, listGenerationJobs, listRedeemCodes,
+  OpsApiError, readOrder, retryGenerationJob,
+  type GenerationJobRow, type RedeemCodeRow, type RefundRequestResult,
 } from './ops-api'
 import { normalizeOrderId, orderStatus, orderTime, type OpsOrder } from './ops-order'
 import './orders.css'
@@ -33,6 +34,8 @@ const canRefund = computed(() => props.permissions.includes('mbti:orders:read') 
 const canSubmitRefund = computed(() => !!order.value && order.value.status === 'paid' && canRefund.value && refundReason.value.trim().length > 0 && refundReason.value.trim().length <= 500 && refundState.value !== 'loading')
 const canRedeemWrite = computed(() => props.permissions.includes('mbti:ops:redemption:write'))
 const canRedeemRead = computed(() => props.permissions.includes('mbti:orders:read'))
+const canJobsRead = computed(() => props.permissions.includes('mbti:orders:read'))
+const canJobsRetry = computed(() => props.permissions.includes('mbti:ops:generation:retry'))
 const redeemProduct = ref('studio_tier_1')
 const redeemCount = ref(5)
 const redeemRows = ref<RedeemCodeRow[]>([])
@@ -40,6 +43,11 @@ const redeemIssued = ref<{ id: string; code: string; product_code: string }[]>([
 const redeemState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
 const redeemError = ref('')
 let redeemVersion = 0
+const jobStatus = ref('failed')
+const jobRows = ref<GenerationJobRow[]>([])
+const jobState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+const jobError = ref('')
+let jobVersion = 0
 const stateTitle = computed(() => ({
   idle: '输入订单号开始核对', loading: '正在查询订单', success: '订单详情', invalid: '请检查订单号',
   notFound: '未找到此订单', forbidden: '没有订单读取权限', unauthenticated: '登录已失效', error: '暂时无法查询',
@@ -165,7 +173,48 @@ async function stopRedeemCode(id: string) {
     redeemState.value = 'error'; redeemError.value = redeemMessage(error)
   }
 }
-watch(tab, value => { if (value === 'codes') void loadRedeemCodes() })
+function jobMessage(error: unknown) {
+  const status = error instanceof OpsApiError ? error.status : 0
+  return status === 401 ? '登录已失效，请重新核验登录。' : status === 403 ? '服务端拒绝生成任务操作，请核对 mbti:orders:read / mbti:ops:generation:retry。'
+    : status === 409 ? '仅失败任务可重试。' : status === 422 ? '任务筛选或幂等键无效。'
+      : status >= 500 ? '生成任务服务暂不可用，请重试。' : error instanceof OpsApiError ? error.message : '生成任务请求失败，请重试。'
+}
+function jobKey() {
+  const bytes = new Uint8Array(18)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, b => (b % 36).toString(36)).join('')
+}
+async function loadJobs() {
+  if (!canJobsRead.value) { jobRows.value = []; return }
+  const current = ++jobVersion
+  jobState.value = 'loading'; jobError.value = ''
+  try {
+    const rows = await listGenerationJobs({ status: jobStatus.value || undefined, limit: '50' })
+    if (current !== jobVersion) return
+    jobRows.value = rows; jobState.value = 'success'
+  } catch (error) {
+    if (current !== jobVersion) return
+    jobState.value = 'error'; jobError.value = jobMessage(error); jobRows.value = []
+  }
+}
+async function retryJob(id: string) {
+  if (!canJobsRetry.value || jobState.value === 'loading') return
+  const current = ++jobVersion
+  jobState.value = 'loading'; jobError.value = ''
+  try {
+    await retryGenerationJob(id, { idempotency_key: jobKey() })
+    const rows = await listGenerationJobs({ status: jobStatus.value || undefined, limit: '50' })
+    if (current !== jobVersion) return
+    jobRows.value = rows; jobState.value = 'success'
+  } catch (error) {
+    if (current !== jobVersion) return
+    jobState.value = 'error'; jobError.value = jobMessage(error)
+  }
+}
+watch(tab, value => {
+  if (value === 'codes') void loadRedeemCodes()
+  if (value === 'jobs') void loadJobs()
+})
 </script>
 
 <template>
@@ -213,7 +262,7 @@ watch(tab, value => { if (value === 'codes') void loadRedeemCodes() })
             </div>
             <div class="order-disabled-actions">
               <button class="outline-button" :disabled="!canSubmitRefund" :title="refundTitle" @click="submitRefund">{{ refundState === 'loading' ? '提交中…' : '提交退款申请' }}</button>
-              <button class="outline-button" disabled title="UI_CONTRACT · 任务及重试接口未接通">重试交付 · 未接通</button>
+              <button class="outline-button" @click="tab = 'jobs'">查看生成任务 →</button>
             </div>
           </div>
         </article>
@@ -231,8 +280,32 @@ watch(tab, value => { if (value === 'codes') void loadRedeemCodes() })
 
     <section v-else class="panel order-contract-panel" :aria-labelledby="`order-tab-${tab}`">
       <template v-if="tab === 'jobs'">
-        <p class="eyebrow">GENERATION TASKS</p><h2>生成任务尚未接通</h2><p>订单读取接口不返回生成任务、异常队列或素材交付状态。需要任务查询、同任务重试、幂等和审计接口。</p>
-        <div class="order-disabled-actions"><button class="outline-button" disabled>筛选异常 · 未接通</button><button class="outline-button" disabled>恢复当前统计范围 · 未接通</button><button class="outline-button" disabled>任务详情 · 未接通</button><button class="outline-button" disabled>重试原任务 · 未接通</button></div>
+        <p class="eyebrow">GENERATION TASKS</p><h2>生成任务队列</h2>
+        <p>独立于权益解锁；<code>unlocked</code> 不等于素材已交付。重试需 <code>mbti:ops:generation:retry</code>。</p>
+        <div class="order-disabled-actions">
+          <label>状态<select v-model="jobStatus" aria-label="任务状态筛选" :disabled="jobState === 'loading'" @change="loadJobs">
+            <option value="">全部</option><option value="queued">queued</option><option value="running">running</option>
+            <option value="succeeded">succeeded</option><option value="failed">failed</option>
+          </select></label>
+          <button class="outline-button" :disabled="!canJobsRead || jobState === 'loading'" @click="loadJobs">{{ jobState === 'loading' ? '加载中…' : '刷新队列' }}</button>
+        </div>
+        <p v-if="!canJobsRead" class="muted">当前会话缺少 mbti:orders:read，无法读取任务队列。</p>
+        <p v-else-if="jobState === 'error'" class="order-refund-err" role="alert">{{ jobError }}</p>
+        <table v-if="jobRows.length" class="order-redeem-table">
+          <thead><tr><th>任务</th><th>订单</th><th>配方</th><th>状态</th><th>尝试</th><th>错误类</th><th></th></tr></thead>
+          <tbody>
+            <tr v-for="row in jobRows" :key="row.id">
+              <td class="order-mono">{{ row.id }}</td>
+              <td class="order-mono">{{ row.order_id }}</td>
+              <td>{{ row.recipe }}</td>
+              <td>{{ row.job_status }}</td>
+              <td>{{ row.attempt }}</td>
+              <td>{{ row.last_error_class || '—' }}</td>
+              <td><button class="text-button" :disabled="!canJobsRetry || row.job_status !== 'failed' || jobState === 'loading'" :title="canJobsRetry ? '仅 failed 可重试' : '缺少 mbti:ops:generation:retry'" @click="retryJob(row.id)">重试</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else-if="canJobsRead && jobState === 'success'" class="muted">当前筛选下没有生成任务；空队列不等于交付正常。</p>
       </template>
       <template v-else-if="tab === 'codes'">
         <p class="eyebrow">EXPERIENCE CODES</p><h2>体验兑换码账本</h2>
@@ -268,7 +341,7 @@ watch(tab, value => { if (value === 'codes') void loadRedeemCodes() })
         <p class="eyebrow">LOCAL TEST ORDERS</p><h2>本机前台订单尚未接通</h2><p>保留原型测试入口。需要来源隔离的测试账本与处理接口；当前不会读取原型浏览器账本或创建演练订单。</p>
         <div class="order-disabled-actions"><button class="outline-button" disabled>刷新 · 未接通</button><button class="outline-button" disabled>详情 · 未接通</button><button class="outline-button" disabled>处理 · 未接通</button></div>
       </template>
-      <p class="order-contract-note">{{ tab === 'codes' ? '兑换码候选 · needs_human_review；访客核销未接' : 'UI_CONTRACT · 依赖待定稿，needs_human_review' }}</p><button class="text-button" @click="tab = 'orders'">返回交易订单按号查询 →</button>
+      <p class="order-contract-note">{{ tab === 'codes' ? '兑换码候选 · needs_human_review；访客核销未接' : tab === 'jobs' ? '生成任务候选 · needs_human_review；真模型通道未接' : 'UI_CONTRACT · 依赖待定稿，needs_human_review' }}</p><button class="text-button" @click="tab = 'orders'">返回交易订单按号查询 →</button>
     </section>
     <p class="security-note">订单数据由服务端按 mbti:orders:read 授权返回。页面只保留订单业务字段，不展示支付凭据、私密联系方式或私有作答。</p>
   </div>

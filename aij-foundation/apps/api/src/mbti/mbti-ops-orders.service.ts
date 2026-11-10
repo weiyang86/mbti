@@ -1,5 +1,5 @@
 import { Injectable, ServiceUnavailableException } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { PaymentTransactionKind, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { reject } from "./mbti.http";
@@ -44,15 +44,37 @@ export class MbtiOpsOrdersService {
   summary(input: unknown) {
     const query = parseOrderQuery(input, true);
     const interval = { from: query.filters.from!, to: query.filters.to!, startInclusive: query.filters.from! + "T00:00:00.000Z", endExclusive: new Date(Date.parse(query.filters.to! + "T00:00:00.000Z") + 86_400_000).toISOString(), dateBasis: "order_created_at", boundaryTimezone: "UTC", displayTimezone: "Asia/Shanghai" };
-    const base = { interval, netCollectedFen: null, refundsUnavailable: true, channelAttributionUnavailable: true };
-    if (query.channel && query.channel !== "all") return Promise.resolve({ ...base, metrics: null, unavailableReason: "channel_attribution_unavailable" });
+    const base = { interval, channelAttributionUnavailable: true as const };
+    if (query.channel && query.channel !== "all") {
+      return Promise.resolve({ ...base, netCollectedFen: null, refundsUnavailable: true, metrics: null, unavailableReason: "channel_attribution_unavailable" });
+    }
     return this.prisma.$transaction(async tx => {
       const groups = await tx.mbtiOrder.groupBy({ by: ["status", "currency"], where: orderWhere(query), _count: { _all: true }, _sum: { amount: true } });
       const count = (status: string) => groups.filter(g => g.status === status).reduce((sum, g) => sum + g._count._all, 0);
       const paid = groups.filter(g => g.status === "paid");
       const grossPaidByCurrency = paid.map(g => ({ currency: g.currency.trim(), amountFen: g._sum.amount ?? 0, paidOrderCount: g._count._all })).sort((a, b) => a.currency.localeCompare(b.currency));
-      return { ...base, metrics: { pending: count("pending"), paid: count("paid"), failed: count("failed"), paidOrderCount: count("paid"),
-        grossPaidAmountFen: paid.length > 1 ? null : paid[0]?._sum.amount ?? 0, currency: paid.length === 1 ? paid[0].currency.trim() : null, grossPaidByCurrency }, unavailableReason: null };
+      const metrics = { pending: count("pending"), paid: count("paid"), failed: count("failed"), paidOrderCount: count("paid"),
+        grossPaidAmountFen: paid.length > 1 ? null : paid[0]?._sum.amount ?? 0, currency: paid.length === 1 ? paid[0].currency.trim() : null, grossPaidByCurrency };
+      // Net only when refund PaymentTransaction facts exist for paid orders in-window; empty refund ledger ≠ zero refunds.
+      const paidLinks = await tx.mbtiOrder.findMany({
+        where: { AND: [orderWhere(query), { status: "paid", paymentOrderId: { not: null } }] },
+        select: { amount: true, currency: true, paymentOrderId: true },
+      });
+      const paymentIds = [...new Set(paidLinks.map(row => row.paymentOrderId!).filter(Boolean))];
+      const refundRows = paymentIds.length === 0 ? [] : await tx.paymentTransaction.findMany({
+        where: { orderId: { in: paymentIds }, kind: PaymentTransactionKind.refund },
+        select: { amountMinor: true, currency: true },
+      });
+      if (refundRows.length === 0) {
+        return { ...base, netCollectedFen: null, refundsUnavailable: true, metrics, unavailableReason: null };
+      }
+      const currencies = new Set([...paidLinks.map(row => row.currency.trim()), ...refundRows.map(row => row.currency.trim())]);
+      if (currencies.size !== 1) {
+        return { ...base, netCollectedFen: null, refundsUnavailable: false, metrics, unavailableReason: null };
+      }
+      const gross = paidLinks.reduce((sum, row) => sum + row.amount, 0);
+      const refunded = refundRows.reduce((sum, row) => sum + Number(row.amountMinor), 0);
+      return { ...base, netCollectedFen: gross - refunded, refundsUnavailable: false, metrics, unavailableReason: null };
     }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, maxWait: 2000, timeout: 10000 });
   }
 }

@@ -16,7 +16,7 @@
 | 毛额 ≠ 净实收 | `netCollectedFen` 在退款事实接通前恒 null |
 | 不把 guest 社交当运营源 | 工单必须独立管理投影 |
 | 不把 `unlocked` 当素材交付 | 任务队列另表 |
-| H5 published | 仍由 `MBTI_PUBLIC_APPROVED` 硬闸；禁止 env 旁路 |
+| H5 published | **已解闸**：`MBTI_PUBLIC_APPROVED=true` + publicCandidate；禁止 env 旁路；Intern 见解闸说明 |
 | 真支付 / 真模型 | 另需 Pay/Model owner；B5/B4 演练 ≠ 生产 |
 
 ---

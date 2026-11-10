@@ -266,7 +266,7 @@ test("permission matrix covers every category family for denied/editor/publisher
   assert.equal(root.authorization.canPublish, true); assert.equal(root.authorization.canReadSystem, true);
   assert.deepEqual(Object.keys(root.categories).sort(), [...MBTI_CATEGORIES].sort());
   for (const key of SYSTEM) await f.service.saveDraft("root", key, { value: systemValues[key], expectedDraftVersion: draftVersion++ });
-  assert.equal(MBTI_PUBLIC_APPROVED, false);
+  assert.equal(MBTI_PUBLIC_APPROVED, true);
   assert.deepEqual([...MBTI_PUBLIC_CATEGORIES].sort(), ["assessment", "catalog", "channels", "content", "discovery", "imageRecipes", "personas", "retention"]);
   for (const key of SYSTEM) assert.equal((MBTI_PUBLIC_CATEGORIES as readonly string[]).includes(key), false);
   for (const channel of ["wechat", "mp", "douyin", "xhs"] as const) {
@@ -303,8 +303,12 @@ test("actual Nest HTTP routes enforce auth, permissions, disabled state and stri
     const send = (path: string, method: string, id?: string, body?: unknown) => fetch(base + path, { method, headers: { ...(id ? { authorization: id } : {}), "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) });
     const publicRead = (query: string) => fetch(base.replace("/plugins/mbti-config", "/v1/config/published") + query);
     for (const channel of ["wechat", "mp", "douyin", "xhs"]) {
-      const response = await publicRead(`?channel=${channel}`); assert.equal(response.status, 404); assert.equal(response.headers.get("cache-control"), "no-store");
-      const body = await response.json(); assert.equal(Object.hasOwn(body, "categories"), false); assert.equal(JSON.stringify(body).includes("headline"), false);
+      const response = await publicRead(`?channel=${channel}`); assert.equal(response.status, 200); assert.equal(response.headers.get("cache-control"), "no-store");
+      const body = await response.json(); assert.equal(body.status, "needs_human_review"); assert.equal(body.channel, channel);
+      assert.equal(Object.hasOwn(body.categories, "aiRuntime"), false); assert.equal(Object.hasOwn(body.categories, "payments"), false);
+      assert.equal(Object.hasOwn(body.categories, "trade"), false);
+      // Empty published snapshot keeps channels null until a non-null channels category is published.
+      assert.ok(body.categories.channels === null || Object.keys(body.categories.channels).length === 1 && Object.keys(body.categories.channels)[0] === channel);
     }
     for (const query of ["", "?channel=other", "?channel=mp&draft=true", "?channel=mp&view=draft", "?channel=mp&projectId=spoof", "?channel=mp&environment=production", "?channel=mp&version=1", "?channel=mp&channel=wechat"]) assert.equal((await publicRead(query)).status, 400);
     assert.equal((await send("/draft", "GET")).status, 401);
@@ -319,7 +323,12 @@ test("actual Nest HTTP routes enforce auth, permissions, disabled state and stri
     assert.equal((await send("/draft/trade", "PATCH", "editor", { value: { ttl: 30, redeem: false, selfRefund: "support", refundDays: 7 }, expectedDraftVersion: 1 })).status, 403);
     const draftResponse = await (await send("/draft", "GET", "editor")).json(); assert.equal(draftResponse.authorization.canPublish, false);
     assert.equal((await (await send("/draft", "GET", "root")).json()).authorization.canPublish, true);
-    assert.equal((await publicRead("?channel=mp")).status, 404); // Even after successful publication, no anonymous fields.
+    const publicLive = await (await publicRead("?channel=mp")).json();
+    assert.equal(publicLive.categories.content.headline, "HTTP");
+    // Only content was published in this fixture; channels remains null until saved.
+    assert.equal(publicLive.categories.channels, null);
+    assert.equal(Object.hasOwn(publicLive.categories, "trade"), false);
+    assert.equal(Object.hasOwn(publicLive.categories, "aiRuntime"), false);
     const live = await (await send("/published", "GET", "editor")).json(); assert.equal(live.categories.content.headline, "HTTP"); assert.equal(Object.hasOwn(live.categories, "trade"), false);
     for (const id of ["editor", "publisher"]) for (const path of ["/versions", "/versions/1", "/audit"]) assert.equal((await send(path, "GET", id)).status, 403);
     assert.equal((await send("/versions", "GET", "root")).status, 200); assert.equal((await send("/versions/1", "GET", "root")).status, 200); assert.equal((await send("/audit", "GET", "root")).status, 200);
@@ -340,8 +349,8 @@ test("actual Nest HTTP routes enforce auth, permissions, disabled state and stri
 });
 
 
-test("C2 internal published projection (NOT anonymous exposure): isolated channels, source revision, CAS and rollback; no retained cache", async () => {
-  assert.equal(MBTI_PUBLIC_APPROVED, false);
+test("C2 internal published projection + approved anonymous path: isolated channels, source revision, CAS and rollback; no retained cache", async () => {
+  assert.equal(MBTI_PUBLIC_APPROVED, true);
   assert.deepEqual(MBTI_PUBLIC_CATEGORIES, ["content", "channels", "catalog", "assessment", "personas", "imageRecipes", "retention", "discovery"]);
   const f = fixture(); await f.enable();
   const channels = { wechat: { name: "微信小程序", landing: "home", badge: "微信专用" }, mp: { name: "公众号 H5", landing: "pricing", badge: "公众号专用" }, douyin: { name: "抖音小程序", landing: "home", badge: "抖音专用" }, xhs: { name: "小红书小程序", landing: "discover", badge: "小红书专用" } };

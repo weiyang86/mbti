@@ -34,15 +34,15 @@ Owner 缩写：`Agent`=本会话工程；`Remy`=契约/字段；`Coord`=总控/�
 |---:|---|---|---|---|---|
 | 5 | 退款原因与确认 | UI-03.3 | ~~人工申请已接 AF-106~~；到账事实/权益吊销仍缺 | Remy + Pay | 申请路径已交付；回写 MbtiOrder/entitlement 另批 |
 | 6 | 体验兑换码账本 | UI-03.4 | ~~运营生成/停用已接~~；访客核销仍缺 | Remy | 运营账本已交付；guest redeem 另批 |
-| 7 | 生成任务队列/重试 | UI-03.2 / UI-01.3 | 任务持久化、与 unlocked 分离、幂等审计 | Remy + Model | admin 任务标签 + API |
-| 8 | 匿名治理工单 | UI-04.1–04.2 | 匿名字段白名单、只读 vs write 权限码 | Remy + Privacy | 管理端列表/处置；**禁用 guest 社交当运营源** |
-| 9 | 净实收 / 按日趋势 | UI-01.1–01.2 | 退款事实、归属日、币种隔离 | Remy + Pay | summary 扩展或独立 metrics |
-| 10 | 渠道经营/传播报表 | UI-02.* / UI-01.4 growth | MBTI 表无渠道字段；访问/分享事件源 | Remy | 有事件表才能接；否则永不可用 |
-| 11 | 成熟队列/复测对比率 | UI-09.2 | cohort 定义、渠道时间归属 | Remy | 聚合 API + retention 页 |
+| 7 | ~~生成任务队列/重试~~ | UI-03.2 / UI-01.3 | ~~已交付候选~~；真模型 worker 仍 NO | Agent | 见 §5 |
+| 8 | ~~匿名治理工单~~ | UI-04.1–04.2 | ~~已交付候选~~；授权汇总仍缺 | Agent | 见 §5 |
+| 9 | 净实收 / 按日趋势 | UI-01.1–01.2 | ~~净实收条件可得~~；按日趋势仍缺日桶 | Remy + Pay | 趋势另批 |
+| 10 | 渠道经营/传播报表 | UI-02.* / UI-01.4 growth | ~~事件表+summary~~；CSV 导出仍缺；空表不可得 | Remy | 写入事件源 / CSV 另批 |
+| 11 | ~~成熟队列/复测对比率~~ | UI-09.2 | ~~全站 cohort 已接~~；分渠道归属仍不可得 | Agent | 见 §5 |
 | 12 | mbti-config 正式字段/角色映射 | C1 unknowns | prototype→storage、每类读写/发布角色、商户凭据族 | Remy | 议题包：[MBTI-REMY-UNKNOWNS.md](MBTI-REMY-UNKNOWNS.md)；定稿前保持 candidate + needs_human_review |
-| 13 | H5 匿名 published 投影解闸 | C2 硬闸 | 公开字段集、渠道、与实习生消费映射 | Remy → Intern 消费 | foundation 解闸；**web 改动归实习生** |
-| 14 | 支付商户 SecretRef 真接 | UI-12.* | 获批商户/证书/沙箱 | Pay + Remy | 替换 UNCONFIGURED；B5 演练≠真实验签 |
-| 15 | AI 真网关 health/generate | UI-05/11 | 供应方、费用、上传所有权 | Model + Remy | 保留本机 kit；另开真实通道 |
+| 13 | ~~H5 匿名 published 投影解闸~~ | C2 | `MBTI_PUBLIC_APPROVED=true`；Intern 说明已发 | Intern 消费 web | [解闸说明](MBTI-H5-PUBLIC-UNLOCK-INTERN.md) |
+| 14 | 支付商户 SecretRef 真接 | UI-12.* | 获批商户/证书/沙箱 | Pay + Remy | [边界](MBTI-MERCHANT-AI-BOUNDARY.md)；B5 演练≠真实验签 |
+| 15 | AI 真网关 health/generate | UI-05/11 | 供应方、费用、上传所有权 | Model + Remy | [边界](MBTI-MERCHANT-AI-BOUNDARY.md)；保留本机 kit |
 
 ---
 
@@ -82,7 +82,13 @@ Owner 缩写：`Agent`=本会话工程；`Remy`=契约/字段；`Coord`=总控/�
 | Remy unknowns 议题包（#12 文档） | [MBTI-REMY-UNKNOWNS.md](MBTI-REMY-UNKNOWNS.md)；待批注 |
 | 订单人工退款申请（#5 部分） | `POST .../orders/:id/refund-requests` → AF-106；admin 详情可提交；不打款/不吊销 |
 | 体验兑换码运营账本（#6 部分） | `MbtiRedeemCode` + admin 生成/列表/停用；明文仅一次；访客核销未接 |
-| B3–B5 配置上方面板 ↔ mbti-config | 本地替身 API_CONSUMER；H5 硬闸 |
+| 生成任务队列（#7） | `MbtiGenerationJob` + list/enqueue/retry；admin 任务标签；unlocked≠交付 |
+| 匿名治理工单（#8） | `MbtiModerationCase` + list/intake/dispose；`moderation:read/write`；不读 guest 社交 |
+| 净实收条件可得（#9 部分） | summary：有 `PaymentTransaction.refund` 才算净额；否则 null |
+| 渠道事件汇总（#10 部分） | `MbtiGrowthEvent` + `/growth/summary`；空表 unavailable；CSV 未接 |
+| 成熟队列（#11） | `/retention/cohorts`；全站 MbtiResult；渠道归属 unavailable |
+| H5 published 解闸（#13） | `MBTI_PUBLIC_APPROVED=true` + publicCandidate；Intern 说明 |
+| B3–B5 配置上方面板 ↔ mbti-config | 本地替身 API_CONSUMER；H5 已解闸投影 |
 | B4 本机双图 kit | LOCAL；真模型 NO |
 | C1 插件候选 / C2 consumer | 候选；正式字段 ASK |
 

@@ -5,7 +5,10 @@ export interface OrderPage { items: OpsOrder[]; next_cursor: string | null }
 export interface OrderSummary {
   interval: { from: string; to: string; startInclusive: string; endExclusive: string; dateBasis: string; boundaryTimezone: string; displayTimezone: string }
   metrics: { pending: number; paid: number; failed: number; paidOrderCount: number; grossPaidAmountFen: number | null; currency: string | null; grossPaidByCurrency: { currency: string; amountFen: number; paidOrderCount: number }[] } | null
-  netCollectedFen: null; refundsUnavailable: true; channelAttributionUnavailable: true; unavailableReason: string | null
+  netCollectedFen: number | null
+  refundsUnavailable: boolean
+  channelAttributionUnavailable: true
+  unavailableReason: string | null
 }
 export function orderQuery(filters: OrderFilters | { from: string; to: string; channel: string }): string {
   const values = Object.entries(filters).filter(([, value]) => value !== undefined && value !== '')
@@ -19,7 +22,9 @@ export function projectOrderPage(value: unknown): OrderPage {
 export function projectOrderSummary(value: unknown): OrderSummary {
   const row = value as OrderSummary
   const count = (value: unknown) => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
-  if (!row || row.netCollectedFen !== null || row.refundsUnavailable !== true || row.channelAttributionUnavailable !== true ||
+  const netOk = row.netCollectedFen === null || (typeof row.netCollectedFen === 'number' && Number.isSafeInteger(row.netCollectedFen))
+  if (!row || !netOk || typeof row.refundsUnavailable !== 'boolean' || row.channelAttributionUnavailable !== true ||
+    (row.refundsUnavailable && row.netCollectedFen !== null) ||
     row.interval?.boundaryTimezone !== 'UTC' || row.interval.displayTimezone !== 'Asia/Shanghai' || row.interval.dateBasis !== 'order_created_at' ||
     !/^\d{4}-\d{2}-\d{2}$/.test(row.interval.from) || !/^\d{4}-\d{2}-\d{2}$/.test(row.interval.to) ||
     !Number.isFinite(Date.parse(row.interval.startInclusive)) || !Number.isFinite(Date.parse(row.interval.endExclusive))) throw new Error('Invalid summary')
@@ -31,5 +36,5 @@ export function projectOrderSummary(value: unknown): OrderSummary {
   const i = row.interval
   return { interval: { from: i.from, to: i.to, startInclusive: i.startInclusive, endExclusive: i.endExclusive, dateBasis: i.dateBasis, boundaryTimezone: i.boundaryTimezone, displayTimezone: i.displayTimezone },
     metrics: m === null ? null : { pending: m.pending, paid: m.paid, failed: m.failed, paidOrderCount: m.paidOrderCount, grossPaidAmountFen: m.grossPaidAmountFen, currency: m.currency, grossPaidByCurrency: m.grossPaidByCurrency.map(g => ({ currency: g.currency, amountFen: g.amountFen, paidOrderCount: g.paidOrderCount })) },
-    netCollectedFen: null, refundsUnavailable: true, channelAttributionUnavailable: true, unavailableReason: row.unavailableReason }
+    netCollectedFen: row.netCollectedFen, refundsUnavailable: row.refundsUnavailable, channelAttributionUnavailable: true, unavailableReason: row.unavailableReason }
 }

@@ -89,14 +89,25 @@ test("list/export share filters, omit owner IDs, and audit only count/categories
   assert.doesNotMatch(JSON.stringify(projected), /secret-name|leak|evil/);
 });
 
-test("summary keeps net null, rejects channel attribution, and aggregates fen by currency", async () => {
+test("summary keeps net null without refund facts, computes net when refund txs exist, rejects channel attribution", async () => {
   const groups = [
     { status: "paid", currency: "CNY", _count: { _all: 2 }, _sum: { amount: 1980 } },
     { status: "pending", currency: "CNY", _count: { _all: 1 }, _sum: { amount: 990 } },
     { status: "failed", currency: "CNY", _count: { _all: 1 }, _sum: { amount: 500 } },
   ];
-  const prisma = { async $transaction(work: (tx: { mbtiOrder: { groupBy: () => Promise<typeof groups> } }) => Promise<unknown>) {
-    return work({ mbtiOrder: { async groupBy() { return groups; } } });
+  const paidLinks = [
+    { amount: 990, currency: "CNY", paymentOrderId: "pay-1" },
+    { amount: 990, currency: "CNY", paymentOrderId: "pay-2" },
+  ];
+  let refundRows: { amountMinor: bigint; currency: string }[] = [];
+  const prisma = { async $transaction(work: (tx: {
+    mbtiOrder: { groupBy: () => Promise<typeof groups>; findMany: () => Promise<typeof paidLinks> };
+    paymentTransaction: { findMany: () => Promise<typeof refundRows> };
+  }) => Promise<unknown>) {
+    return work({
+      mbtiOrder: { async groupBy() { return groups; }, async findMany() { return paidLinks; } },
+      paymentTransaction: { async findMany() { return refundRows; } },
+    });
   } } as unknown as PrismaService;
   const service = new MbtiOpsOrdersService(prisma, {} as MbtiOrdersService);
   const blocked = await service.summary({ from: "2026-11-01", to: "2026-11-10", channel: "wechat" }) as { metrics: null; unavailableReason: string; netCollectedFen: null };
@@ -105,14 +116,21 @@ test("summary keeps net null, rejects channel attribution, and aggregates fen by
   assert.equal(blocked.netCollectedFen, null);
   const all = await service.summary({ from: "2026-11-01", to: "2026-11-10", channel: "all" }) as {
     metrics: { pending: number; paid: number; failed: number; paidOrderCount: number; grossPaidAmountFen: number; currency: string };
-    refundsUnavailable: true; interval: { boundaryTimezone: string; displayTimezone: string; dateBasis: string };
+    refundsUnavailable: true; netCollectedFen: null; interval: { boundaryTimezone: string; displayTimezone: string; dateBasis: string };
   };
   assert.equal(all.refundsUnavailable, true);
+  assert.equal(all.netCollectedFen, null);
   assert.equal(all.interval.boundaryTimezone, "UTC");
   assert.equal(all.interval.displayTimezone, "Asia/Shanghai");
   assert.equal(all.interval.dateBasis, "order_created_at");
   assert.deepEqual(all.metrics, { pending: 1, paid: 2, failed: 1, paidOrderCount: 2, grossPaidAmountFen: 1980, currency: "CNY",
     grossPaidByCurrency: [{ currency: "CNY", amountFen: 1980, paidOrderCount: 2 }] });
+  refundRows = [{ amountMinor: 180n, currency: "CNY" }];
+  const withNet = await service.summary({ from: "2026-11-01", to: "2026-11-10", channel: "all" }) as {
+    netCollectedFen: number; refundsUnavailable: false;
+  };
+  assert.equal(withNet.refundsUnavailable, false);
+  assert.equal(withNet.netCollectedFen, 1800);
   assert.deepEqual(orderWhere(parseOrderQuery({ from: "2026-11-01", to: "2026-11-01" })), {
     AND: [{ createdAt: { gte: new Date("2026-11-01T00:00:00.000Z"), lt: new Date("2026-11-02T00:00:00.000Z") } }],
   });

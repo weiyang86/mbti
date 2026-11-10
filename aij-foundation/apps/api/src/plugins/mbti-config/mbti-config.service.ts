@@ -68,7 +68,7 @@ export class MbtiConfigService {
       return this.view(c, await this.state(tx, c), "draft");
     });
   }
-  /** No public route calls this until separate human approval and wiring review. Always fresh, no draft/cache. */
+  /** Anonymous published projection. Only reachable when MBTI_PUBLIC_APPROVED; always fresh, no draft/cache. */
   publicCandidate(channel: MbtiChannel) {
     return this.access.database(() => this.prisma.$transaction(async tx => {
       if (this.runtime.getOrThrow<string>("projectId") !== "mbti-foundation") throw new ForbiddenException("MBTI project required");

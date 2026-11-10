@@ -2,7 +2,8 @@ import { BadRequestException } from "@nestjs/common";
 import { MbtiSnapshot, validateCategory } from "./mbti-config.schema";
 
 // Candidate only. No environment variable, installation flag or client parameter can approve it.
-export const MBTI_PUBLIC_APPROVED = false;
+// Remy queue 2026-11-10: flip for H5 published projection; never gate via env.
+export const MBTI_PUBLIC_APPROVED = true;
 export const MBTI_PUBLIC_CATEGORIES = ["content", "channels", "catalog", "assessment", "personas", "imageRecipes", "retention", "discovery"] as const;
 export const MBTI_CHANNELS = ["wechat", "mp", "douyin", "xhs"] as const;
 export type MbtiChannel = typeof MBTI_CHANNELS[number];

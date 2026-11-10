@@ -7,15 +7,17 @@ const grants = Object.freeze({
   systemWrite: "mbti:ops:system:write",
   release: "mbti:ops:release:write",
   fulfillment: "mbti:ops:fulfillment:write",
+  generationRetry: "mbti:ops:generation:retry",
+  moderationRead: "mbti:ops:moderation:read",
   moderation: "mbti:ops:moderation:write",
   export: "mbti:ops:export",
   redemption: "mbti:ops:redemption:write"
 });
 const roles = Object.freeze({
   owner: Object.values(grants),
-  editor: [grants.access, grants.orders, grants.systemRead, grants.draft, grants.moderation, grants.export],
-  support: [grants.access, grants.orders, grants.systemRead, grants.fulfillment, grants.moderation, grants.export],
-  reader: [grants.access, grants.orders, grants.systemRead]
+  editor: [grants.access, grants.orders, grants.systemRead, grants.draft, grants.moderationRead, grants.moderation, grants.export],
+  support: [grants.access, grants.orders, grants.systemRead, grants.fulfillment, grants.generationRetry, grants.moderationRead, grants.moderation, grants.export],
+  reader: [grants.access, grants.orders, grants.systemRead, grants.moderationRead]
 });
 function capabilities(permissions) {
   return Object.fromEntries(Object.entries(grants).map(([key, code]) => [key, permissions.includes(code)]));

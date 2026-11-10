@@ -1872,6 +1872,7 @@ model MbtiOrder {
   owner              MbtiGuest @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   paymentOrder       PaymentOrder? @relation(fields: [paymentOrderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   entitlement        MbtiEntitlement?
+  generationJobs     MbtiGenerationJob[]
   @@unique([ownerId, idempotencyKeyHash])
   @@index([ownerId, createdAt(sort: Desc), id(sort: Desc)])
 }
@@ -1898,6 +1899,50 @@ model MbtiRedeemCode {
   disabledAt       DateTime?
   @@index([status, createdAt(sort: Desc), id(sort: Desc)])
   @@index([productCode, status])
+}
+
+// Generation job queue candidate. unlocked entitlement is never treated as succeeded delivery.
+model MbtiGenerationJob {
+  id             String   @id
+  orderId        String
+  recipe         String   @default("balanced")
+  status         String   @default("queued")
+  attempt        Int      @default(0)
+  lastErrorClass String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  order          MbtiOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@index([status, updatedAt(sort: Desc), id(sort: Desc)])
+  @@index([orderId, createdAt(sort: Desc)])
+}
+
+// Anonymous moderation case candidate. Never stores contact, location, or private answers.
+model MbtiModerationCase {
+  id            String    @id
+  kind          String
+  subjectType   String
+  subjectRef    String
+  reasonCode    String
+  status        String    @default("open")
+  decision      String?
+  note          String?
+  createdAt     DateTime  @default(now())
+  closedAt      DateTime?
+  closedByUserId String?
+  @@index([status, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([kind, status])
+}
+
+// Growth/channel event candidate. Empty table => metrics unavailable; never invent rates.
+model MbtiGrowthEvent {
+  id        String   @id @default(uuid())
+  channel   String
+  eventType String
+  dayKey    String
+  actorHash String
+  createdAt DateTime @default(now())
+  @@index([channel, dayKey, eventType])
+  @@index([dayKey, eventType])
 }
 
 // F4 internal runtime candidate. Public card IDs never reuse the private guest ID.

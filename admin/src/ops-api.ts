@@ -1,7 +1,7 @@
 import { orderQuery, projectOrderPage, projectOrderSummary, type OrderFilters } from './ops-orders-collection'
 import { normalizeOrderId, orderPath, projectOrder } from './ops-order'
 
-export type Capability = 'access' | 'orders' | 'draft' | 'systemRead' | 'systemWrite' | 'release' | 'fulfillment' | 'moderation' | 'export' | 'redemption'
+export type Capability = 'access' | 'orders' | 'draft' | 'systemRead' | 'systemWrite' | 'release' | 'fulfillment' | 'generationRetry' | 'moderationRead' | 'moderation' | 'export' | 'redemption'
 export interface OpsSession {
   user: { id: string; username: string; realName: string; isSuperAdmin: boolean }
   platformSuperAdmin: boolean
@@ -176,4 +176,140 @@ export async function disableRedeemCode(id: string) {
   if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(id)) throw new OpsApiError(422, '兑换码编号无效。')
   const value = await request<unknown>(`/admin/mbti/redeem-codes/${encodeURIComponent(id)}/disable`, { method: 'POST', body: '{}' }, true, true)
   try { return projectRedeemRow(value) } catch { throw new OpsApiError(502, '兑换码停用响应格式不正确。') }
+}
+
+export interface GenerationJobRow {
+  id: string
+  order_id: string
+  recipe: string
+  job_status: string
+  attempt: number
+  last_error_class: string | null
+  created_at: string
+  updated_at: string
+}
+
+function projectGenerationJob(value: unknown): GenerationJobRow {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid')
+  const row = value as Record<string, unknown>
+  if (typeof row.id !== 'string' || typeof row.order_id !== 'string' || typeof row.recipe !== 'string' ||
+    typeof row.job_status !== 'string' || typeof row.attempt !== 'number' || typeof row.created_at !== 'string' ||
+    typeof row.updated_at !== 'string' || row.unlocked_is_not_delivery !== true) throw new Error('invalid')
+  return {
+    id: row.id, order_id: row.order_id, recipe: row.recipe, job_status: row.job_status, attempt: row.attempt,
+    last_error_class: typeof row.last_error_class === 'string' ? row.last_error_class : null,
+    created_at: row.created_at, updated_at: row.updated_at,
+  }
+}
+
+export async function listGenerationJobs(filters: { status?: string; order_id?: string; limit?: string } = {}) {
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(filters)) if (value) query.set(key, value)
+  const suffix = query.toString() ? `?${query}` : ''
+  const value = await request<unknown>(`/admin/mbti/generation-jobs${suffix}`, {}, true, true)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new OpsApiError(502, '生成任务响应格式不正确。')
+  const body = value as { items?: unknown[] }
+  if (!Array.isArray(body.items)) throw new OpsApiError(502, '生成任务响应格式不正确。')
+  try { return body.items.map(projectGenerationJob) } catch { throw new OpsApiError(502, '生成任务响应格式不正确。') }
+}
+
+export async function retryGenerationJob(id: string, body: { idempotency_key: string }) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(id)) throw new OpsApiError(422, '任务编号无效。')
+  const value = await request<unknown>(`/admin/mbti/generation-jobs/${encodeURIComponent(id)}/retry`, { method: 'POST', body: JSON.stringify(body) }, true, true)
+  try { return projectGenerationJob(value) } catch { throw new OpsApiError(502, '生成任务重试响应格式不正确。') }
+}
+
+export interface ModerationCaseRow {
+  id: string
+  kind: string
+  subject_type: string
+  subject_ref: string
+  reason_code: string
+  case_status: string
+  decision: string | null
+  note: string | null
+  created_at: string
+  closed_at?: string
+}
+
+function projectModerationCase(value: unknown): ModerationCaseRow {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid')
+  const row = value as Record<string, unknown>
+  if (typeof row.id !== 'string' || typeof row.kind !== 'string' || typeof row.subject_type !== 'string' ||
+    typeof row.subject_ref !== 'string' || typeof row.reason_code !== 'string' || typeof row.case_status !== 'string' ||
+    typeof row.created_at !== 'string') throw new Error('invalid')
+  return {
+    id: row.id, kind: row.kind, subject_type: row.subject_type, subject_ref: row.subject_ref, reason_code: row.reason_code,
+    case_status: row.case_status, decision: typeof row.decision === 'string' ? row.decision : null,
+    note: typeof row.note === 'string' ? row.note : null, created_at: row.created_at,
+    ...(typeof row.closed_at === 'string' ? { closed_at: row.closed_at } : {}),
+  }
+}
+
+export async function listModerationCases(filters: { case_status?: string; kind?: string; limit?: string } = {}) {
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(filters)) if (value) query.set(key, value)
+  const suffix = query.toString() ? `?${query}` : ''
+  const value = await request<unknown>(`/admin/mbti/moderation/cases${suffix}`, {}, true, true)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new OpsApiError(502, '匿名工单响应格式不正确。')
+  const body = value as { items?: unknown[] }
+  if (!Array.isArray(body.items)) throw new OpsApiError(502, '匿名工单响应格式不正确。')
+  try { return body.items.map(projectModerationCase) } catch { throw new OpsApiError(502, '匿名工单响应格式不正确。') }
+}
+
+export async function disposeModerationCase(id: string, body: { decision: string; note?: string }) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(id)) throw new OpsApiError(422, '工单编号无效。')
+  const value = await request<unknown>(`/admin/mbti/moderation/cases/${encodeURIComponent(id)}/dispose`, { method: 'POST', body: JSON.stringify(body) }, true, true)
+  try { return projectModerationCase(value) } catch { throw new OpsApiError(502, '工单处置响应格式不正确。') }
+}
+
+export interface GrowthSummary {
+  interval: { from: string; to: string }
+  channel: string
+  metrics: { by_channel_event: { channel: string; event_type: string; count: number }[] } | null
+  unavailableReason: string | null
+}
+
+export async function readGrowthSummary(from: string, to: string, channel: string) {
+  const query = new URLSearchParams({ from, to, channel })
+  const value = await request<unknown>(`/admin/mbti/growth/summary?${query}`, {}, true, true)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new OpsApiError(502, '渠道汇总响应格式不正确。')
+  const row = value as Record<string, unknown>
+  const interval = row.interval as { from?: string; to?: string } | undefined
+  if (!interval || interval.from !== from || interval.to !== to || typeof row.channel !== 'string') throw new OpsApiError(502, '渠道汇总响应格式不正确。')
+  if (row.metrics === null) {
+    if (row.unavailableReason !== 'growth_events_unavailable') throw new OpsApiError(502, '渠道汇总响应格式不正确。')
+    return { interval: { from, to }, channel: row.channel, metrics: null, unavailableReason: 'growth_events_unavailable' }
+  }
+  const metrics = row.metrics as { by_channel_event?: unknown }
+  if (!metrics || !Array.isArray(metrics.by_channel_event)) throw new OpsApiError(502, '渠道汇总响应格式不正确。')
+  const by = metrics.by_channel_event.map(item => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) throw new Error('invalid')
+    const event = item as Record<string, unknown>
+    if (typeof event.channel !== 'string' || typeof event.event_type !== 'string' || typeof event.count !== 'number') throw new Error('invalid')
+    return { channel: event.channel, event_type: event.event_type, count: event.count }
+  })
+  return { interval: { from, to }, channel: row.channel, metrics: { by_channel_event: by }, unavailableReason: null }
+}
+
+export interface RetentionCohort {
+  as_of: string
+  eligible_first_tests: number
+  same_bank_retakes: number
+  retake_rate: number | null
+  channel_attribution_unavailable: true
+}
+
+export async function readRetentionCohorts(asOf?: string) {
+  const suffix = asOf ? `?as_of=${encodeURIComponent(asOf)}` : ''
+  const value = await request<unknown>(`/admin/mbti/retention/cohorts${suffix}`, {}, true, true)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new OpsApiError(502, '成熟队列响应格式不正确。')
+  const row = value as Record<string, unknown>
+  if (typeof row.as_of !== 'string' || typeof row.eligible_first_tests !== 'number' || typeof row.same_bank_retakes !== 'number' ||
+    row.channel_attribution_unavailable !== true ||
+    !(row.retake_rate === null || typeof row.retake_rate === 'number')) throw new OpsApiError(502, '成熟队列响应格式不正确。')
+  return {
+    as_of: row.as_of, eligible_first_tests: row.eligible_first_tests, same_bank_retakes: row.same_bank_retakes,
+    retake_rate: row.retake_rate, channel_attribution_unavailable: true as const,
+  }
 }

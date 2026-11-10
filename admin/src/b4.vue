@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { OpsApiError, readRetentionCohorts, type RetentionCohort } from './ops-api'
 import { cohortSemantics, initialLifecycle, initialSocial, lifecycleInput, radarProjection, socialInput, type B4Page } from './b4-model'
 import { generationBlock, localFile, recipeLabel, runOfflineSample, sanitizedRecord, type CallRecord, type ImageMode, type Recipe } from './b4-image'
 import { C2_DEPENDENCY, CONFIG_CONTRACT_VERSION } from './config-contract-v1'
@@ -20,6 +21,19 @@ const lifecycle = ref(initialLifecycle()), tagsText = ref(lifecycle.value.tags.j
 const social = ref(initialSocial()), socialBuffer = reactive(initialSocial())
 const scenario = ref('unavailable')
 const radar = computed(() => radarProjection(social.value.radar, social.value.minimum, scenario.value === 'unavailable' ? null : scenario.value === 'below' ? social.value.minimum - 1 : Math.ceil(social.value.minimum / 10) * 10 + 3))
+const cohort = ref<RetentionCohort | null>(null)
+const cohortError = ref('')
+async function loadCohort() {
+  if (props.page !== 'retention') return
+  cohortError.value = ''
+  try { cohort.value = await readRetentionCohorts() }
+  catch (err) {
+    cohort.value = null
+    cohortError.value = err instanceof OpsApiError ? err.message : '成熟队列读取失败'
+  }
+}
+onMounted(() => { void loadCohort() })
+watch(() => props.page, () => { void loadCohort() })
 function invalidate() { revision++; result.value = ''; busy.value = false; error.value = '' }
 function clearSlot(role: 'portrait' | 'style') {
   slotRevision[role]++; selecting[role] = false; invalidate()
@@ -102,9 +116,15 @@ onUnmounted(() => { active = false; clearImages(); records.value = [] })
       <section v-else class="panel config-card"><h2>调用记录 · 当前页面内存</h2><p>仅记录后台离线试片，最多 20 条；刷新/离开清空，不含文件名、原图、成图、Base64、提示词或凭据。不是服务端审计记录。</p><p v-if="!records.length" class="config-unavailable">尚无本机试跑记录。真实模型记录来源未接通。</p><ol v-else class="b4-records"><li v-for="(r, i) in records" :key="i"><b>{{ r.status === 'success' ? '离线成功' : '离线失败' }}</b><span>{{ r.at }} · {{ r.durationMs }}ms · {{ recipeLabel[r.recipe] }}</span><small>后台本机 / offline / {{ r.errorCategory }}</small></li></ol></section>
     </template>
     <template v-else-if="page === 'retention'">
-      <div class="metric-grid"><article v-for="label in ['观察满 45 天的首测人数','第 28–45 天同版复测人数','阶段复测率','复测后 7 天对比打开率']" :key="label" class="panel metric-card"><span>{{ label }}</span><b>—</b><small>UI_CONTRACT · 无队列事实来源</small></article></div>
-      <div class="config-grid"><form class="panel config-card b4-form" aria-label="阶段计划编辑" @submit.prevent="applyLifecycle"><p class="eyebrow">LIFECYCLE / MEMORY ONLY</p><h2>阶段与复测计划</h2><fieldset :disabled="!canEdit"><label>阶段标签（每行一个）<textarea v-model="tagsText" aria-label="阶段标签" maxlength="140" rows="5" @input="emit('dirty', true)"></textarea><small>1–10 个，不重复，每个最多 12 字。</small></label><label>快捷回访天数<input v-model="daysText" aria-label="快捷回访天数" maxlength="22" @input="emit('dirty', true)"><small>1–3 个不同整数，范围 1–365，逗号分隔。</small></label><button class="primary">应用阶段计划到内存预览</button></fieldset><p>用户仍可自选日期；旧阶段快照不会随标签更名而改写。预览不发微信、短信或系统消息，不生成日历文件。</p></form><article class="panel config-card"><p class="eyebrow">OBSERVATION / NO FABRICATED METRICS</p><h2>成熟队列与观察窗口</h2><p v-for="item in cohortSemantics" :key="item">{{ item }}</p><p class="config-notice">队列、同版复测及对比事件服务 UI_CONTRACT。当前没有查询、导出或提醒发送动作。</p></article></div>
-      <section class="panel config-card b4-cohorts"><h2>分渠道成熟队列</h2><p>首测渠道与成熟日期周期归属待服务端确认；不从历史订单、用户数或 H5 私有作答推算。</p><div class="config-table-scroll"><table><thead><tr><th>渠道</th><th>满窗首测</th><th>同版复测</th><th>复测率 / 对比打开率</th></tr></thead><tbody><tr v-for="channel in ['微信小程序','小红书小程序','抖音小程序','公众号 H5']" :key="channel"><th scope="row">{{ channel }}</th><td>—</td><td>—</td><td>— / —</td></tr></tbody></table></div></section>
+      <p v-if="cohortError" class="error-text" role="alert">{{ cohortError }} <button class="text-button" @click="loadCohort">重试</button></p>
+      <div class="metric-grid">
+        <article class="panel metric-card"><span>观察满 45 天的首测人数</span><b>{{ cohort ? cohort.eligible_first_tests : '—' }}</b><small>{{ cohort ? `as_of ${cohort.as_of}` : '读取中或不可得' }}</small></article>
+        <article class="panel metric-card"><span>第 28–45 天同版复测人数</span><b>{{ cohort ? cohort.same_bank_retakes : '—' }}</b><small>同 bankVersion · 排除同日重测</small></article>
+        <article class="panel metric-card"><span>阶段复测率</span><b>{{ cohort && cohort.retake_rate !== null ? cohort.retake_rate : '—' }}</b><small>{{ cohort && cohort.eligible_first_tests === 0 ? '分母为 0 · 率不可得' : 'eligible → same_bank_retakes' }}</small></article>
+        <article class="panel metric-card"><span>复测后 7 天对比打开率</span><b>—</b><small>对比打开事件仍不可得</small></article>
+      </div>
+      <div class="config-grid"><form class="panel config-card b4-form" aria-label="阶段计划编辑" @submit.prevent="applyLifecycle"><p class="eyebrow">LIFECYCLE / MEMORY ONLY</p><h2>阶段与复测计划</h2><fieldset :disabled="!canEdit"><label>阶段标签（每行一个）<textarea v-model="tagsText" aria-label="阶段标签" maxlength="140" rows="5" @input="emit('dirty', true)"></textarea><small>1–10 个，不重复，每个最多 12 字。</small></label><label>快捷回访天数<input v-model="daysText" aria-label="快捷回访天数" maxlength="22" @input="emit('dirty', true)"><small>1–3 个不同整数，范围 1–365，逗号分隔。</small></label><button class="primary">应用阶段计划到内存预览</button></fieldset><p>用户仍可自选日期；旧阶段快照不会随标签更名而改写。预览不发微信、短信或系统消息，不生成日历文件。</p></form><article class="panel config-card"><p class="eyebrow">OBSERVATION / NO FABRICATED METRICS</p><h2>成熟队列与观察窗口</h2><p v-for="item in cohortSemantics" :key="item">{{ item }}</p><p class="config-notice">全站成熟队列来自 MbtiResult 首测；渠道时间归属仍不可得（channel_attribution_unavailable）。</p></article></div>
+      <section class="panel config-card b4-cohorts"><h2>分渠道成熟队列</h2><p>首测渠道时间归属不可得；不从支付 provider、订单或 guest 数推算分渠道率。</p><div class="config-table-scroll"><table><thead><tr><th>渠道</th><th>满窗首测</th><th>同版复测</th><th>复测率 / 对比打开率</th></tr></thead><tbody><tr v-for="channel in ['微信小程序','小红书小程序','抖音小程序','公众号 H5']" :key="channel"><th scope="row">{{ channel }}</th><td>—</td><td>—</td><td>— / —</td></tr></tbody></table></div></section>
     </template>
     <template v-else>
       <form class="panel config-card b4-form" aria-label="交换与雷达编辑" @submit.prevent="applySocial"><div class="config-grid"><fieldset :disabled="!canEdit"><p class="eyebrow">CARD EXCHANGE</p><h2>交换名片规则</h2><label>推荐顺序<select v-model="socialBuffer.order" aria-label="推荐顺序" @change="emit('dirty', true)"><option value="same">相同 MBTI 优先</option><option value="recommend">共同兴趣优先</option></select></label><label>每人每日申请上限<input v-model.number="socialBuffer.daily" type="number" min="1" max="30" step="1" aria-label="每人每日申请上限" @input="emit('dirty', true)"></label><p>双方同意换卡后，微信 / QQ / 电话仍须分别授权。后台不能代替任何人同意；申请上限最终由服务端执行。</p></fieldset><fieldset :disabled="!canEdit"><p class="eyebrow">ANONYMOUS RADAR</p><h2>同型雷达</h2><label class="b4-consent"><input v-model="socialBuffer.radar" type="checkbox" aria-label="开放同型雷达" @change="emit('dirty', true)">开放雷达（仅预览）</label><label>默认半径<select v-model.number="socialBuffer.radius" aria-label="默认半径" @change="emit('dirty', true)"><option :value="500">500 米</option><option :value="1000">1 公里</option><option :value="3000">3 公里</option></select></label><label>匿名最低人数阈值<input v-model.number="socialBuffer.minimum" type="number" min="10" max="200" step="1" aria-label="匿名最低人数阈值" @input="emit('dirty', true)"></label><p>低于阈值只显示“人数较少”，返回 count: null；满足条件后仅按十人分桶。不读取 GPS，不画人员标记。</p></fieldset></div><button class="primary" :disabled="!canEdit">应用交换与雷达到内存预览</button><p class="config-notice">配置字段、推荐服务、每日限额、全局关停、匿名聚合与权限 UI_CONTRACT。当前 H5 服务只返回 unavailable / count: null；参与选择不等于位置授权。</p></form>
