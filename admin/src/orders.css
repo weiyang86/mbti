@@ -1,0 +1,50 @@
+.order-tabs{display:flex;gap:22px;overflow-x:auto;margin-bottom:19px;border-bottom:1px solid var(--stroke)}
+.order-tabs button{flex:none;min-height:42px;padding:6px 2px 12px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-size:13px}
+.order-tabs button.selected{border-bottom-color:var(--vio);color:var(--deep);font-weight:650}
+.order-scope{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+.order-scope p{margin:0;color:var(--muted);font-size:11px;line-height:1.7}
+.order-badge{display:inline-flex;align-items:center;flex:none;gap:5px;padding:5px 9px;border-radius:99px;background:var(--pale);color:var(--deep);font-size:10px;line-height:1.5}
+.order-badge.paid{background:#e6f5ee;color:var(--green)}
+.order-badge.failed{background:#faeae9;color:var(--red)}
+.order-search,.order-result,.order-list-contract{margin-bottom:16px;padding:19px 20px}
+.order-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.orders-page h2{margin:0;color:var(--ink);font-size:16px;font-weight:650;letter-spacing:-.3px}
+.order-read-label{color:var(--green);font-size:10px}
+.order-search .lookup-form{align-items:flex-end;margin-bottom:8px}
+.order-search .lookup-form label{display:grid;gap:7px;width:min(100%,520px);color:var(--muted);font-size:11px}
+.order-search .lookup-form input{width:100%;font-family:'DM Mono','Noto Sans SC',monospace;font-size:12px}
+.order-search .muted{margin:0;font-size:10px}
+.order-record{margin-top:20px}
+.order-record-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 18px;border-bottom:1px solid var(--stroke)}
+.order-mono{font-family:'DM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.order-record h3{margin:0;font-size:clamp(12px,1.5vw,17px);font-weight:500;line-height:1.7;letter-spacing:-.3px}
+.order-facts{display:grid;grid-template-columns:1.15fr .9fr 1fr;gap:18px;padding:21px 0;border-bottom:1px solid var(--stroke)}
+.order-facts>div{min-width:0}
+.order-facts span{display:block;color:var(--muted);font-size:11px}
+.order-facts strong,.order-facts b{display:block;margin:8px 0;color:var(--ink);font-weight:600;font-size:16px;line-height:1.5}
+.order-facts strong{color:var(--deep);font-size:26px;font-variant-numeric:tabular-nums;line-height:1.2}
+.order-facts small{font-size:12px;font-weight:500}
+.order-facts p{margin:0;color:var(--soft);font-size:10px;line-height:1.7}
+.order-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 30px;margin:0 0 19px}
+.order-fields>div{min-width:0;padding:15px 0;border-bottom:1px solid #efedf3}
+.order-fields dt{color:var(--muted);font-size:10px}
+.order-fields dd{margin:7px 0 0;font-size:11px;line-height:1.7;overflow-wrap:anywhere}
+.order-dependency{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:13px;border-radius:8px;background:#f7f6fa}
+.order-dependency b{font-size:11px;font-weight:600}
+.order-dependency p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.7}
+.order-state{display:grid;justify-items:center;align-content:center;gap:10px;min-height:233px;padding:25px 10px;text-align:center}
+.order-state-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#f1eff9;color:#7667b6;font-size:20px}
+.order-state h3{margin:3px 0 0;font-size:13px;font-weight:600;color:var(--ink)}
+.order-state p{max-width:560px;margin:0;color:var(--muted);font-size:11px;line-height:1.8}
+.order-state-error .order-state-icon{background:#fff1ee;color:var(--red)}
+.order-disabled-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.order-disabled-actions select{min-height:34px;padding:7px 10px;border:1px solid #dedde8;border-radius:8px;background:#fff;color:var(--muted);font-size:11px;cursor:not-allowed}
+.order-list-contract .order-disabled-actions{margin:12px 0 19px}
+.order-list-contract .muted{margin:7px 0 0;font-size:10px}
+.order-list-contract .pager{margin:0 -20px -19px}
+.order-contract-panel{min-height:300px;padding:26px 22px}
+.order-contract-panel>p:not(.eyebrow){max-width:670px;margin:13px 0;color:var(--muted);font-size:12px;line-height:1.9}
+.order-contract-panel .order-disabled-actions{margin:24px 0}
+.order-contract-panel .order-contract-note{padding-top:15px;border-top:1px solid var(--stroke);font-family:'DM Mono',monospace;font-size:10px}
+.orders-page .security-note{font-size:10px}
+@media(max-width:560px){.order-tabs{gap:20px}.order-scope{align-items:flex-start}.order-search,.order-result,.order-list-contract{padding:17px 15px}.order-search .lookup-form{display:grid;grid-template-columns:1fr auto;align-items:stretch}.order-search .lookup-form label{grid-column:1/-1;width:100%}.order-search .lookup-form input{min-height:40px}.order-facts{grid-template-columns:1fr 1fr;gap:20px 12px}.order-amount{grid-column:1/-1}.order-fields{grid-template-columns:1fr}.order-list-contract .pager{margin:0 -15px -17px}.order-record-heading{gap:12px}.order-record-heading>div{width:100%}.order-contract-panel{padding:23px 17px}}

@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import vm from 'node:vm'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { buildSync } from 'esbuild'
 
 const api = 'http://test.invalid/api/v1'
@@ -16,6 +18,7 @@ const compile = (entry) => buildSync({
 const clientCode = compile('../src/api/client.ts')
 const draftCode = compile('../src/store/quiz-draft.ts')
 const apiCode = compile('../src/api/index.ts')
+const publishedConfigCode = compile('../src/api/published-config.ts')
 const socialDisplayCode = compile('../src/utils/social-display.ts')
 const contactDisplayCode = compile('../src/utils/contact-display.ts')
 const privateScopeCode = compile('../src/utils/private-page.ts')
@@ -624,4 +627,38 @@ test('corrupted cached questions are refused without throwing during recovery', 
   const b = browser()
   const draft = { sessionId: 's', questionBankVersion: 'v', questionBank: { question_bank_version: 'v', questions: Array(12).fill(null) }, answers: {}, index: 0 }
   assert.equal(b.drafts.isRestorableDraft(draft), false)
+})
+
+
+test('C2 anonymous candidate adapter maps only four exact prototype names; disabled route falls back without guest/storage/private headers', async () => {
+  const storage = new Map([[guestKey, { guest_token: 'private-existing-identity', expires_at: future }]])
+  const b = browser(storage, () => ({ statusCode: 404, data: { message: 'Public configuration pending approval' } }))
+  const c = b.load(publishedConfigCode)
+  for (const name of ['微信小程序', '公众号 H5', '抖音小程序', '小红书小程序']) assert.equal(await c.readPublishedPreview(name), null)
+  assert.deepEqual(b.calls.map(call => call.url), ['wechat', 'mp', 'douyin', 'xhs'].map(channel => `${api}/config/published?channel=${channel}`))
+  for (const call of b.calls) { assert.equal(call.method, 'GET'); assert.equal(call.header['X-Guest-Token'], undefined); assert.equal(call.header.Authorization, undefined); assert.equal(call.data, undefined) }
+  const count = b.calls.length
+  for (const name of ['mp', 'h5', '公众号', 'arbitrary', '__proto__', '?draft=true', { channel: 'mp' }, undefined]) assert.equal(await c.readPublishedPreview(name), null)
+  assert.equal(b.calls.length, count); assert.equal(storage.size, 1); assert.equal(storage.get(guestKey).guest_token, 'private-existing-identity')
+})
+function publicCandidate(channel = 'mp', version = 1) {
+  return { schema: 'mbti-config-candidate/v1', status: 'needs_human_review', view: 'published', projectId: 'fixture-project', channel, publishedVersion: version, cacheIdentity: JSON.stringify(['fixture-project', channel, version]),
+    categories: { content: { headline: '已发布', accent: '当前', sub: '说明', cta: '开始' }, channels: { [channel]: { name: '入口', badge: '仅本渠道', landing: 'home' } }, catalog: { shop: [{ id: 'candidate-only', title: '展示商品', desc: '展示描述', on: true, cents: 999999 }], styles: [] }, assessment: null, personas: null, imageRecipes: null, retention: null, discovery: null } }
+}
+test('C2 read-only published preview rejects draft/system/wrong-channel payloads and never changes checkout prices or quiz snapshots', () => {
+  const c = browser().load(publishedConfigCode), candidate = publicCandidate(), preview = c.publishedPreview(candidate, 'mp')
+  assert.equal(preview.content.headline, '已发布'); assert.equal(preview.products[0].title, '展示商品'); assert.equal(preview.products[0].cents, undefined); assert.equal(preview.assessment, undefined); assert.equal(preview.personas, undefined)
+  for (const value of [{ ...candidate, view: 'draft' }, publicCandidate('wechat'), { ...candidate, cacheIdentity: 'spoof' }, { ...candidate, publishedVersion: 0 }, { ...candidate, categories: { ...candidate.categories, payments: {} } }, { ...candidate, categories: { ...candidate.categories, channels: { ...candidate.categories.channels, wechat: { badge: 'other' } } } }]) assert.equal(c.publishedPreview(value, 'mp'), null)
+  for (const name of ['quiz.ts', 'payment.ts', 'results.ts']) assert.doesNotMatch(readFileSync(new URL(`../src/api/${name}`, import.meta.url), 'utf8'), /published-config|config\/published/)
+})
+test('C2 has no response cache: new versions/rollback and disabled lifecycle always re-read source, isolated between guest browsers', async () => {
+  let version = 1, enabled = true
+  const respond = () => enabled ? { statusCode: 200, data: publicCandidate('mp', version) } : { statusCode: 404, data: {} }
+  const a = browser(new Map([[guestKey, { guest_token: 'fixture-a', expires_at: future }]]), respond), b = browser(new Map([[guestKey, { guest_token: 'fixture-b', expires_at: future }]]), respond)
+  const ca = a.load(publishedConfigCode), cb = b.load(publishedConfigCode)
+  const first = await ca.readPublishedPreview('公众号 H5'); version = 2
+  const second = await ca.readPublishedPreview('公众号 H5'); assert.notEqual(first.cacheIdentity, second.cacheIdentity); assert.equal((await cb.readPublishedPreview('公众号 H5')).publishedVersion, 2)
+  version = 3; assert.equal((await ca.readPublishedPreview('公众号 H5')).publishedVersion, 3)
+  enabled = false; assert.equal(await ca.readPublishedPreview('公众号 H5'), null); assert.equal(await cb.readPublishedPreview('公众号 H5'), null)
+  assert.equal(a.calls.length, 4); assert.equal(b.calls.length, 2); assert.equal(a.storage.size, 1); assert.equal(b.storage.size, 1)
 })

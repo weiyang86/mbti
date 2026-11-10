@@ -9,14 +9,16 @@ const pluginCodePattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 @Injectable()
 export class PluginRuntimeAccessService {
   private readonly projectCode: string;
+  private readonly environment: string;
 
   constructor(private readonly prisma: PrismaService, runtime: ConfigService) {
+    this.environment = runtime.getOrThrow<string>("environment");
     this.projectCode = runtime.getOrThrow<string>("projectId") + "-" + runtime.getOrThrow<string>("environment");
   }
 
   async projectId(tx: Prisma.TransactionClient): Promise<string> {
     const project = await tx.projectProfile.findFirst({
-      where: { code: this.projectCode, status: "active", deletedAt: null, organization: { status: "active", deletedAt: null } },
+      where: { code: this.projectCode, environment: this.environment, status: "active", deletedAt: null, organization: { status: "active", deletedAt: null } },
       select: { id: true }
     });
     if (!project) throw new ServiceUnavailableException("Plugin runtime unavailable");

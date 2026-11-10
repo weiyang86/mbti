@@ -12,6 +12,8 @@ source_ref: UIhtml/mbti-buddy-product-sop-v0.4.html
 
 ## 产品来源
 
+当前开发联调请使用 [HTML 接口文档](../api-reference/README.md)、[汇总 OpenAPI](../api-reference/openapi.json) 与 [F1–F6 实测交接](../execution/MBTI-WEB-API-FAST-HANDOFF.md)。它们明确标记内部候选及不可用范围，不替代本目录待 Remy 定稿的正式契约。
+
 - 产品：**MBTI搭子 V0.4** — TEST / CREATE / CONNECT  
 - 产品稿：`UIhtml/mbti-buddy-product-sop-v0.4.html`（`source_ref` 同上）
 

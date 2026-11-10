@@ -48,9 +48,10 @@ export function assertRetainedBusinessAbsent(models) {
 // Later verified cards added these generic reverse links. Historical owner
 // suites still bound every external relation rather than accepting any new FK.
 export const ownerExtensions = {
+  ClientAuthSession: [["personalScriptRuns", "AiPersonalScriptRun"]],
   SysUser: [["sessions", "AdminAuthSession"], ["paymentRefundRequests", "PaymentRefundRequest"], ["paymentReconciliationRuns", "PaymentReconciliationRun"], ["paymentReconciliationReviews", "PaymentReconciliationDiscrepancy"]],
   MemberUser: [["personalAiSkills", "AiPersonalSkill"], ["personalAiSkillVersions", "AiPersonalSkillVersion"], ["createdWorkspaces", "ClientWorkspace"], ["workspaceMemberships", "ClientWorkspaceMembership"], ["authoredAiKnowledgeDocuments", "AiKnowledgeDocument"], ["aiKnowledgeQuestions", "AiKnowledgeQuestion"], ["aiAgentRuns", "AiAgentRun"], ["personalAiAgents", "AiPersonalAgent"], ["personalAiAgentVersions", "AiPersonalAgentVersion"], ["personalAiMemories", "AiPersonalMemory"], ["personalWorkflows", "AiPersonalWorkflow"]],
-  ProjectProfile: [["aiExecutionTraces", "AiExecutionTrace"], ["connectorInstallations", "ConnectorInstallation"], ["paymentOrders", "PaymentOrder"], ["paymentCallbackEvents", "PaymentCallbackEvent"], ["paymentRefundRequests", "PaymentRefundRequest"], ["paymentReconciliationRuns", "PaymentReconciliationRun"], ["paymentReconciliationDiscrepancies", "PaymentReconciliationDiscrepancy"]],
+  ProjectProfile: [["aiExecutionTraces", "AiExecutionTrace"], ["connectorInstallations", "ConnectorInstallation"], ["paymentOrders", "PaymentOrder"], ["paymentCallbackEvents", "PaymentCallbackEvent"], ["paymentRefundRequests", "PaymentRefundRequest"], ["paymentReconciliationRuns", "PaymentReconciliationRun"], ["paymentReconciliationDiscrepancies", "PaymentReconciliationDiscrepancy"], ["documentExports", "PersonalDocumentExport"], ["personalScriptVersions", "AiPersonalScriptVersion"]],
   SecretReference: [["connectorInstallations", "ConnectorInstallation"]]
 };
 

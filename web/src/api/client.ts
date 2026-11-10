@@ -127,3 +127,8 @@ export function requestErrorMessage(error: unknown, fallback: string): string {
 export function useMock(): boolean {
   return String(import.meta.env.VITE_USE_MOCK).toLowerCase() === 'true'
 }
+
+/** Anonymous GET only. Does not initialize a guest or attach a guest token. */
+export function publicRequest<T>(path: string): Promise<T> {
+  return send<T>(path, { method: 'GET', header: { 'Cache-Control': 'no-cache' } })
+}

@@ -2,7 +2,7 @@ import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { resolveAllowlistedPluginModules, resolvePluginDependencyOrder, validatePluginCatalog } from "./plugin-manifest";
 import type { PluginManifestV2, PluginRegistration } from "./plugin-manifest";
 
-export type TrustedPluginRegistration = PluginRegistration & Readonly<{ owner: string }>;
+export type TrustedPluginRegistration = PluginRegistration & Readonly<{ owner: string; projectIds?: readonly string[] }>;
 export type PluginDescriptor = Readonly<{ code: string; name: string; version: string; owner: string }>;
 
 /** Immutable view of modules explicitly imported by the host. The production host currently supplies an empty map. */
@@ -18,8 +18,9 @@ export class PluginCatalog {
           typeof registration.owner !== "string" || !/^@[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*$/.test(registration.owner)) {
         throw new BadRequestException("Plugin registration is not trusted");
       }
+      if (registration.projectIds && (!registration.projectIds.length || new Set(registration.projectIds).size !== registration.projectIds.length || registration.projectIds.some(id => !/^[a-z][a-z0-9-]{0,47}$/.test(id)))) throw new BadRequestException("Invalid trusted plugin project restriction");
       manifests.push(registration.manifest);
-      normalized.set(code, Object.freeze({ ...registration }));
+      normalized.set(code, Object.freeze({ ...registration, ...(registration.projectIds ? { projectIds: Object.freeze([...registration.projectIds]) } : {}) }));
     }
     validatePluginCatalog(manifests);
     resolveAllowlistedPluginModules([...normalized.keys()], normalized);

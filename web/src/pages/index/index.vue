@@ -5,13 +5,21 @@
         <view class="badge"><text>16</text><text class="plus">+</text></view>
         <text class="brand-name">MBTI搭子</text>
       </view>
-      <text class="chip" @click="showChannels">微信预览 ⌄</text>
+      <view class="brand-actions">
+        <text v-if="config?.entry" class="chip" @click="goChannelEntry">{{ config.entry.name }}入口</text>
+        <text class="chip" @click="showChannels">微信预览 ⌄</text>
+      </view>
     </view>
 
     <text class="kicker">MBTI TEST × PERSONALITY CARD</text>
-    <text class="h1">你的 MBTI，</text>
-    <text class="h1"><text class="hl">值得一张主角卡。</text></text>
-    <text class="sub">测出你的类型，晒出专属形象，遇见同频搭子。</text>
+    <template v-if="heroTitle">
+      <text class="h1 hero-dynamic">{{ heroTitle }}</text>
+    </template>
+    <template v-else>
+      <text class="h1">你的 MBTI，</text>
+      <text class="h1"><text class="hl">值得一张主角卡。</text></text>
+    </template>
+    <text class="sub">{{ heroSub }}</text>
 
     <view class="cover">
       <image class="cover-img" src="/static/cover-illustration.webp" mode="aspectFill" />
@@ -29,7 +37,7 @@
     </view>
 
     <view class="entry">
-      <view class="btn-primary" @click="startQuiz">免费测测我的 MBTI</view>
+      <view class="btn-primary" @click="startQuiz">{{ ctaText }}</view>
       <text class="quick" @click="goSelfSelect">已经知道类型？直接做专属名片 →</text>
       <text class="fine">12 题趣味版 · 非官方量表 · 基础结果免费</text>
     </view>
@@ -103,11 +111,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onHide, onLoad, onShow } from '@dcloudio/uni-app'
 import type { ResultSnapshotSummary } from '@/api/types'
 import { listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
 import { DEFAULT_COMPARE_TYPE } from '@/constants/compat'
+import { landingRoutes, readPublishedPreview, publicChannel, type PublishedPreview } from '@/api/published-config'
 
 function profileName(): string {
   try {
@@ -121,10 +130,40 @@ function profileName(): string {
   return '小禾'
 }
 
+const config = ref<PublishedPreview | null>(null)
+let channelName = '公众号 H5'
+let configRead = 0
+
+onLoad((q) => {
+  if (q?.channel !== undefined) channelName = publicChannel(q.channel) ? String(q.channel) : ''
+})
+onHide(() => {
+  configRead++
+  config.value = null
+})
+
+function goChannelEntry() {
+  const route = config.value?.entry && landingRoutes[config.value.entry.landing]
+  if (route) uni.navigateTo({ url: `${route}?channel=${encodeURIComponent(channelName)}` })
+}
+
+async function loadConfiguration() {
+  const token = ++configRead
+  config.value = null
+  const value = await readPublishedPreview(channelName)
+  if (token === configRead) config.value = value
+}
+
+const heroTitle = computed(() =>
+  config.value?.content ? config.value.content.headline + config.value.content.accent : '',
+)
+const heroSub = computed(() => config.value?.content?.sub || '测出你的类型，晒出专属形象，遇见同频搭子。')
+const ctaText = computed(() => config.value?.content?.cta || '免费测测我的 MBTI')
 const latest = ref<ResultSnapshotSummary | null>(null)
 const resultCount = ref(0)
 
 onShow(async () => {
+  void loadConfiguration()
   try {
     const res = await listResults({ limit: 50 })
     resultCount.value = res.items.length
@@ -164,7 +203,7 @@ function goSelfSelect() {
 }
 
 function goPricing() {
-  uni.navigateTo({ url: '/pages/pricing/pricing' })
+  uni.navigateTo({ url: `/pages/pricing/pricing?channel=${encodeURIComponent(channelName)}` })
 }
 
 function goHistory() {
@@ -236,6 +275,11 @@ function showChannels() {
   margin-left: 12rpx;
   font-size: 30rpx;
   font-weight: 700;
+}
+.brand-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
 .chip {
   font-size: 22rpx;

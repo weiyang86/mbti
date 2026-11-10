@@ -1,4 +1,5 @@
 import { MbtiContactStorage } from "./mbti-contact-storage.service";
+import { MbtiOpsController } from "./mbti-ops.controller";
 import { MbtiContactsController } from "./mbti-contacts.controller";
 import { MbtiContactsService } from "./mbti-contacts.service";
 import { DynamicModule, Module } from "@nestjs/common";
@@ -37,7 +38,7 @@ export class MbtiModule {
     }
     return { module: MbtiModule,
       imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule] : []), ...(secret ? [PluginRuntimeAccessModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController] : []),
+      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController, MbtiOpsController] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
       providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },

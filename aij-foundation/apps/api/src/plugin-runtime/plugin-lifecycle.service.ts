@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, ServiceUnavailableException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Prisma } from "@prisma/client";
 import { comparePluginVersions, satisfiesVersion } from "./plugin-manifest";
@@ -24,7 +24,7 @@ export class PluginLifecycleService {
   private async projectId(tx: Prisma.TransactionClient): Promise<string> {
     const projectCode = this.runtime.getOrThrow<string>("projectId") + "-" + this.runtime.getOrThrow<string>("environment");
     const project = await tx.projectProfile.findFirst({
-      where: { code: projectCode, status: "active", deletedAt: null, organization: { status: "active", deletedAt: null } },
+      where: { code: projectCode, environment: this.runtime.getOrThrow<string>("environment"), status: "active", deletedAt: null, organization: { status: "active", deletedAt: null } },
       select: { id: true }
     });
     if (!project) throw new ServiceUnavailableException("Active project context unavailable");
@@ -34,6 +34,7 @@ export class PluginLifecycleService {
   private trusted(pluginCode: string, requestedVersion?: string) {
     if (!validCode(pluginCode)) throw new BadRequestException("Invalid plugin code");
     const registration = this.catalog.get(pluginCode);
+    if (registration.projectIds && !registration.projectIds.includes(this.runtime.getOrThrow<string>("projectId"))) throw new ForbiddenException("Plugin is restricted to its trusted project");
     const version = registration.manifest.version;
     if (requestedVersion !== undefined && requestedVersion !== version) throw new BadRequestException("Requested plugin version is not in the trusted catalog");
     return registration;
