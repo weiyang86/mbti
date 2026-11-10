@@ -122,3 +122,58 @@ export async function createOrderRefundRequest(orderId: string, body: { reason: 
   try { return projectRefundRequest(value, normalized) }
   catch { throw new OpsApiError(502, '退款申请响应格式不正确。') }
 }
+
+export interface RedeemCodeRow {
+  id: string
+  product_code: string
+  max_redemptions: number
+  redeemed_count: number
+  code_status: string
+  created_by: string
+  created_at: string
+  disabled_at?: string
+}
+
+function projectRedeemRow(value: unknown): RedeemCodeRow {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid')
+  const row = value as Record<string, unknown>
+  if (typeof row.id !== 'string' || typeof row.product_code !== 'string' || typeof row.code_status !== 'string' ||
+    typeof row.max_redemptions !== 'number' || typeof row.redeemed_count !== 'number' ||
+    typeof row.created_by !== 'string' || typeof row.created_at !== 'string') throw new Error('invalid')
+  return {
+    id: row.id, product_code: row.product_code, max_redemptions: row.max_redemptions, redeemed_count: row.redeemed_count,
+    code_status: row.code_status, created_by: row.created_by, created_at: row.created_at,
+    ...(typeof row.disabled_at === 'string' ? { disabled_at: row.disabled_at } : {}),
+  }
+}
+
+export async function listRedeemCodes(filters: { product_code?: string; code_status?: string; limit?: string } = {}) {
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(filters)) if (value) query.set(key, value)
+  const suffix = query.toString() ? `?${query}` : ''
+  const value = await request<unknown>(`/admin/mbti/redeem-codes${suffix}`, {}, true, true)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new OpsApiError(502, '兑换码列表响应格式不正确。')
+  const body = value as { items?: unknown[] }
+  if (!Array.isArray(body.items)) throw new OpsApiError(502, '兑换码列表响应格式不正确。')
+  try { return body.items.map(projectRedeemRow) } catch { throw new OpsApiError(502, '兑换码列表响应格式不正确。') }
+}
+
+export async function createRedeemCodes(body: { product_code: string; count: number }) {
+  const value = await request<unknown>('/admin/mbti/redeem-codes', { method: 'POST', body: JSON.stringify(body) }, true, true)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new OpsApiError(502, '兑换码生成响应格式不正确。')
+  const row = value as { codes?: unknown; note?: unknown }
+  if (!Array.isArray(row.codes) || typeof row.note !== 'string') throw new OpsApiError(502, '兑换码生成响应格式不正确。')
+  const codes = row.codes.map(item => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) throw new Error('invalid')
+    const code = item as Record<string, unknown>
+    if (typeof code.id !== 'string' || typeof code.code !== 'string' || typeof code.product_code !== 'string') throw new Error('invalid')
+    return { id: code.id, code: code.code, product_code: code.product_code }
+  })
+  return { codes, note: row.note }
+}
+
+export async function disableRedeemCode(id: string) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(id)) throw new OpsApiError(422, '兑换码编号无效。')
+  const value = await request<unknown>(`/admin/mbti/redeem-codes/${encodeURIComponent(id)}/disable`, { method: 'POST', body: '{}' }, true, true)
+  try { return projectRedeemRow(value) } catch { throw new OpsApiError(502, '兑换码停用响应格式不正确。') }
+}

@@ -10,6 +10,8 @@ import { MbtiShareService } from "./mbti-share.service";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { MbtiOpsOrdersService } from "./mbti-ops-orders.service";
 import { MbtiOpsRefundService } from "./mbti-ops-refund.service";
+import { MbtiOpsRedeemService } from "./mbti-ops-redeem.service";
+import { MbtiOpsRedeemController } from "./mbti-ops-redeem.controller";
 import { MbtiOrdersAdminController, MbtiOrdersController } from "./mbti-orders.controller";
 import { MbtiSocialController } from "./mbti-social.controller";
 import { MbtiSocialService } from "./mbti-social.service";
@@ -40,9 +42,9 @@ export class MbtiModule {
     }
     return { module: MbtiModule,
       imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController, MbtiOpsController] : []),
+      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController, MbtiOpsController, MbtiOpsRedeemController] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [MbtiOpsRefundService] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
+      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [MbtiOpsRefundService, MbtiOpsRedeemService] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },
         { provide: PAYMENT_CREDENTIAL_RESOLVER, useValue: { async resolve(reference: string) {
           if (reference !== "test-only:mbti-f3-payment") throw new Error("Controlled fixture credential rejected");

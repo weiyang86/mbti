@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { createOrderRefundRequest, OpsApiError, readOrder, type RefundRequestResult } from './ops-api'
+import {
+  createOrderRefundRequest, createRedeemCodes, disableRedeemCode, listRedeemCodes, OpsApiError, readOrder,
+  type RedeemCodeRow, type RefundRequestResult,
+} from './ops-api'
 import { normalizeOrderId, orderStatus, orderTime, type OpsOrder } from './ops-order'
 import './orders.css'
 import OrdersList from './orders-list.vue'
@@ -28,6 +31,15 @@ let requestVersion = 0
 let refundVersion = 0
 const canRefund = computed(() => props.permissions.includes('mbti:orders:read') && props.permissions.includes('admin.payment.refund.request'))
 const canSubmitRefund = computed(() => !!order.value && order.value.status === 'paid' && canRefund.value && refundReason.value.trim().length > 0 && refundReason.value.trim().length <= 500 && refundState.value !== 'loading')
+const canRedeemWrite = computed(() => props.permissions.includes('mbti:ops:redemption:write'))
+const canRedeemRead = computed(() => props.permissions.includes('mbti:orders:read'))
+const redeemProduct = ref('studio_tier_1')
+const redeemCount = ref(5)
+const redeemRows = ref<RedeemCodeRow[]>([])
+const redeemIssued = ref<{ id: string; code: string; product_code: string }[]>([])
+const redeemState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+const redeemError = ref('')
+let redeemVersion = 0
 const stateTitle = computed(() => ({
   idle: '输入订单号开始核对', loading: '正在查询订单', success: '订单详情', invalid: '请检查订单号',
   notFound: '未找到此订单', forbidden: '没有订单读取权限', unauthenticated: '登录已失效', error: '暂时无法查询',
@@ -103,6 +115,57 @@ async function submitRefund() {
         : status >= 500 ? '退款申请服务暂不可用，请重试。' : error instanceof OpsApiError ? error.message : '退款申请失败，请重试。'
   }
 }
+
+function redeemMessage(error: unknown) {
+  const status = error instanceof OpsApiError ? error.status : 0
+  return status === 401 ? '登录已失效，请重新核验登录。' : status === 403 ? '服务端拒绝兑换码操作，请核对 mbti:ops:redemption:write / mbti:orders:read。'
+    : status === 422 ? '兑换码参数无效。' : status >= 500 ? '兑换码服务暂不可用，请重试。'
+      : error instanceof OpsApiError ? error.message : '兑换码请求失败，请重试。'
+}
+async function loadRedeemCodes() {
+  if (!canRedeemRead.value) { redeemRows.value = []; return }
+  const current = ++redeemVersion
+  redeemState.value = 'loading'; redeemError.value = ''
+  try {
+    const rows = await listRedeemCodes({ product_code: redeemProduct.value, limit: '50' })
+    if (current !== redeemVersion) return
+    redeemRows.value = rows; redeemState.value = 'success'
+  } catch (error) {
+    if (current !== redeemVersion) return
+    redeemState.value = 'error'; redeemError.value = redeemMessage(error); redeemRows.value = []
+  }
+}
+async function mintRedeemCodes() {
+  if (!canRedeemWrite.value || redeemState.value === 'loading') return
+  const current = ++redeemVersion
+  redeemState.value = 'loading'; redeemError.value = ''; redeemIssued.value = []
+  try {
+    const batch = await createRedeemCodes({ product_code: redeemProduct.value, count: redeemCount.value })
+    if (current !== redeemVersion) return
+    redeemIssued.value = batch.codes
+    const rows = await listRedeemCodes({ product_code: redeemProduct.value, limit: '50' })
+    if (current !== redeemVersion) return
+    redeemRows.value = rows; redeemState.value = 'success'
+  } catch (error) {
+    if (current !== redeemVersion) return
+    redeemState.value = 'error'; redeemError.value = redeemMessage(error)
+  }
+}
+async function stopRedeemCode(id: string) {
+  if (!canRedeemWrite.value || redeemState.value === 'loading') return
+  const current = ++redeemVersion
+  redeemState.value = 'loading'; redeemError.value = ''
+  try {
+    await disableRedeemCode(id)
+    const rows = await listRedeemCodes({ product_code: redeemProduct.value, limit: '50' })
+    if (current !== redeemVersion) return
+    redeemRows.value = rows; redeemState.value = 'success'
+  } catch (error) {
+    if (current !== redeemVersion) return
+    redeemState.value = 'error'; redeemError.value = redeemMessage(error)
+  }
+}
+watch(tab, value => { if (value === 'codes') void loadRedeemCodes() })
 </script>
 
 <template>
@@ -172,14 +235,40 @@ async function submitRefund() {
         <div class="order-disabled-actions"><button class="outline-button" disabled>筛选异常 · 未接通</button><button class="outline-button" disabled>恢复当前统计范围 · 未接通</button><button class="outline-button" disabled>任务详情 · 未接通</button><button class="outline-button" disabled>重试原任务 · 未接通</button></div>
       </template>
       <template v-else-if="tab === 'codes'">
-        <p class="eyebrow">EXPERIENCE CODES</p><h2>体验兑换码尚未接通</h2><p>需要来源隔离的体验码账本、套装查询、生成与停用接口。当前不会生成、兑换或保存本机体验码。</p>
-        <div class="order-disabled-actions"><select aria-label="体验码套装筛选" disabled><option>按套装 · 未接通</option></select><button class="outline-button" disabled>生成一批体验码 · 未接通</button><button class="outline-button" disabled>停用 · 未接通</button></div>
+        <p class="eyebrow">EXPERIENCE CODES</p><h2>体验兑换码账本</h2>
+        <p>服务端哈希账本；明文仅在生成当次展示。访客核销路径尚未接通。写入需 <code>mbti:ops:redemption:write</code>。</p>
+        <div class="order-disabled-actions">
+          <label>套装<select v-model="redeemProduct" aria-label="体验码套装筛选" :disabled="redeemState === 'loading'" @change="loadRedeemCodes"><option value="studio_tier_1">晒图套装 · studio_tier_1</option></select></label>
+          <label>数量<input v-model.number="redeemCount" type="number" min="1" max="50" :disabled="!canRedeemWrite || redeemState === 'loading'" aria-label="生成数量"></label>
+          <button class="outline-button" :disabled="!canRedeemWrite || redeemState === 'loading'" :title="canRedeemWrite ? '生成后请立即复制明文' : '缺少 mbti:ops:redemption:write'" @click="mintRedeemCodes">{{ redeemState === 'loading' ? '处理中…' : '生成一批体验码' }}</button>
+          <button class="outline-button" :disabled="!canRedeemRead || redeemState === 'loading'" @click="loadRedeemCodes">刷新列表</button>
+        </div>
+        <p v-if="!canRedeemRead" class="muted">当前会话缺少 mbti:orders:read，无法读取账本。</p>
+        <p v-else-if="redeemState === 'error'" class="order-refund-err" role="alert">{{ redeemError }}</p>
+        <div v-if="redeemIssued.length" class="order-redeem-issued" role="status">
+          <b>本次明文（仅此一次）</b>
+          <ul><li v-for="item in redeemIssued" :key="item.id"><code>{{ item.code }}</code> · {{ item.id }}</li></ul>
+        </div>
+        <table v-if="redeemRows.length" class="order-redeem-table">
+          <thead><tr><th>编号</th><th>商品</th><th>状态</th><th>核销</th><th>创建</th><th></th></tr></thead>
+          <tbody>
+            <tr v-for="row in redeemRows" :key="row.id">
+              <td class="order-mono">{{ row.id }}</td>
+              <td class="order-mono">{{ row.product_code }}</td>
+              <td>{{ row.code_status }}</td>
+              <td>{{ row.redeemed_count }}/{{ row.max_redemptions }}</td>
+              <td>{{ orderTime(row.created_at) }}</td>
+              <td><button class="text-button" :disabled="!canRedeemWrite || row.code_status === 'disabled' || redeemState === 'loading'" @click="stopRedeemCode(row.id)">停用</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else-if="canRedeemRead && redeemState === 'success'" class="muted">当前套装暂无兑换码记录。</p>
       </template>
       <template v-else>
         <p class="eyebrow">LOCAL TEST ORDERS</p><h2>本机前台订单尚未接通</h2><p>保留原型测试入口。需要来源隔离的测试账本与处理接口；当前不会读取原型浏览器账本或创建演练订单。</p>
         <div class="order-disabled-actions"><button class="outline-button" disabled>刷新 · 未接通</button><button class="outline-button" disabled>详情 · 未接通</button><button class="outline-button" disabled>处理 · 未接通</button></div>
       </template>
-      <p class="order-contract-note">UI_CONTRACT · 依赖待定稿，needs_human_review</p><button class="text-button" @click="tab = 'orders'">返回交易订单按号查询 →</button>
+      <p class="order-contract-note">{{ tab === 'codes' ? '兑换码候选 · needs_human_review；访客核销未接' : 'UI_CONTRACT · 依赖待定稿，needs_human_review' }}</p><button class="text-button" @click="tab = 'orders'">返回交易订单按号查询 →</button>
     </section>
     <p class="security-note">订单数据由服务端按 mbti:orders:read 授权返回。页面只保留订单业务字段，不展示支付凭据、私密联系方式或私有作答。</p>
   </div>

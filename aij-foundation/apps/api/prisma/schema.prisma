@@ -1885,6 +1885,21 @@ model MbtiEntitlement {
   order       MbtiOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
 }
 
+// Ops redeem ledger candidate. Plaintext codes exist only in the create response; storage is hash-only.
+model MbtiRedeemCode {
+  id               String    @id
+  codeHash         String    @unique @db.Char(64)
+  productCode      String
+  maxRedemptions   Int       @default(1)
+  redeemedCount    Int       @default(0)
+  status           String    @default("active")
+  createdByUserId  String
+  createdAt        DateTime  @default(now())
+  disabledAt       DateTime?
+  @@index([status, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([productCode, status])
+}
+
 // F4 internal runtime candidate. Public card IDs never reuse the private guest ID.
 model MbtiCard {
   id String @id

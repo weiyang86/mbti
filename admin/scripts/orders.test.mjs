@@ -142,13 +142,18 @@ function mountNodes() {
   })
   return { node, renderer }
 }
-function mountPage(readOrder, listOrders = async () => ({ items: [], next_cursor: null }), permissions = [], createOrderRefundRequest = async () => { throw new Error('refund unused') }) {
+function mountPage(readOrder, listOrders = async () => ({ items: [], next_cursor: null }), permissions = [], createOrderRefundRequest = async () => { throw new Error('refund unused') }, redeemApi = {}) {
   const { node, renderer } = mountNodes()
   const errors = client(() => json({})).api
   const List = evaluate(listCode, { vue: Vue, './ops-api': { listOrders, exportOrders: async () => { throw new Error('export unused') }, OpsApiError: errors.OpsApiError, saveOrdersCsv() {} }, './ops-order': model, './ops-orders-collection': collection }).default
   const refundCalls = []
   const component = evaluate(componentCode, { vue: Vue, './ops-order': model, './ops-api': {
-    readOrder, createOrderRefundRequest: async (...args) => { refundCalls.push(args); return createOrderRefundRequest(...args) }, OpsApiError: errors.OpsApiError,
+    readOrder,
+    createOrderRefundRequest: async (...args) => { refundCalls.push(args); return createOrderRefundRequest(...args) },
+    listRedeemCodes: redeemApi.listRedeemCodes ?? (async () => []),
+    createRedeemCodes: redeemApi.createRedeemCodes ?? (async () => { throw new Error('redeem unused') }),
+    disableRedeemCode: redeemApi.disableRedeemCode ?? (async () => { throw new Error('disable unused') }),
+    OpsApiError: errors.OpsApiError,
   }, './orders-list.vue': { default: List }, './orders.css': {} }, {
     crypto: { getRandomValues(bytes) { for (let i = 0; i < bytes.length; i++) bytes[i] = (i + 7) % 256; return bytes } },
   }).default
@@ -220,18 +225,21 @@ test('component maps real status values to separate denial/missing/login/error s
   }
 })
 
-test('invalid input never requests; unsupported fulfillment/code/local controls stay disabled', async () => {
+test('invalid input never requests; unsupported fulfillment/local controls stay disabled; codes need permissions', async () => {
   let calls = 0
   const p = mountPage(async () => { calls++; return model.projectOrder(fixture(), id) })
   await p.input('../bad'); await p.submit(); await flush()
   assert.match(p.text(), /请检查订单号/); assert.equal(calls, 0)
-  for (const label of ['生成任务', '体验兑换码', '本机前台订单']) {
+  for (const label of ['生成任务', '本机前台订单']) {
     p.button(label).props.onClick(); await flush()
     assert.match(p.text(), /UI_CONTRACT/)
     const unsupported = p.nodes().filter(n => n.type === 'select' || n.type === 'button' && /未接通/.test(n.text))
     assert.ok(unsupported.length > 0)
     assert.ok(unsupported.every(n => n.props.disabled === '' || n.props.disabled === true))
   }
+  p.button('体验兑换码').props.onClick(); await flush()
+  assert.match(p.text(), /缺少 mbti:orders:read/)
+  assert.equal(p.button('生成一批体验码').props.disabled, true)
   assert.equal(calls, 0)
   p.app.unmount()
 })

@@ -36,6 +36,11 @@
 .order-refund-label textarea{display:block;width:min(420px,100%);margin-top:6px;padding:8px 10px;border:1px solid #dedde8;border-radius:8px;background:#fff;font:inherit;resize:vertical}
 .order-refund-ok{color:#1f6b3a!important}
 .order-refund-err{color:#9b1c1c!important}
+.order-redeem-issued{margin:14px 0;padding:12px;border-radius:8px;background:#f0f7f2}
+.order-redeem-issued ul{margin:8px 0 0;padding-left:18px}
+.order-redeem-table{width:100%;margin-top:14px;border-collapse:collapse;font-size:11px}
+.order-redeem-table th,.order-redeem-table td{padding:8px 6px;border-bottom:1px solid #eceaf2;text-align:left}
+.order-disabled-actions input[type=number]{width:72px;min-height:34px;padding:7px 10px;border:1px solid #dedde8;border-radius:8px}
 .order-state{display:grid;justify-items:center;align-content:center;gap:10px;min-height:233px;padding:25px 10px;text-align:center}
 .order-state-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#f1eff9;color:#7667b6;font-size:20px}
 .order-state h3{margin:3px 0 0;font-size:13px;font-weight:600;color:var(--ink)}

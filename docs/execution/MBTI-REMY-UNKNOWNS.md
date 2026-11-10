@@ -45,7 +45,7 @@
 |---|---|---|---|
 | D1 | 商户 SecretRef 族 | payments 恒 `enabled:false` + `UNCONFIGURED` | 获批商户/证书/沙箱；凭据投影白名单 |
 | D2 | 退款写路径 | **已批准（2026-11-10）**：权限 A（`mbti:orders:read`+`admin.payment.refund.request`）；reason 自由文本；**不**自动吊销权益；复用 AF-106 `pending_manual_review` | 通过后如何回写 MbtiOrder / entitlement 仍 ASK |
-| D3 | 体验兑换码 | 无隔离账本 | 制码身份、次数、权益种类、停用语义 |
+| D3 | 体验兑换码 | **运营账本已批准落地**：可售商品、一次核销上限、哈希存储、`mbti:ops:redemption:write` | 访客核销路径/与 entitlement 发放仍 ASK |
 | D4 | 净实收 | overview 恒 null；毛额 ≠ 净额 | 退款归属日、币种隔离、是否进 summary |
 
 ---
