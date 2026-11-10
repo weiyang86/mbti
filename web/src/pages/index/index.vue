@@ -1,184 +1,568 @@
 <template>
-  <view class="page">
-    <view class="hero card">
-      <text class="eyebrow">TEST · CREATE · CONNECT</text>
-      <text class="h1">{{ config?.content ? config.content.headline + config.content.accent : 'MBTI搭子' }}</text>
-      <text class="lead muted">{{ config?.content?.sub || '趣味倾向体验，非临床测评。带教闭环：测 → 结果 → 晒预览 → 阶段记录。' }}</text>
-      <text v-if="config?.entry" class="muted">{{ config.entry.badge }}</text>
+  <view class="page home">
+    <view class="brand-row">
+      <view class="brand-left">
+        <view class="badge"><text>16</text><text class="plus">+</text></view>
+        <text class="brand-name">MBTI搭子</text>
+      </view>
+      <view class="brand-actions">
+        <text v-if="config?.entry" class="chip" @click="goChannelEntry">{{ config.entry.name }}入口</text>
+        <text class="chip" @click="showChannels">微信预览 ⌄</text>
+      </view>
     </view>
 
-    <view class="actions">
-      <view v-if="config?.entry" class="btn-secondary" @click="goChannelEntry">{{ config.entry.name }}入口</view>
-      <view class="btn-primary" @click="startQuiz">{{ starting ? '正在准备题目…' : config?.content?.cta || '测一测（12 题）' }}</view>
-      <view v-if="sessionExpired" class="btn-secondary mt" @click="renewGuest">重新建立游客会话</view>
-      <view class="btn-secondary mt" @click="goSelfSelect">我已经知道类型</view>
-      <view class="btn-secondary mt" @click="goHistory">阶段记录</view>
-      <view class="btn-secondary mt" @click="goCatalog">商品目录</view>
-      <view class="btn-secondary mt" @click="goOrders">我的订单与权益</view>
-      <view class="btn-secondary mt" @click="goCard">我的名片</view>
-      <view class="btn-secondary mt" @click="goDiscover">发现搭子</view>
-      <view class="btn-secondary mt" @click="goRadar">同型雷达</view>
-      <view class="btn-secondary mt" @click="goExchanges">我的名片夹</view>
-      <view class="btn-secondary mt" @click="goBlocked">屏蔽管理</view>
-      <view class="btn-secondary mt" @click="goContacts">本人联系方式</view>
-      <view class="btn-secondary mt" @click="goContactRequests">联系方式请求</view>
+    <text class="kicker">MBTI TEST × PERSONALITY CARD</text>
+    <template v-if="heroTitle">
+      <text class="h1 hero-dynamic">{{ heroTitle }}</text>
+    </template>
+    <template v-else>
+      <text class="h1">你的 MBTI，</text>
+      <text class="h1"><text class="hl">值得一张主角卡。</text></text>
+    </template>
+    <text class="sub">{{ heroSub }}</text>
+
+    <view class="cover">
+      <image class="cover-img" src="/static/cover-illustration.webp" mode="aspectFill" />
+      <view class="cover-shade" />
+      <view class="cover-top">
+        <text>MY MBTI / MY MAIN CHARACTER</text>
+        <text>{{ coverIndex }}</text>
+      </view>
+      <view class="stamp"><text>今日人设</text><text>我来晒</text></view>
+      <view class="cover-bottom">
+        <text class="cover-type">{{ coverType }}</text>
+        <text class="cover-name">{{ coverName }}</text>
+        <text class="cover-quote">{{ coverQuote }}</text>
+      </view>
     </view>
 
-    <text v-if="latest" class="muted foot">最近结果：{{ latest.type_code }}</text>
-    <text class="muted foot">趣味倾向体验 · {{ mockMode ? 'Mock 演示' : '在线测评' }}</text>
+    <view class="entry">
+      <view class="btn-primary" @click="startQuiz">{{ ctaText }}</view>
+      <text class="quick" @click="goSelfSelect">已经知道类型？直接做专属名片 →</text>
+      <text class="fine">12 题趣味版 · 非官方量表 · 基础结果免费</text>
+    </view>
+
+    <view class="scenes">
+      <view class="scene" @click="goPricing">
+        <text class="scene-mark">↗</text>
+        <text class="scene-title">发漂亮朋友圈</text>
+        <text class="scene-desc">看 ¥9.9 晒图套装</text>
+      </view>
+      <view class="scene" @click="goDiscover">
+        <text class="scene-mark">⇄</text>
+        <text class="scene-title">交换 MBTI 名片</text>
+        <text class="scene-desc">遇见相同与不同的你</text>
+      </view>
+    </view>
+
+    <view class="journey-entry" @click="goHistory">
+      <view class="journey-main">
+        <text class="journey-kicker">MY MBTI JOURNEY</text>
+        <text class="journey-title">{{ resultCount ? '看看不同阶段的我' : '给现在的自己，留一个起点。' }}</text>
+        <text class="journey-desc">
+          {{ resultCount
+            ? '已留存 ' + resultCount + ' 次结果' + (latest ? ' · 最近 ' + latest.submitted_at.slice(0, 10) : '')
+            : '免费复测 · 私密记录 · 前后对比' }}
+        </text>
+      </view>
+      <text class="journey-arrow">↗</text>
+    </view>
+
+    <view class="mini-tools">
+      <view class="mini-tools-head">
+        <text class="mini-tools-title">MBTI 的另一种打开方式</text>
+        <text class="tag">小应用</text>
+      </view>
+      <view class="tool-grid">
+        <view class="tool-tile radar-tile" @click="goRadar">
+          <text class="tool-icon">◎</text>
+          <text class="tool-name">同型雷达</text>
+          <text class="tool-desc">统计暂不可用</text>
+          <text class="tool-desc">周边同型人数待接通</text>
+          <text class="tool-note">不会显示虚构人数 ↗</text>
+        </view>
+        <view class="tool-tile" @click="goCompat">
+          <text class="tool-icon">✧</text>
+          <text class="tool-name">相处小抄</text>
+          <text class="tool-desc">{{ compatTileLine }}</text>
+          <text class="tool-desc">找个舒服的相处方式</text>
+          <text class="tool-note">趣味建议，无配对分数 ↗</text>
+        </view>
+        <view class="tool-tile" @click="goContacts">
+          <text class="tool-icon">✉</text>
+          <text class="tool-name">我的联系方式</text>
+          <text class="tool-desc">微信 / QQ / 电话</text>
+          <text class="tool-desc">只在本人批准后单向授权</text>
+          <text class="tool-note">私密字段不落本机 ↗</text>
+        </view>
+        <view class="tool-tile" @click="goContactRequests">
+          <text class="tool-icon">⇄</text>
+          <text class="tool-name">联系方式请求</text>
+          <text class="tool-desc">收到的申请与授权状态</text>
+          <text class="tool-note">查看本人请求 ↗</text>
+        </view>
+      </view>
+    </view>
+
+    <text class="demo-fine">V0.4 交互原型 · 人物与订单均为示例</text>
+    <text class="foot">MBTI搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onHide, onLoad, onShow } from '@dcloudio/uni-app'
-import { createQuizSession, getCurrentQuizVersion } from '@/api/quiz'
-import { listResults } from '@/api/results'
 import type { ResultSnapshotSummary } from '@/api/types'
-import { isGuestSessionExpired, requestErrorMessage, startNewGuestSession, useMock } from '@/api/client'
-import { clearQuizDraft, createQuizDraft, isRestorableDraft, loadQuizDraft, recoveryMessage } from '@/store/quiz-draft'
-
+import { listResults } from '@/api/results'
+import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
+import { DEFAULT_COMPARE_TYPE } from '@/constants/compat'
 import { landingRoutes, readPublishedPreview, publicChannel, type PublishedPreview } from '@/api/published-config'
 
+function profileName(): string {
+  try {
+    const raw = uni.getStorageSync('mbti_test_profile_v1')
+    if (raw && typeof raw === 'object' && typeof raw.name === 'string' && raw.name.trim()) {
+      return raw.name.trim()
+    }
+  } catch {
+    /* ignore */
+  }
+  return '小禾'
+}
+
 const config = ref<PublishedPreview | null>(null)
-let channelName = '公众号 H5', configRead = 0
-onLoad(q => { if (q?.channel !== undefined) channelName = publicChannel(q.channel) ? String(q.channel) : '' })
-onHide(() => { configRead++; config.value = null })
-function goChannelEntry() { const route = config.value?.entry && landingRoutes[config.value.entry.landing]; if (route) uni.navigateTo({ url: `${route}?channel=${encodeURIComponent(channelName)}` }) }
-async function loadConfiguration() { const token = ++configRead; config.value = null; const value = await readPublishedPreview(channelName); if (token === configRead) config.value = value }
-const starting = ref(false)
-const sessionExpired = ref(false)
+let channelName = '公众号 H5'
+let configRead = 0
+
+onLoad((q) => {
+  if (q?.channel !== undefined) channelName = publicChannel(q.channel) ? String(q.channel) : ''
+})
+onHide(() => {
+  configRead++
+  config.value = null
+})
+
+function goChannelEntry() {
+  const route = config.value?.entry && landingRoutes[config.value.entry.landing]
+  if (route) uni.navigateTo({ url: `${route}?channel=${encodeURIComponent(channelName)}` })
+}
+
+async function loadConfiguration() {
+  const token = ++configRead
+  config.value = null
+  const value = await readPublishedPreview(channelName)
+  if (token === configRead) config.value = value
+}
+
+const heroTitle = computed(() =>
+  config.value?.content ? config.value.content.headline + config.value.content.accent : '',
+)
+const heroSub = computed(() => config.value?.content?.sub || '测出你的类型，晒出专属形象，遇见同频搭子。')
+const ctaText = computed(() => config.value?.content?.cta || '免费测测我的 MBTI')
 const latest = ref<ResultSnapshotSummary | null>(null)
-const mockMode = useMock()
+const resultCount = ref(0)
 
 onShow(async () => {
   void loadConfiguration()
-  sessionExpired.value = isGuestSessionExpired()
   try {
-    const response = await listResults({ limit: 1 })
-    latest.value = response.items[0] || null
-  } catch (error) {
-    sessionExpired.value = isGuestSessionExpired()
-    uni.showToast({ title: requestErrorMessage(error, '暂时无法读取阶段记录，可稍后重试'), icon: 'none' })
+    const res = await listResults({ limit: 50 })
+    resultCount.value = res.items.length
+    latest.value = res.items[0] || null
+  } catch {
+    latest.value = null
+    resultCount.value = 0
   }
 })
 
-async function startQuiz() {
-  if (starting.value) return
-  if (isGuestSessionExpired()) {
-    sessionExpired.value = true
-    uni.showToast({ title: '游客会话已失效，请先重新建立会话', icon: 'none' })
-    return
-  }
-  const draft = loadQuizDraft()
-  if (draft) {
-    uni.showModal({
-      title: isRestorableDraft(draft) ? '还有一份没完成的测验' : '需要重新开始',
-      content: isRestorableDraft(draft) ? '可以继续上次答题，也可以重新开始。已有历史结果会保留。' : recoveryMessage,
-      confirmText: isRestorableDraft(draft) ? '继续答题' : '重新开始',
-      cancelText: isRestorableDraft(draft) ? '重新开始' : '暂不开始',
-      success: (response) => {
-        if (response.confirm && isRestorableDraft(draft)) {
-          uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${encodeURIComponent(draft.sessionId)}` })
-        } else if ((response.cancel && isRestorableDraft(draft)) || (response.confirm && !isRestorableDraft(draft))) {
-          clearQuizDraft()
-          beginQuiz()
-        }
-      },
-    })
-    return
-  }
-  await beginQuiz()
-}
+const coverIndex = computed(() => (latest.value ? '001' : '000'))
 
-async function beginQuiz() {
-  if (starting.value) return
-  starting.value = true
-  try {
-    const questionBank = await getCurrentQuizVersion()
-    const session = await createQuizSession({ question_bank_version: questionBank.question_bank_version })
-    createQuizDraft(session, questionBank)
-    uni.navigateTo({ url: `/pages/quiz/quiz?sessionId=${encodeURIComponent(session.id)}` })
-  } catch (e) {
-    sessionExpired.value = isGuestSessionExpired()
-    uni.showToast({ title: requestErrorMessage(e, '无法开始测验，请重试'), icon: 'none' })
-  } finally {
-    starting.value = false
-  }
-}
+const coverType = computed(() => latest.value?.type_code || '----')
 
-function renewGuest() {
-  if (starting.value) return
-  uni.showModal({
-    title: '建立新的游客会话？',
-    content: '原游客历史结果仍保留在服务端，新游客无法访问。本次操作会放弃未完成的答题，之后可重新测评。',
-    confirmText: '建立新会话',
-    success: async (response) => {
-      if (!response.confirm) return
-      starting.value = true
-      try {
-        await startNewGuestSession()
-        clearQuizDraft()
-        latest.value = null
-        sessionExpired.value = false
-        uni.showToast({ title: '新会话已建立', icon: 'none' })
-      } catch (error) {
-        uni.showToast({ title: requestErrorMessage(error, '无法建立会话，请重试'), icon: 'none' })
-      } finally {
-        starting.value = false
-      }
-    },
-  })
+const coverName = computed(() =>
+  latest.value
+    ? `${TYPE_NAMES[latest.value.type_code] || 'MBTI'} / ${profileName()}`
+    : '还没测过，先测一次',
+)
+
+const coverQuote = computed(() =>
+  latest.value
+    ? DECLARATIONS[latest.value.type_code] || '四个字母之外，还有不一样的你。'
+    : '测完这里会换成你的类型和一句话人设。',
+)
+
+const compatTileLine = computed(() =>
+  latest.value ? `${latest.value.type_code} × ${DEFAULT_COMPARE_TYPE}` : '和不同 MBTI',
+)
+
+function startQuiz() {
+  uni.navigateTo({ url: '/pages/test-intro/test-intro' })
 }
 
 function goSelfSelect() {
   uni.navigateTo({ url: '/pages/self-select/self-select' })
 }
 
-function goHistory() {
-  uni.navigateTo({ url: '/pages/history/list' })
+function goPricing() {
+  uni.navigateTo({ url: `/pages/pricing/pricing?channel=${encodeURIComponent(channelName)}` })
 }
 
-function goCatalog() { uni.navigateTo({ url: `/pages/pricing/pricing?channel=${encodeURIComponent(channelName)}` }) }
-function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
-function goCard() { uni.navigateTo({ url: '/pages/card/card' }) }
-function goDiscover() { uni.navigateTo({ url: '/pages/discover/discover' }) }
-function goRadar() { uni.navigateTo({ url: '/pages/radar/radar' }) }
-function goExchanges() { uni.navigateTo({ url: '/pages/exchanges/exchanges' }) }
-function goBlocked() { uni.navigateTo({ url: '/pages/buddies/blocked' }) }
-function goContacts() { uni.navigateTo({ url: '/pages/contacts/contacts' }) }
-function goContactRequests() { uni.navigateTo({ url: '/pages/contact-request/contact-request' }) }
+function goHistory() {
+  uni.switchTab({ url: '/pages/history/list' })
+}
+
+function goDiscover() {
+  uni.switchTab({ url: '/pages/discover/discover' })
+}
+
+function goRadar() {
+  uni.navigateTo({ url: '/pages/radar/radar' })
+}
+
+function goCompat() {
+  uni.navigateTo({ url: '/pages/compat/compat' })
+}
+
+function goContacts() {
+  uni.navigateTo({ url: '/pages/contacts/contacts' })
+}
+
+function goContactRequests() {
+  uni.navigateTo({ url: '/pages/contact-request/contact-request' })
+}
+
+function showChannels() {
+  uni.showModal({
+    title: '预览渠道',
+    content: '微信小程序 · 小红书小程序 · 抖音小程序 · 公众号 H5\n当前为演示版本，仅展示微信预览效果。',
+    showCancel: false,
+    confirmText: '知道了',
+  })
+}
 </script>
 
 <style scoped lang="scss">
-.hero {
-  margin-bottom: 48rpx;
+.home {
+  padding-top: 32rpx;
+  padding-bottom: 48rpx;
 }
-.eyebrow {
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand-left {
+  display: flex;
+  align-items: center;
+}
+.badge {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #8b6cf6, #6c53f5);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 22rpx;
-  letter-spacing: 4rpx;
-  color: #7560df;
+  font-weight: 700;
+}
+.plus {
+  font-size: 18rpx;
+  margin-left: 2rpx;
+}
+.brand-name {
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.brand-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.chip {
+  font-size: 22rpx;
+  color: #77727e;
+  background: #eeeaf3;
+  border-radius: 999rpx;
+  padding: 8rpx 20rpx;
+}
+
+.kicker {
+  display: block;
+  margin-top: 40rpx;
+  font-size: 20rpx;
+  letter-spacing: 3rpx;
+  color: #a398af;
+  font-weight: 600;
 }
 .h1 {
   display: block;
-  font-size: 56rpx;
-  font-weight: 700;
-  margin: 16rpx 0;
+  font-size: 68rpx;
+  font-weight: 800;
+  line-height: 1.24;
+  letter-spacing: -2rpx;
+  margin-top: 12rpx;
 }
-.lead {
+.hl {
+  color: #7560df;
+  border-bottom: 12rpx solid #dfff8b;
+}
+.sub {
   display: block;
-  line-height: 1.7;
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: #a398af;
 }
-.actions {
+
+.cover {
+  position: relative;
+  margin-top: 36rpx;
+  height: 640rpx;
+  border-radius: 32rpx;
+  overflow: hidden;
+  box-shadow: 0 24rpx 60rpx rgba(49, 33, 77, 0.18);
+}
+.cover-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.cover-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62%;
+  background: linear-gradient(180deg, rgba(20, 12, 40, 0) 0%, rgba(20, 12, 40, 0.82) 100%);
+}
+.cover-top {
+  position: absolute;
+  left: 32rpx;
+  right: 32rpx;
+  top: 28rpx;
+  display: flex;
+  justify-content: space-between;
+  font-size: 18rpx;
+  letter-spacing: 2rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+.stamp {
+  position: absolute;
+  right: 32rpx;
+  top: 96rpx;
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: rgba(223, 255, 139, 0.9);
+  color: #4a3a86;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  transform: rotate(6deg);
 }
-.mt {
+.cover-bottom {
+  position: absolute;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: 32rpx;
+}
+.cover-type {
+  display: block;
+  font-size: 96rpx;
+  font-weight: 800;
+  letter-spacing: 4rpx;
+  line-height: 1;
+  color: #fff;
+}
+.cover-name {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #fff;
+}
+.cover-quote {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.entry {
+  margin-top: 40rpx;
+}
+.btn-primary {
+  font-weight: 700;
+}
+.quick {
+  display: block;
   margin-top: 24rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #7560df;
 }
+.fine {
+  display: block;
+  margin-top: 14rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #a398af;
+}
+
+.scenes {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 48rpx;
+}
+.scene {
+  flex: 1;
+  background: #fff;
+  border: 2rpx solid #e9e5ed;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+}
+.scene-mark {
+  display: block;
+  font-size: 30rpx;
+  color: #7560df;
+}
+.scene-title {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+.scene-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #77727e;
+  line-height: 1.5;
+}
+
+.journey-entry {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 24rpx;
+  padding: 28rpx 26rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(120deg, #211a36, #3a2c58 60%, #4b3570);
+  box-shadow: 0 18rpx 40rpx rgba(33, 26, 54, 0.22);
+}
+.journey-main {
+  flex: 1;
+}
+.journey-kicker {
+  display: block;
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: rgba(255, 255, 255, 0.55);
+}
+.journey-title {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #fff;
+}
+.journey-desc {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: rgba(255, 255, 255, 0.66);
+}
+.journey-arrow {
+  font-size: 32rpx;
+  color: #dfff8b;
+}
+
+.mini-tools {
+  margin-top: 60rpx;
+}
+.mini-tools-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+.mini-tools-title {
+  font-size: 36rpx;
+  font-weight: 800;
+}
+.tag {
+  margin-left: auto;
+  font-size: 20rpx;
+  color: #8b8099;
+  background: #efeaf4;
+  border-radius: 999rpx;
+  padding: 6rpx 18rpx;
+}
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+}
+.tool-tile {
+  display: flex;
+  flex-direction: column;
+  min-height: 390rpx;
+  box-sizing: border-box;
+  border: 2rpx solid #e9e0f5;
+  border-radius: 42rpx;
+  padding: 38rpx;
+  background: #eee8fa;
+}
+.tool-icon {
+  font-size: 64rpx;
+  color: #7654b7;
+  line-height: 1.1;
+}
+.tool-name {
+  margin: 10rpx 0;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #292630;
+}
+.tool-desc {
+  font-size: 24rpx;
+  color: #77698a;
+  line-height: 1.5;
+}
+.tool-note {
+  margin-top: 28rpx;
+  font-size: 20rpx;
+  color: #94869e;
+}
+.radar-tile {
+  background: #e7eddb;
+  border-color: #dce6ca;
+}
+.radar-tile .tool-icon,
+.radar-tile .tool-name {
+  color: #596d35;
+}
+
+.demo-fine {
+  display: block;
+  margin-top: 48rpx;
+  text-align: center;
+  font-size: 19rpx;
+  color: #b3a9be;
+  line-height: 1.6;
+}
+
 .foot {
   display: block;
-  margin-top: 64rpx;
+  margin-top: 12rpx;
   text-align: center;
+  font-size: 20rpx;
+  color: #a398af;
 }
 </style>

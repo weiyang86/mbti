@@ -1,112 +1,73 @@
 {
   "pages": [
-    {
-      "path": "pages/index/index",
-      "style": {
-        "navigationBarTitleText": "MBTI搭子"
-      }
-    },
-    {
-      "path": "pages/quiz/quiz",
-      "style": {
-        "navigationBarTitleText": "测一测"
-      }
-    },
-    {
-      "path": "pages/self-select/self-select",
-      "style": {
-        "navigationBarTitleText": "自选类型"
-      }
-    },
-    {
-      "path": "pages/result/result",
-      "style": {
-        "navigationBarTitleText": "我的结果"
-      }
-    },
-    {
-      "path": "pages/share-preview/share-preview",
-      "style": {
-        "navigationBarTitleText": "晒图预览"
-      }
-    },
-    {
-      "path": "pages/history/list",
-      "style": {
-        "navigationBarTitleText": "阶段记录"
-      }
-    },
-    {
-      "path": "pages/history/detail",
-      "style": {
-        "navigationBarTitleText": "记录详情"
-      }
-    },
-    {
-      "path": "pages/pricing/pricing",
-      "style": {
-        "navigationBarTitleText": "商品目录"
-      }
-    },
-    {
-      "path": "pages/unlock/unlock",
-      "style": {
-        "navigationBarTitleText": "确认测试订单"
-      }
-    },
-    {
-      "path": "pages/order-status/order-status",
-      "style": {
-        "navigationBarTitleText": "订单状态"
-      }
-    },
-    {
-      "path": "pages/orders/orders",
-      "style": {
-        "navigationBarTitleText": "我的订单与权益"
-      }
-    },
-    {
-      "path": "pages/card/card",
-      "style": {
-        "navigationBarTitleText": "我的名片"
-      }
-    },
-    {
-      "path": "pages/card/public",
-      "style": {
-        "navigationBarTitleText": "公开名片"
-      }
-    },
-    {
-      "path": "pages/discover/discover",
-      "style": {
-        "navigationBarTitleText": "发现搭子"
-      }
-    },
-    {
-      "path": "pages/buddies/detail",
-      "style": {
-        "navigationBarTitleText": "搭子详情"
-      }
-    },
-    {
-      "path": "pages/exchanges/exchanges",
-      "style": {
-        "navigationBarTitleText": "我的名片夹"
-      }
-    },
-    {
-      "path": "pages/buddies/blocked",
-      "style": {
-        "navigationBarTitleText": "屏蔽管理"
-      }
-    },
+    { "path": "pages/index/index", "style": { "navigationBarTitleText": "MBTI搭子" } },
+    { "path": "pages/test-intro/test-intro", "style": { "navigationBarTitleText": "MBTI 趣味测试" } },
+    { "path": "pages/quiz/quiz", "style": { "navigationBarTitleText": "测一测" } },
+    { "path": "pages/self-select/self-select", "style": { "navigationBarTitleText": "自选类型" } },
+    { "path": "pages/result/result", "style": { "navigationBarTitleText": "我的结果" } },
+    { "path": "pages/share-preview/share-preview", "style": { "navigationBarTitleText": "晒图预览" } },
+    { "path": "pages/history/list", "style": { "navigationBarTitleText": "阶段记录" } },
+    { "path": "pages/history/detail", "style": { "navigationBarTitleText": "记录详情" } },
+    { "path": "pages/pricing/pricing", "style": { "navigationBarTitleText": "商品目录" } },
+    { "path": "pages/unlock/unlock", "style": { "navigationBarTitleText": "确认测试订单" } },
+    { "path": "pages/order-status/order-status", "style": { "navigationBarTitleText": "订单状态" } },
+    { "path": "pages/orders/orders", "style": { "navigationBarTitleText": "我的订单与权益" } },
+    { "path": "pages/card/card", "style": { "navigationBarTitleText": "我的名片" } },
+    { "path": "pages/card/public", "style": { "navigationBarTitleText": "公开名片" } },
+    { "path": "pages/discover/discover", "style": { "navigationBarTitleText": "发现搭子" } },
+    { "path": "pages/buddies/detail", "style": { "navigationBarTitleText": "搭子详情" } },
+    { "path": "pages/exchanges/exchanges", "style": { "navigationBarTitleText": "我的名片夹" } },
+    { "path": "pages/buddies/blocked", "style": { "navigationBarTitleText": "屏蔽管理" } },
     { "path": "pages/contacts/contacts", "style": { "navigationBarTitleText": "我的联系方式" } },
     { "path": "pages/contact-request/contact-request", "style": { "navigationBarTitleText": "联系方式请求" } },
     { "path": "pages/contact-request/granted", "style": { "navigationBarTitleText": "当前授权读取" } },
-    { "path": "pages/radar/radar", "style": { "navigationBarTitleText": "同型雷达" } }
+    { "path": "pages/radar/radar", "style": { "navigationBarTitleText": "同型雷达" } },
+    { "path": "pages/create/create", "style": { "navigationBarTitleText": "形象工作台" } },
+    { "path": "pages/generating/generating", "style": { "navigationBarTitleText": "制作我的 MBTI 形象" } },
+    { "path": "pages/video/video", "style": { "navigationBarTitleText": "视频分镜预览" } },
+    { "path": "pages/compare/compare", "style": { "navigationBarTitleText": "前后对比" } },
+    { "path": "pages/journey-share/journey-share", "style": { "navigationBarTitleText": "阶段分享" } },
+    { "path": "pages/account/account", "style": { "navigationBarTitleText": "我的" } },
+    { "path": "pages/compat/compat", "style": { "navigationBarTitleText": "MBTI 相处小抄" } }
   ],
+  "tabBar": {
+    "color": "#77727E",
+    "selectedColor": "#7560DF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "测一测",
+        "iconPath": "static/tab/spark.png",
+        "selectedIconPath": "static/tab/spark-active.png"
+      },
+      {
+        "pagePath": "pages/history/list",
+        "text": "我的轨迹",
+        "iconPath": "static/tab/trail.png",
+        "selectedIconPath": "static/tab/trail-active.png"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "换名片",
+        "iconPath": "static/tab/exchange.png",
+        "selectedIconPath": "static/tab/exchange-active.png"
+      },
+      {
+        "pagePath": "pages/card/card",
+        "text": "我的名片",
+        "iconPath": "static/tab/card.png",
+        "selectedIconPath": "static/tab/card-active.png"
+      },
+      {
+        "pagePath": "pages/account/account",
+        "text": "我的",
+        "iconPath": "static/tab/user.png",
+        "selectedIconPath": "static/tab/user-active.png"
+      }
+    ]
+  },
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "MBTI搭子",

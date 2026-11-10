@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 import vm from 'node:vm'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
