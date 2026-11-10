@@ -213,6 +213,7 @@
         </view>
 
         <text class="plan-label">自己选一天</text>
+        <!-- #ifndef H5 -->
         <picker mode="date" :value="planDate" :start="planMinDate" @change="onPickDate">
           <view class="date-row">
             <text class="date-value">{{ planDateText }}</text>
@@ -224,6 +225,18 @@
             </view>
           </view>
         </picker>
+        <!-- #endif -->
+        <!-- #ifdef H5 -->
+        <view class="date-row" @click="openNativeDate">
+          <text class="date-value">{{ planDateText }}</text>
+          <view class="cal-icon">
+            <view class="cal-dot" />
+            <view class="cal-dot" />
+            <view class="cal-dot" />
+            <view class="cal-dot" />
+          </view>
+        </view>
+        <!-- #endif -->
 
         <view class="btn-primary plan-save" @click="saveReviewPlan">保存本机计划</view>
         <text class="plan-foot">不会发送短信、微信或系统通知；保存后可导出日历事项。</text>
@@ -484,6 +497,29 @@ function onPickDate(e: { detail: { value: number | string } }) {
   planDate.value = value
   planChoice.value = 0
 }
+
+/** H5 用浏览器原生日期选择器，避免 uni-app 日期弹层在底部弹层内不显示 */
+// #ifdef H5
+function openNativeDate() {
+  const input = document.createElement('input')
+  input.type = 'date'
+  input.value = planDate.value
+  input.min = planMinDate.value
+  input.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0'
+  document.body.appendChild(input)
+  const timer = setTimeout(() => input.remove(), 8000)
+  input.addEventListener('change', () => {
+    if (input.value) {
+      planDate.value = input.value
+      planChoice.value = 0
+    }
+    clearTimeout(timer)
+    input.remove()
+  })
+  if (typeof input.showPicker === 'function') input.showPicker()
+  else input.click()
+}
+// #endif
 
 function saveReviewPlan() {
   if (!planDate.value) return
@@ -1191,6 +1227,7 @@ function downloadOrCopy(text: string, filename: string, mime: string) {
   color: #292630;
 }
 .date-row {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
