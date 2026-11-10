@@ -3,6 +3,8 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { OpsApiError, readOrder } from './ops-api'
 import { normalizeOrderId, orderStatus, orderTime, type OpsOrder } from './ops-order'
 import './orders.css'
+import OrdersList from './orders-list.vue'
+const props = withDefaults(defineProps<{ permissions?: string[] }>(), { permissions: () => [] })
 
 const emit = defineEmits<{ reauthenticate: [] }>()
 const tabs = [
@@ -112,11 +114,7 @@ async function queryOrder() {
         </div>
       </section>
 
-      <section class="panel order-list-contract" aria-label="订单列表待接入">
-        <div class="order-section-heading"><div><h2>订单列表</h2><p class="muted">UI_CONTRACT · 列表、筛选、分页与导出接口未接通；按号结果不作为列表总数。</p></div><button class="outline-button" disabled>导出当前列表 · 未接通</button></div>
-        <div class="order-disabled-actions"><button class="outline-button" disabled>日期范围 · 未接通</button><select aria-label="订单渠道筛选" disabled><option>全部渠道 · 未接通</option></select><select aria-label="订单状态筛选" disabled><option>全部状态 · 未接通</option></select></div>
-        <div class="pager"><span>总数与页码待列表接口返回</span><div><button class="outline-button" disabled>上一页</button><select aria-label="订单每页条数" disabled><option>10 条/页 · 未接通</option></select><button class="outline-button" disabled>下一页</button></div></div>
-      </section>
+      <OrdersList :permissions="props.permissions" @detail="id => { orderId = id; queryOrder() }" @reauthenticate="emit('reauthenticate')" />
     </section>
 
     <section v-else class="panel order-contract-panel" :aria-labelledby="`order-tab-${tab}`">

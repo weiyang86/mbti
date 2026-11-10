@@ -36,7 +36,7 @@ export function dateWindow(from: string, to: string, today = shanghaiToday()) {
 // These explain the original prototype, with actual source gaps. They are not KPI values.
 export const definitions = [
   { title: '日期、渠道与周期对比', detail: '北京时间自然日，起止日均含；比较紧邻的前一等长周期。今日尚未结束；实际数据截止时间须由服务端返回。四渠道为原型枚举，现存 MBTI 业务表没有获客渠道字段，不能用支付 provider 代替渠道。' },
-  { title: '净实收 / 支付订单', detail: '原型按订单归属日选取成功支付订单：支付总额（gross）减去该批订单截至统计时点的累计成功退款（net）；退款单保留在支付订单数内，不代表利润。MBTI 当前只有受控测试支付关联；归属日、币种隔离、真实/测试隔离及退款事实映射待确认，退款申请不等于已退金额。' },
+  { title: '净实收 / 支付订单', detail: '原型按订单归属日选取成功支付订单：支付总额（gross）减去该批订单截至统计时点的累计成功退款（net）；退款单保留在支付订单数内，不代表利润。现有 /orders/summary 只返回创建日（UTC）pending/paid/failed 与已支付毛额，净实收恒为 null（refundsUnavailable）。币种隔离、真实/测试隔离及退款事实映射待确认，退款申请不等于已退金额。' },
   { title: '访问人次（日内去重）', detail: '同渠道同北京时间日去重，再按日/渠道相加，不代表周期去重用户。缺访问事件、稳定去重键和渠道归因，不能用 guest 数或 session 数代替访问。' },
   { title: '测试完成率 / 测评完成', detail: '同一批开始测试的人次中完成 12 题者 ÷ 开始人次；按开始日期归组，排除自选类型，分母为零显示 —。现存 QuizSession 与关联 Result 可作为候选事实；人次去重、跨日完成截止和渠道仍待确认。' },
   { title: '成图预览 / 预览后 7 日付费率', detail: '按用户首看预览归组，以首看满 7 天之日归入筛选周期；分子为该批用户在随后 7 天内成功付费人数，分母为观察满 7 天的首看人数。未成熟样本剔除，分母为零显示 —。缺首看事件、用户去重键、支付关联和成熟队列，生成 ShareAsset 不能当作已看预览。' },

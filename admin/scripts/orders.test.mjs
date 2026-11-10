@@ -16,19 +16,22 @@ function evaluate(code, modules = {}, globals = {}) {
   return module.exports
 }
 const model = evaluate(compile(source('../src/ops-order.ts')))
+const collection = evaluate(compile(source('../src/ops-orders-collection.ts')), { './ops-order': model })
 const id = 'MBTI-00000000-0000-4000-8000-000000000001'
 // Synthetic contract fixture only. Never a real database order or acceptance result.
 const fixture = (extra = {}) => ({ id, result_id: 'result-synthetic', product_code: 'basic', amount: 990, currency: 'CNY', status: 'pending', unlocked: false, created_at: '2026-11-10T00:00:00.000Z', payment_availability: 'unconfigured', pricing_mode: 'controlled_test_fixture', ...extra })
 const apiCode = compile(source('../src/ops-api.ts'))
 function client(respond, clock = { setTimeout, clearTimeout }) {
   const calls = []
-  const api = evaluate(apiCode, { './ops-order': model }, {
-    window: clock, AbortController, DOMException, Headers,
+  const api = evaluate(apiCode, { './ops-order': model, './ops-orders-collection': collection }, {
+    window: clock, AbortController, DOMException, Headers, document: { body: { appendChild() {}, removeChild() {} }, createElement: () => ({ click() {}, remove() {} }) },
+    URL: { createObjectURL: () => 'blob:synthetic', revokeObjectURL() {} }, Blob,
     fetch: async (path, init) => { calls.push({ path, init }); return respond(path, init, calls.length) },
   })
   return { api, calls }
 }
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+const csv = (body, status = 200) => new Response(body, { status, headers: { 'Content-Type': 'text/csv; charset=utf-8' } })
 
 test('order identifier trims only edges, preserves case and rejects unsafe/oversized input before HTTP', async () => {
   assert.equal(model.normalizeOrderId('  MBTI-a_B-1  '), 'MBTI-a_B-1')
@@ -98,26 +101,55 @@ test('network and abort timeout fail safely', async () => {
   await assert.rejects(timeout.api.readOrder(id), error => error.status === 0 && /超时/.test(error.message))
 })
 
+test('list/export/summary use raw MBTI payloads, identical filters, and CSV content-type checks', async () => {
+  const page = { items: [fixture()], next_cursor: null }
+  const summary = { interval: { from: '2026-11-01', to: '2026-11-10', startInclusive: '2026-11-01T00:00:00.000Z', endExclusive: '2026-11-11T00:00:00.000Z', dateBasis: 'order_created_at', boundaryTimezone: 'UTC', displayTimezone: 'Asia/Shanghai' },
+    metrics: { pending: 1, paid: 2, failed: 0, paidOrderCount: 2, grossPaidAmountFen: 1980, currency: 'CNY', grossPaidByCurrency: [{ currency: 'CNY', amountFen: 1980, paidOrderCount: 2 }] },
+    netCollectedFen: null, refundsUnavailable: true, channelAttributionUnavailable: true, unavailableReason: null }
+  const b = client(path => {
+    if (path.includes('/export.csv')) return csv('\uFEFF"id"\r\n"MBTI-1"\r\n')
+    if (path.includes('/summary')) return json(summary)
+    if (path.includes('/orders?')) return json(page)
+    return json(fixture())
+  })
+  assert.equal((await b.api.listOrders({ status: 'paid', limit: '20' })).items[0].amount, 990)
+  assert.equal(b.calls[0].path, '/api/admin/mbti/orders?status=paid&limit=20')
+  const exported = await b.api.exportOrders({ status: 'paid', from: '2026-11-01', to: '2026-11-10' })
+  assert.match(exported, /"id"\r\n"MBTI-1"\r\n/)
+  assert.equal(b.calls[1].path, '/api/admin/mbti/orders/export.csv?status=paid&from=2026-11-01&to=2026-11-10')
+  assert.equal((await b.api.readOrderSummary('2026-11-01', '2026-11-10', 'all')).metrics.paid, 2)
+  assert.equal(b.calls[2].path, '/api/admin/mbti/orders/summary?from=2026-11-01&to=2026-11-10&channel=all')
+  await assert.rejects(client(() => json(page)).api.exportOrders({}), error => error.status === 502)
+  await assert.rejects(client(() => json({ ...summary, netCollectedFen: 1 })).api.readOrderSummary('2026-11-01', '2026-11-10', 'all'), error => error.status === 502)
+})
+
 // Exercise the actual Vue component with Vue's in-memory renderer. No browser login
 // or live role acceptance is implied by these isolated component tests.
 const { descriptor } = parse(source('../src/orders.vue'))
 const componentCode = compile(compileScript(descriptor, { id: 'orders-test', inlineTemplate: true, templateOptions: { compilerOptions: { hoistStatic: false } } }).content)
-function mountPage(readOrder) {
-  globalThis.document = { activeElement: null }
-  const node = (type, text = '') => ({ type, text, props: {}, children: [], parent: null, tagName: type.toUpperCase(), value: '', addEventListener() {}, removeEventListener() {} })
+const listDescriptor = parse(source('../src/orders-list.vue')).descriptor
+const listCode = compile(compileScript(listDescriptor, { id: 'orders-list-test', inlineTemplate: true, templateOptions: { compilerOptions: { hoistStatic: false } } }).content)
+function mountNodes() {
+  globalThis.document = { activeElement: null, body: { appendChild() {}, removeChild() {} }, createElement: () => ({ click() {}, remove() {} }) }
+  const node = (type, text = '') => ({ type, text, props: {}, children: [], parent: null, tagName: type.toUpperCase(), value: '', get options() { return this.children.filter(n => n.type === 'option') }, addEventListener() {}, removeEventListener() {} })
   const renderer = Vue.createRenderer({
     createElement: type => node(type), createText: text => node('#text', text), createComment: text => node('#comment', text),
     insert(el, parent, anchor = null) { if (el.parent) this.remove(el); el.parent = parent; const i = parent.children.indexOf(anchor); parent.children.splice(i < 0 ? parent.children.length : i, 0, el) },
     remove(el) { const i = el.parent?.children.indexOf(el) ?? -1; if (i >= 0) el.parent.children.splice(i, 1); el.parent = null },
     setText(el, text) { el.text = text }, setElementText(el, text) { el.text = text; el.children = [] },
     parentNode: el => el.parent, nextSibling: el => el.parent?.children[el.parent.children.indexOf(el) + 1] ?? null,
-    patchProp(el, key, _old, value) { el.props[key] = value },
+    patchProp(el, key, _old, value) { el.props[key] = value; if (key === 'value') el.value = value },
   })
+  return { node, renderer }
+}
+function mountPage(readOrder, listOrders = async () => ({ items: [], next_cursor: null })) {
+  const { node, renderer } = mountNodes()
   const errors = client(() => json({})).api
-  const component = evaluate(componentCode, { vue: Vue, './ops-order': model, './ops-api': { readOrder, OpsApiError: errors.OpsApiError }, './orders.css': {} }).default
+  const List = evaluate(listCode, { vue: Vue, './ops-api': { listOrders, exportOrders: async () => { throw new Error('export unused') }, OpsApiError: errors.OpsApiError, saveOrdersCsv() {} }, './ops-order': model, './ops-orders-collection': collection }).default
+  const component = evaluate(componentCode, { vue: Vue, './ops-order': model, './ops-api': { readOrder, OpsApiError: errors.OpsApiError }, './orders-list.vue': { default: List }, './orders.css': {} }).default
   const root = node('root')
   let reauth = 0
-  const app = renderer.createApp(component, { onReauthenticate: () => reauth++ })
+  const app = renderer.createApp(component, { permissions: [], onReauthenticate: () => reauth++ })
   app.mount(root)
   const nodes = () => { const all = []; const visit = n => { all.push(n); n.children.forEach(visit) }; visit(root); return all }
   const text = () => nodes().filter(n => n.type !== '#comment').map(n => n.text).join(' ')
@@ -125,6 +157,19 @@ function mountPage(readOrder) {
   const input = async value => { nodes().find(n => n.type === 'input').props['onUpdate:modelValue'](value); await Vue.nextTick() }
   const submit = async () => { const promise = nodes().find(n => n.type === 'form').props.onSubmit({ preventDefault() {} }); await Vue.nextTick(); return promise }
   return { app, nodes, text, button, input, submit, errors, reauth: () => reauth }
+}
+function mountList(api, permissions = ['mbti:ops:access', 'mbti:ops:export']) {
+  const { node, renderer } = mountNodes()
+  const errors = client(() => json({})).api
+  const component = evaluate(listCode, { vue: Vue, './ops-api': { ...api, OpsApiError: errors.OpsApiError }, './ops-order': model, './ops-orders-collection': collection }).default
+  const root = node('root')
+  let detail = '', reauth = 0
+  const app = renderer.createApp(component, { permissions, onDetail: id => { detail = id }, onReauthenticate: () => reauth++ })
+  app.mount(root)
+  const nodes = () => { const all = []; const visit = n => { all.push(n); n.children.forEach(visit) }; visit(root); return all }
+  const text = () => nodes().filter(n => n.type !== '#comment').map(n => n.text).join(' ')
+  const button = label => nodes().find(n => n.type === 'button' && n.text === label)
+  return { app, nodes, text, button, detail: () => detail, reauth: () => reauth, errors }
 }
 const flush = async () => { await Promise.resolve(); await Vue.nextTick(); await Vue.nextTick() }
 
@@ -170,15 +215,15 @@ test('component maps real status values to separate denial/missing/login/error s
   }
 })
 
-test('invalid input never requests; all unsupported order/fulfillment/code/local controls are disabled', async () => {
+test('invalid input never requests; unsupported fulfillment/code/local controls stay disabled', async () => {
   let calls = 0
   const p = mountPage(async () => { calls++; return model.projectOrder(fixture(), id) })
   await p.input('../bad'); await p.submit(); await flush()
   assert.match(p.text(), /请检查订单号/); assert.equal(calls, 0)
-  for (const label of ['交易订单', '生成任务', '体验兑换码', '本机前台订单']) {
+  for (const label of ['生成任务', '体验兑换码', '本机前台订单']) {
     p.button(label).props.onClick(); await flush()
     assert.match(p.text(), /UI_CONTRACT/)
-    const unsupported = p.nodes().filter(n => n.type === 'select' || n.type === 'button' && /未接通|上一页|下一页/.test(n.text))
+    const unsupported = p.nodes().filter(n => n.type === 'select' || n.type === 'button' && /未接通/.test(n.text))
     assert.ok(unsupported.length > 0)
     assert.ok(unsupported.every(n => n.props.disabled === '' || n.props.disabled === true))
   }
@@ -186,10 +231,38 @@ test('invalid input never requests; all unsupported order/fulfillment/code/local
   p.app.unmount()
 })
 
+test('orders list renders paging, export permission gating, and detail handoff', async () => {
+  let exportCalls = 0
+  const cursor = 'eyJ0ZXN0IjoxfQ'
+  const p = mountList({
+    listOrders: async filters => filters.cursor ? { items: [fixture({ id: 'MBTI-page-2' })], next_cursor: null } : { items: [fixture()], next_cursor: cursor },
+    exportOrders: async filters => { exportCalls++; assert.equal(filters.cursor, undefined); return '\uFEFF"id"\r\n' },
+    saveOrdersCsv: () => {},
+  })
+  await flush(); await flush()
+  assert.match(p.text(), new RegExp(id))
+  assert.match(p.text(), /990 分 · CNY/)
+  p.nodes().find(n => n.type === 'button' && /查看订单/.test(n.props['aria-label'] || '')).props.onClick()
+  assert.equal(p.detail(), id)
+  await p.button('下一页').props.onClick(); await flush(); await flush()
+  assert.match(p.text(), /MBTI-page-2/)
+  await p.button('导出当前筛选 CSV').props.onClick(); await flush(); await flush()
+  assert.equal(exportCalls, 1)
+  assert.match(p.text(), /CSV 已交给浏览器下载/)
+  p.app.unmount()
+  const denied = mountList({ listOrders: async () => ({ items: [fixture()], next_cursor: null }), exportOrders: async () => { throw new Error('must not export') }, saveOrdersCsv() {} }, [])
+  await flush(); await flush()
+  assert.equal(denied.button('导出当前筛选 CSV').props.disabled, true)
+  denied.app.unmount()
+})
+
 test('existing server order controller remains raw, no-store, and protected by exact Foundation guards/permission', () => {
   const controller = source('../../aij-foundation/apps/api/src/mbti/mbti-orders.controller.ts').split('// Existing Foundation Auth/RBAC')[1]
   assert.match(controller, /@SetMetadata\(MBTI_RAW, true\)/)
   assert.match(controller, /@UseGuards\(JwtAuthGuard, PermissionsGuard\)/)
+  assert.match(controller, /@Get\(\) @Permissions\("mbti:orders:read"\) @Header\("Cache-Control", "no-store"\)/)
+  assert.match(controller, /@Get\("export\.csv"\) @Permissions\("mbti:ops:access", "mbti:ops:export"\)/)
+  assert.match(controller, /@Get\("summary"\) @Permissions\("mbti:orders:read"\)/)
   assert.match(controller, /@Get\(":id"\) @Permissions\("mbti:orders:read"\) @Header\("Cache-Control", "no-store"\)/)
   assert.doesNotMatch(controller, /@Post|@Patch|@Delete|@Put/)
 })

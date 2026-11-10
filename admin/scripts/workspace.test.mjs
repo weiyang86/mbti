@@ -16,8 +16,15 @@ function evaluate(code, modules = {}, globals = {}) {
   return module.exports
 }
 const model = evaluate(compile(source('../src/ops-workspace.ts')))
+const orderModel = evaluate(compile(source('../src/ops-order.ts')))
+const collection = evaluate(compile(source('../src/ops-orders-collection.ts')), { './ops-order': orderModel })
 const { descriptor } = parse(source('../src/workspace.vue'))
 const componentCode = compile(compileScript(descriptor, { id: 'workspace-test', inlineTemplate: true, templateOptions: { compilerOptions: { hoistStatic: false } } }).content)
+const summaryFixture = {
+  interval: { from: '2026-11-04', to: '2026-11-10', startInclusive: '2026-11-04T00:00:00.000Z', endExclusive: '2026-11-11T00:00:00.000Z', dateBasis: 'order_created_at', boundaryTimezone: 'UTC', displayTimezone: 'Asia/Shanghai' },
+  metrics: { pending: 3, paid: 5, failed: 1, paidOrderCount: 5, grossPaidAmountFen: 4950, currency: 'CNY', grossPaidByCurrency: [{ currency: 'CNY', amountFen: 4950, paidOrderCount: 5 }] },
+  netCollectedFen: null, refundsUnavailable: true, channelAttributionUnavailable: true, unavailableReason: null,
+}
 
 test('Beijing dates and previous equal windows remain correct across UTC midnight, leap days and years', () => {
   assert.equal(model.shanghaiToday(new Date('2026-11-09T16:00:00Z')), '2026-11-10')
@@ -35,9 +42,9 @@ test('invalid, missing, reversed and future dates cannot become a query window',
   }
 })
 
-// Real component, in-memory renderer; no login, service, database or HTTP evidence.
-function mountPage(page, canExport = false, canModerate = false) {
-  const listeners = new Map(), navigation = []
+// Real component, in-memory renderer; overview may call the summary client with synthetic fixtures only.
+function mountPage(page, canExport = false, canModerate = false, readOrderSummary = async () => summaryFixture) {
+  const listeners = new Map(), navigation = [], summaryCalls = []
   const document = { activeElement: null, addEventListener: (key, fn) => listeners.set(key, fn), removeEventListener: key => listeners.delete(key) }
   globalThis.document = document
   class Element {}
@@ -51,7 +58,9 @@ function mountPage(page, canExport = false, canModerate = false) {
     patchProp(el, key, _old, value) { el.props[key] = value; if (key === 'value') el.value = value },
   })
   const forbidden = () => { throw new Error('Workspace UI must not send a request or create a ledger') }
-  const component = evaluate(componentCode, { vue: Vue, './ops-workspace': model, './workspace.css': {} }, { document, HTMLElement: Element, fetch: forbidden, localStorage: new Proxy({}, { get: forbidden }), sessionStorage: new Proxy({}, { get: forbidden }) }).default
+  class OpsApiError extends Error { constructor(status, message) { super(message); this.status = status } }
+  const api = { OpsApiError, async readOrderSummary(from, to, channel) { summaryCalls.push({ from, to, channel }); return readOrderSummary(from, to, channel) } }
+  const component = evaluate(componentCode, { vue: Vue, './ops-workspace': model, './ops-api': api, './ops-orders-collection': collection, './workspace.css': {} }, { document, HTMLElement: Element, fetch: forbidden, localStorage: new Proxy({}, { get: forbidden }), sessionStorage: new Proxy({}, { get: forbidden }) }).default
   const root = node('root')
   const app = renderer.createApp(component, { page, canExport, canModerate, onNavigate: id => navigation.push(id) })
   app.mount(root)
@@ -60,22 +69,31 @@ function mountPage(page, canExport = false, canModerate = false) {
   const button = label => nodes().find(n => n.type === 'button' && n.text === label)
   const control = label => nodes().find(n => n.props['aria-label'] === label)
   const set = async (label, value) => { control(label).props['onUpdate:modelValue'](value); await Vue.nextTick() }
-  return { app, nodes, text, button, control, set, listeners, navigation }
+  return { app, nodes, text, button, control, set, listeners, navigation, summaryCalls }
 }
-const flush = async () => { await Vue.nextTick(); await Vue.nextTick() }
+const flush = async () => { await Vue.nextTick(); await Vue.nextTick(); await Promise.resolve(); await Vue.nextTick() }
 const disabled = node => node.props.disabled === true || node.props.disabled === ''
 
-test('three pages retain prototype sections with unavailable metrics, and no fake rows or requests', () => {
-  for (const [page, labels] of [
-    ['overview', ['净实收', '支付订单', '测试完成率', '分享回流新客', '经营趋势', '渠道收入构成', '运营待办', '热门视觉模板']],
-    ['growth', ['访问人次（日内去重）', '成图预览人次', '预览后 7 日付费率', '可归因新访客', '测评完成', '传播行为', '渠道表现']],
-    ['moderation', ['互换申请', '名片同意率', '联系授权完成率', '待处理举报（全量）', '举报队列', '全部日期 · 匿名工单']],
+test('three pages retain prototype sections; overview consumes summary without inventing net/channel KPIs', async () => {
+  const overview = mountPage('overview')
+  await flush()
+  for (const label of ['净实收', '已支付订单', '待支付订单', '支付失败', '已支付毛额', '经营趋势', '渠道收入构成', '运营待办', '热门视觉模板']) assert.ok(overview.text().includes(label), label)
+  assert.match(overview.text(), /4950 分 · CNY/)
+  assert.match(overview.text(), /退款事实未接通/)
+  assert.equal(overview.summaryCalls.length, 1)
+  assert.equal(overview.summaryCalls[0].channel, 'all')
+  assert.doesNotMatch(overview.text(), /测试完成率|分享回流新客|MOD-108|导出成功|处理成功/)
+  overview.app.unmount(); assert.equal(overview.listeners.size, 0)
+  for (const [page, labels, unavailable] of [
+    ['growth', ['访问人次（日内去重）', '成图预览人次', '预览后 7 日付费率', '可归因新访客', '测评完成', '传播行为', '渠道表现'], 4],
+    ['moderation', ['互换申请', '名片同意率', '联系授权完成率', '待处理举报（全量）', '举报队列', '全部日期 · 匿名工单'], 4],
   ]) {
     const p = mountPage(page)
+    await flush()
     for (const label of labels) assert.ok(p.text().includes(label), label)
-    assert.equal(p.nodes().filter(n => n.props['aria-label'] === '数据不可得').length, 4)
+    assert.equal(p.nodes().filter(n => n.props['aria-label'] === '数据不可得').length, unavailable)
+    assert.equal(p.summaryCalls.length, 0)
     assert.match(p.text(), /UI_CONTRACT/)
-    assert.doesNotMatch(p.text(), /MOD-108|¥\d|\d+\.\d+%|导出成功|处理成功/)
     p.app.unmount(); assert.equal(p.listeners.size, 0)
   }
 })
@@ -97,10 +115,20 @@ test('channel filter changes fixed channel rows; custom dates validate and defin
   assert.equal(p.nodes().some(n => n.props.role === 'dialog'), false)
   p.app.unmount()
 })
+test('overview marks channel-filtered summary unavailable instead of inventing attribution', async () => {
+  const p = mountPage('overview', false, false, async (_from, _to, channel) => channel === 'all' ? summaryFixture : { ...summaryFixture, metrics: null, unavailableReason: 'channel_attribution_unavailable' })
+  await flush()
+  assert.match(p.text(), /4950 分 · CNY/)
+  await p.set('统计渠道', 'wechat'); await flush()
+  assert.match(p.text(), /渠道归因不可得/)
+  assert.ok(p.nodes().filter(n => n.props['aria-label'] === '数据不可得').length >= 4)
+  p.app.unmount()
+})
 test('export and moderation remain disabled with any presentation capability; no client write path', async () => {
   for (const capability of [false, true]) {
     for (const [page, label] of [['overview', '导出报表 · 未接通'], ['growth', '导出渠道表 · 未接通']]) {
       const p = mountPage(page, capability, capability)
+      await flush()
       assert.ok(disabled(p.button(label))); assert.match(p.button(label).props.title, /缺同筛选/)
       if (!capability) assert.match(p.button(label).props.title, /mbti:ops:export/)
       if (page === 'overview') {
@@ -110,6 +138,7 @@ test('export and moderation remain disabled with any presentation capability; no
       p.app.unmount()
     }
     const p = mountPage('moderation', capability, capability)
+    await flush()
     assert.ok(disabled(p.button('查看处理 · 未接通'))); assert.ok(disabled(p.button('查看记录 · 未接通')))
     await p.button('工单字段与处理说明').props.onClick(); await flush()
     assert.ok(disabled(p.nodes().find(n => n.type === 'fieldset')))

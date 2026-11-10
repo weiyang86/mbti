@@ -1,3 +1,4 @@
+import { orderQuery, projectOrderPage, projectOrderSummary, type OrderFilters } from './ops-orders-collection'
 import { normalizeOrderId, orderPath, projectOrder } from './ops-order'
 
 export type Capability = 'access' | 'orders' | 'draft' | 'systemRead' | 'systemWrite' | 'release' | 'fulfillment' | 'moderation' | 'export' | 'redemption'
@@ -18,7 +19,7 @@ export class OpsApiError extends Error {
   constructor(readonly status: number, message: string, readonly code?: 'INVALID_ORDER_RESPONSE') { super(message) }
 }
 
-export async function request<T>(path: string, init: RequestInit = {}, retry = true, raw = false): Promise<T> {
+export async function request<T>(path: string, init: RequestInit = {}, retry = true, raw: boolean | 'csv' = false): Promise<T> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -30,6 +31,10 @@ export async function request<T>(path: string, init: RequestInit = {}, retry = t
     if (response.status === 401 && retry && path !== '/auth/browser-login' && path !== '/auth/session' && path !== '/auth/logout') {
       try { await session() } catch { throw new OpsApiError(401, '登录已失效，请重新登录。') }
       return request<T>(path, init, false, raw)
+    }
+    if (raw === 'csv' && response.ok) {
+      if (!response.headers.get('Content-Type')?.startsWith('text/csv')) throw new OpsApiError(502, '导出响应格式不正确。')
+      return await response.text() as T
     }
     const payload = await response.json().catch(() => null) as { success?: boolean; data?: T; message?: string } | null
     if (!response.ok || (!raw && !payload?.success)) {
@@ -62,4 +67,21 @@ export async function readOrder(id: string) {
   const payload = await request<unknown>(orderPath(normalized), {}, true, true)
   try { return projectOrder(payload, normalized) }
   catch { throw new OpsApiError(502, '订单响应格式不正确，请重试或联系维护人员。', 'INVALID_ORDER_RESPONSE') }
+}
+
+export async function listOrders(filters: OrderFilters) {
+  const value = await request<unknown>('/admin/mbti/orders' + orderQuery(filters), {}, true, true)
+  try { return projectOrderPage(value) } catch { throw new OpsApiError(502, '订单列表响应格式不正确。') }
+}
+export function exportOrders(filters: OrderFilters) {
+  return request<string>('/admin/mbti/orders/export.csv' + orderQuery(filters), {}, true, 'csv')
+}
+export async function readOrderSummary(from: string, to: string, channel: string) {
+  const value = await request<unknown>('/admin/mbti/orders/summary' + orderQuery({ from, to, channel }), {}, true, true)
+  try { return projectOrderSummary(value) } catch { throw new OpsApiError(502, '订单汇总响应格式不正确。') }
+}
+export function saveOrdersCsv(csv: string) {
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+  const link = document.createElement('a'); link.href = url; link.download = 'mbti-orders.csv'
+  document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url)
 }
