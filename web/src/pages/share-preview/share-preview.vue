@@ -18,8 +18,8 @@
 
     <view v-else>
       <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+        <text>V0.4 · 趣味体验 · 不产生费用</text>
+        <text class="demo-link" @click="showDemo">体验说明 ↗</text>
       </view>
 
       <text class="kicker">READY TO SHARE / 晒出我的 MBTI</text>
@@ -358,8 +358,8 @@ function persistDrafts() {
 
 function showDemo() {
   uni.showModal({
-    title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：预览图由本地素材渲染，不产生真实费用，也未连接真实后端。',
+    title: '体验说明',
+    content: '当前为 V0.4 趣味体验版：预览图由本地素材渲染，平台分享能力尚未接入。',
     showCancel: false,
     confirmText: '知道了',
   })

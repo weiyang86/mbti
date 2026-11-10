@@ -1,7 +1,7 @@
 <template>
   <view class="page generation">
     <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text>V0.4 · 趣味体验 · 不产生费用</text>
     </view>
 
     <view class="gen-orb">✦</view>

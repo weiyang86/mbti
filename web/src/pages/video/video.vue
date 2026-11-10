@@ -11,7 +11,7 @@
 
     <view v-else>
       <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
+        <text>V0.4 · 趣味体验 · 不产生费用</text>
       </view>
 
       <text class="kicker">STORYBOARD / 分镜预览</text>

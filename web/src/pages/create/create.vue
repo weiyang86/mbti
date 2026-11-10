@@ -26,8 +26,8 @@
 
     <view v-else>
       <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+        <text>V0.4 · 趣味体验 · 不产生费用</text>
+        <text class="demo-link" @click="showDemo">体验说明 ↗</text>
       </view>
 
       <text class="kicker">MY MBTI LOOK / 形象工作台</text>
@@ -241,8 +241,8 @@ function goPricing() {
 
 function showDemo() {
   uni.showModal({
-    title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：昵称、风格与宣言只保存在本机，生成使用预置示例素材。',
+    title: '体验说明',
+    content: '当前为 V0.4 趣味体验版：昵称、风格与宣言只保存在本机，生成使用预置示例素材。',
     showCancel: false,
     confirmText: '知道了',
   })

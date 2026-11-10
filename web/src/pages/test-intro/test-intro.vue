@@ -1,8 +1,8 @@
 <template>
   <view class="page intro-page">
     <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+      <text>V0.4 · 趣味体验 · 不产生费用</text>
+      <text class="demo-link" @click="showDemo">体验说明 ↗</text>
     </view>
 
     <text class="kicker"><text class="dash">—</text> 12 QUESTIONS / MBTI 趣味测试</text>
@@ -135,8 +135,8 @@ function goSelfSelect() {
 
 function showDemo() {
   uni.showModal({
-    title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：页面数据来自本地 mock，不产生真实费用，也未连接真实后端。',
+    title: '体验说明',
+    content: '当前为 V0.4 趣味体验版：页面使用正式测试接口，基础结果免费查看。',
     showCancel: false,
     confirmText: '知道了',
   })

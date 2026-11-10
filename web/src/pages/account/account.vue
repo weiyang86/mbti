@@ -19,7 +19,7 @@
       <view class="link" @click="goTab('/pages/discover/discover')">发现搭子 →</view>
     </view>
 
-    <text class="fine">联系方式与同型雷达依赖 F5/F6 接口，尚未接入。</text>
+    <text class="fine">联系方式保存与同型统计仍在联调中，部分功能可能暂不可用。</text>
   </view>
 </template>
 

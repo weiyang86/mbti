@@ -9,8 +9,8 @@
 
     <view v-else>
       <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">演示状态 ↗</text>
+        <text>V0.4 · 趣味体验 · 不产生费用</text>
+        <text class="demo-link" @click="showDemo">体验说明 ↗</text>
       </view>
 
       <view class="banner">
@@ -240,8 +240,8 @@ const declaration = computed(
 
 function showDemo() {
   uni.showModal({
-    title: '演示状态',
-    content: '当前为 V0.4 Mock 演示：结果来自本地 mock，不产生真实费用，也未连接真实后端。',
+    title: '体验说明',
+    content: '当前为 V0.4 趣味体验版：结果来自正式测试接口，仅供趣味参考，不构成心理诊断。',
     showCancel: false,
     confirmText: '知道了',
   })
