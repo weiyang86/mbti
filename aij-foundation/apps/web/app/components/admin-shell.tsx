@@ -75,6 +75,7 @@ export function AdminOverview() {
     <div className="admin-overview"><div><span className="admin-field-label">当前账号</span><strong>{session.user.username}</strong></div><div><span className="admin-field-label">账号身份</span><strong>{permissions.isSuperAdmin ? "系统管理员" : "管理员"}</strong></div></div>
     <section className="admin-overview-section" aria-label="当前授权的管理入口"><div className="admin-overview-section-heading"><h2>可用管理入口</h2><span>{available.length} 项</span></div>
       {available.length ? <nav className="admin-overview-links" aria-label="可用管理入口">{available.map(item => <Link key={item.id} href={item.path!}><strong>{item.title}</strong><span>{item.path}</span></Link>)}</nav> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="此账号暂无可访问的管理页面。" />}
+      {permissions.isSuperAdmin && permissions.effectivePermissions.includes("admin.plugin.manage") && <p><Link href="/plugins/mbti-config/settings">MBTI 插件配置</Link></p>}
       <p className="admin-help">此列表来自服务端菜单授权；实际 API 仍会独立执行权限检查。</p>
     </section>
   </>;

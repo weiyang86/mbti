@@ -1,5 +1,6 @@
 // F00 M03/M06: source redactText patterns, plus fail-closed read projection for historical rows.
 import type { AuditLog, Prisma } from "@prisma/client";
+import { MBTI_CATEGORIES } from "../plugins/mbti-config/mbti-config.categories";
 export const REDACTED = "[REDACTED]";
 export function redactText(input: string): string {
   return input.replace(/-----BEGIN [A-Z ]*(?:PRIVATE KEY|CERTIFICATE)-----[\s\S]*?-----END [A-Z ]*(?:PRIVATE KEY|CERTIFICATE)-----/gi, REDACTED)
@@ -14,13 +15,13 @@ const actions: Readonly<Record<string, readonly string[]>> = {
   "rbac-management": ["role_created", "role_updated", "role_enabled", "role_disabled", "role_deleted", "role_permissions_assigned", "permission_created", "permission_updated", "permission_enabled", "permission_disabled", "permission_deleted"],
   menus: ["menu_created", "menu_updated", "menu_deleted"],
   dictionaries: ["dict_created", "dict_updated", "dict_deleted", "dict_item_created", "dict_item_updated", "dict_item_deleted"],
-  configuration: ["scoped_config_updated", "project_status_updated"],
+  configuration: ["scoped_config_updated", "project_status_updated", "mbti_draft_saved", "mbti_published", "mbti_rollback"],
   "secret-center": ["secret_reference_created", "secret_reference_checked", "secret_reference_rotated", "secret_reference_cleared", "secret_reference_rebound"],
   runtime: ["job_retried", "job_cancelled", "outbox_retried"],
   "aij-ai": ["trace_listed"]
 };
 const resourceTypes = new Set(["admin-auth", "member_auth", "client_auth_session", "permission", "administrator", "role", "menu", "system_dict", "system_dict_item", "scoped_config", "project_profile", "secret_reference", "runtime_job", "runtime_outbox", "ai_execution_trace"]);
-const fieldNames = new Set(["identity", "roles", "realName", "email", "phone", "roleIds", "roleCode", "roleName", "remark", "permissionIds", "permissionCode", "permissionName", "resourceType", "action", "apiPath", "name", "title", "parentId", "path", "icon", "sortOrder", "visible", "permissionCode", "status", "code", "description", "isPublic", "label", "value", "dictId", "configValue", "version", "reference", "sessionId", "page", "pageSize", "providerCode", "modelCode", "correlationId", "costSource", "startAt", "endAt"]);
+const fieldNames = new Set([...MBTI_CATEGORIES, "identity", "roles", "realName", "email", "phone", "roleIds", "roleCode", "roleName", "remark", "permissionIds", "permissionCode", "permissionName", "resourceType", "action", "apiPath", "name", "title", "parentId", "path", "icon", "sortOrder", "visible", "permissionCode", "status", "code", "description", "isPublic", "label", "value", "dictId", "configValue", "version", "reference", "sessionId", "page", "pageSize", "providerCode", "modelCode", "correlationId", "costSource", "startAt", "endAt"]);
 const permissions = new Set(["aij.bootstrap.admin", "admin.user.manage", "admin.role.manage", "admin.permission.manage", "admin.menu.manage", "admin.dict.manage", "admin.config.manage", "admin.secret.manage", "admin.log.read", "admin.runtime.read", "admin.runtime.manage", "admin.client.read", "admin.client.sessions.revoke"]);
 function identifier(value: string | null) { return value === null ? null : /^(?:[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}|c[a-z0-9]{24})$/.test(value) && redactText(value) === value ? value : REDACTED; }
 function summary(value: Prisma.JsonValue) {

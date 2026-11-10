@@ -18,9 +18,9 @@ test('AF-120 delivery integration joins import, runtime answers, evaluation and 
   try{
     await f.prisma.secretReference.create({data:{ref,provider:'env',description:'Synthetic in-memory test credential only'}});
     await setConfig('offline-knowledge','synthetic-qa-v1');
-    await t.test('launcher and API share the actual three trusted plugin registrations',()=>{
+    await t.test('launcher and API share the actual trusted plugin registrations',()=>{
       const {resolvePluginModules}=f.requireApi('plugin-runtime/plugin-runtime.module.js');
-      assertLaunchPlugins(LAUNCH_PLUGIN_CODES);assert.equal(resolvePluginModules(LAUNCH_PLUGIN_CODES).length,3);
+      assertLaunchPlugins(LAUNCH_PLUGIN_CODES);assert.equal(resolvePluginModules(LAUNCH_PLUGIN_CODES).length,LAUNCH_PLUGIN_CODES.length);
       assert.throws(()=>assertLaunchPlugins(['unknown-plugin']));assert.throws(()=>resolvePluginModules(['unknown-plugin']));
     });
     await t.test('file import becomes real queued answer, source citation and separate evaluation record',async()=>{

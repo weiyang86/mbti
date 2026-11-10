@@ -7,7 +7,7 @@ import { loadRuntimeEnvironment } from "../../../scripts/runtime-environment.cjs
 
 test("plugins are opt-in, migrated modules resolve and unknown modules reject", () => {
   assert.deepEqual(resolvePluginModules([]), []);
-  for (const code of ["aij-ai", "aij-notification", "aij-payment"]) assert.equal(resolvePluginModules([code]).length, 1);
+  for (const code of ["aij-ai", "aij-notification", "aij-payment", "mbti-config"]) assert.equal(resolvePluginModules([code]).length, 1);
   for (const code of ["qingqi-app", "company-ops", "unknown-plugin"]) {
     assert.throws(() => resolvePluginModules([code]), /not in the registered backend allowlist/);
   }

@@ -381,6 +381,7 @@ function loadRuntimeEnvironment(environment = process.env) {
 }
 
 function assertRuntimeCapabilities(config) {
+  if (config.enabledPlugins.includes("mbti-config") && (config.projectId !== "mbti-foundation" || !config.capabilities.auth || !config.capabilities.database)) throw new Error("MBTI config requires its trusted project, administrator auth and database capabilities");
   if (config.capabilities.clientAuth && !config.capabilities.database) throw new Error("Client auth requires the database capability");
   if (config.capabilities.auth && !config.capabilities.database) throw new Error("Administrator auth requires the database capability");
   if (config.asyncRuntimeEnabled && (!config.capabilities.auth || !config.capabilities.database)) throw new Error("Async runtime requires administrator auth and the database capability");
