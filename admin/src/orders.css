@@ -29,9 +29,13 @@
 .order-fields>div{min-width:0;padding:15px 0;border-bottom:1px solid #efedf3}
 .order-fields dt{color:var(--muted);font-size:10px}
 .order-fields dd{margin:7px 0 0;font-size:11px;line-height:1.7;overflow-wrap:anywhere}
-.order-dependency{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:13px;border-radius:8px;background:#f7f6fa}
+.order-dependency{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:13px;border-radius:8px;background:#f7f6fa}
 .order-dependency b{font-size:11px;font-weight:600}
 .order-dependency p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.7}
+.order-refund-label{display:block;margin-top:10px;font-size:10px;color:var(--muted)}
+.order-refund-label textarea{display:block;width:min(420px,100%);margin-top:6px;padding:8px 10px;border:1px solid #dedde8;border-radius:8px;background:#fff;font:inherit;resize:vertical}
+.order-refund-ok{color:#1f6b3a!important}
+.order-refund-err{color:#9b1c1c!important}
 .order-state{display:grid;justify-items:center;align-content:center;gap:10px;min-height:233px;padding:25px 10px;text-align:center}
 .order-state-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#f1eff9;color:#7667b6;font-size:20px}
 .order-state h3{margin:3px 0 0;font-size:13px;font-weight:600;color:var(--ink)}

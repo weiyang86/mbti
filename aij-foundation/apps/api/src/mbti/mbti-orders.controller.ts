@@ -5,6 +5,8 @@ import { Permissions } from "../common/decorators/permissions.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { PermissionsGuard } from "../common/guards/permissions.guard";
 import { MbtiOpsOrdersService } from "./mbti-ops-orders.service";
+import { MbtiOpsRefundService } from "./mbti-ops-refund.service";
+import { PAYMENT_REFUND_REQUEST } from "../../../../scripts/payment-admin-policy.cjs";
 import type { AdminRequest } from "../auth/auth.types";
 
 @Controller("v1")
@@ -26,7 +28,11 @@ export class MbtiOrdersController {
 @UseFilters(MbtiErrorFilter)
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class MbtiOrdersAdminController {
-  constructor(private readonly orders: MbtiOrdersService, private readonly collection: MbtiOpsOrdersService) {}
+  constructor(
+    private readonly orders: MbtiOrdersService,
+    private readonly collection: MbtiOpsOrdersService,
+    private readonly refunds: MbtiOpsRefundService,
+  ) {}
   @Get() @Permissions("mbti:orders:read") @Header("Cache-Control", "no-store")
   list(@Query() query: unknown) { return this.collection.list(query); }
   @Get("export.csv") @Permissions("mbti:ops:access", "mbti:ops:export") @Header("Cache-Control", "no-store")
@@ -34,6 +40,10 @@ export class MbtiOrdersAdminController {
   exportCsv(@Req() req: AdminRequest, @Query() query: unknown) { return this.collection.exportCsv(req.user!.id, query); }
   @Get("summary") @Permissions("mbti:orders:read") @Header("Cache-Control", "no-store")
   summary(@Query() query: unknown) { return this.collection.summary(query); }
+  @Post(":id/refund-requests") @Permissions("mbti:orders:read", PAYMENT_REFUND_REQUEST) @Header("Cache-Control", "no-store")
+  createRefund(@Req() req: AdminRequest, @Param("id") id: string, @Body() body: unknown) {
+    return this.refunds.create(id, body, req.user!.id, req.correlationId);
+  }
   @Get(":id") @Permissions("mbti:orders:read") @Header("Cache-Control", "no-store")
   get(@Param("id") id: string) { return this.orders.operations(id); }
 }

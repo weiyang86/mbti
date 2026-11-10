@@ -32,7 +32,7 @@ Owner 缩写：`Agent`=本会话工程；`Remy`=契约/字段；`Coord`=总控/�
 
 | # | 项 | 原型/路由 | 阻塞点 | Owner | 拍板后动作 |
 |---:|---|---|---|---|---|
-| 5 | 退款原因与确认 | UI-03.3 | 可退条件、到账事实、人工/回调、权限 | Remy + Pay | foundation 写路径 + admin 详情解禁 |
+| 5 | 退款原因与确认 | UI-03.3 | ~~人工申请已接 AF-106~~；到账事实/权益吊销仍缺 | Remy + Pay | 申请路径已交付；回写 MbtiOrder/entitlement 另批 |
 | 6 | 体验兑换码账本 | UI-03.4 | 制码/核销身份、次数、权益种类 | Remy | 隔离账本 API + admin 标签页 |
 | 7 | 生成任务队列/重试 | UI-03.2 / UI-01.3 | 任务持久化、与 unlocked 分离、幂等审计 | Remy + Model | admin 任务标签 + API |
 | 8 | 匿名治理工单 | UI-04.1–04.2 | 匿名字段白名单、只读 vs write 权限码 | Remy + Privacy | 管理端列表/处置；**禁用 guest 社交当运营源** |
@@ -80,6 +80,7 @@ Owner 缩写：`Agent`=本会话工程；`Remy`=契约/字段；`Coord`=总控/�
 | overview 订单派生报表 CSV（#2） | 复用 orders/export.csv；渠道/净实收不发明；growth 仍 UI_CONTRACT |
 | mbti-config 类目×角色矩阵测试（#3） | Nest 替身；H5 `MBTI_PUBLIC_APPROVED=false` 仍硬闸 |
 | Remy unknowns 议题包（#12 文档） | [MBTI-REMY-UNKNOWNS.md](MBTI-REMY-UNKNOWNS.md)；待批注 |
+| 订单人工退款申请（#5 部分） | `POST .../orders/:id/refund-requests` → AF-106；admin 详情可提交；不打款/不吊销 |
 | B3–B5 配置上方面板 ↔ mbti-config | 本地替身 API_CONSUMER；H5 硬闸 |
 | B4 本机双图 kit | LOCAL；真模型 NO |
 | C1 插件候选 / C2 consumer | 候选；正式字段 ASK |
@@ -90,9 +91,10 @@ Owner 缩写：`Agent`=本会话工程；`Remy`=契约/字段；`Coord`=总控/�
 
 在 **不恢复 DB** 前提下，默认顺序：
 
-1. ~~**#2** overview CSV~~、~~**#3** 权限矩阵测试~~、~~**#12 议题包**~~ 已交付文档/测试（本迭代）  
-2. **#1** 真实验收探针（有 owner 才跑；否则文档化阻塞）  
-3. 任一 **ASK** 项获批后，立刻开对应 foundation+admin 卡；**#13 解闸** 时同步 Intern 契约说明，不代改 H5  
+1. ~~**#2** overview CSV~~、~~**#3** 权限矩阵测试~~、~~**#12 议题包**~~ 已交付文档/测试  
+2. **候选契约包**：[MBTI-OPS-CANDIDATE-CONTRACTS.md](MBTI-OPS-CANDIDATE-CONTRACTS.md)（退款优先复用 AF-106）— 待 Remy 批注  
+3. **#1** 真实验收探针（有 owner 才跑；否则文档化阻塞）  
+4. 任一 **ASK** 项获批后，立刻开对应 foundation+admin 卡；建议顺序：退款申请 → 兑换码 → 任务读路径 → 工单 → 报表/解闸  
 
 V1 全绿仍依赖 **§3 ENV**；看板完成 ≠ V1 通过。
 

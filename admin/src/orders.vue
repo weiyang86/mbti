@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { OpsApiError, readOrder } from './ops-api'
+import { createOrderRefundRequest, OpsApiError, readOrder, type RefundRequestResult } from './ops-api'
 import { normalizeOrderId, orderStatus, orderTime, type OpsOrder } from './ops-order'
 import './orders.css'
 import OrdersList from './orders-list.vue'
@@ -20,7 +20,14 @@ const orderId = ref('')
 const queriedId = ref('')
 const order = ref<OpsOrder | null>(null)
 const errorMessage = ref('')
+const refundReason = ref('')
+const refundState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+const refundError = ref('')
+const refundResult = ref<RefundRequestResult | null>(null)
 let requestVersion = 0
+let refundVersion = 0
+const canRefund = computed(() => props.permissions.includes('mbti:orders:read') && props.permissions.includes('admin.payment.refund.request'))
+const canSubmitRefund = computed(() => !!order.value && order.value.status === 'paid' && canRefund.value && refundReason.value.trim().length > 0 && refundReason.value.trim().length <= 500 && refundState.value !== 'loading')
 const stateTitle = computed(() => ({
   idle: '输入订单号开始核对', loading: '正在查询订单', success: '订单详情', invalid: '请检查订单号',
   notFound: '未找到此订单', forbidden: '没有订单读取权限', unauthenticated: '登录已失效', error: '暂时无法查询',
@@ -29,10 +36,17 @@ const paymentAvailability = computed(() => {
   const code = order.value?.payment_availability
   return code === 'unconfigured' ? '未配置收款' : code === 'controlled_test' ? '受控测试收款' : '未识别收款状态'
 })
+const refundTitle = computed(() => {
+  if (!canRefund.value) return '当前会话缺少 mbti:orders:read 或 admin.payment.refund.request'
+  if (order.value?.status !== 'paid') return '仅已支付订单可提交人工退款申请'
+  return '提交后进入 pending_manual_review；不会打款，也不会吊销权益'
+})
 
 function clearLookup() {
   requestVersion++
+  refundVersion++
   state.value = 'idle'; order.value = null; queriedId.value = ''; errorMessage.value = ''
+  refundReason.value = ''; refundState.value = 'idle'; refundError.value = ''; refundResult.value = null
 }
 // Clear earlier data immediately when the identifier changes, including during a request.
 watch(orderId, clearLookup, { flush: 'sync' })
@@ -64,6 +78,29 @@ async function queryOrder() {
         : status === 401 ? '请重新核验管理员会话后查询。'
           : error instanceof OpsApiError && error.code === 'INVALID_ORDER_RESPONSE' ? '订单响应格式不正确，请重试或联系维护人员。'
             : error instanceof OpsApiError && status === 0 ? error.message : '订单服务暂不可用，请稍后重试。'
+  }
+}
+
+function refundKey() {
+  const bytes = new Uint8Array(18)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, b => (b % 36).toString(36)).join('')
+}
+async function submitRefund() {
+  if (!order.value || !canSubmitRefund.value) return
+  const current = ++refundVersion
+  refundState.value = 'loading'; refundError.value = ''; refundResult.value = null
+  try {
+    const result = await createOrderRefundRequest(order.value.id, { reason: refundReason.value.trim(), idempotency_key: refundKey() })
+    if (current !== refundVersion) return
+    refundResult.value = result; refundState.value = 'success'
+  } catch (error) {
+    if (current !== refundVersion) return
+    const status = error instanceof OpsApiError ? error.status : 0
+    refundState.value = 'error'
+    refundError.value = status === 401 ? '登录已失效，请重新核验登录。' : status === 403 ? '服务端拒绝退款申请，请核对 mbti:orders:read 与 admin.payment.refund.request。'
+      : status === 409 ? '当前订单不可申请退款，或申请与剩余可退金额冲突。' : status === 422 ? '退款原因或幂等键无效。'
+        : status >= 500 ? '退款申请服务暂不可用，请重试。' : error instanceof OpsApiError ? error.message : '退款申请失败，请重试。'
   }
 }
 </script>
@@ -101,9 +138,21 @@ async function queryOrder() {
             <div><dt>创建时间（北京时间）</dt><dd>{{ orderTime(order.created_at) }}</dd></div>
             <div><dt>支付时间（北京时间）</dt><dd>{{ orderTime(order.paid_at) }}</dd></div>
             <div><dt>定价模式</dt><dd>{{ order.pricing_mode === 'controlled_test_fixture' ? '受控测试定价' : '未识别定价模式' }} <span class="order-mono">· {{ order.pricing_mode }}</span></dd></div>
-            <div><dt>素材交付 / 累计退款</dt><dd>接口未提供，等待接入</dd></div>
+            <div><dt>素材交付 / 累计退款</dt><dd>素材交付仍未接通；退款仅人工申请入审，不表示到账</dd></div>
           </dl>
-          <div class="order-dependency"><div><b>售后与交付尚未接通</b><p>UI_CONTRACT · 退款原因与确认、同任务重试及审计依赖对应业务接口。</p></div><div class="order-disabled-actions"><button class="outline-button" disabled title="UI_CONTRACT · 退款接口未接通">退款 · 未接通</button><button class="outline-button" disabled title="UI_CONTRACT · 任务及重试接口未接通">重试交付 · 未接通</button></div></div>
+          <div class="order-dependency">
+            <div>
+              <b>人工退款申请（AF-106 候选）</b>
+              <p>{{ refundTitle }}</p>
+              <label class="order-refund-label">退款原因<textarea v-model="refundReason" maxlength="500" rows="3" :disabled="!canRefund || order.status !== 'paid' || refundState === 'loading'" placeholder="说明客服或业务原因（1–500 字）"></textarea></label>
+              <p v-if="refundState === 'success' && refundResult" class="order-refund-ok" role="status">已提交申请 {{ refundResult.request_id }} · {{ refundResult.refund_status }} · {{ refundResult.amount_fen }} 分 · 权益未吊销</p>
+              <p v-else-if="refundState === 'error'" class="order-refund-err" role="alert">{{ refundError }}</p>
+            </div>
+            <div class="order-disabled-actions">
+              <button class="outline-button" :disabled="!canSubmitRefund" :title="refundTitle" @click="submitRefund">{{ refundState === 'loading' ? '提交中…' : '提交退款申请' }}</button>
+              <button class="outline-button" disabled title="UI_CONTRACT · 任务及重试接口未接通">重试交付 · 未接通</button>
+            </div>
+          </div>
         </article>
         <div v-else class="order-state" :class="{ 'order-state-error': !['idle', 'loading'].includes(state) }" :role="['idle', 'loading'].includes(state) ? 'status' : 'alert'" aria-live="polite">
           <span v-if="state === 'loading'" class="spinner" aria-hidden="true"></span><span v-else class="order-state-icon" aria-hidden="true">{{ state === 'idle' ? '▤' : '!' }}</span>

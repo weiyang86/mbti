@@ -9,6 +9,7 @@ import { MbtiService } from "./mbti.service";
 import { MbtiShareService } from "./mbti-share.service";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { MbtiOpsOrdersService } from "./mbti-ops-orders.service";
+import { MbtiOpsRefundService } from "./mbti-ops-refund.service";
 import { MbtiOrdersAdminController, MbtiOrdersController } from "./mbti-orders.controller";
 import { MbtiSocialController } from "./mbti-social.controller";
 import { MbtiSocialService } from "./mbti-social.service";
@@ -38,10 +39,10 @@ export class MbtiModule {
       throw new Error("MBTI controlled payments require explicit isolated test runtime, administrator auth and a local random secret");
     }
     return { module: MbtiModule,
-      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule] : []), ...(secret ? [PluginRuntimeAccessModule] : [])],
+      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule] : [])],
       controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [MbtiOrdersAdminController, MbtiOpsController] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
+      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [MbtiOpsRefundService] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },
         { provide: PAYMENT_CREDENTIAL_RESOLVER, useValue: { async resolve(reference: string) {
           if (reference !== "test-only:mbti-f3-payment") throw new Error("Controlled fixture credential rejected");

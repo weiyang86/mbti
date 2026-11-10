@@ -44,7 +44,7 @@
 | # | 议题 | 候选现状 | 需要拍板 |
 |---|---|---|---|
 | D1 | 商户 SecretRef 族 | payments 恒 `enabled:false` + `UNCONFIGURED` | 获批商户/证书/沙箱；凭据投影白名单 |
-| D2 | 退款写路径 | 订单详情退款按钮禁用 | 可退条件、到账事实源、人工 vs 回调、权限码 |
+| D2 | 退款写路径 | **已批准（2026-11-10）**：权限 A（`mbti:orders:read`+`admin.payment.refund.request`）；reason 自由文本；**不**自动吊销权益；复用 AF-106 `pending_manual_review` | 通过后如何回写 MbtiOrder / entitlement 仍 ASK |
 | D3 | 体验兑换码 | 无隔离账本 | 制码身份、次数、权益种类、停用语义 |
 | D4 | 净实收 | overview 恒 null；毛额 ≠ 净额 | 退款归属日、币种隔离、是否进 summary |
 
@@ -73,8 +73,9 @@
 ## 批注后默认动作
 
 1. Remy 在本文件批注或另开签发记录。  
-2. Agent 只对 **批准** 项开 foundation+admin 卡；**改写** 先改候选 schema/测试再接线。  
-3. **#13 解闸** 时同步 Intern 契约说明，不代改 `web/`。  
-4. 未批项保持 UI_CONTRACT / 硬闸；不进根 `docs/api/` 权威定稿。
+2. 路径/字段级候选见 **[MBTI-OPS-CANDIDATE-CONTRACTS.md](MBTI-OPS-CANDIDATE-CONTRACTS.md)**（退款可复用 AF-106）。  
+3. Agent 只对 **批准** 项开 foundation+admin 卡；**改写** 先改候选 schema/测试再接线。  
+4. **#13 解闸** 时同步 Intern 契约说明，不代改 `web/`。  
+5. 未批项保持 UI_CONTRACT / 硬闸；不进根 `docs/api/` 权威定稿。
 
 `needs_human_review`：本页全部议题在 Remy 签字前均属 unknowns。

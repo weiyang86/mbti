@@ -85,3 +85,40 @@ export function saveOrdersCsv(csv: string, filename = 'mbti-orders.csv') {
   const link = document.createElement('a'); link.href = url; link.download = filename
   document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url)
 }
+
+export interface RefundRequestResult {
+  schema: string
+  status: string
+  request_id: string
+  order_id: string
+  payment_order_id: string
+  amount_fen: number
+  currency: string
+  refund_status: string
+  reason: string
+  created_at: string
+  entitlement_revoked: boolean
+}
+
+function projectRefundRequest(value: unknown, expectedOrderId: string): RefundRequestResult {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid')
+  const row = value as Record<string, unknown>
+  if (row.schema !== 'mbti-ops-refund-request-candidate/v1' || row.status !== 'needs_human_review' ||
+    row.order_id !== expectedOrderId || typeof row.request_id !== 'string' || typeof row.payment_order_id !== 'string' ||
+    typeof row.amount_fen !== 'number' || !Number.isSafeInteger(row.amount_fen) || row.amount_fen < 1 ||
+    typeof row.currency !== 'string' || !/^[A-Z]{3}$/.test(row.currency) ||
+    row.refund_status !== 'pending_manual_review' || typeof row.reason !== 'string' ||
+    typeof row.created_at !== 'string' || row.entitlement_revoked !== false) throw new Error('invalid')
+  return {
+    schema: row.schema, status: row.status, request_id: row.request_id, order_id: row.order_id,
+    payment_order_id: row.payment_order_id, amount_fen: row.amount_fen, currency: row.currency,
+    refund_status: row.refund_status, reason: row.reason, created_at: row.created_at, entitlement_revoked: false,
+  }
+}
+
+export async function createOrderRefundRequest(orderId: string, body: { reason: string; idempotency_key: string; amount_fen?: number }) {
+  const normalized = normalizeOrderId(orderId)
+  const value = await request<unknown>(`${orderPath(normalized)}/refund-requests`, { method: 'POST', body: JSON.stringify(body) }, true, true)
+  try { return projectRefundRequest(value, normalized) }
+  catch { throw new OpsApiError(502, '退款申请响应格式不正确。') }
+}

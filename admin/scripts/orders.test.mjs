@@ -142,21 +142,26 @@ function mountNodes() {
   })
   return { node, renderer }
 }
-function mountPage(readOrder, listOrders = async () => ({ items: [], next_cursor: null })) {
+function mountPage(readOrder, listOrders = async () => ({ items: [], next_cursor: null }), permissions = [], createOrderRefundRequest = async () => { throw new Error('refund unused') }) {
   const { node, renderer } = mountNodes()
   const errors = client(() => json({})).api
   const List = evaluate(listCode, { vue: Vue, './ops-api': { listOrders, exportOrders: async () => { throw new Error('export unused') }, OpsApiError: errors.OpsApiError, saveOrdersCsv() {} }, './ops-order': model, './ops-orders-collection': collection }).default
-  const component = evaluate(componentCode, { vue: Vue, './ops-order': model, './ops-api': { readOrder, OpsApiError: errors.OpsApiError }, './orders-list.vue': { default: List }, './orders.css': {} }).default
+  const refundCalls = []
+  const component = evaluate(componentCode, { vue: Vue, './ops-order': model, './ops-api': {
+    readOrder, createOrderRefundRequest: async (...args) => { refundCalls.push(args); return createOrderRefundRequest(...args) }, OpsApiError: errors.OpsApiError,
+  }, './orders-list.vue': { default: List }, './orders.css': {} }, {
+    crypto: { getRandomValues(bytes) { for (let i = 0; i < bytes.length; i++) bytes[i] = (i + 7) % 256; return bytes } },
+  }).default
   const root = node('root')
   let reauth = 0
-  const app = renderer.createApp(component, { permissions: [], onReauthenticate: () => reauth++ })
+  const app = renderer.createApp(component, { permissions, onReauthenticate: () => reauth++ })
   app.mount(root)
   const nodes = () => { const all = []; const visit = n => { all.push(n); n.children.forEach(visit) }; visit(root); return all }
   const text = () => nodes().filter(n => n.type !== '#comment').map(n => n.text).join(' ')
   const button = label => nodes().find(n => n.type === 'button' && n.text === label)
   const input = async value => { nodes().find(n => n.type === 'input').props['onUpdate:modelValue'](value); await Vue.nextTick() }
   const submit = async () => { const promise = nodes().find(n => n.type === 'form').props.onSubmit({ preventDefault() {} }); await Vue.nextTick(); return promise }
-  return { app, nodes, text, button, input, submit, errors, reauth: () => reauth }
+  return { app, nodes, text, button, input, submit, errors, refundCalls, reauth: () => reauth }
 }
 function mountList(api, permissions = ['mbti:ops:access', 'mbti:ops:export']) {
   const { node, renderer } = mountNodes()
@@ -263,6 +268,35 @@ test('existing server order controller remains raw, no-store, and protected by e
   assert.match(controller, /@Get\(\) @Permissions\("mbti:orders:read"\) @Header\("Cache-Control", "no-store"\)/)
   assert.match(controller, /@Get\("export\.csv"\) @Permissions\("mbti:ops:access", "mbti:ops:export"\)/)
   assert.match(controller, /@Get\("summary"\) @Permissions\("mbti:orders:read"\)/)
+  assert.match(controller, /@Post\(":id\/refund-requests"\) @Permissions\("mbti:orders:read", PAYMENT_REFUND_REQUEST\)/)
   assert.match(controller, /@Get\(":id"\) @Permissions\("mbti:orders:read"\) @Header\("Cache-Control", "no-store"\)/)
-  assert.doesNotMatch(controller, /@Post|@Patch|@Delete|@Put/)
+  assert.doesNotMatch(controller, /@Patch|@Delete|@Put/)
+})
+
+test('paid order can submit AF-106 refund request when permitted; unpaid and unauthorized stay disabled', async () => {
+  const paid = fixture({ status: 'paid', unlocked: true, paid_at: '2026-11-10T00:01:00.000Z', payment_availability: 'controlled_test' })
+  const denied = mountPage(async () => model.projectOrder(paid, id))
+  await denied.input(id); await denied.submit(); await flush()
+  assert.match(denied.text(), /缺少 mbti:orders:read 或 admin\.payment\.refund\.request/)
+  assert.equal(denied.button('提交退款申请').props.disabled, true)
+  denied.app.unmount()
+  const refund = {
+    schema: 'mbti-ops-refund-request-candidate/v1', status: 'needs_human_review', request_id: 'refund-1', order_id: id,
+    payment_order_id: 'pay-1', amount_fen: 990, currency: 'CNY', refund_status: 'pending_manual_review',
+    reason: '客服补偿', created_at: '2026-11-10T00:02:00.000Z', entitlement_revoked: false,
+  }
+  const p = mountPage(async () => model.projectOrder(paid, id), undefined, ['mbti:orders:read', 'admin.payment.refund.request'], async () => refund)
+  await p.input(id); await p.submit(); await flush()
+  assert.equal(p.button('提交退款申请').props.disabled, true)
+  const area = p.nodes().find(n => n.type === 'textarea')
+  area.props['onUpdate:modelValue']('客服补偿'); await flush()
+  assert.equal(p.button('提交退款申请').props.disabled, false)
+  await p.button('提交退款申请').props.onClick(); await flush(); await flush()
+  assert.equal(p.refundCalls.length, 1)
+  assert.equal(p.refundCalls[0][0], id)
+  assert.equal(p.refundCalls[0][1].reason, '客服补偿')
+  assert.match(p.refundCalls[0][1].idempotency_key, /^[a-z0-9]{16,}$/)
+  assert.match(p.text(), /已提交申请 refund-1/)
+  assert.match(p.text(), /权益未吊销/)
+  p.app.unmount()
 })
