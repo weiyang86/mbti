@@ -5,6 +5,8 @@ import OrdersPage from './orders.vue'
 import WorkspacePage from './workspace.vue'
 import ConfigPage from './config.vue'
 import B4Page from './b4.vue'
+import B5Page from './b5.vue'
+import type { B5Scope } from './b5-contract'
 import type { B4Page as B4Scope } from './b4-model'
 import type { ConfigScope } from './config-contract-v1'
 
@@ -27,6 +29,8 @@ const pages: Page[] = [
 ]
 const configPage = ref<InstanceType<typeof ConfigPage> | null>(null)
 const b4Page = ref<InstanceType<typeof B4Page> | null>(null)
+const b5Page = ref<InstanceType<typeof B5Page> | null>(null)
+const b5Scope = computed(() => ['ai-settings', 'payment-settings', 'trade-settings', 'release'].includes(pageId.value) ? pageId.value as B5Scope : null)
 const b4Scope = computed(() => ['ai', 'retention', 'social'].includes(pageId.value) ? pageId.value as B4Scope : null)
 const configScope = computed(() => ['content', 'catalog', 'assessment'].includes(pageId.value) ? pageId.value as ConfigScope : null)
 const sessionState = ref<OpsSession | null>(null)
@@ -64,10 +68,12 @@ async function submitLogin() {
   finally { loggingIn.value = false }
 }
 async function signOut() {
+  if (unsaved.value && !window.confirm('有尚未保存的更改，确定退出登录吗？')) return
   try { await logout() } catch (error) { apiError.value = error instanceof Error ? error.message : '注销请求失败。' }
   sessionState.value = null; location.hash = ''; pageId.value = 'overview'
 }
 function go(id: string) {
+  if (id === pageId.value) { navOpen.value = false; return }
   if (unsaved.value && !window.confirm('有尚未保存的更改，确定离开此页面吗？')) return
   pageId.value = id; location.hash = `/${id}`; navOpen.value = false; drawer.value = ''; unsaved.value = false
 }
@@ -85,8 +91,9 @@ function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') { drawer.value = ''; searchOpen.value = false; navOpen.value = false }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); searchOpen.value = !searchOpen.value }
 }
-onMounted(() => { void loadSession(); window.addEventListener('hashchange', onPopState); window.addEventListener('keydown', onKey) })
-onUnmounted(() => { window.removeEventListener('hashchange', onPopState); window.removeEventListener('keydown', onKey) })
+function onBeforeUnload(event: BeforeUnloadEvent) { if (unsaved.value) { event.preventDefault(); event.returnValue = '' } }
+onMounted(() => { void loadSession(); window.addEventListener('hashchange', onPopState); window.addEventListener('keydown', onKey); window.addEventListener('beforeunload', onBeforeUnload) })
+onUnmounted(() => { window.removeEventListener('hashchange', onPopState); window.removeEventListener('keydown', onKey); window.removeEventListener('beforeunload', onBeforeUnload) })
 watch(visiblePage, valid => { if (!valid && sessionState.value) go(visiblePages.value[0]?.id || 'overview') })
 </script>
 
@@ -101,15 +108,15 @@ watch(visiblePage, valid => { if (!valid && sessionState.value) go(visiblePages.
   <div v-else class="app-shell" :class="{ 'nav-open': navOpen }">
     <button v-if="navOpen" class="nav-scrim" aria-label="关闭导航" @click="navOpen = false"></button>
     <aside class="sidebar"><div class="brand"><div class="brand-mark">M</div><div><b>MBTI搭子</b><small>OPERATIONS STUDIO</small></div></div><nav aria-label="主导航" class="nav-list"><template v-for="group in groups" :key="group"><p class="nav-heading">{{ group }}</p><button v-for="item in filteredPages.filter(row => row.group === group)" :key="item.id" class="nav-item" :class="{ active: pageId === item.id }" :aria-current="pageId === item.id ? 'page' : undefined" @click="go(item.id)"><span class="nav-icon">{{ item.id === 'orders' ? '▤' : item.id === 'release' ? '◷' : '◇' }}</span>{{ item.name }}</button></template></nav><div class="side-account"><div class="avatar">{{ sessionState.user.realName.slice(0, 1) || '运' }}</div><div class="account-label"><b>{{ sessionState.user.realName }}</b><small>{{ { owner: '项目运营管理员', editor: '运营编辑', support: '客服专员', reader: '只读观察员' }[sessionState.role] }}</small></div><button class="icon-button" aria-label="退出登录" title="退出登录" @click="signOut">↪</button></div></aside>
-    <section class="workspace"><header class="topbar"><div class="breadcrumb"><button class="mobile-menu icon-button" aria-label="打开导航" @click="navOpen = true">☰</button><span>运营工作台</span><i>/</i><b>{{ page.name }}</b></div><div class="top-actions"><span class="environment"><i></i>服务端会话</span><button class="icon-button search-shortcut" aria-label="查找功能" @click="searchOpen = true">⌕</button><button class="outline-button" @click="configScope ? configPage?.openPreview() : b4Scope ? b4Page?.openPreview() : openDrawer('前台预览')">前台预览</button><button v-if="sessionState.capabilities.release" class="primary" disabled title="发布接口尚未接通">发布中心 · 未接通</button><button class="icon-button logout-top" aria-label="退出登录" @click="signOut">↪</button></div></header>
+    <section class="workspace"><header class="topbar"><div class="breadcrumb"><button class="mobile-menu icon-button" aria-label="打开导航" @click="navOpen = true">☰</button><span>运营工作台</span><i>/</i><b>{{ page.name }}</b></div><div class="top-actions"><span class="environment"><i></i>服务端会话</span><button class="icon-button search-shortcut" aria-label="查找功能" @click="searchOpen = true">⌕</button><button class="outline-button" @click="configScope ? configPage?.openPreview() : b4Scope ? b4Page?.openPreview() : b5Scope ? b5Page?.openPreview() : openDrawer('前台预览')">前台预览</button><button v-if="sessionState.capabilities.release" class="primary" disabled title="发布接口尚未接通">发布中心 · 未接通</button><button class="icon-button logout-top" aria-label="退出登录" @click="signOut">↪</button></div></header>
       <main class="content"><div v-if="apiError" class="alert error-banner" role="alert">{{ apiError }} <button class="text-button" @click="loadSession">重新连接</button></div><div class="page-heading"><div><p class="eyebrow">OPERATIONS / {{ page.code }}</p><h1>{{ page.name }}</h1><p class="description">{{ page.description }}</p></div><div class="heading-actions"><button class="outline-button" @click="goBack">返回</button><button v-if="page.id === 'ai' || page.id === 'ai-settings'" class="outline-button" disabled>图像服务未接通</button></div></div>
         <WorkspacePage v-if="(page.id === 'overview' || page.id === 'growth' || page.id === 'moderation') && visiblePage" :page="page.id" :can-export="sessionState.capabilities.export" :can-moderate="sessionState.capabilities.moderation" @navigate="go" />
         <ConfigPage v-if="configScope && visiblePage" ref="configPage" :page="configScope" @dirty="unsaved = $event" />
         <B4Page v-if="b4Scope && visiblePage" :key="b4Scope" ref="b4Page" :page="b4Scope" :can-edit="sessionState.capabilities.draft" @dirty="unsaved = $event" />
+        <B5Page v-if="b5Scope && visiblePage" :key="b5Scope" ref="b5Page" :page="b5Scope" :can-edit="sessionState.capabilities.systemWrite" :can-release="sessionState.capabilities.release" :can-open-studio="sessionState.capabilities.draft" @dirty="unsaved = $event" @navigate="go" />
         <OrdersPage v-if="page.id === 'orders' && visiblePage" @reauthenticate="loadSession" />
-        <section v-if="!['overview', 'growth', 'moderation', 'orders', 'content', 'catalog', 'assessment', 'ai', 'retention', 'social'].includes(page.id)" class="panel list-shell"><div class="list-toolbar"><label>搜索当前页面<input placeholder="搜索当前页面" aria-label="搜索当前页面"></label><select aria-label="状态筛选"><option>全部状态</option><option>待处理</option><option>已完成</option></select><span>服务未连接 · 0 条记录</span></div><div class="empty-panel"><div class="empty-icon">{{ page.id === 'release' ? '◷' : '◇' }}</div><p class="eyebrow">{{ page.code }}</p><h2>{{ page.id === 'overview' || page.id === 'growth' ? '暂无线上数据' : '此模块尚未接通业务服务' }}</h2><p>{{ page.id === 'payment-settings' ? '支付渠道未配置。不会展示商户号、回调凭据或密钥引用。' : page.id === 'moderation' ? '服务连接后仅返回匿名举报信息，不读取私人联系方式、精确位置或私有作答。' : '当前页面保留原型路由与交互位置，数据和写入操作由后续业务卡接入。' }}</p><div class="status-line"><span class="status-dot"></span> {{ page.id === 'overview' || page.id === 'growth' ? '数据接口未连接' : 'UI_CONTRACT · 等待对应业务接口' }}</div></div><div class="pager"><span>第 {{ listPage }} 页 · 0 条记录</span><div><button class="outline-button" :disabled="listPage === 1" @click="listPage = Math.max(1, listPage - 1)">上一页</button> <select v-model.number="pageSize" aria-label="每页条数"><option :value="10">10 条/页</option><option :value="20">20 条/页</option><option :value="50">50 条/页</option></select> <button class="outline-button" disabled @click="listPage++">下一页</button></div></div></section>
-        <section v-if="!['overview', 'growth', 'moderation', 'orders', 'content', 'catalog', 'assessment', 'ai', 'retention', 'social'].includes(page.id)" class="panel control-panel"><div><p class="eyebrow">工作队列</p><h2>待处理事项</h2></div><div class="queue-empty"><span>✓</span><p>工作队列服务尚未接通</p></div></section>
-        <p v-if="page.id === 'payment-settings'" class="security-note">支付商户和凭据引用仅对项目运营管理员授权显示；原始密钥永远不会返回浏览器。</p>
+        <section v-if="!b5Scope && !['overview', 'growth', 'moderation', 'orders', 'content', 'catalog', 'assessment', 'ai', 'retention', 'social'].includes(page.id)" class="panel list-shell"><div class="list-toolbar"><label>搜索当前页面<input placeholder="搜索当前页面" aria-label="搜索当前页面"></label><select aria-label="状态筛选"><option>全部状态</option><option>待处理</option><option>已完成</option></select><span>服务未连接 · 0 条记录</span></div><div class="empty-panel"><div class="empty-icon">{{ page.id === 'release' ? '◷' : '◇' }}</div><p class="eyebrow">{{ page.code }}</p><h2>{{ page.id === 'overview' || page.id === 'growth' ? '暂无线上数据' : '此模块尚未接通业务服务' }}</h2><p>{{ page.id === 'payment-settings' ? '支付渠道未配置。不会展示商户号、回调凭据或密钥引用。' : page.id === 'moderation' ? '服务连接后仅返回匿名举报信息，不读取私人联系方式、精确位置或私有作答。' : '当前页面保留原型路由与交互位置，数据和写入操作由后续业务卡接入。' }}</p><div class="status-line"><span class="status-dot"></span> {{ page.id === 'overview' || page.id === 'growth' ? '数据接口未连接' : 'UI_CONTRACT · 等待对应业务接口' }}</div></div><div class="pager"><span>第 {{ listPage }} 页 · 0 条记录</span><div><button class="outline-button" :disabled="listPage === 1" @click="listPage = Math.max(1, listPage - 1)">上一页</button> <select v-model.number="pageSize" aria-label="每页条数"><option :value="10">10 条/页</option><option :value="20">20 条/页</option><option :value="50">50 条/页</option></select> <button class="outline-button" disabled @click="listPage++">下一页</button></div></div></section>
+        <section v-if="!b5Scope && !['overview', 'growth', 'moderation', 'orders', 'content', 'catalog', 'assessment', 'ai', 'retention', 'social'].includes(page.id)" class="panel control-panel"><div><p class="eyebrow">工作队列</p><h2>待处理事项</h2></div><div class="queue-empty"><span>✓</span><p>工作队列服务尚未接通</p></div></section>
       </main><footer class="footer"><span>MBTI搭子 · 运营工作台</span><span>{{ sessionState.user.username }} · {{ sessionState.platformSuperAdmin ? 'AIJ 平台超级管理员' : '项目角色' }}</span></footer>
     </section>
     <div v-if="searchOpen" class="overlay" @click.self="searchOpen = false"><section class="dialog search-dialog" role="dialog" aria-modal="true" aria-label="查找功能"><div class="dialog-header"><div><p class="eyebrow">QUICK NAVIGATION</p><h2>查找功能</h2></div><button class="icon-button" aria-label="关闭" @click="searchOpen = false">×</button></div><input v-model="query" autofocus placeholder="输入页面名称…" aria-label="搜索页面"><div class="search-results"><button v-for="item in filteredPages" :key="item.id" @click="go(item.id); searchOpen = false"><span>{{ item.group }}</span><b>{{ item.name }}</b><small>打开 →</small></button><p v-if="filteredPages.length === 0" class="muted">没有匹配的可访问页面</p></div></section></div>
