@@ -197,7 +197,7 @@
       <view class="plan-sheet" @click.stop>
         <view class="sheet-handle" />
         <text class="sheet-close" @click="planOpen = false">✕</text>
-        <text class="sheet-kicker">— MBTI搭子 / V0.4</text>
+        <text class="sheet-kicker">— MBTI搭子 / 阶段记录</text>
         <text class="sheet-title">下一次，什么时候回来？</text>
         <text class="sheet-desc">
           可以按阶段回访。时间间隔只是个人安排，不是判断人格变化的科学阈值。

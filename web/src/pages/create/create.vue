@@ -25,11 +25,6 @@
     </view>
 
     <view v-else>
-      <view class="demo-strip">
-        <text>V0.4 · 趣味体验 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">体验说明 ↗</text>
-      </view>
-
       <text class="kicker">MY MBTI LOOK / 形象工作台</text>
       <text class="title">这一次，<text class="hl">晒我的这一面。</text></text>
       <text class="sub">先选风格和宣言，再生成你的整套素材。</text>
@@ -239,14 +234,6 @@ function goPricing() {
   uni.navigateTo({ url: '/pages/pricing/pricing' })
 }
 
-function showDemo() {
-  uni.showModal({
-    title: '体验说明',
-    content: '当前为 V0.4 趣味体验版：昵称、风格与宣言只保存在本机，生成使用预置示例素材。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
 </script>
 
 <style scoped lang="scss">
@@ -286,17 +273,6 @@ function showDemo() {
   line-height: 1.7;
 }
 
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 26rpx;
-}
-.demo-link {
-  color: #7560df;
-}
 
 .kicker {
   display: block;

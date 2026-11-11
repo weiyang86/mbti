@@ -104,7 +104,6 @@
       </view>
     </view>
 
-    <text class="demo-fine">V0.4 交互原型 · 人物与订单均为示例</text>
     <text class="foot">MBTI搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
@@ -547,15 +546,6 @@ function showChannels() {
 .radar-tile .tool-icon,
 .radar-tile .tool-name {
   color: #596d35;
-}
-
-.demo-fine {
-  display: block;
-  margin-top: 48rpx;
-  text-align: center;
-  font-size: 19rpx;
-  color: #b3a9be;
-  line-height: 1.6;
 }
 
 .foot {

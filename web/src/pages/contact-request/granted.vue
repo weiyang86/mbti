@@ -1,20 +1,26 @@
 <template>
-  <view class="page social-page">
-    <text class="heading">当前授权读取</text>
-    <text class="notice">只允许原请求人实时读取确切批准的渠道。列表状态不能保证当前仍有授权；离页或重读时清空旧值。</text>
+  <view class="page social-page granted-page">
+    <text class="kicker">GRANTED / 当前授权读取</text>
+    <text class="page-title">只读，<text class="hl">且只到撤回为止。</text></text>
+    <text class="page-sub">只允许原请求人实时读取确切批准的渠道；离页或重读时清空旧值。</text>
+
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <button class="btn-secondary" :disabled="loading || busy" @click="load">重新验证并读取授权</button>
     <text v-if="loading" class="notice">正在验证当前授权…</text>
     <template v-if="loaded">
       <text class="success">本次服务端读取成功，仅显示当前批准渠道。</text>
-      <view v-for="item in granted" :key="item.channel" class="card">
-        <text class="section">{{ channelLabel(item.channel) }}</text>
-        <text class="line private-contact-value">{{ item.value }}</text>
+      <view v-for="item in granted" :key="item.channel" class="panel">
+        <text class="panel-title">{{ channelLabel(item.channel) }}</text>
+        <text class="private-contact-value">{{ item.value }}</text>
       </view>
       <button class="btn-secondary mt" :disabled="loading || busy" @click="revoke">撤回本次渠道申请并清空</button>
     </template>
-    <button class="btn-secondary mt" @click="go('/pages/contact-request/contact-request')">返回联系方式请求</button>
+
+    <view class="sk-foot-links">
+      <text class="sk-foot-link" @click="load">重新验证并读取</text>
+      <text class="sk-foot-link" @click="go('/pages/contact-request/contact-request')">联系方式请求</text>
+    </view>
+    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
 <script setup lang="ts">
@@ -55,4 +61,11 @@ async function revoke() {
 }
 function go(url: string) { uni.navigateTo({ url }) }
 </script>
-<style scoped lang="scss">@import '@/styles/social.scss';</style>
+<style scoped lang="scss">
+@import '@/styles/social.scss';
+@import '@/styles/page-frame.scss';
+
+.granted-page {
+  padding-bottom: 48rpx;
+}
+</style>

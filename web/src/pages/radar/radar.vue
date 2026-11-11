@@ -1,43 +1,63 @@
 <template>
-  <view class="page social-page">
-    <text class="heading">同型雷达</text>
-    <text class="notice">你可以选择参与或退出。当前只保存参与选择，统计暂不可用；不会请求定位。</text>
-    <text class="line">参与不等于位置授权，也不会更改名片公开范围或联系方式授权。私密名片也可以参与。</text>
+  <view class="page social-page radar-page">
+    <text class="kicker">SAME TYPE RADAR / 同型雷达</text>
+    <text class="page-title">周边 {{ radiusLabel }}，<text class="hl">有多少个同型的你？</text></text>
+    <text class="page-sub">查看自愿参与者的类型人数，不展示任何人的具体位置。</text>
+
+    <view class="demo-strip"><text>DEMO · 虚拟示例区域 · 未读取 GPS</text></view>
+
+    <view class="radar">
+      <view class="ring ring-outer">
+        <view class="ring ring-mid">
+          <view class="ring ring-inner">
+            <text class="radar-type">{{ state.typeCode || 'MBTI' }} / {{ radiusLabel }}</text>
+            <view class="radar-bar"><view class="radar-fill" :style="{ width: radarFill }" /></view>
+            <text class="radar-status">{{ radarStatus }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="radius-row">
+      <view
+        v-for="radius in RADII"
+        :key="radius"
+        class="radius-chip"
+        :class="{ on: state.radius === radius, dim: !canQuery }"
+        @click="controller.setRadius(radius)"
+      >{{ radius === 500 ? '500 米' : `${radius / 1000} 公里` }}</view>
+    </view>
+
+    <view
+      v-if="state.enrolled !== true"
+      class="btn-primary cta"
+      :class="{ disabled: ctaDisabled }"
+      @click="join"
+    >{{ state.saving ? '正在保存…' : '体验同型雷达（模拟授权）' }}</view>
+    <view v-else class="btn-secondary cta" :class="{ disabled: ctaDisabled }" @click="leave">{{ state.saving ? '正在保存…' : '退出雷达' }}</view>
+    <text class="cta-link" @click="explainNoLocation">模拟拒绝授权</text>
+
     <text v-if="state.loading" class="notice" role="status">正在读取本人类型和参与状态…</text>
     <text v-if="state.error" class="error" role="alert">{{ state.error }}</text>
     <text v-if="state.notice" class="success" role="status">{{ state.notice }}</text>
-    <view class="card">
-      <text class="section">{{ state.needsReload && state.enrolled !== null ? '上次确认的参与状态' : '当前参与状态' }}</text>
-      <text class="line">{{ state.enrolled === null ? '尚未读取' : state.enrolled ? '已参与雷达' : '未参与雷达' }}</text>
-      <text v-if="state.typeCode" class="line">本人名片类型：{{ state.typeCode }}</text>
-      <text v-else-if="!state.loading && !state.needsReload" class="notice">缺少本人 MBTI 类型。请先到我的名片主动选择并保存，再回来重新读取。</text>
-      <button v-if="state.enrolled !== true" class="btn-primary mt" :disabled="state.loading || state.saving || state.needsReload || !state.typeCode" @click="controller.save(true)">{{ state.saving ? '正在保存…' : '参与雷达' }}</button>
-      <button v-else class="btn-secondary mt" :disabled="state.loading || state.saving || state.needsReload" @click="controller.save(false)">{{ state.saving ? '正在保存…' : '退出雷达' }}</button>
+    <text v-if="!state.typeCode && !state.loading" class="notice">缺少本人 MBTI 类型，请先到我的名片选择并保存。</text>
+    <text v-if="state.statistics.kind === 'error'" class="error" role="alert">{{ state.statistics.message }}</text>
+
+    <text class="radar-section">看见同类，不暴露行踪。</text>
+    <text class="radar-note">正式方案：主动加入、可随时关闭；少于 10 人时仅显示“人数较少”，不展示精确人数或个人轨迹。</text>
+    <text class="radar-note">参与不等于位置授权，也不会更改名片公开范围或联系方式授权；私密名片也可以参与。</text>
+
+    <view class="btn-secondary cta" @click="go('/pages/discover/discover')">去看非位置推荐的 MBTI 搭子</view>
+
+    <view class="sk-foot-links">
+      <text class="sk-foot-link" @click="controller.load">重新读取状态</text>
+      <text class="sk-foot-link" @click="go('/pages/card/card')">去我的名片设置类型</text>
     </view>
-    <view class="card" aria-live="polite">
-      <text class="section">同型统计</text>
-      <text v-if="state.statistics.kind === 'loading'" class="notice">正在读取统计状态…</text>
-      <text v-else-if="state.statistics.kind === 'missing_type'" class="notice">缺少本人类型，暂不能查询同型统计。</text>
-      <text v-else-if="state.statistics.kind === 'not_enrolled'" class="notice">尚未参与雷达。参与后可读取统计的可用状态。</text>
-      <template v-else-if="state.statistics.kind === 'unavailable'">
-        <text class="line">同型统计暂不可用</text>
-        <text class="notice">尚未接通自愿位置来源，暂时无法统计所选范围的同型人数。参与选择已保存，你仍可随时退出。</text>
-      </template>
-      <text v-else-if="state.statistics.kind === 'error'" class="error" role="alert">{{ state.statistics.message }}</text>
-      <text v-else class="notice">{{ state.saving ? '正在保存参与选择…' : '请先读取当前状态。' }}</text>
-      <text class="field">查询范围</text>
-      <view class="row">
-        <button v-for="radius in RADII" :key="radius" :class="state.radius === radius ? 'btn-primary' : 'btn-secondary'" :disabled="state.loading || state.saving || state.needsReload || !state.typeCode || !state.enrolled" :aria-pressed="state.radius === radius" @click="controller.setRadius(radius)">{{ radius === 500 ? '500 米' : `${radius / 1000} 公里` }}</button>
-      </view>
-      <text class="notice">切换范围会重新查询当前可用状态；范围统计尚未开放。</text>
-    </view>
-    <button class="btn-secondary mt" :disabled="state.loading || state.saving" @click="controller.load">重新读取状态</button>
-    <button class="btn-secondary mt" :disabled="state.saving" @click="go('/pages/card/card')">去我的名片设置类型</button>
-    <button class="btn-secondary mt" :disabled="state.saving" @click="go('/pages/discover/discover')">发现搭子</button>
+    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { onHide, onShow, onUnload } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'
 import { getRadarParticipation, getSameTypeCount, updateRadarParticipation } from '@/api/radar'
@@ -48,6 +68,165 @@ const controller = createRadarController({ getMyCard, getRadarParticipation, upd
 onShow(controller.enter)
 onHide(controller.leave)
 onUnload(controller.leave)
+
+const radiusLabel = computed(() => (state.radius === 500 ? '500 米' : `${state.radius / 1000} 公里`))
+const canQuery = computed(() => !state.loading && !state.saving && !state.needsReload && !!state.typeCode && state.enrolled === true)
+const ctaDisabled = computed(() => state.loading || state.saving || state.needsReload || (state.enrolled !== true && !state.typeCode))
+const radarFill = computed(() => (state.enrolled === true ? '62%' : '18%'))
+const radarStatus = computed(() => {
+  if (state.loading) return '正在读取…'
+  if (!state.typeCode) return '先到我的名片设置类型'
+  if (state.enrolled !== true) return '先选择体验状态'
+  if (state.statistics.kind === 'loading') return '正在统计…'
+  if (state.statistics.kind === 'error') return '统计读取失败'
+  return '同型统计暂不可用'
+})
+
+function join() {
+  if (ctaDisabled.value) return
+  controller.save(true)
+}
+function leave() {
+  if (ctaDisabled.value) return
+  controller.save(false)
+}
+function explainNoLocation() {
+  uni.showModal({
+    title: '模拟拒绝授权',
+    content: '当前不会请求定位，也没有接真实位置来源；拒绝后只保留「未参与」状态。',
+    showCancel: false,
+    confirmText: '知道了',
+  })
+}
 function go(url: string) { uni.navigateTo({ url }) }
 </script>
-<style scoped lang="scss">@import '@/styles/social.scss';</style>
+<style scoped lang="scss">
+@import '@/styles/social.scss';
+@import '@/styles/page-frame.scss';
+
+.radar-page {
+  padding-bottom: 48rpx;
+}
+
+.demo-strip {
+  margin-top: 26rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 16rpx;
+  background: #f6efe2;
+  text-align: center;
+  font-size: 20rpx;
+  color: #8a7a5a;
+}
+
+.radar {
+  display: flex;
+  justify-content: center;
+  padding: 34rpx 0 10rpx;
+}
+.ring {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ring-outer {
+  width: 560rpx;
+  height: 560rpx;
+  background: #fdfbf5;
+  border: 2rpx solid #ede4d1;
+}
+.ring-mid {
+  width: 400rpx;
+  height: 400rpx;
+  border: 2rpx solid #e8e0f3;
+  background: #fbf9ff;
+}
+.ring-inner {
+  width: 270rpx;
+  height: 270rpx;
+  flex-direction: column;
+  border: 2rpx dashed #dcd2f0;
+  background: #f7f4fd;
+}
+.radar-type {
+  font-size: 24rpx;
+  color: #6f6880;
+}
+.radar-bar {
+  margin-top: 18rpx;
+  width: 130rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: #e3dcef;
+  overflow: hidden;
+}
+.radar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: #6b7a45;
+  transition: width 0.3s ease;
+}
+.radar-status {
+  margin-top: 18rpx;
+  font-size: 19rpx;
+  color: #a398af;
+  text-align: center;
+  padding: 0 16rpx;
+}
+
+.radius-row {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 26rpx;
+}
+.radius-chip {
+  flex: 1;
+  text-align: center;
+  padding: 22rpx 0;
+  border-radius: 18rpx;
+  background: #fff;
+  border: 2rpx solid #e9e5ed;
+  font-size: 23rpx;
+  color: #5c5368;
+}
+.radius-chip.on {
+  background: #6b7a45;
+  border-color: #6b7a45;
+  color: #fff;
+  font-weight: 700;
+}
+.radius-chip.dim {
+  opacity: 0.55;
+}
+
+.cta {
+  margin-top: 22rpx;
+  padding: 30rpx 40rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.cta.disabled {
+  opacity: 0.55;
+}
+.cta-link {
+  display: block;
+  margin-top: 18rpx;
+  font-size: 22rpx;
+  color: #7560df;
+}
+
+.radar-section {
+  display: block;
+  margin-top: 44rpx;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #241f2e;
+}
+.radar-note {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 23rpx;
+  color: #77727e;
+  line-height: 1.8;
+}
+</style>

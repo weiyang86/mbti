@@ -1,12 +1,12 @@
 <template>
-  <view class="page social-page">
-    <text class="heading">我的联系方式</text>
-    <text class="notice">仅维护本人的私密渠道，不出现在公开名片。实际改值或清除会使旧申请和授权失效，重新填写不会恢复旧授权。</text>
+  <view class="page social-page contacts-page">
+    <text class="kicker">PRIVATE CHANNELS / 联系方式</text>
+    <text class="page-title">只给愿意的人，<text class="hl">看我的联系方式。</text></text>
+    <text class="page-sub">仅维护本人的私密渠道，不出现在公开名片。实际改值或清除会使旧申请和授权失效。</text>
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <button class="btn-secondary" :disabled="loading || busy" @click="load">重新读取本人渠道</button>
     <text v-if="loading" class="notice">正在读取本人渠道…</text>
-    <view v-if="loaded" class="card">
+    <view v-if="loaded" class="panel">
       <label class="field" for="wechat">微信号（选填）</label>
       <input id="wechat" v-model="form.wechat" :disabled="busy" maxlength="20" placeholder="以字母开头，6–20 位" :auto-focus="false" />
       <label class="field" for="qq">QQ（选填）</label>
@@ -17,14 +17,19 @@
       <button class="btn-primary mt" :disabled="busy || loading" @click="save">保存本人联系方式</button>
       <button class="btn-secondary mt" :disabled="busy || loading" @click="clearAll">清除全部本人渠道</button>
     </view>
-    <button class="btn-secondary mt" @click="go('/pages/contact-request/contact-request')">联系方式请求</button>
-    <button class="btn-secondary mt" @click="go('/pages/index/index')">返回首页</button>
+    <view class="sk-foot-links">
+      <text class="sk-foot-link" @click="load">重新读取本人渠道</text>
+      <text class="sk-foot-link" @click="go('/pages/contact-request/contact-request')">联系方式请求</text>
+      <text class="sk-foot-link" @click="goTab('/pages/index/index')">返回首页</text>
+    </view>
+    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { onHide, onShow, onUnload } from '@dcloudio/uni-app'
 import { clearContacts, getContacts, updateContacts } from '@/api/contacts'
+import { HttpError } from '@/api/client'
 import type { MyContacts } from '@/api/types-social'
 import { contactErrorMessage, validateContacts } from '@/utils/contact-display'
 import { createPrivateScope } from '@/utils/private-page'
@@ -58,7 +63,16 @@ async function save() {
   const ticket = scope.begin()
   busy.value = true; message.value = ''
   try { const data = await updateContacts(body); if (scope.current(ticket)) { fill(data); message.value = '本人渠道已保存到服务端。' } }
-  catch (e) { if (scope.current(ticket)) { empty(); error.value = contactErrorMessage(e, '保存失败，旧值已清空；请重新读取。') } }
+  catch (e) {
+    if (!scope.current(ticket)) return
+    // 存储未开启属于服务端能力问题，保留本次输入方便重试；其他失败按原策略清空旧值。
+    if (e instanceof HttpError && e.status === 503) {
+      error.value = contactErrorMessage(e, '保存失败，请稍后重试。')
+    } else {
+      empty()
+      error.value = contactErrorMessage(e, '保存失败，旧值已清空；请重新读取。')
+    }
+  }
   finally { if (scope.current(ticket)) busy.value = false }
 }
 function clearAll() {
@@ -72,5 +86,13 @@ function clearAll() {
   } })
 }
 function go(url: string) { uni.navigateTo({ url }) }
+function goTab(url: string) { uni.switchTab({ url }) }
 </script>
-<style scoped lang="scss">@import '@/styles/social.scss';</style>
+<style scoped lang="scss">
+@import '@/styles/social.scss';
+@import '@/styles/page-frame.scss';
+
+.contacts-page {
+  padding-bottom: 48rpx;
+}
+</style>

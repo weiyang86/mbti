@@ -1,10 +1,5 @@
 <template>
   <view class="page intro-page">
-    <view class="demo-strip">
-      <text>V0.4 · 趣味体验 · 不产生费用</text>
-      <text class="demo-link" @click="showDemo">体验说明 ↗</text>
-    </view>
-
     <text class="kicker"><text class="dash">—</text> 12 QUESTIONS / MBTI 趣味测试</text>
     <text class="title">12 个选择，</text>
     <text class="title">找到你更像的那一面。</text>
@@ -133,14 +128,6 @@ function goSelfSelect() {
   uni.navigateTo({ url: '/pages/self-select/self-select' })
 }
 
-function showDemo() {
-  uni.showModal({
-    title: '体验说明',
-    content: '当前为 V0.4 趣味体验版：页面使用正式测试接口，基础结果免费查看。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
 
 function start() {
   if (submitting.value) return
@@ -206,16 +193,6 @@ async function beginNewTest() {
   padding-bottom: 280rpx;
 }
 
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-}
-.demo-link {
-  color: #7560df;
-}
 
 .kicker {
   display: block;
