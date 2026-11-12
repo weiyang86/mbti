@@ -4,8 +4,6 @@
     <text class="page-title">周边 {{ radiusLabel }}，<text class="hl">有多少个同型的你？</text></text>
     <text class="page-sub">查看自愿参与者的类型人数，不展示任何人的具体位置。</text>
 
-    <view class="demo-strip"><text>DEMO · 虚拟示例区域 · 未读取 GPS</text></view>
-
     <view class="radar">
       <view class="ring ring-outer">
         <view class="ring ring-mid">
@@ -33,9 +31,8 @@
       class="btn-primary cta"
       :class="{ disabled: ctaDisabled }"
       @click="join"
-    >{{ state.saving ? '正在保存…' : '体验同型雷达（模拟授权）' }}</view>
+    >{{ state.saving ? '正在保存…' : '体验同型雷达' }}</view>
     <view v-else class="btn-secondary cta" :class="{ disabled: ctaDisabled }" @click="leave">{{ state.saving ? '正在保存…' : '退出雷达' }}</view>
-    <text class="cta-link" @click="explainNoLocation">模拟拒绝授权</text>
 
     <text v-if="state.loading" class="notice" role="status">正在读取本人类型和参与状态…</text>
     <text v-if="state.error" class="error" role="alert">{{ state.error }}</text>
@@ -44,14 +41,14 @@
     <text v-if="state.statistics.kind === 'error'" class="error" role="alert">{{ state.statistics.message }}</text>
 
     <text class="radar-section">看见同类，不暴露行踪。</text>
-    <text class="radar-note">正式方案：主动加入、可随时关闭；少于 10 人时仅显示“人数较少”，不展示精确人数或个人轨迹。</text>
+    <text class="radar-note">主动加入、可随时关闭；少于 10 人时仅显示“人数较少”，不展示精确人数或个人轨迹。</text>
     <text class="radar-note">参与不等于位置授权，也不会更改名片公开范围或联系方式授权；私密名片也可以参与。</text>
 
-    <view class="btn-secondary cta" @click="go('/pages/discover/discover')">去看非位置推荐的 MBTI 搭子</view>
+    <view class="btn-secondary cta" @click="goTab('/pages/discover/discover')">去看非位置推荐的 MBTI 搭子</view>
 
     <view class="sk-foot-links">
       <text class="sk-foot-link" @click="controller.load">重新读取状态</text>
-      <text class="sk-foot-link" @click="go('/pages/card/card')">去我的名片设置类型</text>
+      <text class="sk-foot-link" @click="goTab('/pages/card/card')">去我的名片设置类型</text>
     </view>
     <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
   </view>
@@ -90,15 +87,7 @@ function leave() {
   if (ctaDisabled.value) return
   controller.save(false)
 }
-function explainNoLocation() {
-  uni.showModal({
-    title: '模拟拒绝授权',
-    content: '当前不会请求定位，也没有接真实位置来源；拒绝后只保留「未参与」状态。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
-function go(url: string) { uni.navigateTo({ url }) }
+function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
 @import '@/styles/social.scss';
@@ -106,16 +95,6 @@ function go(url: string) { uni.navigateTo({ url }) }
 
 .radar-page {
   padding-bottom: 48rpx;
-}
-
-.demo-strip {
-  margin-top: 26rpx;
-  padding: 18rpx 20rpx;
-  border-radius: 16rpx;
-  background: #f6efe2;
-  text-align: center;
-  font-size: 20rpx;
-  color: #8a7a5a;
 }
 
 .radar {

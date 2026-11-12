@@ -7,13 +7,7 @@
     </view>
     <text class="sub">留下每个阶段的答案，看看哪些在变化、哪些一直没变。</text>
 
-    <view v-if="demo" class="journey-demo">
-      <text class="demo-title">示例档案 · 不是你的测试记录</text>
-      <text class="demo-desc">三个虚构阶段，只演示变化；不会合并到你的历史。</text>
-      <text class="demo-link" @click="exitDemo">返回我的真实作答记录</text>
-    </view>
-
-    <text v-if="!demo" class="private-badge">🔒 默认仅自己可见 · 本机保存</text>
+    <text class="private-badge">🔒 默认仅自己可见 · 本机保存</text>
 
     <view v-if="loading" class="state"><text class="state-text">正在读取记录…</text></view>
 
@@ -25,7 +19,7 @@
     <template v-else>
       <template v-if="rows.length">
         <view class="journey-summary">
-          <text class="summary-kicker">{{ demo ? '三段示例人生' : '属于自己的阶段档案' }}</text>
+          <text class="summary-kicker">属于自己的阶段档案</text>
           <view class="summary-main">
             <text class="summary-count">{{ rows.length }}</text>
             <text class="summary-unit">次记录</text>
@@ -138,7 +132,7 @@
               </view>
               <text class="record-note">{{ recordNote(item) }}</text>
             </view>
-            <text v-if="!demo" class="record-chev">↗</text>
+            <text class="record-chev">↗</text>
           </view>
         </view>
       </template>
@@ -152,14 +146,9 @@
         <text class="empty-title">今天的你，就是第一个起点。</text>
         <text class="empty-desc">每次完成测试都会新增一份记录。重测不覆盖过去，也不扣费。</text>
         <view class="btn-primary empty-btn" @click="goQuiz">建立我的第一份记录</view>
-        <text class="textbtn" @click="enterDemo">先看三个阶段的示例 →</text>
       </view>
 
-      <view v-if="demo" class="btn-primary mt" @click="exitDemo">
-        回到我的轨迹，开始记录
-      </view>
-
-      <view v-else>
+      <view>
         <view v-if="rows.length" class="btn-primary mt" @click="goQuiz">
           记录现在的我 · 免费复测
         </view>
@@ -186,8 +175,7 @@
         这是原创 12 题趣味记录。类型变化不等于人格已经改变；同样的四个字母，也可能有不同的具体回答。
       </text>
 
-      <view v-if="!demo && rows.length" class="journey-footer-actions">
-        <text class="textbtn" @click="enterDemo">查看示例轨迹</text>
+      <view v-if="rows.length" class="journey-footer-actions">
         <text class="textbtn" @click="exportHistory">导出我的记录 JSON</text>
       </view>
     </template>
@@ -255,7 +243,6 @@ import type {
 } from '@/api/types'
 import { getResult, listResults } from '@/api/results'
 import {
-  DEMO_RECORDS,
   DIM_LIST,
   DIM_MAP,
   dateLabel,
@@ -265,7 +252,6 @@ import {
 } from '@/constants/journey'
 
 type TimelineRow = ResultSnapshotSummary & {
-  demo_title?: string
   recent_status?: string
 }
 
@@ -281,7 +267,6 @@ const summaries = ref<ResultSnapshotSummary[]>([])
 const details = ref<JourneyRecord[]>([])
 const loading = ref(true)
 const loadError = ref(false)
-const demo = ref(false)
 const chartDim = ref<DimKey>('EI')
 const showChartTable = ref(false)
 const reviewDate = ref('')
@@ -290,9 +275,7 @@ const planChoice = ref<0 | 30 | 90>(0)
 const planDate = ref('')
 const planMinDate = ref('')
 
-const rows = computed<TimelineRow[]>(() =>
-  demo.value ? DEMO_RECORDS.slice().reverse() : summaries.value,
-)
+const rows = computed<TimelineRow[]>(() => summaries.value)
 
 const planDateText = computed(() => planDate.value.replaceAll('-', '/'))
 
@@ -301,11 +284,8 @@ const ownVersion = computed(
 )
 
 const chartRows = computed<JourneyRecord[]>(() => {
-  const source: JourneyRecord[] = demo.value ? DEMO_RECORDS : details.value
-  const version = demo.value
-    ? DEMO_RECORDS[0]?.question_bank_version || ''
-    : ownVersion.value
-  return source
+  const version = ownVersion.value
+  return details.value
     .filter(
       (r) =>
         r.source === 'quiz' &&
@@ -407,7 +387,6 @@ function loadReviewPlan() {
 
 function recordTitle(row: TimelineRow): string {
   return (
-    row.demo_title ||
     row.life_stage ||
     (row.source === 'self_select' ? '自行选择' : '日常生活')
   )
@@ -428,33 +407,15 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
-function enterDemo() {
-  demo.value = true
-  showChartTable.value = false
-}
-
-function exitDemo() {
-  demo.value = false
-  showChartTable.value = false
-}
-
-function demoHint() {
-  uni.showToast({ title: '示例记录只用于演示，不会写入历史', icon: 'none' })
-}
-
 function openRecord(item: TimelineRow) {
-  if (demo.value) {
-    demoHint()
-    return
-  }
   uni.navigateTo({ url: `/pages/history/detail?id=${item.id}` })
 }
 
 function goCompare() {
   if (!prevValid.value || !lastValid.value) return
-  let url = `/pages/compare/compare?baseline=${prevValid.value.id}&target=${lastValid.value.id}`
-  if (demo.value) url += '&demo=1'
-  uni.navigateTo({ url })
+  uni.navigateTo({
+    url: `/pages/compare/compare?baseline=${prevValid.value.id}&target=${lastValid.value.id}`,
+  })
 }
 
 function goQuiz() {
@@ -636,33 +597,6 @@ function downloadOrCopy(text: string, filename: string, mime: string) {
   font-size: 24rpx;
   color: #77727e;
   line-height: 1.6;
-}
-
-.journey-demo {
-  margin-top: 28rpx;
-  padding: 24rpx;
-  border-radius: 24rpx;
-  border: 2rpx solid #dbd1ef;
-  background: #f0eafa;
-}
-.demo-title {
-  display: block;
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #746080;
-}
-.demo-desc {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.6;
-}
-.demo-link {
-  display: inline-block;
-  margin-top: 12rpx;
-  font-size: 22rpx;
-  color: #7560df;
 }
 
 .private-badge {

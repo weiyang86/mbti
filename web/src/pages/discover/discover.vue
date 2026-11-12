@@ -10,7 +10,7 @@
         <text class="entry-icon">◎</text>
         <view class="entry-body">
           <text class="entry-title">同型雷达</text>
-          <text class="entry-desc">周边人数 · 模拟</text>
+          <text class="entry-desc">周边人数 · 匿名统计</text>
         </view>
       </view>
       <view class="entry" @click="go('/pages/compat/compat')">
@@ -26,7 +26,7 @@
       <view class="tabs">
         <view class="tab" :class="{ on: mode === 'recommend' }" @click="switchMode('recommend')">推荐搭子</view>
         <view class="tab" :class="{ on: mode === 'same', off: !myCard?.type_code }" @click="switchMode('same')">
-          同型{{ myCard?.type_code ? ` ${myCard.type_code}` : '' }}
+          同型{{ myType ? ` ${myType}` : '' }}
         </view>
       </view>
       <view class="list-links">
@@ -39,8 +39,8 @@
     <text v-if="loading" class="notice">正在读取搭子…</text>
     <text v-if="loaded && !items.length" class="notice">暂时没有符合条件的公开搭子。</text>
 
-    <view v-if="myCard && !myCard.type_code" class="hint" @click="goTab('/pages/card/card')">
-      <text>尚未选择名片类型，同型筛选暂不可用 →</text>
+    <view v-if="!myType" class="hint" @click="goTab('/pages/card/card')">
+      <text>还没有测试类型，同型筛选暂不可用 →</text>
     </view>
     <view v-else-if="myCard && !myCard.discoverable" class="hint" @click="goTab('/pages/card/card')">
       <text>你的名片还未公开，先开启公开与发现 →</text>
@@ -63,7 +63,7 @@
       </view>
     </view>
 
-    <text class="foot">全部为虚构成年人资料，没有聊天、评论或自由发布动态的入口。</text>
+    <text class="foot">搭子资料由平台生成，没有聊天、评论或自由发布动态的入口。</text>
     <view class="foot-links">
       <text class="foot-link" @click="goTab('/pages/card/card')">我的名片</text>
       <text class="foot-dot">·</text>
@@ -76,10 +76,12 @@
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'
+import { listResults } from '@/api/results'
 import { listBuddies } from '@/api/buddies'
 import type { BuddySummary, MyCard } from '@/api/types-social'
 import { avatarTint, displayBuddyName, socialErrorMessage } from '@/utils/social-display'
 const myCard = ref<MyCard | null>(null)
+const myType = ref('')
 const items = ref<BuddySummary[]>([])
 const mode = ref<'recommend' | 'same'>('recommend')
 const loading = ref(false)
@@ -90,25 +92,33 @@ async function load() {
   if (loading.value) return
   loading.value = true; loaded.value = false; items.value = []; myCard.value = null; error.value = ''
   try {
-    const [card, list] = await Promise.all([getMyCard(), listBuddies({ mode: mode.value, limit: 20 })])
-    myCard.value = card; items.value = list.items; loaded.value = true
+    const card = await getMyCard()
+    myCard.value = card
+    let latestType = ''
+    try { latestType = (await listResults({ limit: 1 })).items[0]?.type_code || '' } catch { latestType = '' }
+    // 同型筛选以最近一次测试结果为准，名片里保存的类型只作兜底
+    myType.value = latestType || card.type_code || ''
+    const list = mode.value === 'same' && myType.value
+      ? await listBuddies({ mode: 'recommend', type_code: myType.value, limit: 20 })
+      : await listBuddies({ mode: 'recommend', limit: 20 })
+    items.value = list.items; loaded.value = true
   } catch (e) { error.value = socialErrorMessage(e, '搭子列表读取失败，请重试') }
   finally { loading.value = false }
 }
 function switchMode(next: 'recommend' | 'same') {
-  if (loading.value || (next === 'same' && !myCard.value?.type_code)) return
+  if (loading.value || (next === 'same' && !myType.value)) return
   mode.value = next; load()
 }
 function avatarText(buddy: BuddySummary) {
   return Array.from(displayBuddyName(buddy.nickname, buddy.id))[0] || '搭'
 }
 function sharedText(buddy: BuddySummary) {
-  if (buddy.shared_interests.length) return `共同兴趣：${buddy.shared_interests.join('、')} · 示例用户`
-  return buddy.same_type ? '同型搭子 · 示例用户' : '不同类型，也可以认识 · 示例用户'
+  if (buddy.shared_interests.length) return `共同兴趣：${buddy.shared_interests.join('、')}`
+  return buddy.type_code === myType.value ? '同型搭子' : '不同类型，也可以认识'
 }
 function openBuddy(id: string) { go(`/pages/buddies/detail?id=${encodeURIComponent(id)}`) }
 function go(url: string) { uni.navigateTo({ url }) }
-function goTab(url: string) { uni.switchTab({ url }) }
+function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
 @import '@/styles/social.scss';

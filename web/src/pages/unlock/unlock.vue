@@ -38,7 +38,7 @@
       </view>
     </view>
 
-    <text class="fine">示例人物形象；文字按模板、MBTI、兴趣与宣言排版；上传本人照片需本人授权。</text>
+    <text class="fine">人物形象由 AI 生成；文字按模板、MBTI、兴趣与宣言排版；上传本人照片需本人授权。</text>
 
     <view class="checks">
       <view class="check"><text class="check-icon">✓</text><text>一次购买</text></view>
@@ -123,7 +123,7 @@ const FAQS = [
   },
   {
     q: '图片不满意怎么办？',
-    a: '使用示例人物素材时，风格与宣言可以随时更换；本人照片方案需另行授权。',
+    a: '素材风格与宣言可以随时更换；本人照片方案需另行授权。',
   },
 ]
 

@@ -7,17 +7,11 @@
     </view>
     <text class="sub">只分享你选择的两个结果，完整历史与作答不会被公开。</text>
 
-    <view v-if="demo" class="journey-demo">
-      <text class="demo-title">示例档案 · 不是你的测试记录</text>
-      <text class="demo-desc">三个虚构阶段，只演示变化；不会合并到你的历史。</text>
-    </view>
-
     <view v-if="loading" class="state"><text class="state-text">正在生成阶段图…</text></view>
 
     <view v-else-if="error || !a || !b" class="state">
       <text class="state-text">{{ error || '还没有两份可比较的记录' }}</text>
       <view class="btn-primary mt" @click="backToJourney">回到我的轨迹</view>
-      <view class="btn-ghost mt" @click="openDemoCompare">先看变化示例</view>
     </view>
 
     <template v-else>
@@ -39,9 +33,7 @@
         <text class="poster-summary">{{ posterSummary }}</text>
         <text v-if="showName" class="poster-name">{{ nickname }}</text>
         <text v-if="showStage" class="poster-stage">{{ stageOf(a) }} → {{ stageOf(b) }}</text>
-        <text class="poster-fine">
-          {{ demo ? '虚构示例 · ' : '' }}趣味复测记录，不代表人格已改变
-        </text>
+        <text class="poster-fine">趣味复测记录，不代表人格已改变</text>
         <text class="poster-star">✦</text>
       </view>
 
@@ -83,20 +75,17 @@ import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot, ResultSnapshotSummary } from '@/api/types'
 import { getResult, listResults } from '@/api/results'
 import {
-  DEMO_RECORDS,
   changedAnswerCount,
   chooseSummaryPair,
   dateLabel,
   dimCompareRows,
-  pickPair,
   summaryText,
 } from '@/constants/journey'
 
-type PickRow = ResultSnapshotSummary & { demo_title?: string; recent_status?: string }
+type PickRow = ResultSnapshotSummary & { recent_status?: string }
 
 const baselineId = ref('')
 const targetId = ref('')
-const demo = ref(false)
 const loading = ref(true)
 const error = ref('')
 const a = ref<ResultSnapshot | null>(null)
@@ -110,7 +99,6 @@ const nickname = ref('小禾')
 onLoad((q) => {
   baselineId.value = (q?.baseline as string) || ''
   targetId.value = (q?.target as string) || ''
-  demo.value = q?.demo === '1'
   nickname.value = readNickname()
 })
 
@@ -136,13 +124,6 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    if (demo.value) {
-      const [from, to] = pickPair(DEMO_RECORDS, baselineId.value, targetId.value)
-      a.value = from
-      b.value = to
-      if (!from || !to) error.value = '示例数据不完整，请回到轨迹重新进入。'
-      return
-    }
     const res = await listResults({ limit: 100 })
     const quiz = res.items.filter((i) => i.source === 'quiz')
     const version = quiz[0]?.question_bank_version
@@ -193,7 +174,7 @@ function toggleStage(e: any) {
 function caption(): string {
   if (!a.value || !b.value) return ''
   return [
-    `${demo.value ? '【虚构示例】\n' : ''}${dateLabel(a.value.submitted_at)} → ${dateLabel(b.value.submitted_at)}`,
+    `${dateLabel(a.value.submitted_at)} → ${dateLabel(b.value.submitted_at)}`,
     summaryText(a.value, b.value),
     '每一面的我，都值得记录。',
     '#MBTI搭子 #我的阶段记录',
@@ -300,11 +281,7 @@ function buildPoster(): string {
 
   ctx.fillStyle = '#81718e'
   ctx.font = '25px "PingFang SC", sans-serif'
-  ctx.fillText(
-    demo.value ? '虚构示例 · 不属于你的真实作答' : '两次趣味复测记录 · 仅展示所选结果',
-    80,
-    1290,
-  )
+  ctx.fillText('两次趣味复测记录 · 仅展示所选结果', 80, 1290)
   ctx.fillText('不代表人格已改变 · 不含具体答案与联系方式', 80, 1350)
 
   return canvas.toDataURL('image/png')
@@ -312,11 +289,7 @@ function buildPoster(): string {
 // #endif
 
 function backToJourney() {
-  uni.switchTab({ url: '/pages/history/list' })
-}
-
-function openDemoCompare() {
-  uni.redirectTo({ url: '/pages/compare/compare?demo=1' })
+  uni.switchTab({ url: '/pages/history/list', fail: () => uni.reLaunch({ url: '/pages/history/list' }) })
 }
 </script>
 
@@ -350,26 +323,6 @@ function openDemoCompare() {
   line-height: 1.6;
 }
 
-.journey-demo {
-  margin-top: 28rpx;
-  padding: 24rpx;
-  border-radius: 24rpx;
-  border: 2rpx solid #dbd1ef;
-  background: #f0eafa;
-}
-.demo-title {
-  display: block;
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #746080;
-}
-.demo-desc {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.6;
-}
 
 .state {
   padding-top: 160rpx;

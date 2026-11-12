@@ -42,25 +42,31 @@
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import type { MyCard } from '@/api/types-social'
+import type { ResultSnapshotSummary } from '@/api/types'
 import { getMyCard } from '@/api/cards'
+import { listResults } from '@/api/results'
 
 const card = ref<MyCard | null>(null)
+const latestResult = ref<ResultSnapshotSummary | null>(null)
 
 const displayName = computed(() => card.value?.nickname?.trim() || '匿名搭子')
+// 类型展示以最近一次测试结果为准，名片保存的类型只作兜底
+const displayType = computed(() => latestResult.value?.type_code || card.value?.type_code || '')
 const typeLine = computed(() =>
-  card.value?.type_code ? `${card.value.type_code} · 免费基础用户` : '还没有选择类型',
+  displayType.value ? `${displayType.value} · 免费基础用户` : '还没有选择类型',
 )
 
 onShow(async () => {
-  try {
-    card.value = await getMyCard()
-  } catch {
-    card.value = null
-  }
+  await Promise.all([
+    getMyCard().then((data) => { card.value = data }).catch(() => { card.value = null }),
+    listResults({ limit: 1 })
+      .then((res) => { latestResult.value = res.items[0] || null })
+      .catch(() => { latestResult.value = null }),
+  ])
 })
 
 function goTab(url: string) {
-  uni.switchTab({ url })
+  uni.switchTab({ url, fail: () => uni.reLaunch({ url }) })
 }
 
 function go(url: string) {
@@ -68,7 +74,7 @@ function go(url: string) {
 }
 
 function goResult() {
-  const id = card.value?.latest_result_id
+  const id = latestResult.value?.id || card.value?.latest_result_id
   if (!id) {
     uni.showToast({ title: '还没有测试结果', icon: 'none' })
     return

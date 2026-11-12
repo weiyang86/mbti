@@ -11,8 +11,8 @@
     <view v-if="loaded && !items.length" class="empty">
       <text class="kicker plain">MBTI BUDDY</text>
       <text class="empty-title">名片夹还空着</text>
-      <text class="empty-desc">先向喜欢的示例搭子发出一张名片。</text>
-      <view class="btn-primary mt" @click="go('/pages/discover/discover')">去发现搭子</view>
+      <text class="empty-desc">先向喜欢的搭子发出一张名片。</text>
+      <view class="btn-primary mt" @click="goTab('/pages/discover/discover')">去发现搭子</view>
     </view>
 
     <view v-for="item in items" :key="item.id" class="panel swap">
@@ -72,6 +72,7 @@ async function act(operation: () => Promise<unknown>) {
 function respond(item: CardExchange, action: 'accept' | 'decline') { if (canRespond(item)) act(() => respondCardExchange(item.id, action)) }
 function revoke(item: CardExchange) { if (canRevoke(item)) act(() => revokeCardExchange(item.id)) }
 function go(url: string) { uni.navigateTo({ url }) }
+function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
 @import '@/styles/social.scss';

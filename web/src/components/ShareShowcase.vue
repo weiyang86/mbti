@@ -29,7 +29,6 @@
             <text class="pv-type-name">{{ nickname }} / {{ typeName }}</text>
           </view>
         </view>
-        <text class="pv-note">AI 示例人物</text>
       </template>
 
       <template v-else-if="sceneTab === 'avatar'">
@@ -38,7 +37,6 @@
         </view>
         <text class="pv-quote centered">头像也要有我的 MBTI 气质。</text>
         <text class="pv-sub centered">同款 1:1 头像，可单独下载。</text>
-        <text class="pv-note centered">AI 虚构人物样例</text>
       </template>
 
       <template v-else>

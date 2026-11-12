@@ -7,7 +7,6 @@
       </view>
       <view class="brand-actions">
         <text v-if="config?.entry" class="chip" @click="goChannelEntry">{{ config.entry.name }}入口</text>
-        <text class="chip" @click="showChannels">微信预览 ⌄</text>
       </view>
     </view>
 
@@ -79,7 +78,7 @@
           <text class="tool-name">同型雷达</text>
           <text class="tool-desc">统计暂不可用</text>
           <text class="tool-desc">周边同型人数待接通</text>
-          <text class="tool-note">不会显示虚构人数 ↗</text>
+          <text class="tool-note">不展示精确人数 ↗</text>
         </view>
         <view class="tool-tile" @click="goCompat">
           <text class="tool-icon">✧</text>
@@ -227,15 +226,6 @@ function goContacts() {
 
 function goContactRequests() {
   uni.navigateTo({ url: '/pages/contact-request/contact-request' })
-}
-
-function showChannels() {
-  uni.showModal({
-    title: '预览渠道',
-    content: '微信小程序 · 小红书小程序 · 抖音小程序 · 公众号 H5\n当前为演示版本，仅展示微信预览效果。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
 }
 </script>
 

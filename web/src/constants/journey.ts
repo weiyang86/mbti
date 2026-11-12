@@ -1,10 +1,8 @@
 import type {
-  CompareResult,
   DimensionCounts,
   ResultSnapshot,
   ResultSnapshotSummary,
 } from '@/api/types'
-import { QUESTION_BANK_VERSION } from '@/api/mock/questions'
 
 export type DimKey = 'EI' | 'SN' | 'TF' | 'JP'
 export type DimLetter = keyof DimensionCounts
@@ -34,57 +32,9 @@ export const DIM_MAP: Record<DimKey, DimMeta> = DIM_LIST.reduce(
   {} as Record<DimKey, DimMeta>,
 )
 
-/** 仅用于「先看示例」的虚构阶段，不写入真实记录 */
-export interface JourneyRecord extends ResultSnapshot {
-  demo_title?: string
-  /** 示例记录独有的 0/1 作答，用于演示“几道题不同”，真实接口不下发 */
-  demo_answers?: number[]
-}
+export type JourneyRecord = ResultSnapshot
 
 const DAY = 86400000
-
-function daysAgo(days: number) {
-  return new Date(Date.now() - days * DAY).toISOString()
-}
-
-export const DEMO_RECORDS: JourneyRecord[] = [
-  {
-    id: 'demo-stage-0',
-    source: 'quiz',
-    type_code: 'INFP',
-    dimension_counts: { E: 1, I: 2, S: 1, N: 2, T: 1, F: 2, J: 1, P: 2 },
-    question_bank_version: QUESTION_BANK_VERSION,
-    submitted_at: daysAgo(90),
-    life_stage: '新城市',
-    recent_status: '忙碌',
-    demo_title: '毕业后的夏天',
-    demo_answers: [1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1],
-  },
-  {
-    id: 'demo-stage-1',
-    source: 'quiz',
-    type_code: 'ENFP',
-    dimension_counts: { E: 2, I: 1, S: 1, N: 2, T: 1, F: 2, J: 1, P: 2 },
-    question_bank_version: QUESTION_BANK_VERSION,
-    submitted_at: daysAgo(45),
-    life_stage: '新工作',
-    recent_status: '平稳',
-    demo_title: '慢慢适应新生活',
-    demo_answers: [0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1],
-  },
-  {
-    id: 'demo-stage-2',
-    source: 'quiz',
-    type_code: 'ENFP',
-    dimension_counts: { E: 3, I: 0, S: 0, N: 3, T: 1, F: 2, J: 0, P: 3 },
-    question_bank_version: QUESTION_BANK_VERSION,
-    submitted_at: daysAgo(0),
-    life_stage: '日常生活',
-    recent_status: '轻松',
-    demo_title: '更愿意主动认识人',
-    demo_answers: [0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
-  },
-]
 
 export function dateLabel(value?: string, short = false): string {
   if (!value) return '日期未知'
@@ -128,11 +78,9 @@ export function isComparableSummary(
   )
 }
 
-export function changedAnswerCount(a: ResultSnapshot, b: ResultSnapshot): number | null {
-  const left = (a as JourneyRecord).demo_answers
-  const right = (b as JourneyRecord).demo_answers
-  if (!left || !right || left.length !== right.length) return null
-  return left.reduce((sum, value, i) => sum + (value === right[i] ? 0 : 1), 0)
+/** 接口不下发原始作答，历史对比只用四维计数 */
+export function changedAnswerCount(_a: ResultSnapshot, _b: ResultSnapshot): number | null {
+  return null
 }
 
 export interface DimCompareRow extends DimMeta {
@@ -169,27 +117,6 @@ export function summaryText(a: ResultSnapshot, b: ResultSnapshot): string {
   return `结果从 ${a.type_code} 到 ${b.type_code}，${changedDims.length} 个维度的题数发生变化。`
 }
 
-/** 示例记录在本地完成对比，不调用后端 */
-export function localCompare(a: ResultSnapshot, b: ResultSnapshot): CompareResult {
-  const deltas: Record<string, number> = {}
-  if (a.dimension_counts && b.dimension_counts) {
-    ;(Object.keys(a.dimension_counts) as DimLetter[]).forEach((key) => {
-      deltas[key] = (b.dimension_counts?.[key] ?? 0) - (a.dimension_counts?.[key] ?? 0)
-    })
-  }
-  return {
-    baseline_id: a.id,
-    target_id: b.id,
-    question_bank_version: a.question_bank_version,
-    type_changed: a.type_code !== b.type_code,
-    baseline_type_code: a.type_code,
-    target_type_code: b.type_code,
-    dimension_deltas: deltas,
-    stability_notes:
-      a.type_code === b.type_code ? ['类型相同，可查看四维计数差异'] : [],
-  }
-}
-
 /** 列表摘要选对：缺省取最新两次并按时间升序 */
 export function chooseSummaryPair<T extends ResultSnapshotSummary>(
   rows: T[],
@@ -204,25 +131,4 @@ export function chooseSummaryPair<T extends ResultSnapshotSummary>(
   if (!from || !to) return [null, null]
   if (from.submitted_at > to.submitted_at) [from, to] = [to, from]
   return [from, to]
-}
-
-/** 从候选记录中选出「之前 / 这次」两份，缺省取最新两次并按时间升序 */
-export function pickPair<T extends ResultSnapshot>(
-  rows: T[],
-  baselineId?: string,
-  targetId?: string,
-): [T | null, T | null] {
-  const valid = rows
-    .filter((r) => r.source === 'quiz' && r.dimension_counts)
-    .slice()
-    .sort((a, b) => a.submitted_at.localeCompare(b.submitted_at))
-  if (valid.length < 2) return [null, null]
-  let to = targetId ? valid.find((r) => r.id === targetId) : valid[valid.length - 1]
-  let from = baselineId ? valid.find((r) => r.id === baselineId) : undefined
-  if (!to) to = valid[valid.length - 1]
-  if (!from || from.id === to.id) {
-    from = valid.filter((r) => r.id !== to?.id).slice(-1)[0]
-  }
-  if (!from || !to) return [null, null]
-  return from.submitted_at <= to.submitted_at ? [from, to] : [to, from]
 }

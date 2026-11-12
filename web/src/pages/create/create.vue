@@ -20,7 +20,7 @@
     <view v-else-if="studio.tier === 0" class="state-empty">
       <text class="empty-mark">✦</text>
       <text class="empty-title">先选一份想晒的自己</text>
-      <text class="empty-desc">形象工作台需要先解锁晒图套装；当前为模拟支付，不产生扣款。</text>
+      <text class="empty-desc">形象工作台需要先解锁晒图套装；当前支付尚未开通，不会产生扣款。</text>
       <view class="btn-primary mt" @click="goPricing">去看晒图套装</view>
     </view>
 
@@ -35,7 +35,7 @@
           <text class="preview-type">{{ latestType }}</text>
           <text class="preview-quote">{{ quoteText }}</text>
         </view>
-        <text class="preview-small">AI 示例人物 · 文字按填写内容排版</text>
+        <text class="preview-small">文字按填写内容排版</text>
       </view>
 
       <view class="field">

@@ -45,9 +45,10 @@
 
       <view class="namecard">
         <text class="nc-label">MBTI BUDDY / 基础名片</text>
-        <text class="nc-type">{{ card.type_code }}</text>
-        <text class="nc-name">{{ card.nickname || '我' }} · {{ typeName }}</text>
-        <text class="nc-decl">{{ card.declaration || declarationText }}</text>
+        <text class="nc-type">{{ displayType }}</text>
+        <text class="nc-name">{{ card.nickname || '我' }} · {{ displayTypeName }}</text>
+        <text class="nc-decl">{{ card.declaration || displayDeclaration }}</text>
+        <text v-if="latestType && latestType !== card.type_code" class="nc-src">按最近一次测试结果展示</text>
         <text class="nc-foot">联系方式仅在双方同意后单独交换</text>
       </view>
 
@@ -187,9 +188,11 @@ const visibilityRows: { key: keyof CardVisibility; label: string }[] = [
   { key: 'name', label: '昵称' }, { key: 'interests', label: '兴趣' }, { key: 'declaration', label: '自我介绍' }, { key: 'manual', label: '相处说明' },
 ]
 
-const typeName = computed(() => TYPE_NAMES[card.value?.type_code || ''] || 'MBTI')
-const declarationText = computed(
-  () => DECLARATIONS[card.value?.type_code || ''] || '四个字母之外，还有不一样的我。',
+/** 名片大卡按最近一次测试结果展示；没有测试结果时才用名片上保存的类型 */
+const displayType = computed(() => latestType.value || card.value?.type_code || '')
+const displayTypeName = computed(() => TYPE_NAMES[displayType.value] || 'MBTI')
+const displayDeclaration = computed(
+  () => DECLARATIONS[displayType.value] || '四个字母之外，还有不一样的我。',
 )
 /** 付费态只认服务端权益：有 studio_tier_2 优先，其次 studio_tier_1 */
 const unlockTier = computed<0 | 1 | 2>(() => {
@@ -204,18 +207,15 @@ async function load() {
   if (loading.value || busy.value) return
   loading.value = true; card.value = null; error.value = ''; success.value = ''; typesError.value = ''
   await Promise.all([
-    getMyCard().then(async (data) => {
+    getMyCard().then((data) => {
       card.value = data
       resetForm(data)
-      latestType.value = ''
-      if (!data.type_code) {
-        try {
-          const res = await listResults({ limit: 1 })
-          latestType.value = res.items[0]?.type_code || ''
-          if (latestType.value) form.type_code = latestType.value
-        } catch { latestType.value = '' }
-      }
     }).catch((e) => { error.value = socialErrorMessage(e, '本人名片读取失败，请重试') }),
+    listResults({ limit: 1 }).then((res) => {
+      latestType.value = res.items[0]?.type_code || ''
+      // 名片还没有保存类型时，预选最近一次结果，方便一键保存
+      if (!form.type_code && latestType.value) form.type_code = latestType.value
+    }).catch(() => { latestType.value = '' }),
     listTypes().then((data) => { types.value = data.items }).catch((e) => { types.value = []; typesError.value = socialErrorMessage(e, '类型列表读取失败，请重新读取') }),
     getMyEntitlements().then((data) => { entitlements.value = data.items }).catch(() => { entitlements.value = [] }),
   ])
@@ -270,13 +270,13 @@ function openPublic() {
 function goTest() { uni.navigateTo({ url: '/pages/test-intro/test-intro' }) }
 function goSelfSelect() { uni.navigateTo({ url: '/pages/self-select/self-select' }) }
 function goCreate() { uni.navigateTo({ url: '/pages/create/create' }) }
-function goHistory() { uni.switchTab({ url: '/pages/history/list' }) }
+function goHistory() { uni.switchTab({ url: '/pages/history/list', fail: () => uni.reLaunch({ url: '/pages/history/list' }) }) }
 function goUpgrade() {
   const id = card.value?.latest_result_id
   uni.navigateTo({ url: `/pages/pricing/pricing${id ? `?result_id=${encodeURIComponent(id)}` : ''}` })
 }
 function go(url: string) { uni.navigateTo({ url }) }
-function goTab(url: string) { uni.switchTab({ url }) }
+function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 
 <style scoped lang="scss">
@@ -367,6 +367,12 @@ function goTab(url: string) { uni.switchTab({ url }) }
   font-size: 24rpx;
   color: #6f6880;
   line-height: 1.7;
+}
+.nc-src {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 19rpx;
+  color: #8b78b3;
 }
 .nc-foot {
   display: block;

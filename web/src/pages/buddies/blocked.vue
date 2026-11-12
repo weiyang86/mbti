@@ -21,7 +21,7 @@
 
     <view class="sk-foot-links">
       <text class="sk-foot-link" @click="load">刷新屏蔽列表</text>
-      <text class="sk-foot-link" @click="go('/pages/discover/discover')">返回发现搭子</text>
+      <text class="sk-foot-link" @click="goTab('/pages/discover/discover')">返回发现搭子</text>
       <text class="sk-foot-link" @click="goTab('/pages/card/card')">我的名片</text>
     </view>
     <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
@@ -55,7 +55,7 @@ async function unblock(id: string) {
   finally { busy.value = false }
 }
 function go(url: string) { uni.navigateTo({ url }) }
-function goTab(url: string) { uni.switchTab({ url }) }
+function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
 @import '@/styles/social.scss';
