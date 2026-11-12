@@ -99,7 +99,7 @@
         </view>
 
         <view class="btn-primary offer-cta" @click="goCheckout('studio_tier_1')">¥9.9 · 制作我的 MBTI 晒图套装 →</view>
-        <text class="fine centered">一次购买 · 无订阅 · 当前为模拟支付</text>
+        <text class="fine centered">一次购买 · 无订阅 · 当前支付尚未开通</text>
       </view>
 
       <view class="discovery-card" @click="goDiscover">

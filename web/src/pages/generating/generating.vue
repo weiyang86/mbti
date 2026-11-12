@@ -23,7 +23,7 @@
     </view>
 
     <view class="btn-secondary mt" @click="cancel">返回编辑</view>
-    <text class="foot">模拟生成过程，不会上传照片或产生真实费用。</text>
+    <text class="foot">生成过程不会上传照片，也不会产生真实费用。</text>
   </view>
 </template>
 

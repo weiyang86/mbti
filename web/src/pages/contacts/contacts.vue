@@ -86,7 +86,7 @@ function clearAll() {
   } })
 }
 function go(url: string) { uni.navigateTo({ url }) }
-function goTab(url: string) { uni.switchTab({ url }) }
+function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
 @import '@/styles/social.scss';

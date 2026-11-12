@@ -7,12 +7,6 @@
     </view>
     <text class="sub">比较你选择的两个阶段；没有高低阶，也没有“更好的人格”。</text>
 
-    <view v-if="demo" class="journey-demo">
-      <text class="demo-title">示例档案 · 不是你的测试记录</text>
-      <text class="demo-desc">三个虚构阶段，只演示变化；不会合并到你的历史。</text>
-      <text class="demo-link" @click="backToJourney">返回我的真实作答记录</text>
-    </view>
-
     <view v-if="loading" class="state"><text class="state-text">正在准备对比…</text></view>
 
     <view v-else-if="error" class="state">
@@ -149,7 +143,7 @@
         <text class="reflection-desc">
           可以想想：最近的生活节奏、环境或作答理解有没有不同？这里不把阶段标签当成变化的因果解释。
         </text>
-        <text v-if="!demo" class="reflection-link" @click="openRecord(b.id)">
+        <text class="reflection-link" @click="openRecord(b.id)">
           回看这次阶段记录 →
         </text>
       </view>
@@ -164,7 +158,6 @@
       <text class="empty-desc">只比较同一题目、计分规则和回顾时间窗下的两次结果。</text>
       <view class="btn-primary empty-btn" @click="goQuiz">免费记录现在的我</view>
       <view class="btn-secondary" @click="backToJourney">查看已有记录</view>
-      <text class="textbtn" @click="openDemo">先看变化示例 →</text>
     </view>
   </view>
 </template>
@@ -180,24 +173,20 @@ import type {
 import { compareResults, getResult, listResults } from '@/api/results'
 import { getLocalAnswers, type LocalAnswerRecord } from '@/store/local-answers'
 import {
-  DEMO_RECORDS,
   DIM_LIST,
   changedAnswerCount,
   chooseSummaryPair,
   dateLabel,
   daysBetween,
   dimCompareRows,
-  localCompare,
-  pickPair,
   summaryText,
   type JourneyRecord,
 } from '@/constants/journey'
 
-type PickRow = ResultSnapshotSummary & { demo_title?: string; recent_status?: string }
+type PickRow = ResultSnapshotSummary & { recent_status?: string }
 
 const baselineId = ref('')
 const targetId = ref('')
-const demo = ref(false)
 const loading = ref(true)
 const error = ref('')
 const a = ref<ResultSnapshot | null>(null)
@@ -211,7 +200,6 @@ const showAnswerDiff = ref(false)
 onLoad((q) => {
   baselineId.value = (q?.baseline as string) || ''
   targetId.value = (q?.target as string) || ''
-  demo.value = q?.demo === '1'
 })
 
 onShow(() => {
@@ -270,10 +258,7 @@ const typeChanges = computed(() => {
 
 const notes = computed(() => compare.value?.stability_notes || [])
 
-const pickerRows = computed<PickRow[]>(() => {
-  if (demo.value) return DEMO_RECORDS.slice().reverse()
-  return options.value
-})
+const pickerRows = computed<PickRow[]>(() => options.value)
 
 const pickerLabels = computed(() =>
   pickerRows.value.map(
@@ -295,42 +280,29 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    if (demo.value) {
-      const [from, to] = pickPair(DEMO_RECORDS, baselineId.value, targetId.value)
-      a.value = from
-      b.value = to
+    const res = await listResults({ limit: 100 })
+    const quiz = res.items.filter((i) => i.source === 'quiz')
+    const version = quiz[0]?.question_bank_version
+    options.value = quiz.filter((i) => i.question_bank_version === version)
+    const pair = chooseSummaryPair(options.value, baselineId.value, targetId.value)
+    if (!pair[0] || !pair[1]) {
+      a.value = null
+      b.value = null
       localA.value = null
       localB.value = null
-      compare.value = from && to ? localCompare(from, to) : null
-      if (from && to) {
-        baselineId.value = from.id
-        targetId.value = to.id
-      }
+      compare.value = null
     } else {
-      const res = await listResults({ limit: 100 })
-      const quiz = res.items.filter((i) => i.source === 'quiz')
-      const version = quiz[0]?.question_bank_version
-      options.value = quiz.filter((i) => i.question_bank_version === version)
-      const pair = chooseSummaryPair(options.value, baselineId.value, targetId.value)
-      if (!pair[0] || !pair[1]) {
-        a.value = null
-        b.value = null
-        localA.value = null
-        localB.value = null
-        compare.value = null
-      } else {
-        const [from, to] = await Promise.all([
-          getResult(pair[0].id),
-          getResult(pair[1].id),
-        ])
-        a.value = from
-        b.value = to
-        localA.value = getLocalAnswers(from.id)
-        localB.value = getLocalAnswers(to.id)
-        baselineId.value = from.id
-        targetId.value = to.id
-        compare.value = await compareResults(from.id, to.id)
-      }
+      const [from, to] = await Promise.all([
+        getResult(pair[0].id),
+        getResult(pair[1].id),
+      ])
+      a.value = from
+      b.value = to
+      localA.value = getLocalAnswers(from.id)
+      localB.value = getLocalAnswers(to.id)
+      baselineId.value = from.id
+      targetId.value = to.id
+      compare.value = await compareResults(from.id, to.id)
     }
   } catch {
     error.value = '对比加载失败，请稍后再试。'
@@ -368,9 +340,9 @@ function openRecord(id: string) {
 
 function goShare() {
   if (!a.value || !b.value) return
-  let url = `/pages/journey-share/journey-share?baseline=${a.value.id}&target=${b.value.id}`
-  if (demo.value) url += '&demo=1'
-  uni.navigateTo({ url })
+  uni.navigateTo({
+    url: `/pages/journey-share/journey-share?baseline=${a.value.id}&target=${b.value.id}`,
+  })
 }
 
 function goQuiz() {
@@ -378,11 +350,7 @@ function goQuiz() {
 }
 
 function backToJourney() {
-  uni.switchTab({ url: '/pages/history/list' })
-}
-
-function openDemo() {
-  uni.redirectTo({ url: '/pages/compare/compare?demo=1' })
+  uni.switchTab({ url: '/pages/history/list', fail: () => uni.reLaunch({ url: '/pages/history/list' }) })
 }
 </script>
 
@@ -416,32 +384,6 @@ function openDemo() {
   line-height: 1.6;
 }
 
-.journey-demo {
-  margin-top: 28rpx;
-  padding: 24rpx;
-  border-radius: 24rpx;
-  border: 2rpx solid #dbd1ef;
-  background: #f0eafa;
-}
-.demo-title {
-  display: block;
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #746080;
-}
-.demo-desc {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.6;
-}
-.demo-link {
-  display: inline-block;
-  margin-top: 12rpx;
-  font-size: 22rpx;
-  color: #7560df;
-}
 
 .state {
   padding-top: 160rpx;

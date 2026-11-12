@@ -94,11 +94,11 @@
           <text class="textbtn centered" @click="openDrafts">查看草稿</text>
         </template>
         <text v-if="platform === 'douyin'" class="textbtn centered" @click="goVideo">
-          预览 15 秒分镜（模拟）
+          预览 15 秒分镜
         </text>
       </view>
 
-      <text class="textbtn centered" @click="nativeShare">预览平台分享卡片（模拟）</text>
+      <text class="textbtn centered" @click="nativeShare">预览平台分享卡片</text>
 
       <view class="notice mt">
         本页不发布动态或私信。图片可下载、文案可复制；平台分享能力尚未接入。联系方式不会放入图片。
@@ -222,10 +222,10 @@ function defaultCaption(k: PlatformKey) {
   const names = TYPE_NAMES[t] || 'MBTI'
   const quote = currentQuote(t)
   if (k === 'douyin') {
-    return `四个字母说不完我。\n${t} · ${names}\n${quote}\n晒出我的 MBTI 主角卡。#MBTI搭子 #MBTI\n画面为 AI 示例人物。`
+    return `四个字母说不完我。\n${t} · ${names}\n${quote}\n晒出我的 MBTI 主角卡。#MBTI搭子 #MBTI`
   }
   const likes = interests.value.length ? interests.value.join('、') : '探索生活里的新鲜事'
-  return `同样是 ${t}，我也有自己的主角感。\n${quote}\n最近喜欢：${likes}。\n换了张 MBTI 名片，也换个方式认识我。\n#MBTI搭子 #MBTI #人格名片\n图片为 AI 示例，类型仅作趣味参考。`
+  return `同样是 ${t}，我也有自己的主角感。\n${quote}\n最近喜欢：${likes}。\n换了张 MBTI 名片，也换个方式认识我。\n#MBTI搭子 #MBTI #人格名片\n图片为 AI 生成，类型仅作趣味参考。`
 }
 
 function switchPlatform(key: PlatformKey) {
@@ -292,7 +292,7 @@ function previewImage() {
 
 function nativeShare() {
   uni.showModal({
-    title: '平台分享卡片预览（模拟）',
+    title: '平台分享卡片预览',
     content: `${displayName.value} 的 ${result.value?.type_code || 'MBTI'} 人格名片\nMBTI搭子 · 先换名片，再认识彼此\n\n未调用平台 SDK，不会真实发送。联系方式不进入分享内容。`,
     showCancel: false,
     confirmText: '返回继续编辑',

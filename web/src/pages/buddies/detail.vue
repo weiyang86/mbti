@@ -9,7 +9,6 @@
         <view class="hero-avatar" :style="{ background: avatarTint(buddy.id).bg }">
           <text class="hero-avatar-text" :style="{ color: avatarTint(buddy.id).fg }">{{ avatarText }}</text>
         </view>
-        <text class="hero-chip">虚构成年人资料</text>
         <text class="hero-name">
           {{ displayBuddyName(buddy.nickname, buddy.id) }}
           <text class="hero-type">{{ buddy.type_code }}</text>
@@ -55,7 +54,7 @@
       <text class="foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
     </template>
 
-    <button v-if="!buddy && !loading" class="btn-secondary mt" @click="go('/pages/discover/discover')">返回发现搭子</button>
+    <button v-if="!buddy && !loading" class="btn-secondary mt" @click="goTab('/pages/discover/discover')">返回发现搭子</button>
   </view>
 </template>
 <script setup lang="ts">
@@ -150,6 +149,7 @@ function block() {
   } })
 }
 function go(url: string) { uni.navigateTo({ url }) }
+function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
 @import '@/styles/social.scss';

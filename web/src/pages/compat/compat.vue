@@ -15,12 +15,12 @@
 
     <template v-else-if="myType">
       <view class="type-pair">
-        <view class="type-card">
-          <text class="type-code">{{ myType }}</text>
-          <text class="type-label">我的类型</text>
+        <view class="type-card pick" @click="openMyPicker">
+          <text class="type-code">{{ myType || '未选择' }}</text>
+          <text class="type-label">我的类型 · 点此更换 ⌄</text>
         </view>
         <text class="type-x">×</text>
-        <view class="type-card pick" @click="openPicker">
+        <view class="type-card pick" @click="openOtherPicker">
           <text class="type-code">{{ otherType }}</text>
           <text class="type-label">点此换一种 ⌄</text>
         </view>
@@ -48,33 +48,53 @@
     </view>
     <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
 
-    <!-- 对方类型选择：点右卡才以底部弹层出现 -->
-    <view v-if="showPicker" class="picker-mask" @click="showPicker = false">
+    <!-- 类型选择：点卡片才以底部弹层出现 -->
+    <view v-if="showPicker" class="picker-mask" @click="closePicker">
       <view class="picker-sheet" @click.stop>
         <view class="sheet-handle" />
         <view class="sheet-head">
-          <text class="sheet-kicker">MBTI 搭子 / 选择类型</text>
-          <view class="sheet-close" @click="showPicker = false"><text>×</text></view>
+          <text class="sheet-kicker">{{ pickerMode === 'mine' ? 'MY TYPE / 我的类型' : 'MBTI 搭子 / 选择类型' }}</text>
+          <view class="sheet-close" @click="closePicker"><text>×</text></view>
         </view>
-        <text class="sheet-title">想了解哪种搭子？</text>
+        <text class="sheet-title">{{ pickerMode === 'mine' ? '选择我的类型' : '想了解哪种搭子？' }}</text>
 
-        <view v-for="group in typeGroups" :key="group.label" class="sheet-group">
-          <text class="group-label">{{ group.label }}</text>
-          <view class="group-grid">
+        <template v-if="pickerMode === 'mine'">
+          <text class="panel-desc">从你测试过或选择过的记录里挑一个。</text>
+          <view v-if="myResultTypes.length" class="mine-list">
             <view
-              v-for="item in group.items"
-              :key="item.code"
-              class="type-tile"
-              :class="{ on: item.code === otherType }"
-              @click="pick(item.code)"
+              v-for="item in myResultTypes"
+              :key="item.type_code"
+              class="mine-item"
+              :class="{ on: item.type_code === myType }"
+              @click="pickMine(item.type_code)"
             >
-              <text class="tile-code">{{ item.code }}</text>
-              <text class="tile-name">{{ item.name }}</text>
+              <text class="mine-code">{{ item.type_code }}</text>
+              <text class="mine-name">{{ item.name }}</text>
+              <text class="mine-date">{{ item.date }}</text>
             </view>
           </view>
-        </view>
+          <text v-else class="panel-desc">还没有可用的测试记录，先测一次再来。</text>
+          <view class="btn-secondary mt" @click="goQuiz">去测一次</view>
+        </template>
 
-        <text v-if="!typeGroups.length" class="panel-desc">类型列表暂不可用，当前按 {{ otherType }} 生成建议。</text>
+        <template v-else>
+          <view v-for="group in typeGroups" :key="group.label" class="sheet-group">
+            <text class="group-label">{{ group.label }}</text>
+            <view class="group-grid">
+              <view
+                v-for="item in group.items"
+                :key="item.code"
+                class="type-tile"
+                :class="{ on: item.code === otherType }"
+                @click="pickOther(item.code)"
+              >
+                <text class="tile-code">{{ item.code }}</text>
+                <text class="tile-name">{{ item.name }}</text>
+              </view>
+            </view>
+          </view>
+          <text v-if="!typeGroups.length" class="panel-desc">类型列表暂不可用，当前按 {{ otherType }} 生成建议。</text>
+        </template>
       </view>
     </view>
   </view>
@@ -84,9 +104,11 @@
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'
+import { listResults } from '@/api/results'
 import { listTypes } from '@/api/types-api'
 import type { TypeMeta } from '@/api/types'
 import { TYPE_GROUPS, TYPE_NAMES } from '@/constants/types'
+import { dateLabel } from '@/constants/journey'
 import {
   COMPAT_SCENES,
   COMPAT_SCENE_TIPS,
@@ -102,6 +124,9 @@ const otherType = ref(DEFAULT_COMPARE_TYPE)
 const scene = ref<CompatScene>('初次见面')
 const typeOptions = ref<TypeMeta[]>([])
 const showPicker = ref(false)
+const pickerMode = ref<'mine' | 'other'>('other')
+const myResultTypes = ref<{ type_code: string; name: string; date: string }[]>([])
+let myTypeTouched = false
 
 const scenes = COMPAT_SCENES
 const notes = computed(() => compatNotes(myType.value, otherType.value, scene.value))
@@ -131,12 +156,12 @@ async function load() {
   if (loading.value) return
   loading.value = true
   error.value = ''
+  let cardType = ''
   try {
     const card = await getMyCard()
-    myType.value = card.type_code || ''
+    cardType = card.type_code || ''
   } catch {
     error.value = '读取你的类型失败，请稍后重试'
-    myType.value = ''
   }
   try {
     const types = await listTypes()
@@ -147,25 +172,69 @@ async function load() {
   } catch {
     typeOptions.value = []
   }
+  await loadMyResultTypes()
+  // 默认优先用最近一次测试结果，没有测试记录时才用名片上保存的类型
+  if (!myTypeTouched) {
+    myType.value = myResultTypes.value[0]?.type_code || cardType
+  }
   loading.value = false
 }
 
+/** 读取本人测试过/选择过的类型，按时间从新到旧取唯一类型 */
+async function loadMyResultTypes() {
+  try {
+    const res = await listResults({ limit: 50 })
+    const seen = new Map<string, string>()
+    for (const item of res.items) {
+      if (!item.type_code || seen.has(item.type_code)) continue
+      seen.set(item.type_code, item.submitted_at)
+    }
+    myResultTypes.value = Array.from(seen, ([code, date]) => ({
+      type_code: code,
+      name: TYPE_NAMES[code] || '',
+      date: dateLabel(date),
+    }))
+  } catch {
+    myResultTypes.value = []
+  }
+}
+
+function openMyPicker() {
+  pickerMode.value = 'mine'
+  showPicker.value = true
+}
+
 /** 点右边的类型卡弹出类型选择 */
-function openPicker() {
+function openOtherPicker() {
   if (!typeOptions.value.length) {
     uni.showToast({ title: '类型列表暂不可用', icon: 'none' })
     return
   }
+  pickerMode.value = 'other'
   showPicker.value = true
 }
 
-function pick(code: string) {
+function closePicker() {
+  showPicker.value = false
+}
+
+function pickMine(code: string) {
+  myType.value = code
+  myTypeTouched = true
+  showPicker.value = false
+}
+
+function goQuiz() {
+  uni.switchTab({ url: '/pages/index/index', fail: () => uni.reLaunch({ url: '/pages/index/index' }) })
+}
+
+function pickOther(code: string) {
   otherType.value = code
   showPicker.value = false
 }
 
 function goCard() {
-  uni.navigateTo({ url: '/pages/card/card' })
+  uni.switchTab({ url: '/pages/card/card', fail: () => uni.reLaunch({ url: '/pages/card/card' }) })
 }
 
 </script>
@@ -367,5 +436,42 @@ function goCard() {
 }
 .type-tile.on .tile-name {
   color: #7560df;
+}
+
+.mine-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+.mine-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx 22rpx;
+  border-radius: 18rpx;
+  background: #fff;
+  border: 2rpx solid #ece7f1;
+}
+.mine-item.on {
+  border-color: #6c4cf3;
+  background: #f6f2ff;
+}
+.mine-code {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #241f2e;
+}
+.mine-item.on .mine-code {
+  color: #6c4cf3;
+}
+.mine-name {
+  flex: 1;
+  font-size: 22rpx;
+  color: #77727e;
+}
+.mine-date {
+  font-size: 20rpx;
+  color: #a398af;
 }
 </style>
