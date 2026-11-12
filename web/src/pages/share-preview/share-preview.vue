@@ -17,11 +17,6 @@
     </view>
 
     <view v-else>
-      <view class="demo-strip">
-        <text>V0.4 · 趣味体验 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">体验说明 ↗</text>
-      </view>
-
       <text class="kicker">READY TO SHARE / 晒出我的 MBTI</text>
       <text class="title">这条朋友圈，</text>
       <text class="title"><text class="hl">我想发自己的主角卡。</text></text>
@@ -356,14 +351,6 @@ function persistDrafts() {
   }
 }
 
-function showDemo() {
-  uni.showModal({
-    title: '体验说明',
-    content: '当前为 V0.4 趣味体验版：预览图由本地素材渲染，平台分享能力尚未接入。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
 </script>
 
 <style scoped lang="scss">
@@ -372,17 +359,6 @@ function showDemo() {
   padding-bottom: 56rpx;
 }
 
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 24rpx;
-}
-.demo-link {
-  color: #7560df;
-}
 
 .state {
   padding-top: 220rpx;

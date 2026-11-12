@@ -9,11 +9,6 @@
     </view>
 
     <view v-else>
-      <view class="demo-strip">
-        <text>V0.4 · 趣味体验 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">体验说明 ↗</text>
-      </view>
-
       <view class="head">
         <text class="head-label">选择更接近日常的你</text>
         <text class="head-count">{{ pad(currentIndex + 1) }} / {{ pad(questions.length) }}</text>
@@ -218,14 +213,6 @@ function goHome() {
   uni.reLaunch({ url: '/pages/index/index' })
 }
 
-function showDemo() {
-  uni.showModal({
-    title: '体验说明',
-    content: '当前为 V0.4 趣味体验版：题目与结果来自正式测试接口，仅供趣味参考，不构成心理诊断。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
 
 /** 读取测试入口保存的阶段信息（与 web/src/store/profile.ts 使用同一存储键） */
 function readProfile(): { stage?: string; recent?: string } {
@@ -249,17 +236,6 @@ function readProfile(): { stage?: string; recent?: string } {
   padding-top: 24rpx;
 }
 
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 28rpx;
-}
-.demo-link {
-  color: #7560df;
-}
 
 .state {
   padding-top: 200rpx;
@@ -342,10 +318,23 @@ function readProfile(): { stage?: string; recent?: string } {
   border-radius: 24rpx;
   padding: 32rpx 28rpx;
   margin-bottom: 20rpx;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
 }
 .option.active {
   border-color: #7560df;
   background: #f6f2ff;
+}
+
+/* H5 鼠标悬停反馈（构建后保留为 .option:hover） */
+.option:hover {
+  border-color: #c9b8f5;
+  background: #fbf9ff;
+  box-shadow: 0 8rpx 24rpx rgba(117, 96, 223, 0.08);
+}
+.option.active:hover {
+  border-color: #7560df;
+  background: #f6f2ff;
+  box-shadow: none;
 }
 .letter {
   flex-shrink: 0;

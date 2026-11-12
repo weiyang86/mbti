@@ -1,6 +1,6 @@
 <template>
   <view class="page account-page">
-    <view class="profile">
+    <view class="profile-card">
       <image class="avatar" src="/static/share-style-illustration.webp" mode="aspectFill" />
       <view class="profile-body">
         <text class="name">{{ displayName }}</text>
@@ -8,18 +8,33 @@
       </view>
     </view>
 
-    <view class="panel">
-      <text class="panel-title">我的</text>
-      <view class="link" @click="goTab('/pages/history/list')">我的轨迹 →</view>
-      <view class="link" @click="goResult">类型结果 →</view>
-      <view class="link" @click="goTab('/pages/card/card')">我的名片 →</view>
-      <view class="link" @click="go('/pages/orders/orders')">我的订单与权益 →</view>
-      <view class="link" @click="go('/pages/exchanges/exchanges')">我的名片夹 →</view>
-      <view class="link" @click="go('/pages/buddies/blocked')">屏蔽管理 →</view>
-      <view class="link" @click="goTab('/pages/discover/discover')">发现搭子 →</view>
+    <view class="pill-grid">
+      <view class="pill" @click="goTab('/pages/history/list')">我的轨迹 →</view>
+      <view class="pill" @click="goResult">类型结果 →</view>
+      <view class="pill" @click="goTab('/pages/card/card')">我的名片 →</view>
+      <view class="pill" @click="go('/pages/exchanges/exchanges')">名片夹 →</view>
+      <view class="pill" @click="go('/pages/contacts/contacts')">联系方式 →</view>
     </view>
 
-    <text class="fine">联系方式保存与同型统计仍在联调中，部分功能可能暂不可用。</text>
+    <view class="panel">
+      <text class="panel-title">我的订单与权益</text>
+      <text class="panel-desc">不会产生真实扣款，刷新后可在本机恢复。</text>
+      <text class="panel-link" @click="go('/pages/orders/orders')">查看订单与权益 →</text>
+    </view>
+
+    <view class="panel">
+      <text class="panel-title">更多</text>
+      <view class="more-row" @click="goTab('/pages/discover/discover')">
+        <text>发现搭子</text>
+        <text class="more-arrow">→</text>
+      </view>
+      <view class="more-row" @click="go('/pages/buddies/blocked')">
+        <text>屏蔽管理</text>
+        <text class="more-arrow">→</text>
+      </view>
+    </view>
+
+    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
 
@@ -31,9 +46,9 @@ import { getMyCard } from '@/api/cards'
 
 const card = ref<MyCard | null>(null)
 
-const displayName = computed(() => card.value?.nickname || '匿名搭子')
+const displayName = computed(() => card.value?.nickname?.trim() || '匿名搭子')
 const typeLine = computed(() =>
-  card.value ? `${card.value.type_code} · ${card.value.type_name}` : '还没有名片',
+  card.value?.type_code ? `${card.value.type_code} · 免费基础用户` : '还没有选择类型',
 )
 
 onShow(async () => {
@@ -60,27 +75,34 @@ function goResult() {
   }
   uni.navigateTo({ url: `/pages/result/result?id=${encodeURIComponent(id)}` })
 }
+
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/page-frame.scss';
+
 .account-page {
   padding-top: 24rpx;
   padding-bottom: 56rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #f8f7f4;
+  color: #241f2e;
 }
 
-.profile {
+.profile-card {
   display: flex;
   align-items: center;
   gap: 24rpx;
-  padding: 36rpx 32rpx;
+  padding: 34rpx 30rpx;
+  border-radius: 32rpx;
   background: #fff;
   border: 2rpx solid #ece7f1;
-  border-radius: 32rpx;
 }
 .avatar {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 28rpx;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 32rpx;
   flex-shrink: 0;
 }
 .profile-body {
@@ -89,46 +111,38 @@ function goResult() {
 }
 .name {
   display: block;
-  font-size: 36rpx;
+  font-size: 42rpx;
   font-weight: 800;
-  color: #292630;
+  color: #241f2e;
 }
 .meta {
   display: block;
   margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #77727e;
+  font-size: 22rpx;
+  color: #a398af;
 }
 
-.panel {
-  margin-top: 24rpx;
-  padding: 32rpx;
-  background: #fff;
-  border: 2rpx solid #ece7f1;
-  border-radius: 32rpx;
+.pill-grid {
+  margin-top: 22rpx;
 }
-.panel-title {
-  display: block;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #292630;
+.pill {
+  font-size: 24rpx;
 }
-.link {
-  padding: 28rpx 0;
-  font-size: 26rpx;
-  color: #4d4557;
+
+.more-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18rpx;
+  padding: 22rpx 0;
   border-bottom: 2rpx solid #f3eef7;
+  font-size: 24rpx;
+  color: #4d4557;
 }
-.link:last-child {
+.more-row:last-child {
   border-bottom: 0;
 }
-
-.fine {
-  display: block;
-  margin-top: 28rpx;
-  padding: 0 8rpx;
-  font-size: 20rpx;
-  line-height: 1.7;
-  color: #a398af;
+.more-arrow {
+  color: #b9a4da;
 }
 </style>

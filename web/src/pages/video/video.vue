@@ -10,10 +10,6 @@
     </view>
 
     <view v-else>
-      <view class="demo-strip">
-        <text>V0.4 · 趣味体验 · 不产生费用</text>
-      </view>
-
       <text class="kicker">STORYBOARD / 分镜预览</text>
       <text class="title">15 秒，<text class="hl">晒出我的 MBTI。</text></text>
       <text class="sub">静态素材切换演示，不是实际视频生成或导出。</text>
@@ -164,11 +160,6 @@ function goCreate() {
   color: #77727e;
 }
 
-.demo-strip {
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 26rpx;
-}
 
 .kicker {
   display: block;

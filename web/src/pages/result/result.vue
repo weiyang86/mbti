@@ -8,11 +8,6 @@
     </view>
 
     <view v-else>
-      <view class="demo-strip">
-        <text>V0.4 · 趣味体验 · 不产生费用</text>
-        <text class="demo-link" @click="showDemo">体验说明 ↗</text>
-      </view>
-
       <view class="banner">
         <text class="banner-label">{{ sourceLabel }} · 免费查看</text>
         <text class="banner-type">{{ result.type_code }}</text>
@@ -88,48 +83,12 @@
         <text class="offer-title" v-for="(line, i) in sceneLines" :key="i">{{ line }}</text>
         <text class="offer-desc">你专享的是一整套能晒、能留、能展示的专属素材。</text>
 
-        <view class="scene-tabs">
-          <view
-            v-for="s in SCENE_TABS"
-            :key="s.key"
-            class="scene-tab"
-            :class="{ active: sceneTab === s.key }"
-            @click="sceneTab = s.key"
-          >
-            <text>{{ s.label }}</text>
-          </view>
-        </view>
-
-        <view class="preview-card">
-          <view class="pv-head">
-            <image class="pv-avatar" :src="previewAsset" mode="aspectFill" />
-            <view class="pv-head-main">
-              <text class="pv-name">{{ nickname }}</text>
-              <text class="pv-mock">虚拟形象 · 示例</text>
-            </view>
-          </view>
-          <text class="pv-quote">同样是 {{ result.type_code }}，我也有自己的主角感。</text>
-          <view class="pv-img-wrap">
-            <image class="pv-img" :src="previewAsset" mode="aspectFill" />
-            <view class="pv-overlay">
-              <text class="pv-type">{{ result.type_code }}</text>
-              <text class="pv-type-name">{{ nickname }} / {{ typeName }}</text>
-            </view>
-          </view>
-          <text class="pv-note">AI 示例人物</text>
-        </view>
-
-        <view class="format-tabs">
-          <view
-            v-for="f in FORMAT_TABS"
-            :key="f"
-            class="format-tab"
-            :class="{ active: formatTab === f }"
-            @click="formatTab = f"
-          >
-            <text>{{ f }}</text>
-          </view>
-        </view>
+        <ShareShowcase
+          :type-code="result.type_code"
+          :type-name="typeName"
+          :scene="sceneTab"
+          @update:scene="sceneTab = $event"
+        />
 
         <view class="pack-grid">
           <view v-for="p in PACKS" :key="p.no" class="pack-item">
@@ -164,7 +123,8 @@ import { getResult, listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
 import { buildManual } from '@/constants/manual'
 import { dateLabel, summaryText } from '@/constants/journey'
-import { studio, styleAsset } from '@/store/studio'
+import { studio } from '@/store/studio'
+import ShareShowcase from '@/components/ShareShowcase.vue'
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
@@ -238,14 +198,6 @@ const declaration = computed(
     '四个字母之外，还有不一样的你。',
 )
 
-function showDemo() {
-  uni.showModal({
-    title: '体验说明',
-    content: '当前为 V0.4 趣味体验版：结果来自正式测试接口，仅供趣味参考，不构成心理诊断。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
 
 const sourceLabel = computed(() =>
   result.value?.source === 'self_select' ? '你的自选人格类型' : '你的趣味测试结果',
@@ -283,25 +235,21 @@ const dimRows = computed(() => {
 const manual = computed(() => buildManual(result.value?.type_code || 'INFP'))
 
 const sceneTab = ref<'moments' | 'avatar' | 'meet'>('moments')
-const formatTab = ref('朋友圈图')
 const SCENE_TABS = [
   { key: 'moments', label: '发朋友圈', lines: ['把我的 MBTI，', '发成一条漂亮朋友圈。'] },
   { key: 'avatar', label: '换同款头像', lines: ['换个头像，', '让我的 MBTI 有点辨识度。'] },
   { key: 'meet', label: '见面亮名片', lines: ['认识新朋友，', '先亮出我的 MBTI 名片。'] },
 ] as const
-const FORMAT_TABS = ['日常海报', '朋友圈图', '未来滤镜']
 const PACKS = [
   { no: '01', cat: '主角图', title: '朋友圈 MBTI 海报', desc: '3 种风格 · 3 种比例' },
   { no: '02', cat: '头像', title: '同款人格头像', desc: '1:1 PNG 独立保存' },
   { no: '03', cat: '相处卡', title: '我的相处小抄', desc: '充电 · 沟通 · 在意' },
-  { no: '04', cat: '配文', title: '发圈文案准备好', desc: '改一句就能复制' },
+  { no: '04', cat: '配文', title: '发朋友圈文案准备', desc: '统一风格配文' },
 ]
 
 const sceneLines = computed(
   () => SCENE_TABS.find((s) => s.key === sceneTab.value)?.lines || SCENE_TABS[0].lines,
 )
-const previewAsset = computed(() => styleAsset(studio.style))
-const nickname = computed(() => studio.nickname || '小禾')
 
 function goCreate() {
   uni.navigateTo({ url: '/pages/create/create' })
@@ -328,17 +276,6 @@ function goHome() {
   padding-bottom: 56rpx;
 }
 
-.demo-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 24rpx;
-}
-.demo-link {
-  color: #7560df;
-}
 
 .state {
   padding-top: 220rpx;
@@ -562,107 +499,6 @@ function goHome() {
   font-size: 23rpx;
   color: #6f6880;
   line-height: 1.7;
-}
-
-.scene-tabs,
-.format-tabs {
-  display: flex;
-  gap: 14rpx;
-  margin-top: 24rpx;
-}
-.scene-tab,
-.format-tab {
-  flex: 1;
-  text-align: center;
-  padding: 18rpx 8rpx;
-  border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.7);
-  color: #7c6f96;
-  font-size: 22rpx;
-  border: 2rpx solid transparent;
-}
-.scene-tab.active,
-.format-tab.active {
-  background: #6c4cf3;
-  color: #fff;
-}
-
-.preview-card {
-  margin-top: 24rpx;
-  padding: 24rpx;
-  border-radius: 26rpx;
-  background: #fff;
-  border: 2rpx solid #e9e3f1;
-}
-.pv-head {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-.pv-avatar {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 50%;
-  flex: none;
-}
-.pv-head-main {
-  display: flex;
-  flex-direction: column;
-}
-.pv-name {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #292630;
-}
-.pv-mock {
-  font-size: 19rpx;
-  color: #a398af;
-  margin-top: 2rpx;
-}
-.pv-quote {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #3f3552;
-  line-height: 1.6;
-}
-.pv-img-wrap {
-  position: relative;
-  margin-top: 16rpx;
-  border-radius: 20rpx;
-  overflow: hidden;
-}
-.pv-img {
-  width: 100%;
-  height: 420rpx;
-  display: block;
-}
-.pv-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 24rpx;
-  background: linear-gradient(180deg, rgba(36, 22, 62, 0), rgba(36, 22, 62, 0.85));
-  display: flex;
-  flex-direction: column;
-}
-.pv-type {
-  font-size: 64rpx;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1;
-}
-.pv-type-name {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.9);
-}
-.pv-note {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 18rpx;
-  color: #a398af;
 }
 
 .pack-grid {

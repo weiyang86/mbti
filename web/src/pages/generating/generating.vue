@@ -1,9 +1,5 @@
 <template>
   <view class="page generation">
-    <view class="demo-strip">
-      <text>V0.4 · 趣味体验 · 不产生费用</text>
-    </view>
-
     <view class="gen-orb">✦</view>
     <text class="gen-title">正在准备你的 MBTI 晒图套装</text>
     <text class="gen-sub">组合个人信息与预置 AI 视觉素材</text>
@@ -85,11 +81,6 @@ function cancel() {
   padding-bottom: 56rpx;
 }
 
-.demo-strip {
-  font-size: 20rpx;
-  color: #a398af;
-  margin-bottom: 28rpx;
-}
 
 .gen-orb {
   width: 168rpx;

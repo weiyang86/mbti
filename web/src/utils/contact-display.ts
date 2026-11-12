@@ -26,6 +26,7 @@ export function contactErrorMessage(error: unknown, fallback: string): string {
     if (error.status === 404) return '当前不可读取：未获批准、不属于本人或授权已失效。'
     if (error.status === 409) return '当前角色、关系或渠道状态冲突，请刷新；可拒绝后重新申请更小范围。'
     if (error.status === 422) return '输入不符合要求，请检查渠道格式和所选范围。'
+    if (error.status === 503) return '服务端私密存储暂未开启，现在无法保存；填写内容仍留在本页，可稍后重试。'
   }
   return fallback
 }

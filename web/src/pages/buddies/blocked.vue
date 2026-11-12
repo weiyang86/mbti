@@ -1,19 +1,30 @@
 <template>
-  <view class="page social-page">
-    <text class="heading">屏蔽管理</text>
-    <text class="notice">只显示由你发起的屏蔽。管理标签用于区分记录，不展示对方私密资料。解除后旧交换不会恢复。</text>
+  <view class="page social-page blocked-page">
+    <text class="kicker">PRIVACY / 屏蔽管理</text>
+    <text class="page-title">不想再看到，<text class="hl">就静静屏蔽。</text></text>
+    <text class="page-sub">只显示由你发起的屏蔽。管理标签用于区分记录，不展示对方私密资料。</text>
+
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
-    <button class="btn-secondary" :disabled="loading || busy" @click="load">刷新屏蔽列表</button>
     <text v-if="loading" class="notice">正在读取屏蔽列表…</text>
-    <text v-if="loaded && !items.length" class="notice">你尚未屏蔽任何搭子。</text>
-    <view v-for="(item, index) in items" :key="item.id" class="card">
-      <text class="section">已屏蔽搭子 {{ index + 1 }}</text>
-      <text class="line">管理编号：{{ item.id }}</text>
+
+    <view v-if="loaded && !items.length" class="panel empty">
+      <text class="panel-title">还没有屏蔽任何搭子</text>
+      <text class="panel-desc">解除屏蔽后，旧的名片交换与授权不会恢复。</text>
+    </view>
+
+    <view v-for="(item, index) in items" :key="item.id" class="panel">
+      <text class="panel-title">已屏蔽搭子 {{ index + 1 }}</text>
+      <text class="panel-desc">管理编号：{{ item.id }}</text>
       <button class="btn-secondary mt" :disabled="busy || loading" @click="unblock(item.id)">解除此项屏蔽</button>
     </view>
-    <button class="btn-secondary mt" @click="go('/pages/discover/discover')">返回发现搭子</button>
-    <button class="btn-secondary mt" @click="go('/pages/card/card')">我的名片</button>
+
+    <view class="sk-foot-links">
+      <text class="sk-foot-link" @click="load">刷新屏蔽列表</text>
+      <text class="sk-foot-link" @click="go('/pages/discover/discover')">返回发现搭子</text>
+      <text class="sk-foot-link" @click="goTab('/pages/card/card')">我的名片</text>
+    </view>
+    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
   </view>
 </template>
 <script setup lang="ts">
@@ -44,5 +55,16 @@ async function unblock(id: string) {
   finally { busy.value = false }
 }
 function go(url: string) { uni.navigateTo({ url }) }
+function goTab(url: string) { uni.switchTab({ url }) }
 </script>
-<style scoped lang="scss">@import '@/styles/social.scss';</style>
+<style scoped lang="scss">
+@import '@/styles/social.scss';
+@import '@/styles/page-frame.scss';
+
+.blocked-page {
+  padding-bottom: 48rpx;
+}
+.empty {
+  text-align: left;
+}
+</style>
