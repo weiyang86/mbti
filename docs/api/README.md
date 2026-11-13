@@ -34,15 +34,17 @@ source_ref: UIhtml/mbti-buddy-product-sop-v0.4.html
 
 ## 如何消费（定稿前）
 
-1. 阅读本索引与 [`resources.md`](./resources.md) 了解资源语义与待定项。  
-2. 机器可读草案：[`openapi-v0.1-draft.yaml`](./openapi-v0.1-draft.yaml)（OpenAPI 3.0.3，`/api/v1` 前缀）。  
-3. 前端/联调：以 OpenAPI 路径为准；缺字段或歧义写入 Issue / 联调笔记，**不要**直接改本目录权威字段。  
-4. 变更记录：[`CHANGELOG.md`](./CHANGELOG.md)。
+1. **首选阅读（实习生）：** [`接口文档-实习生版.md`](./接口文档-实习生版.md) — 按「接口 / 请求参数 / 返回示例」组织，覆盖带教闭环。  
+2. 资源语义与待定项：[`resources.md`](./resources.md)。  
+3. 机器可读草案：[`openapi-v0.1-draft.yaml`](./openapi-v0.1-draft.yaml)（OpenAPI 3.0.3，`/api/v1` 前缀）。  
+4. 前端/联调：以 OpenAPI 路径为准；缺字段或歧义写入 Issue / 联调笔记，**不要**直接改本目录权威字段。  
+5. 变更记录：[`CHANGELOG.md`](./CHANGELOG.md)。
 
 ## 文档清单
 
 | 文件 | 说明 |
 |------|------|
+| **`接口文档-实习生版.md`** | **首选**：实习生友好接口说明（接口 / 请求参数 / 返回示例） |
 | `openapi-v0.1-draft.yaml` | REST 路径、Schema、错误包络 |
 | `resources.md` | 人类可读说明、状态码、幂等、版本规则、Remy unknowns |
 | `CHANGELOG.md` | 版本沿革 |
