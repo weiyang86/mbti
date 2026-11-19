@@ -1,45 +1,62 @@
 <template>
-  <view class="page social-page wallet-page">
-    <text class="kicker">CARD WALLET / 名片夹</text>
-    <text class="page-title">每次交换，<text class="hl">都由双方选择。</text></text>
-    <text class="page-sub">名片交换与联系方式交换是两次独立授权。</text>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
+    </view>
 
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
-    <text v-if="loading" class="notice">正在读取收发记录…</text>
+    <view v-if="loading" class="notice">正在读取收发记录…</view>
 
-    <view v-if="loaded && !items.length" class="empty">
-      <text class="kicker plain">MBTI BUDDY</text>
-      <text class="empty-title">名片夹还空着</text>
-      <text class="empty-desc">先向喜欢的搭子发出一张名片。</text>
-      <view class="btn-primary mt" @click="goTab('/pages/discover/discover')">去发现搭子</view>
+    <view class="page-intro">
+      <view class="eyebrow">CARD WALLET / 名片夹</view>
+      <view class="h1">每次交换，都由双方选择。</view>
+      <view class="p">名片交换与联系方式交换是两次独立授权。</view>
     </view>
 
-    <view v-for="item in items" :key="item.id" class="panel swap">
-      <view class="swap-head">
-        <text class="swap-name">{{ displayBuddyName(item.buddy.nickname, item.buddy.id) }}</text>
-        <text class="swap-type">{{ item.buddy.type_code }}</text>
+    <template v-if="loaded && !items.length">
+      <view class="empty-block">
+        <view class="page-intro">
+          <view class="eyebrow">MBTI BUDDY</view>
+          <view class="h1">名片夹还空着</view>
+          <view class="p">先向喜欢的示例搭子发出一张名片。</view>
+        </view>
+        <button class="btn full" @click="goTab('/pages/discover/discover')">去发现搭子</button>
       </view>
-      <text class="swap-state">{{ item.direction === 'incoming' ? '收到的申请' : '发出的申请' }} · {{ exchangeStatusLabel(item.status) }}</text>
-      <text v-if="item.buddy.tagline" class="swap-tag">{{ item.buddy.tagline }}</text>
-      <view v-if="item.buddy.interests.length" class="swap-tags">
-        <text v-for="interest in item.buddy.interests" :key="interest" class="tag">{{ interest }}</text>
-      </view>
-      <text class="swap-time">创建时间：{{ item.created_at }}</text>
-      <view v-if="canRespond(item)" class="row mt">
-        <button class="btn-primary" :disabled="busy || loading" @click="respond(item, 'accept')">接受名片交换</button>
-        <button class="btn-secondary" :disabled="busy || loading" @click="respond(item, 'decline')">拒绝名片交换</button>
-      </view>
-      <button v-if="canRevoke(item)" class="btn-secondary mt" :disabled="busy || loading" @click="revoke(item)">{{ item.status === 'accepted' ? '撤回已接受的交换' : '撤回申请' }}</button>
-      <button class="btn-secondary mt" @click="go(`/pages/buddies/detail?id=${encodeURIComponent(item.buddy_id)}`)">查看搭子详情</button>
-      <button v-if="item.status === 'accepted'" class="btn-secondary mt" :disabled="busy || loading" @click="go(`/pages/contact-request/contact-request?id=${encodeURIComponent(item.buddy_id)}`)">申请对方联系方式</button>
-    </view>
+    </template>
 
-    <view class="sk-foot-links">
-      <text class="sk-foot-link" @click="load">刷新名片夹</text>
-      <text class="sk-foot-link" @click="go('/pages/contact-request/contact-request')">联系方式请求</text>
-    </view>
-    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
+    <template v-else>
+      <view v-for="item in items" :key="item.id" class="wallet-item">
+        <view class="wallet-head">
+          <text class="b">{{ displayBuddyName(item.buddy.nickname, item.buddy.id) }} · {{ item.buddy.type_code }}</text>
+          <text class="tag">{{ exchangeStatusLabel(item.status) }}</text>
+        </view>
+        <view class="p">{{ item.direction === 'incoming' ? '收到的申请' : '发出的申请' }} · 联系方式仍未公开</view>
+        <view v-if="canRespond(item)" class="btnrow">
+          <button class="btn secondary small" :disabled="busy || loading" @click="respond(item, 'accept')">接受名片交换</button>
+          <button class="btn ghost small" :disabled="busy || loading" @click="respond(item, 'decline')">拒绝名片交换</button>
+        </view>
+        <button
+          v-if="canRevoke(item)"
+          class="btn ghost small mt"
+          :disabled="busy || loading"
+          @click="revoke(item)"
+        >{{ item.status === 'accepted' ? '撤销名片交换' : '撤回申请' }}</button>
+        <view class="wallet-links">
+          <text class="textbtn" @click="go(`/pages/buddies/detail?id=${encodeURIComponent(item.buddy_id)}`)">查看详情与交换设置 →</text>
+          <text
+            v-if="item.status === 'accepted'"
+            class="textbtn"
+            @click="go(`/pages/contact-request/contact-request?id=${encodeURIComponent(item.buddy_id)}`)"
+          >申请对方联系方式</text>
+        </view>
+      </view>
+    </template>
+
+    <view class="notice mt">撤销会停止应用内展示；正式服务无法收回对方已经保存或复制的内容。</view>
+  <proto-footer />
   </view>
 </template>
 <script setup lang="ts">
@@ -71,73 +88,55 @@ async function act(operation: () => Promise<unknown>) {
 }
 function respond(item: CardExchange, action: 'accept' | 'decline') { if (canRespond(item)) act(() => respondCardExchange(item.id, action)) }
 function revoke(item: CardExchange) { if (canRevoke(item)) act(() => revokeCardExchange(item.id)) }
+function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 function go(url: string) { uni.navigateTo({ url }) }
 function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
-@import '@/styles/social.scss';
-@import '@/styles/page-frame.scss';
-
-.wallet-page {
-  padding-bottom: 48rpx;
-}
-
-.empty {
-  margin-top: 40rpx;
-}
-.empty-title {
+.line {
   display: block;
-  margin-top: 18rpx;
-  font-size: 48rpx;
-  font-weight: 800;
-  color: #241f2e;
 }
-.empty-desc {
+.error {
   display: block;
-  margin-top: 12rpx;
-  font-size: 23rpx;
-  color: #77727e;
+  margin: 12px 0;
+  font-size: 12px;
   line-height: 1.7;
+  color: #a43b3b;
 }
-
-.swap-head {
+.empty-block {
+  padding: 12px 0 18px;
+}
+.wallet-head {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  justify-content: space-between;
+  gap: 10px;
 }
-.swap-name {
-  font-size: 30rpx;
-  font-weight: 800;
-  color: #241f2e;
+.wallet-item .btnrow {
+  margin-top: 10px;
 }
-.swap-type {
-  font-size: 18rpx;
-  font-weight: 700;
-  color: #6c4cf3;
-  background: #f1ecfb;
-  border-radius: 8rpx;
-  padding: 4rpx 10rpx;
+.wallet-item > .btn {
+  margin-top: 10px;
 }
-.swap-state {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  color: #8b78b3;
+.wallet-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
 }
-.swap-tag {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 23rpx;
-  color: #3f3552;
-  line-height: 1.6;
+.wallet-links .textbtn {
+  padding: 4px;
+  font-size: 12px;
 }
-.swap-tags {
-  margin-top: 4rpx;
+.btn::after,
+.textbtn::after {
+  border: 0;
 }
-.swap-time {
-  display: block;
-  margin-top: 14rpx;
-  font-size: 19rpx;
-  color: #a398af;
+.demo-strip .textbtn {
+  font-size: 9px;
+  color: #a197ad;
+}
+.btnrow > .btn {
+  margin: 0;
 }
 </style>

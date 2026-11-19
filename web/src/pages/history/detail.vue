@@ -1,115 +1,105 @@
 <template>
-  <view class="page detail-page">
-    <view v-if="loading" class="state"><text class="state-text">正在读取这份记录…</text></view>
+  <view class="page">
+    <proto-nav />
+    <view v-if="loading" class="notice mt">正在读取这份记录…</view>
 
-    <view v-else-if="loadError" class="state">
-      <text class="state-text">读取这份记录失败</text>
-      <text class="state-sub">请检查网络后再试一次。</text>
-      <view class="btn-secondary mt" @click="load">重试</view>
-      <text class="state-link" @click="backList">回到我的轨迹</text>
-    </view>
+    <template v-else-if="loadError">
+      <view class="page-intro">
+        <view class="eyebrow">A MOMENT OF ME / 阶段记录</view>
+        <view class="h1">读取这份记录失败</view>
+        <view class="p">请检查网络后再试一次。</view>
+      </view>
+      <view class="btn secondary full" @click="load">重试</view>
+      <view class="btn ghost full mt" @click="backList">回到我的轨迹</view>
+    </template>
 
-    <view v-else-if="!result" class="state">
-      <text class="state-text">这份记录已不可用</text>
-      <text class="state-sub">请返回轨迹查看仍然保留的记录。</text>
-      <view class="btn-secondary mt" @click="backList">回到我的轨迹</view>
-    </view>
+    <template v-else-if="!result">
+      <view class="page-intro">
+        <view class="eyebrow">MBTI BUDDY</view>
+        <view class="h1">这份记录已不可用</view>
+        <view class="p">请返回轨迹查看仍然保留的记录。</view>
+      </view>
+      <view class="btn full" @click="backList">回到我的轨迹</view>
+    </template>
 
-    <view v-else>
-      <text class="kicker">A MOMENT OF ME / 阶段记录</text>
-      <text class="title">{{ result.type_code }} · {{ meta?.name_zh || 'MBTI' }}</text>
-      <text class="sub">{{ dateText }} · {{ sourceLabel }}</text>
-
-      <view class="private-card">
-        <text class="private-badge">🔒 阶段信息仅自己可见</text>
-        <text class="private-title">{{ stageTitle }}</text>
-        <text class="private-line" v-if="result.recent_status">
-          最近状态：{{ result.recent_status }}。这些信息不用于自动判断变化原因。
-        </text>
-        <text class="private-fine">{{ privateFine }}</text>
+    <template v-else>
+      <view class="demo-strip">
+        <text>V0.4 · Mock 演示 · 不产生费用</text>
+        <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
       </view>
 
-      <view class="dims" v-if="result.dimension_counts">
-        <text class="section">当时的四维分布</text>
-        <view class="dim-row" v-for="d in dimRows" :key="d.key">
-          <view class="dim-head">
-            <text class="dim-label">{{ d.left }}</text>
-            <text class="dim-count">{{ d.l }} : {{ d.r }}</text>
-            <text class="dim-label right">{{ d.right }}</text>
-          </view>
-          <view class="track"><view class="fill" :style="{ width: d.pct }" /></view>
+      <view class="page-intro">
+        <view class="eyebrow">A MOMENT OF ME / 阶段记录</view>
+        <view class="h1">{{ result.type_code }} · {{ meta?.name_zh || 'MBTI' }}</view>
+        <view class="p">{{ subtitle }}</view>
+      </view>
+
+      <view class="stage-private-card">
+        <view class="private-badge">
+          <AppIcon name="lock" :size="13" color="#6e8064" />
+          <text>阶段信息仅自己可见</text>
         </view>
-        <text class="fine">只展示计数分布，不代表人格强弱。</text>
+        <view class="h3">{{ stageTitle }}</view>
+        <view class="p">
+          最近状态：{{ result.recent_status || '未记录' }}。这些信息不用于自动判断变化原因。
+        </view>
+        <view class="fine">{{ privateFine }}</view>
+      </view>
+
+      <view v-if="older" class="btn full mt" @click="openCompare">与上一次同版本记录比较</view>
+      <view v-else class="notice mt">这份记录之前还没有可比较的同版本结果。</view>
+
+      <view v-if="result.dimension_counts" class="record-dimensions">
+        <view v-for="d in dimRows" :key="d.key" class="dim-row">
+          <text class="span">{{ d.name }}</text>
+          <text class="b">{{ d.key[0] }} {{ d.l }} : {{ d.r }} {{ d.key[1] }}</text>
+        </view>
       </view>
 
       <!-- TODO: 待 Remy 确认「历史作答回放」服务端接口；当前仅回放本机保存的作答 -->
-      <view v-if="result.source === 'quiz' && answerRecord" class="answers">
-        <view class="answers-head" @click="showAnswers = !showAnswers">
-          <text class="section">回看当时的 12 个选择</text>
-          <text class="answers-toggle">{{ showAnswers ? '收起 ⌃' : '展开 ⌄' }}</text>
+      <view v-if="result.source === 'quiz'" class="record-answers">
+        <view class="answers-summary" @click="showAnswers = !showAnswers">
+          <text class="answers-caret" :class="{ open: showAnswers }">▶</text>
+          <text>回看当时的 12 个选择</text>
         </view>
-        <text class="answers-hint">仅自己可见 · 不会出现在分享图或名片中</text>
-        <view v-if="showAnswers" class="answer-list">
-          <view v-for="(item, i) in answerRecord.items" :key="i" class="answer-item">
-            <text class="answer-no">{{ String(i + 1).padStart(2, '0') }}</text>
-            <view class="answer-body">
-              <text class="answer-question">{{ item.question }}</text>
-              <text class="answer-choice">{{ item.answer }}</text>
-            </view>
+        <template v-if="showAnswers">
+          <view v-for="(item, i) in answerRecord?.items || []" :key="i" class="answer-item">
+            <text class="small">{{ pad(i + 1) }} / {{ item.question }}</text>
+            <view class="p">{{ item.answer }}</view>
           </view>
-        </view>
-      </view>
-
-      <view v-if="result.source === 'quiz'" class="compare">
-        <text class="section">与上一次同版本记录比较</text>
-
-        <view v-if="compare" class="compare-result">
-          <text class="compare-type">
-            {{ compare.type_changed ? compare.baseline_type_code + ' → ' + compare.target_type_code : '类型未变（' + compare.target_type_code + '）' }}
-          </text>
-          <text class="compare-note" v-for="(n, i) in compare.stability_notes || []" :key="i">{{ n }}</text>
-          <view class="delta-row" v-for="d in deltas" :key="d.key">
-            <text class="delta-key">{{ d.key }}</text>
-            <text class="delta-val">{{ d.val > 0 ? '+' + d.val : d.val }}</text>
+          <view v-if="!answerRecord" class="p answers-empty">
+            本机没有保留这次作答，仍可查看上面的四维计数。
           </view>
-          <text class="fine">仅比较题库版本相同的两份快照。</text>
-        </view>
-
-        <view v-else-if="older" class="btn-secondary" @click="runCompare">与上一次同版本记录比较</view>
-        <text v-else class="notice">这份记录之前还没有可比较的同版本结果。</text>
+        </template>
       </view>
 
-      <view class="actions">
-        <view class="btn-primary" @click="goShare">去晒成一张图</view>
-        <view class="btn-secondary mt" @click="confirmUseRecord">用这次类型更新名片</view>
-        <view class="btn-secondary mt danger" @click="confirmDelete">删除这份记录</view>
+      <view class="btnrow mt">
+        <view class="btn secondary" @click="confirmUseRecord">用这次类型更新名片</view>
+        <text class="textbtn" @click="confirmDelete">删除这一份记录</text>
       </view>
 
-      <text class="foot">删除后不影响其他记录；已下载的图片无法一并删除。</text>
-    </view>
+      <view class="btn ghost full mt" @click="backList">回到我的轨迹</view>
+    </template>
+  <proto-footer />
   </view>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import type { CompareResult, ResultSnapshot, ResultSnapshotSummary, TypeMeta } from '@/api/types'
-import {
-  compareResults,
-  deleteResult,
-  getResult,
-  listResults,
-} from '@/api/results'
+import type { ResultSnapshot, ResultSnapshotSummary, TypeMeta } from '@/api/types'
+import { deleteResult, getResult, listResults } from '@/api/results'
 import { updateMyCard } from '@/api/cards'
 import { DECLARATIONS } from '@/constants/types'
 import { listTypes } from '@/api/types-api'
+import { DIM_LIST, dateLabel } from '@/constants/journey'
 import { getLocalAnswers, type LocalAnswerRecord } from '@/store/local-answers'
+import AppIcon from '@/components/AppIcon.vue'
 
 const resultId = ref('')
 const result = ref<ResultSnapshot | null>(null)
 const meta = ref<TypeMeta | null>(null)
 const older = ref<ResultSnapshotSummary | null>(null)
-const compare = ref<CompareResult | null>(null)
 const loading = ref(true)
 const loadError = ref(false)
 const answerRecord = ref<LocalAnswerRecord | null>(null)
@@ -157,16 +147,18 @@ async function load() {
   }
 }
 
-const sourceLabel = computed(() =>
-  result.value?.source === 'self_select' ? '自行选择' : '趣味测试',
-)
-
 const stageTitle = computed(() => {
   if (!result.value) return ''
   return (
     result.value.life_stage ||
     (result.value.source === 'self_select' ? '自行选择' : '日常生活')
   )
+})
+
+const subtitle = computed(() => {
+  if (!result.value) return ''
+  if (!result.value.submitted_at) return '旧版导入 · 测试日期未知'
+  return `${dateLabel(result.value.submitted_at)} · ${stageTitle.value}`
 })
 
 const privateFine = computed(() => {
@@ -180,43 +172,30 @@ const privateFine = computed(() => {
   return `回顾最近四周 · 固定 12 题 · ${result.value.question_bank_version}`
 })
 
-const dateText = computed(() => {
-  if (!result.value) return ''
-  if (!result.value.submitted_at) return '旧版导入 · 测试日期未知'
-  return result.value.submitted_at.replace('T', ' ').slice(0, 16)
-})
-
-const DIM_LABELS: [string, string, string][] = [
-  ['EI', '外向 E', '内向 I'],
-  ['SN', '实感 S', '直觉 N'],
-  ['TF', '思考 T', '情感 F'],
-  ['JP', '判断 J', '知觉 P'],
-]
-
 const dimRows = computed(() => {
   const counts = result.value?.dimension_counts
   if (!counts) return []
-  return DIM_LABELS.map(([key, left, right]) => {
-    const l = counts[key[0] as keyof typeof counts] ?? 0
-    const r = counts[key[1] as keyof typeof counts] ?? 0
-    const total = l + r || 1
-    return { key, left, right, l, r, pct: `${Math.round((l / total) * 100)}%` }
-  })
+  return DIM_LIST.map((dim) => ({
+    key: dim.key,
+    name: dim.name,
+    l: counts[dim.left] ?? 0,
+    r: counts[dim.right] ?? 0,
+  }))
 })
 
-const deltas = computed(() =>
-  Object.entries(compare.value?.dimension_deltas || {})
-    .filter(([, val]) => val !== 0)
-    .map(([key, val]) => ({ key, val })),
-)
+function pad(n: number) {
+  return String(n).padStart(2, '0')
+}
 
-async function runCompare() {
+function toastDemo() {
+  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
+}
+
+function openCompare() {
   if (!older.value) return
-  try {
-    compare.value = await compareResults(older.value.id, resultId.value)
-  } catch {
-    uni.showToast({ title: '对比失败，请稍后再试', icon: 'none' })
-  }
+  uni.navigateTo({
+    url: `/pages/compare/compare?baseline=${older.value.id}&target=${resultId.value}`,
+  })
 }
 
 function confirmUseRecord() {
@@ -260,252 +239,63 @@ function confirmDelete() {
   })
 }
 
-function goShare() {
-  if (!resultId.value) return
-  uni.navigateTo({ url: `/pages/share-preview/share-preview?id=${resultId.value}` })
-}
-
 function backList() {
   uni.reLaunch({ url: '/pages/history/list' })
 }
 </script>
 
 <style scoped lang="scss">
-.detail-page {
-  padding-top: 40rpx;
-  padding-bottom: 56rpx;
-}
-
-.state {
-  padding-top: 220rpx;
-  text-align: center;
-}
-.state-text {
-  display: block;
-  font-size: 26rpx;
-  color: #77727e;
-}
-.state-sub {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  color: #a398af;
-  line-height: 1.6;
-}
-.state-link {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 22rpx;
-  color: #8b8099;
-}
-
-.kicker {
-  display: block;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: #a398af;
-  font-weight: 600;
-}
-.title {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 48rpx;
-  font-weight: 800;
-  letter-spacing: 1rpx;
-}
-.sub {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 24rpx;
-  color: #77727e;
-}
-
-.private-card {
-  margin-top: 32rpx;
-  padding: 32rpx 28rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(160deg, #f6f2ff, #eef7f1);
-  border: 2rpx solid #e6dffa;
-}
-.private-badge {
-  display: block;
-  font-size: 20rpx;
-  color: #7560df;
-}
-.private-title {
-  display: block;
-  margin-top: 14rpx;
-  font-size: 30rpx;
+.h3 {
   font-weight: 700;
 }
-.private-line {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  color: #292630;
+.stage-private-card .fine {
+  margin: 0 0 10px;
 }
-.private-fine {
-  display: block;
-  margin-top: 14rpx;
-  font-size: 20rpx;
-  color: #a398af;
-}
-
-.section {
-  display: block;
-  margin-top: 44rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-}
-
-.dim-row {
-  margin-top: 20rpx;
-}
-.dim-head {
+.answers-summary {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: #6f5b82;
+  padding: 17px 0;
+  min-height: 48px;
+  border-top: 0;
+  box-sizing: border-box;
 }
-.dim-label {
-  font-size: 24rpx;
+.answers-caret {
+  display: inline-block;
+  font-size: 7px;
+  line-height: 1;
+  color: #6f5b82;
+  transition: transform 0.18s;
 }
-.dim-label.right {
-  text-align: right;
-}
-.dim-count {
-  font-size: 22rpx;
-  color: #7560df;
-}
-.track {
-  margin-top: 10rpx;
-  height: 12rpx;
-  border-radius: 999rpx;
-  background: #ece8f3;
-  overflow: hidden;
-}
-.fill {
-  height: 100%;
-  border-radius: 999rpx;
-  background: linear-gradient(90deg, #8b6cf6, #dfff8b);
-}
-.fine {
-  display: block;
-  margin-top: 14rpx;
-  font-size: 20rpx;
-  color: #a398af;
-  line-height: 1.6;
-}
-
-.answers-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.answers-toggle {
-  margin-top: 44rpx;
-  font-size: 22rpx;
-  color: #7560df;
-}
-.answers-hint {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 20rpx;
-  color: #a398af;
-}
-.answer-list {
-  margin-top: 18rpx;
-  padding: 8rpx 24rpx;
-  border-radius: 24rpx;
-  background: #fff;
-  border: 2rpx solid #e9e5ed;
+.answers-caret.open {
+  transform: rotate(90deg);
 }
 .answer-item {
-  display: flex;
-  gap: 18rpx;
-  padding: 20rpx 0;
-  border-bottom: 2rpx solid #f1edf6;
+  padding: 15px 0;
+  border-top: 1px solid #efe8f5;
 }
-.answer-item:last-child {
-  border-bottom: none;
+.answers-empty {
+  padding: 15px 0;
+  border-top: 1px solid #efe8f5;
+  margin: 0;
 }
-.answer-no {
-  flex: none;
-  font-size: 20rpx;
-  color: #b49aca;
-  line-height: 1.6;
+.demo-strip .textbtn {
+  font-size: 9px;
+  color: #a197ad;
 }
-.answer-body {
-  flex: 1;
-  min-width: 0;
+.btnrow .textbtn {
+  text-align: center;
 }
-.answer-question {
-  display: block;
-  font-size: 23rpx;
-  color: #5d5568;
-  line-height: 1.6;
-}
-.answer-choice {
-  display: block;
-  margin-top: 6rpx;
-  font-size: 24rpx;
-  color: #292630;
-  line-height: 1.6;
-}
-
-.compare-result {
-  margin-top: 20rpx;
-  padding: 28rpx 24rpx;
-  border-radius: 24rpx;
-  background: #fff;
-  border: 2rpx solid #e9e5ed;
-}
-.compare-type {
-  display: block;
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #7560df;
-}
-.compare-note {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  color: #77727e;
-}
-.delta-row {
+.dim-row {
   display: flex;
   justify-content: space-between;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #77727e;
+  padding: 15px 0;
+  border-bottom: 1px solid #f0eaf5;
+  font-size: 12px;
 }
-.delta-val {
-  color: #292630;
-}
-
-.notice {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #77727e;
-}
-
-.actions {
-  margin-top: 52rpx;
-}
-.mt {
-  margin-top: 20rpx;
-}
-.danger {
-  color: #b42318;
-  border-color: #f2d3cf;
-}
-
-.foot {
-  display: block;
-  margin-top: 36rpx;
-  text-align: center;
-  font-size: 20rpx;
-  color: #a398af;
-  line-height: 1.6;
+.dim-row:last-child {
+  border: 0;
 }
 </style>

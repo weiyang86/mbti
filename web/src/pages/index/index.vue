@@ -1,167 +1,138 @@
 <template>
-  <view class="page home">
-    <view class="brand-row">
-      <view class="brand-left">
-        <view class="badge"><text>16</text><text class="plus">+</text></view>
-        <text class="brand-name">MBTI搭子</text>
+  <view class="page m-home v3-home">
+    <proto-nav />
+    <view class="app-brandbar">
+      <view class="a">
+        <view class="me-logo sm"><text>16</text><text class="span">✦</text></view>
+        <text class="b">MBTI搭子</text>
+        <text class="small">测试 · 记录 · 交换</text>
       </view>
-      <view class="brand-actions">
-        <text v-if="config?.entry" class="chip" @click="goChannelEntry">{{ config.entry.name }}入口</text>
+      <button class="channel-chip" @click="switchChannel">微信预览⌄</button>
+    </view>
+    <text class="m-kicker">MBTI TEST × PERSONALITY CARD</text>
+    <view class="h1">{{ heroLead }}<text class="line"><text class="em">{{ heroAccent }}</text></text></view>
+    <view class="p home-sub">{{ heroSub }}</view>
+
+    <view class="home-showcase">
+      <view class="cover-card">
+        <image :src="coverArt" mode="aspectFill" />
+        <view class="cover-top">
+          <text>MY MBTI / MY MAIN CHARACTER</text>
+          <text>001</text>
+        </view>
+        <view class="cover-stamp">今日人设<text class="line">我来晒</text></view>
+        <view class="cover-info">
+          <text class="strong cover-type">{{ coverType }}</text>
+          <view class="cover-name">{{ coverName }}</view>
+          <text class="p cover-quote">{{ coverQuote }}</text>
+        </view>
       </view>
     </view>
 
-    <text class="kicker">MBTI TEST × PERSONALITY CARD</text>
-    <template v-if="heroTitle">
-      <text class="h1 hero-dynamic">{{ heroTitle }}</text>
-    </template>
-    <template v-else>
-      <text class="h1">你的 MBTI，</text>
-      <text class="h1"><text class="hl">值得一张主角卡。</text></text>
-    </template>
-    <text class="sub">{{ heroSub }}</text>
-
-    <view class="cover">
-      <image class="cover-img" src="/static/cover-illustration.webp" mode="aspectFill" />
-      <view class="cover-shade" />
-      <view class="cover-top">
-        <text>MY MBTI / MY MAIN CHARACTER</text>
-        <text>{{ coverIndex }}</text>
+    <view class="home-entry">
+      <view class="btn full" @click="startQuiz">
+        <AppIcon name="spark" :size="20" color="#ffffff" />
+        <text>{{ ctaText }}</text>
       </view>
-      <view class="stamp"><text>今日人设</text><text>我来晒</text></view>
-      <view class="cover-bottom">
-        <text class="cover-type">{{ coverType }}</text>
-        <text class="cover-name">{{ coverName }}</text>
-        <text class="cover-quote">{{ coverQuote }}</text>
-      </view>
+      <view class="quick-link" @click="goSelfSelect">已经知道类型？直接做专属名片 →</view>
+      <text class="p fine centered">12 题趣味版 · 非官方量表 · 基础结果免费</text>
     </view>
 
-    <view class="entry">
-      <view class="btn-primary" @click="startQuiz">{{ ctaText }}</view>
-      <text class="quick" @click="goSelfSelect">已经知道类型？直接做专属名片 →</text>
-      <text class="fine">12 题趣味版 · 非官方量表 · 基础结果免费</text>
-    </view>
-
-    <view class="scenes">
-      <view class="scene" @click="goPricing">
-        <text class="scene-mark">↗</text>
-        <text class="scene-title">发漂亮朋友圈</text>
-        <text class="scene-desc">看 ¥9.9 晒图套装</text>
+    <view class="home-scenario-row">
+      <view class="a" @click="goPricing">
+        <text class="span">↗</text>
+        <text class="b">发漂亮朋友圈</text>
+        <text class="small">看 ¥9.9 晒图套装</text>
       </view>
-      <view class="scene" @click="goDiscover">
-        <text class="scene-mark">⇄</text>
-        <text class="scene-title">交换 MBTI 名片</text>
-        <text class="scene-desc">遇见相同与不同的你</text>
+      <view class="a" @click="goDiscover">
+        <text class="span">⇄</text>
+        <text class="b">交换 MBTI 名片</text>
+        <text class="small">遇见相同与不同的你</text>
       </view>
     </view>
 
     <view class="journey-entry" @click="goHistory">
-      <view class="journey-main">
-        <text class="journey-kicker">MY MBTI JOURNEY</text>
-        <text class="journey-title">{{ resultCount ? '看看不同阶段的我' : '给现在的自己，留一个起点。' }}</text>
-        <text class="journey-desc">
+      <view>
+        <text class="section-kicker">MY MBTI JOURNEY</text>
+        <text class="h3">{{ resultCount ? '看看不同阶段的我' : '给现在的自己，留一个起点。' }}</text>
+        <text class="p">
           {{ resultCount
-            ? '已留存 ' + resultCount + ' 次结果' + (latest ? ' · 最近 ' + latest.submitted_at.slice(0, 10) : '')
+            ? `已留存 ${resultCount} 次结果${latestDate ? ' · 最近 ' + latestDate : ''}`
             : '免费复测 · 私密记录 · 前后对比' }}
         </text>
       </view>
-      <text class="journey-arrow">↗</text>
+      <text class="span">↗</text>
     </view>
 
-    <view class="mini-tools">
-      <view class="mini-tools-head">
-        <text class="mini-tools-title">MBTI 的另一种打开方式</text>
-        <text class="tag">小应用</text>
+    <view class="mini-tools-title">
+      <text class="h2">MBTI 的另一种打开方式</text>
+      <text class="tag">小应用</text>
+    </view>
+    <view class="tool-grid">
+      <view class="tool-tile radar-tile" @click="goRadar">
+        <text class="i">◎</text>
+        <text class="b">同型雷达</text>
+        <text class="span">周边 500 米<text class="line">有多少同型搭子？</text></text>
+        <text class="small">人数为模拟数据 ↗</text>
       </view>
-      <view class="tool-grid">
-        <view class="tool-tile radar-tile" @click="goRadar">
-          <text class="tool-icon">◎</text>
-          <text class="tool-name">同型雷达</text>
-          <text class="tool-desc">统计暂不可用</text>
-          <text class="tool-desc">周边同型人数待接通</text>
-          <text class="tool-note">不展示精确人数 ↗</text>
-        </view>
-        <view class="tool-tile" @click="goCompat">
-          <text class="tool-icon">✧</text>
-          <text class="tool-name">相处小抄</text>
-          <text class="tool-desc">{{ compatTileLine }}</text>
-          <text class="tool-desc">找个舒服的相处方式</text>
-          <text class="tool-note">趣味建议，无配对分数 ↗</text>
-        </view>
-        <view class="tool-tile" @click="goContacts">
-          <text class="tool-icon">✉</text>
-          <text class="tool-name">我的联系方式</text>
-          <text class="tool-desc">微信 / QQ / 电话</text>
-          <text class="tool-desc">只在本人批准后单向授权</text>
-          <text class="tool-note">私密字段不落本机 ↗</text>
-        </view>
-        <view class="tool-tile" @click="goContactRequests">
-          <text class="tool-icon">⇄</text>
-          <text class="tool-name">联系方式请求</text>
-          <text class="tool-desc">收到的申请与授权状态</text>
-          <text class="tool-note">查看本人请求 ↗</text>
-        </view>
+      <view class="tool-tile" @click="goCompat">
+        <text class="i">✧</text>
+        <text class="b">相处小抄</text>
+        <text class="span">{{ compatLine }}<text class="line">找个舒服的相处方式</text></text>
+        <text class="small">趣味建议，无配对分数 ↗</text>
       </view>
     </view>
 
-    <text class="foot">MBTI搭子 · 原创趣味版 · 非官方测评</text>
+    <text class="p fine centered mt">V0.4 交互原型 · 人物、订单、推荐与附近人数均为示例</text>
+  <proto-tabbar />
+  <proto-footer />
   </view>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { onHide, onLoad, onShow } from '@dcloudio/uni-app'
+import { onShow } from '@dcloudio/uni-app'
+import AppIcon from '@/components/AppIcon.vue'
 import type { ResultSnapshotSummary } from '@/api/types'
 import { listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
 import { DEFAULT_COMPARE_TYPE } from '@/constants/compat'
-import { landingRoutes, readPublishedPreview, publicChannel, type PublishedPreview } from '@/api/published-config'
+import { readPublishedPreview, type PublishedPreview } from '@/api/published-config'
+import { account } from '@/store/account'
 
-function profileName(): string {
-  try {
-    const raw = uni.getStorageSync('mbti_test_profile_v1')
-    if (raw && typeof raw === 'object' && typeof raw.name === 'string' && raw.name.trim()) {
-      return raw.name.trim()
-    }
-  } catch {
-    /* ignore */
-  }
-  return '小禾'
-}
-
-const config = ref<PublishedPreview | null>(null)
-let channelName = '公众号 H5'
-let configRead = 0
-
-onLoad((q) => {
-  if (q?.channel !== undefined) channelName = publicChannel(q.channel) ? String(q.channel) : ''
-})
-onHide(() => {
-  configRead++
-  config.value = null
-})
-
-function goChannelEntry() {
-  const route = config.value?.entry && landingRoutes[config.value.entry.landing]
-  if (route) uni.navigateTo({ url: `${route}?channel=${encodeURIComponent(channelName)}` })
-}
-
-async function loadConfiguration() {
-  const token = ++configRead
-  config.value = null
-  const value = await readPublishedPreview(channelName)
-  if (token === configRead) config.value = value
-}
-
-const heroTitle = computed(() =>
-  config.value?.content ? config.value.content.headline + config.value.content.accent : '',
-)
-const heroSub = computed(() => config.value?.content?.sub || '测出你的类型，晒出专属形象，遇见同频搭子。')
-const ctaText = computed(() => config.value?.content?.cta || '免费测测我的 MBTI')
 const latest = ref<ResultSnapshotSummary | null>(null)
 const resultCount = ref(0)
+const published = ref<PublishedPreview | null>(null)
+
+const heroLead = computed(() => published.value?.content?.headline || '你的 MBTI，')
+const heroAccent = computed(() => published.value?.content?.accent || '值得一张主角卡。')
+const heroSub = computed(() => published.value?.content?.sub || '测出你的类型，晒出专属形象，遇见同频搭子。')
+const ctaText = computed(() => published.value?.content?.cta || '免费测测我的 MBTI')
+
+const coverArt = '/static/share-style-illustration.webp'
+
+const coverType = computed(() => latest.value?.type_code || 'INFP')
+
+const nickname = computed(() => account.profile.nickname.trim() || '小禾')
+
+const coverName = computed(() => {
+  const code = latest.value?.type_code || 'INFP'
+  return `${TYPE_NAMES[code] || '理想收藏家'} / ${nickname.value}`
+})
+
+const coverQuote = computed(() => {
+  const code = latest.value?.type_code || 'INFP'
+  return DECLARATIONS[code] || '温柔有自己的方向。'
+})
+
+const latestDate = computed(() => latest.value?.submitted_at?.slice(0, 10) || '')
+
+const compatLine = computed(() =>
+  latest.value ? `${latest.value.type_code} × ${DEFAULT_COMPARE_TYPE}` : '和不同 MBTI',
+)
 
 onShow(async () => {
-  void loadConfiguration()
+  void loadPublished()
   try {
     const res = await listResults({ limit: 50 })
     resultCount.value = res.items.length
@@ -172,25 +143,9 @@ onShow(async () => {
   }
 })
 
-const coverIndex = computed(() => (latest.value ? '001' : '000'))
-
-const coverType = computed(() => latest.value?.type_code || '----')
-
-const coverName = computed(() =>
-  latest.value
-    ? `${TYPE_NAMES[latest.value.type_code] || 'MBTI'} / ${profileName()}`
-    : '还没测过，先测一次',
-)
-
-const coverQuote = computed(() =>
-  latest.value
-    ? DECLARATIONS[latest.value.type_code] || '四个字母之外，还有不一样的你。'
-    : '测完这里会换成你的类型和一句话人设。',
-)
-
-const compatTileLine = computed(() =>
-  latest.value ? `${latest.value.type_code} × ${DEFAULT_COMPARE_TYPE}` : '和不同 MBTI',
-)
+async function loadPublished() {
+  published.value = await readPublishedPreview('微信小程序')
+}
 
 function startQuiz() {
   uni.navigateTo({ url: '/pages/test-intro/test-intro' })
@@ -201,7 +156,7 @@ function goSelfSelect() {
 }
 
 function goPricing() {
-  uni.navigateTo({ url: `/pages/pricing/pricing?channel=${encodeURIComponent(channelName)}` })
+  uni.navigateTo({ url: '/pages/pricing/pricing' })
 }
 
 function goHistory() {
@@ -220,329 +175,69 @@ function goCompat() {
   uni.navigateTo({ url: '/pages/compat/compat' })
 }
 
-function goContacts() {
-  uni.navigateTo({ url: '/pages/contacts/contacts' })
-}
-
-function goContactRequests() {
-  uni.navigateTo({ url: '/pages/contact-request/contact-request' })
+function switchChannel() {
+  uni.showActionSheet({
+    itemList: ['微信预览', '小红书预览', '抖音预览', '公众号预览'],
+    success: (res) => {
+      const names = ['微信', '小红书', '抖音', '公众号']
+      uni.showToast({ title: `已切换为${names[res.tapIndex] || '微信'}预览（模拟）`, icon: 'none' })
+    },
+  })
 }
 </script>
 
-<style scoped lang="scss">
-.home {
-  padding-top: 32rpx;
-  padding-bottom: 48rpx;
-}
-
-.brand-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.brand-left {
-  display: flex;
-  align-items: center;
-}
-.badge {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
-  background: linear-gradient(140deg, #8b6cf6, #6c53f5);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22rpx;
+<style scoped>
+.h2,
+.h3 {
   font-weight: 700;
 }
-.plus {
-  font-size: 18rpx;
-  margin-left: 2rpx;
-}
-.brand-name {
-  margin-left: 12rpx;
-  font-size: 30rpx;
-  font-weight: 700;
-}
-.brand-actions {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-.chip {
-  font-size: 22rpx;
-  color: #77727e;
-  background: #eeeaf3;
-  border-radius: 999rpx;
-  padding: 8rpx 20rpx;
-}
-
-.kicker {
+.line {
   display: block;
-  margin-top: 40rpx;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: #a398af;
-  font-weight: 600;
 }
-.h1 {
-  display: block;
-  font-size: 68rpx;
-  font-weight: 800;
-  line-height: 1.24;
-  letter-spacing: -2rpx;
-  margin-top: 12rpx;
-}
-.hl {
-  color: #7560df;
-  border-bottom: 12rpx solid #dfff8b;
-}
-.sub {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 26rpx;
-  color: #a398af;
-}
-
-.cover {
+.line .em {
+  display: inline-block;
+  color: var(--accent);
   position: relative;
-  margin-top: 36rpx;
-  height: 640rpx;
-  border-radius: 32rpx;
-  overflow: hidden;
-  box-shadow: 0 24rpx 60rpx rgba(49, 33, 77, 0.18);
+  white-space: nowrap;
 }
-.cover-img {
+.line .em::after {
+  content: '';
+  height: 6px;
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-}
-.cover-shade {
-  position: absolute;
+  bottom: 1px;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 62%;
-  background: linear-gradient(180deg, rgba(20, 12, 40, 0) 0%, rgba(20, 12, 40, 0.82) 100%);
+  background: #dfff8b;
+  border-radius: 4px;
+  z-index: -1;
 }
-.cover-top {
-  position: absolute;
-  left: 32rpx;
-  right: 32rpx;
-  top: 28rpx;
-  display: flex;
-  justify-content: space-between;
-  font-size: 18rpx;
-  letter-spacing: 2rpx;
-  color: rgba(255, 255, 255, 0.8);
+.home-scenario-row .a .span {
+  font-size: 24px;
+  color: #6c4cf3;
+  margin-bottom: 8px;
 }
-.stamp {
-  position: absolute;
-  right: 32rpx;
-  top: 96rpx;
-  width: 140rpx;
-  height: 140rpx;
-  border-radius: 50%;
-  background: rgba(223, 255, 139, 0.9);
-  color: #4a3a86;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 20rpx;
-  font-weight: 600;
-  line-height: 1.4;
-  transform: rotate(6deg);
+.app-brandbar {
+  margin: -12px -20px 14px;
 }
-.cover-bottom {
-  position: absolute;
-  left: 32rpx;
-  right: 32rpx;
-  bottom: 32rpx;
+.quick-link {
+  display: inline;
+  width: auto;
+  min-height: 0;
 }
-.cover-type {
-  display: block;
-  font-size: 96rpx;
-  font-weight: 800;
-  letter-spacing: 4rpx;
-  line-height: 1;
-  color: #fff;
+.app-footer {
+  margin: 0 -20px;
 }
-.cover-name {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  color: #fff;
+.me-logo.sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  font-size: 17px;
+  letter-spacing: -3px;
+  padding-right: 3px;
 }
-.cover-quote {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.entry {
-  margin-top: 40rpx;
-}
-.btn-primary {
-  font-weight: 700;
-}
-.quick {
-  display: block;
-  margin-top: 24rpx;
-  text-align: center;
-  font-size: 26rpx;
-  color: #7560df;
-}
-.fine {
-  display: block;
-  margin-top: 14rpx;
-  text-align: center;
-  font-size: 22rpx;
-  color: #a398af;
-}
-
-.scenes {
-  display: flex;
-  gap: 20rpx;
-  margin-top: 48rpx;
-}
-.scene {
-  flex: 1;
-  background: #fff;
-  border: 2rpx solid #e9e5ed;
-  border-radius: 24rpx;
-  padding: 28rpx 24rpx;
-}
-.scene-mark {
-  display: block;
-  font-size: 30rpx;
-  color: #7560df;
-}
-.scene-title {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 26rpx;
-  font-weight: 700;
-}
-.scene-desc {
-  display: block;
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.5;
-}
-
-.journey-entry {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  margin-top: 24rpx;
-  padding: 28rpx 26rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(120deg, #211a36, #3a2c58 60%, #4b3570);
-  box-shadow: 0 18rpx 40rpx rgba(33, 26, 54, 0.22);
-}
-.journey-main {
-  flex: 1;
-}
-.journey-kicker {
-  display: block;
-  font-size: 18rpx;
-  letter-spacing: 3rpx;
-  color: rgba(255, 255, 255, 0.55);
-}
-.journey-title {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #fff;
-}
-.journey-desc {
-  display: block;
-  margin-top: 6rpx;
-  font-size: 21rpx;
-  color: rgba(255, 255, 255, 0.66);
-}
-.journey-arrow {
-  font-size: 32rpx;
-  color: #dfff8b;
-}
-
-.mini-tools {
-  margin-top: 60rpx;
-}
-.mini-tools-head {
-  display: flex;
-  align-items: center;
-  margin-bottom: 28rpx;
-}
-.mini-tools-title {
-  font-size: 36rpx;
-  font-weight: 800;
-}
-.tag {
-  margin-left: auto;
-  font-size: 20rpx;
-  color: #8b8099;
-  background: #efeaf4;
-  border-radius: 999rpx;
-  padding: 6rpx 18rpx;
-}
-.tool-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24rpx;
-}
-.tool-tile {
-  display: flex;
-  flex-direction: column;
-  min-height: 390rpx;
-  box-sizing: border-box;
-  border: 2rpx solid #e9e0f5;
-  border-radius: 42rpx;
-  padding: 38rpx;
-  background: #eee8fa;
-}
-.tool-icon {
-  font-size: 64rpx;
-  color: #7654b7;
-  line-height: 1.1;
-}
-.tool-name {
-  margin: 10rpx 0;
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #292630;
-}
-.tool-desc {
-  font-size: 24rpx;
-  color: #77698a;
-  line-height: 1.5;
-}
-.tool-note {
-  margin-top: 28rpx;
-  font-size: 20rpx;
-  color: #94869e;
-}
-.radar-tile {
-  background: #e7eddb;
-  border-color: #dce6ca;
-}
-.radar-tile .tool-icon,
-.radar-tile .tool-name {
-  color: #596d35;
-}
-
-.foot {
-  display: block;
-  margin-top: 12rpx;
-  text-align: center;
-  font-size: 20rpx;
-  color: #a398af;
+.me-logo.sm .span {
+  font-size: 22px;
+  margin-left: 3px;
 }
 </style>
+

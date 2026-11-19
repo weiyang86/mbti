@@ -1,56 +1,65 @@
 <template>
-  <view class="page social-page radar-page">
-    <text class="kicker">SAME TYPE RADAR / 同型雷达</text>
-    <text class="page-title">周边 {{ radiusLabel }}，<text class="hl">有多少个同型的你？</text></text>
-    <text class="page-sub">查看自愿参与者的类型人数，不展示任何人的具体位置。</text>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="demoState">演示状态 ↗</text>
+    </view>
 
-    <view class="radar">
-      <view class="ring ring-outer">
-        <view class="ring ring-mid">
-          <view class="ring ring-inner">
-            <text class="radar-type">{{ state.typeCode || 'MBTI' }} / {{ radiusLabel }}</text>
-            <view class="radar-bar"><view class="radar-fill" :style="{ width: radarFill }" /></view>
-            <text class="radar-status">{{ radarStatus }}</text>
-          </view>
-        </view>
+    <view class="page-intro">
+      <view class="eyebrow">SAME TYPE RADAR / 同型雷达</view>
+      <view class="h1">周边 {{ radiusLabel }}，<text class="line">有多少个同型的你？</text></view>
+      <view class="p">查看自愿参与者的类型人数，不展示任何人的具体位置。</view>
+    </view>
+
+    <view class="radar-demo-label">DEMO · 虚构示例区域 · 未读取 GPS</view>
+
+    <view class="radar-visual">
+      <view class="radar-ring r1" />
+      <view class="radar-ring r2" />
+      <view class="radar-ring r3" />
+      <view class="radar-center">
+        <text class="span">{{ state.typeCode || 'INFP' }} / {{ radiusLabel }}</text>
+        <text class="strong">{{ demoCount }}</text>
+        <text class="b">{{ countLabel }}</text>
       </view>
     </view>
 
-    <view class="radius-row">
-      <view
+    <view class="radius-tabs">
+      <button
         v-for="radius in RADII"
         :key="radius"
-        class="radius-chip"
-        :class="{ on: state.radius === radius, dim: !canQuery }"
+        :class="{ active: state.radius === radius }"
         @click="controller.setRadius(radius)"
-      >{{ radius === 500 ? '500 米' : `${radius / 1000} 公里` }}</view>
+      >{{ radius === 500 ? '500 米' : `${radius / 1000} 公里` }}</button>
     </view>
-
-    <view
-      v-if="state.enrolled !== true"
-      class="btn-primary cta"
-      :class="{ disabled: ctaDisabled }"
-      @click="join"
-    >{{ state.saving ? '正在保存…' : '体验同型雷达' }}</view>
-    <view v-else class="btn-secondary cta" :class="{ disabled: ctaDisabled }" @click="leave">{{ state.saving ? '正在保存…' : '退出雷达' }}</view>
 
     <text v-if="state.loading" class="notice" role="status">正在读取本人类型和参与状态…</text>
     <text v-if="state.error" class="error" role="alert">{{ state.error }}</text>
     <text v-if="state.notice" class="success" role="status">{{ state.notice }}</text>
-    <text v-if="!state.typeCode && !state.loading" class="notice">缺少本人 MBTI 类型，请先到我的名片选择并保存。</text>
     <text v-if="state.statistics.kind === 'error'" class="error" role="alert">{{ state.statistics.message }}</text>
 
-    <text class="radar-section">看见同类，不暴露行踪。</text>
-    <text class="radar-note">主动加入、可随时关闭；少于 10 人时仅显示“人数较少”，不展示精确人数或个人轨迹。</text>
-    <text class="radar-note">参与不等于位置授权，也不会更改名片公开范围或联系方式授权；私密名片也可以参与。</text>
+    <template v-if="state.enrolled === true">
+      <view class="notice green">当前仅演示匿名人数统计，不生成附近人员列表，也不展示位置标记。</view>
+      <button class="btn ghost full mt" :class="{ dim: ctaDisabled }" @click="leave">
+        {{ state.saving ? '正在保存…' : '关闭本次雷达体验' }}
+      </button>
+    </template>
+    <template v-else>
+      <button class="btn full mt" :class="{ dim: ctaDisabled }" @click="join">
+        {{ state.saving ? '正在保存…' : '体验同型雷达（模拟授权）' }}
+      </button>
+      <button class="textbtn full mt" @click="deny">模拟拒绝授权</button>
+    </template>
 
-    <view class="btn-secondary cta" @click="goTab('/pages/discover/discover')">去看非位置推荐的 MBTI 搭子</view>
-
-    <view class="sk-foot-links">
-      <text class="sk-foot-link" @click="controller.load">重新读取状态</text>
-      <text class="sk-foot-link" @click="goTab('/pages/card/card')">去我的名片设置类型</text>
+    <view class="radar-rules">
+      <view class="h3">看见同类，不暴露行踪。</view>
+      <view class="p">正式方案：主动加入、可随时关闭；少于 10 人时仅显示“人数较少”，不展示精确人数或个人轨迹。</view>
+      <view class="p">参与不等于位置授权，也不会更改名片公开范围或联系方式授权；私密名片也可以参与。</view>
     </view>
-    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
+
+    <button class="btn secondary full" @click="goDiscover">去看非位置推荐的 MBTI 搭子</button>
+  <proto-footer />
   </view>
 </template>
 <script setup lang="ts">
@@ -60,6 +69,8 @@ import { getMyCard } from '@/api/cards'
 import { getRadarParticipation, getSameTypeCount, updateRadarParticipation } from '@/api/radar'
 import { createRadarController, createRadarViewState } from '@/utils/radar-state'
 const RADII = [500, 1000, 3000] as const
+/** 原型示例人数：仅用于演示，未接真实位置统计 */
+const DEMO_COUNTS: Record<number, number> = { 500: 18, 1000: 43, 3000: 96 }
 const state = reactive(createRadarViewState())
 const controller = createRadarController({ getMyCard, getRadarParticipation, updateRadarParticipation, getSameTypeCount }, state)
 onShow(controller.enter)
@@ -67,17 +78,9 @@ onHide(controller.leave)
 onUnload(controller.leave)
 
 const radiusLabel = computed(() => (state.radius === 500 ? '500 米' : `${state.radius / 1000} 公里`))
-const canQuery = computed(() => !state.loading && !state.saving && !state.needsReload && !!state.typeCode && state.enrolled === true)
-const ctaDisabled = computed(() => state.loading || state.saving || state.needsReload || (state.enrolled !== true && !state.typeCode))
-const radarFill = computed(() => (state.enrolled === true ? '62%' : '18%'))
-const radarStatus = computed(() => {
-  if (state.loading) return '正在读取…'
-  if (!state.typeCode) return '先到我的名片设置类型'
-  if (state.enrolled !== true) return '先选择体验状态'
-  if (state.statistics.kind === 'loading') return '正在统计…'
-  if (state.statistics.kind === 'error') return '统计读取失败'
-  return '同型统计暂不可用'
-})
+const ctaDisabled = computed(() => state.loading || state.saving || state.needsReload)
+const demoCount = computed(() => (state.enrolled === true ? DEMO_COUNTS[state.radius] : '—'))
+const countLabel = computed(() => (state.enrolled === true ? '位同型参与者 · 模拟人数' : '先选择体验状态'))
 
 function join() {
   if (ctaDisabled.value) return
@@ -87,125 +90,44 @@ function leave() {
   if (ctaDisabled.value) return
   controller.save(false)
 }
-function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
+function deny() { uni.showToast({ title: '已模拟拒绝授权，不展示人数', icon: 'none' }) }
+function demoState() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
+function goDiscover() { uni.switchTab({ url: '/pages/discover/discover', fail: () => uni.reLaunch({ url: '/pages/discover/discover' }) }) }
 </script>
 <style scoped lang="scss">
-@import '@/styles/social.scss';
-@import '@/styles/page-frame.scss';
-
-.radar-page {
-  padding-bottom: 48rpx;
+.line {
+  display: block;
+  border-top: 0;
 }
-
-.radar {
-  display: flex;
-  justify-content: center;
-  padding: 34rpx 0 10rpx;
+.error {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #a43b3b;
 }
-.ring {
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.success {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #286747;
 }
-.ring-outer {
-  width: 560rpx;
-  height: 560rpx;
-  background: #fdfbf5;
-  border: 2rpx solid #ede4d1;
+.radius-tabs button,
+.radius-tabs uni-button {
+  padding: 1px 6px;
 }
-.ring-mid {
-  width: 400rpx;
-  height: 400rpx;
-  border: 2rpx solid #e8e0f3;
-  background: #fbf9ff;
-}
-.ring-inner {
-  width: 270rpx;
-  height: 270rpx;
-  flex-direction: column;
-  border: 2rpx dashed #dcd2f0;
-  background: #f7f4fd;
-}
-.radar-type {
-  font-size: 24rpx;
-  color: #6f6880;
-}
-.radar-bar {
-  margin-top: 18rpx;
-  width: 130rpx;
-  height: 10rpx;
-  border-radius: 999rpx;
-  background: #e3dcef;
-  overflow: hidden;
-}
-.radar-fill {
-  height: 100%;
-  border-radius: 999rpx;
-  background: #6b7a45;
-  transition: width 0.3s ease;
-}
-.radar-status {
-  margin-top: 18rpx;
-  font-size: 19rpx;
-  color: #a398af;
-  text-align: center;
-  padding: 0 16rpx;
-}
-
-.radius-row {
-  display: flex;
-  gap: 14rpx;
-  margin-top: 26rpx;
-}
-.radius-chip {
-  flex: 1;
-  text-align: center;
-  padding: 22rpx 0;
-  border-radius: 18rpx;
-  background: #fff;
-  border: 2rpx solid #e9e5ed;
-  font-size: 23rpx;
-  color: #5c5368;
-}
-.radius-chip.on {
-  background: #6b7a45;
-  border-color: #6b7a45;
-  color: #fff;
-  font-weight: 700;
-}
-.radius-chip.dim {
+.radius-tabs button.dim {
   opacity: 0.55;
 }
-
-.cta {
-  margin-top: 22rpx;
-  padding: 30rpx 40rpx;
-  font-size: 30rpx;
+.radar-rules .h3 {
   font-weight: 700;
 }
-.cta.disabled {
+.btn.dim {
   opacity: 0.55;
 }
-.cta-link {
-  display: block;
-  margin-top: 18rpx;
-  font-size: 22rpx;
-  color: #7560df;
-}
-
-.radar-section {
-  display: block;
-  margin-top: 44rpx;
-  font-size: 40rpx;
-  font-weight: 800;
-  color: #241f2e;
-}
-.radar-note {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 23rpx;
-  color: #77727e;
-  line-height: 1.8;
+.btn::after,
+.textbtn::after {
+  border: 0;
 }
 </style>

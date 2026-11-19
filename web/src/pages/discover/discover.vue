@@ -1,103 +1,104 @@
 <template>
-  <view class="page social-page discover-page">
-    <text class="kicker">MEET YOUR TYPE / MBTI 搭子</text>
-    <text class="title">先换张名片，</text>
-    <text class="title hl">看看合不合拍。</text>
-    <text class="sub">推荐依据是自选类型和兴趣。是否交换，由你们双方决定。</text>
-
-    <view class="entry-row">
-      <view class="entry" @click="go('/pages/radar/radar')">
-        <text class="entry-icon">◎</text>
-        <view class="entry-body">
-          <text class="entry-title">同型雷达</text>
-          <text class="entry-desc">周边人数 · 匿名统计</text>
-        </view>
-      </view>
-      <view class="entry" @click="go('/pages/compat/compat')">
-        <text class="entry-icon">✦</text>
-        <view class="entry-body">
-          <text class="entry-title">相处小抄</text>
-          <text class="entry-desc">看看彼此的偏好</text>
-        </view>
-      </view>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
     </view>
 
-    <view class="list-head">
-      <view class="tabs">
-        <view class="tab" :class="{ on: mode === 'recommend' }" @click="switchMode('recommend')">推荐搭子</view>
-        <view class="tab" :class="{ on: mode === 'same', off: !myCard?.type_code }" @click="switchMode('same')">
-          同型{{ myType ? ` ${myType}` : '' }}
-        </view>
-      </view>
-      <view class="list-links">
-        <text class="link" @click="load">刷新</text>
-        <text class="link" @click="go('/pages/exchanges/exchanges')">名片夹</text>
-      </view>
+    <view class="page-intro">
+      <view class="eyebrow">MEET YOUR TYPE / MBTI 搭子</view>
+      <view class="h1">先换张名片，<text class="line">看看合不合拍。</text></view>
+      <view class="p">推荐依据是自选类型和兴趣。是否交换，由你们双方决定。</view>
     </view>
 
     <text v-if="error" class="error" role="alert">{{ error }}</text>
-    <text v-if="loading" class="notice">正在读取搭子…</text>
-    <text v-if="loaded && !items.length" class="notice">暂时没有符合条件的公开搭子。</text>
 
-    <view v-if="!myType" class="hint" @click="goTab('/pages/card/card')">
-      <text>还没有测试类型，同型筛选暂不可用 →</text>
-    </view>
-    <view v-else-if="myCard && !myCard.discoverable" class="hint" @click="goTab('/pages/card/card')">
-      <text>你的名片还未公开，先开启公开与发现 →</text>
+    <view class="notice mb">
+      当前以 {{ myType }} 示例类型体验。
+      <text class="textbtn" @click="goTab('/pages/card/card')">选择我的 MBTI →</text>
     </view>
 
-    <view class="buddy-list">
-      <view v-for="buddy in items" :key="buddy.id" class="buddy" @click="openBuddy(buddy.id)">
-        <view class="avatar" :style="{ background: avatarTint(buddy.id).bg }">
-          <text class="avatar-text" :style="{ color: avatarTint(buddy.id).fg }">{{ avatarText(buddy) }}</text>
-        </view>
-        <view class="buddy-body">
-          <view class="buddy-line">
-            <text class="buddy-name">{{ displayBuddyName(buddy.nickname, buddy.id) }}</text>
-            <text class="buddy-type">{{ buddy.type_code }}</text>
-          </view>
-          <text class="buddy-tagline">{{ buddy.tagline || buddy.type_name }}</text>
-          <text class="buddy-shared">{{ sharedText(buddy) }}</text>
-        </view>
-        <text class="buddy-arrow">↗</text>
+    <view class="exchange-shortcuts">
+      <view class="a" @click="go('/pages/radar/radar')">
+        <text class="b">◎ 同型雷达</text>
+        <text class="small">周边人数 · 模拟</text>
+      </view>
+      <view class="a" @click="go('/pages/compat/compat')">
+        <text class="b">✧ 相处小抄</text>
+        <text class="small">看看彼此的偏好</text>
       </view>
     </view>
 
-    <text class="foot">搭子资料由平台生成，没有聊天、评论或自由发布动态的入口。</text>
-    <view class="foot-links">
-      <text class="foot-link" @click="goTab('/pages/card/card')">我的名片</text>
-      <text class="foot-dot">·</text>
-      <text class="foot-link" @click="go('/pages/buddies/blocked')">屏蔽管理</text>
+    <view class="buddy-tabs">
+      <button class="btn" :class="{ active: mode === 'recommend' }" @click="switchMode('recommend')">
+        推荐搭子
+      </button>
+      <button class="btn" :class="{ active: mode === 'same', off: !myType }" @click="switchMode('same')">
+        同型{{ myType ? ` ${myType}` : '' }}
+      </button>
+      <text class="a" @click="go('/pages/exchanges/exchanges')">名片夹{{ pendingCount ? ` ${pendingCount}` : '' }}</text>
     </view>
-    <text class="foot-fine">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
+
+    <view v-if="loading" class="notice">正在读取搭子…</view>
+
+    <view v-for="buddy in items" :key="buddy.id" class="buddy-tile" @click="openBuddy(buddy.id)">
+      <view class="buddy-avatar" :style="{ background: avatarTint(buddy.id).bg }">
+        <text :style="{ color: avatarTint(buddy.id).fg }">{{ avatarText(buddy) }}</text>
+      </view>
+      <view class="buddy-main">
+        <view class="b">
+          {{ displayBuddyName(buddy.nickname, buddy.id) }}
+          <text class="em">{{ buddy.type_code }}</text>
+        </view>
+        <view class="p">{{ buddy.tagline || buddy.type_name }}</view>
+        <text class="small">{{ sharedText(buddy) }} · {{ buddy.exchange_status === 'accepted' ? '已交换名片' : '示例用户' }}</text>
+      </view>
+      <text class="span">↗</text>
+    </view>
+
+    <view v-if="loaded && !loading && !items.length" class="notice">
+      这一组示例搭子当前不可查看，可以在“我的”中管理屏蔽列表。
+    </view>
+
+    <view class="fine mt">全部为虚构成年人资料。没有聊天、评论或自由发布动态的入口。</view>
+  <proto-tabbar />
+  <proto-footer />
   </view>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'
 import { listResults } from '@/api/results'
 import { listBuddies } from '@/api/buddies'
-import type { BuddySummary, MyCard } from '@/api/types-social'
+import { listCardExchanges } from '@/api/card-exchanges'
+import type { BuddySummary, CardExchange, MyCard } from '@/api/types-social'
 import { avatarTint, displayBuddyName, socialErrorMessage } from '@/utils/social-display'
 const myCard = ref<MyCard | null>(null)
 const myType = ref('')
 const items = ref<BuddySummary[]>([])
+const exchanges = ref<CardExchange[]>([])
 const mode = ref<'recommend' | 'same'>('recommend')
 const loading = ref(false)
 const loaded = ref(false)
 const error = ref('')
+const pendingCount = computed(() => exchanges.value.filter((item) => item.status === 'pending').length)
 onShow(load)
 async function load() {
   if (loading.value) return
-  loading.value = true; loaded.value = false; items.value = []; myCard.value = null; error.value = ''
+  loading.value = true; loaded.value = false; items.value = []; exchanges.value = []; myCard.value = null; error.value = ''
   try {
-    const card = await getMyCard()
+    const [card, exchangeList] = await Promise.all([
+      getMyCard(),
+      listCardExchanges().catch(() => ({ items: [] as CardExchange[] })),
+    ])
     myCard.value = card
+    exchanges.value = exchangeList.items
     let latestType = ''
     try { latestType = (await listResults({ limit: 1 })).items[0]?.type_code || '' } catch { latestType = '' }
     // 同型筛选以最近一次测试结果为准，名片里保存的类型只作兜底
-    myType.value = latestType || card.type_code || ''
+    myType.value = latestType || card.type_code || 'INFP'
     const list = mode.value === 'same' && myType.value
       ? await listBuddies({ mode: 'recommend', type_code: myType.value, limit: 20 })
       : await listBuddies({ mode: 'recommend', limit: 20 })
@@ -117,214 +118,66 @@ function sharedText(buddy: BuddySummary) {
   return buddy.type_code === myType.value ? '同型搭子' : '不同类型，也可以认识'
 }
 function openBuddy(id: string) { go(`/pages/buddies/detail?id=${encodeURIComponent(id)}`) }
+function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 function go(url: string) { uni.navigateTo({ url }) }
 function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">
-@import '@/styles/social.scss';
-
-.discover-page {
-  padding-bottom: 56rpx;
-}
-
-
-.kicker {
+.line {
   display: block;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: #7560df;
-  font-weight: 600;
 }
-.title {
+.error {
   display: block;
-  margin-top: 16rpx;
-  font-size: 56rpx;
-  font-weight: 800;
-  line-height: 1.3;
-  color: #241f2e;
-}
-.hl {
-  color: #7560df;
-  margin-top: 0;
-}
-.sub {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #77727e;
+  margin: 12px 0;
+  font-size: 12px;
   line-height: 1.7;
+  color: #a43b3b;
 }
-
-.entry-row {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 30rpx;
+.notice .textbtn {
+  padding: 4px;
+  display: inline-block;
+  font-size: 13px;
 }
-.entry {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  padding: 24rpx 20rpx;
-  border-radius: 24rpx;
-  background: #f1ecfb;
+.demo-strip .textbtn {
+  font-size: 9px;
+  color: #a197ad;
 }
-.entry-icon {
-  font-size: 30rpx;
-  color: #7560df;
-}
-.entry-title {
-  display: block;
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #2c2550;
-}
-.entry-desc {
-  display: block;
-  margin-top: 4rpx;
-  font-size: 19rpx;
-  color: #8b8099;
-}
-
-.list-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-top: 36rpx;
-}
-.tabs {
-  display: flex;
-  gap: 12rpx;
-}
-.tab {
-  padding: 14rpx 26rpx;
-  border-radius: 999rpx;
-  background: #ece8f3;
-  color: #6f6880;
-  font-size: 22rpx;
-}
-.tab.on {
-  background: #6c4cf3;
-  color: #fff;
-  font-weight: 700;
-}
-.tab.off {
-  opacity: 0.5;
-}
-.list-links {
-  display: flex;
-  gap: 18rpx;
-}
-.link {
-  font-size: 22rpx;
-  color: #7560df;
-}
-
-.hint {
-  margin-top: 20rpx;
-  padding: 18rpx 22rpx;
-  border-radius: 18rpx;
-  background: #f1ecfb;
-  font-size: 21rpx;
-  color: #5b47a8;
-}
-
-.buddy-list {
-  margin-top: 24rpx;
-}
-.buddy {
-  display: flex;
-  align-items: flex-start;
-  gap: 20rpx;
-  margin-top: 16rpx;
-  padding: 26rpx 24rpx;
-  border-radius: 26rpx;
-  background: #fff;
-  box-shadow: 0 12rpx 32rpx rgba(49, 33, 77, 0.05);
-}
-.avatar {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 22rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-}
-.avatar-text {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #6b5a4a;
-}
-.buddy-body {
+.buddy-main {
   flex: 1;
   min-width: 0;
 }
-.buddy-line {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
+.btn::after,
+.textbtn::after {
+  border: 0;
 }
-.buddy-name {
-  font-size: 28rpx;
-  font-weight: 800;
-  color: #241f2e;
+.btnrow > .textbtn {
+  margin: 0;
 }
-.buddy-type {
-  font-size: 18rpx;
-  font-weight: 700;
-  color: #7560df;
-  background: #f1ecfb;
-  border-radius: 8rpx;
-  padding: 4rpx 10rpx;
+.buddy-tabs > .btn {
+  border: 0;
+  margin: 0;
+  padding: 10px 13px;
+  min-height: 44px;
+  border-radius: 11px;
+  background: #eee7f5;
+  color: #90779f;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
 }
-.buddy-tagline {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 23rpx;
-  color: #3f3552;
-  line-height: 1.6;
+.buddy-tabs > .btn.active {
+  background: #6c4cf3;
+  color: #fff;
 }
-.buddy-shared {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 19rpx;
-  color: #a398af;
+.buddy-tabs .btn.off {
+  opacity: 0.5;
 }
-.buddy-arrow {
-  font-size: 26rpx;
-  color: #b9a4da;
+.buddy-tile > .span {
+  font-size: 16px;
+  color: #baa7ca;
 }
-
-.foot {
-  display: block;
-  margin-top: 40rpx;
-  text-align: center;
-  font-size: 19rpx;
-  color: #a398af;
-  line-height: 1.7;
-}
-.foot-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12rpx;
-  margin-top: 16rpx;
-}
-.foot-link {
-  font-size: 21rpx;
-  color: #7560df;
-}
-.foot-dot {
-  font-size: 21rpx;
-  color: #c9c3d4;
-}
-.foot-fine {
-  display: block;
-  margin-top: 12rpx;
-  text-align: center;
-  font-size: 19rpx;
-  color: #b9b3c4;
+.fine.mt {
+  margin-bottom: 10px;
 }
 </style>
+

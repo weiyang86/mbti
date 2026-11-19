@@ -14,7 +14,7 @@ function nameHash(text: string) {
 }
 export function displayBuddyName(nickname: string | undefined, seed = ''): string {
   const name = (nickname || '').trim()
-  if (!name) return '匿名搭子'
+  if (!name) return DEMO_NAMES[nameHash(seed || 'mbti') % DEMO_NAMES.length]
   if (!INTERNAL_NICKNAME.test(name)) return name
   return DEMO_NAMES[nameHash(seed || name) % DEMO_NAMES.length]
 }

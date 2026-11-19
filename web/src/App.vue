@@ -9,9 +9,5 @@ onLaunch(() => {
 
 <style lang="scss">
 @import './uni.scss';
-
-page {
-  background-color: #f8f7f4;
-  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
-}
+@import './styles/prototype.css';
 </style>

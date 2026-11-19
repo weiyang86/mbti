@@ -1,28 +1,74 @@
 <template>
-  <view class="page social-page contacts-page">
-    <text class="kicker">PRIVATE CHANNELS / 联系方式</text>
-    <text class="page-title">只给愿意的人，<text class="hl">看我的联系方式。</text></text>
-    <text class="page-sub">仅维护本人的私密渠道，不出现在公开名片。实际改值或清除会使旧申请和授权失效。</text>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="demoState">演示状态 ↗</text>
+    </view>
+
+    <view class="page-intro">
+      <view class="eyebrow">MY CONTACTS / 交换设置</view>
+      <view class="h1">选好愿意交换的联系方式。</view>
+      <view class="p">填写后也不会出现在公开名片、朋友圈图或附近雷达中。</view>
+    </view>
+
+    <view class="notice">
+      为便于演示，建议填写虚构内容。保存为整份替换：留空即删除该渠道。
+    </view>
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <text v-if="loading" class="notice">正在读取本人渠道…</text>
-    <view v-if="loaded" class="panel">
-      <label class="field" for="wechat">微信号（选填）</label>
-      <input id="wechat" v-model="form.wechat" :disabled="busy" maxlength="20" placeholder="以字母开头，6–20 位" :auto-focus="false" />
-      <label class="field" for="qq">QQ（选填）</label>
-      <input id="qq" v-model="form.qq" :disabled="busy" maxlength="12" placeholder="5–12 位数字，首位不为 0" />
-      <label class="field" for="phone">手机号（选填）</label>
-      <input id="phone" v-model="form.phone" :disabled="busy" maxlength="11" placeholder="11 位手机号" />
-      <text class="notice">保存为整份替换：留空即删除该渠道。输入仅留在当前页面，离页后重新向服务端读取。</text>
-      <button class="btn-primary mt" :disabled="busy || loading" @click="save">保存本人联系方式</button>
-      <button class="btn-secondary mt" :disabled="busy || loading" @click="clearAll">清除全部本人渠道</button>
+    <text v-if="loading" class="notice" role="status">正在读取本人渠道…</text>
+
+    <view v-if="loaded" class="contact-form">
+      <view class="field">
+        <text class="label">微信 <text class="muted">选填</text></text>
+        <input
+          class="input"
+          v-model="form.wechat"
+          :disabled="busy"
+          maxlength="20"
+          placeholder="例如 demo_mbti_01"
+          autocomplete="off"
+        />
+      </view>
+      <view class="field">
+        <text class="label">QQ <text class="muted">选填</text></text>
+        <input
+          class="input"
+          v-model="form.qq"
+          type="number"
+          :disabled="busy"
+          maxlength="12"
+          placeholder="5–12 位数字"
+          autocomplete="off"
+        />
+      </view>
+      <view class="field">
+        <text class="label">电话 <text class="muted">选填</text></text>
+        <input
+          class="input"
+          v-model="form.phone"
+          type="number"
+          :disabled="busy"
+          maxlength="11"
+          placeholder="11 位手机号（仅本机演示）"
+          autocomplete="off"
+        />
+      </view>
     </view>
-    <view class="sk-foot-links">
-      <text class="sk-foot-link" @click="load">重新读取本人渠道</text>
-      <text class="sk-foot-link" @click="go('/pages/contact-request/contact-request')">联系方式请求</text>
-      <text class="sk-foot-link" @click="goTab('/pages/index/index')">返回首页</text>
+
+    <button class="btn full" :disabled="busy || loading || !loaded" @click="save">
+      {{ busy ? '正在保存…' : '保存本人联系方式' }}
+    </button>
+    <button class="btn ghost full mt" :disabled="busy || loading || !loaded" @click="clearAll">
+      清除全部本人渠道
+    </button>
+    <text class="textbtn mt" @click="load">重新读取本人渠道</text>
+
+    <view class="fine mt">
+      每次申请还需选择渠道并单独确认。此页面不会发短信、拨号、加好友或向别人发送资料。
     </view>
-    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
+  <proto-footer />
   </view>
 </template>
 <script setup lang="ts">
@@ -85,14 +131,30 @@ function clearAll() {
     finally { if (scope.current(ticket)) busy.value = false }
   } })
 }
-function go(url: string) { uni.navigateTo({ url }) }
-function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
+function demoState() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 </script>
 <style scoped lang="scss">
-@import '@/styles/social.scss';
-@import '@/styles/page-frame.scss';
-
-.contacts-page {
-  padding-bottom: 48rpx;
+.error {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #a43b3b;
+}
+.success {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #286747;
+}
+.contact-form .input {
+  height: 54px;
+}
+.fine {
+  margin-bottom: 10px;
+}
+.btn::after {
+  border: 0;
 }
 </style>

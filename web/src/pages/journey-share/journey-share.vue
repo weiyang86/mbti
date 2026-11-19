@@ -1,71 +1,89 @@
 <template>
-  <view class="page share-page">
-    <text class="kicker">MY NEXT CHAPTER / 阶段分享</text>
-    <view class="title">
-      <text>每一面的我，</text>
-      <text>都值得留一张。</text>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
     </view>
-    <text class="sub">只分享你选择的两个结果，完整历史与作答不会被公开。</text>
 
-    <view v-if="loading" class="state"><text class="state-text">正在生成阶段图…</text></view>
+    <view v-if="loading" class="notice mt">正在生成阶段图…</view>
 
-    <view v-else-if="error || !a || !b" class="state">
-      <text class="state-text">{{ error || '还没有两份可比较的记录' }}</text>
-      <view class="btn-primary mt" @click="backToJourney">回到我的轨迹</view>
-    </view>
+    <template v-else-if="error || !a || !b">
+      <view class="page-intro">
+        <view class="eyebrow">MY NEXT CHAPTER / 阶段分享</view>
+        <view class="h1">还没有两份可比较的记录</view>
+        <view class="p">{{ error || '先完成两次同版本测试，再回来做成一张图。' }}</view>
+      </view>
+      <view class="btn full" @click="backToJourney">回到我的轨迹</view>
+    </template>
 
     <template v-else>
+      <view class="page-intro">
+        <view class="eyebrow">MY NEXT CHAPTER / 阶段分享</view>
+        <view class="h1">
+          <text class="title-line">每一面的我，</text>
+          <text class="title-line">都值得留一张。</text>
+        </view>
+        <view class="p">只分享你选择的两个结果，完整历史与作答不会被公开。</view>
+      </view>
+
       <view class="journey-poster-preview">
         <text class="poster-kicker">MBTI搭子 / MY NEXT CHAPTER</text>
-        <view class="poster-title">
-          <text>{{ sameType ? '还是这个类型，' : '同一个我，' }}</text>
-          <text>{{ sameType ? '也有新的自己。' : '新的章节。' }}</text>
+        <view class="h2">
+          <text class="title-line">{{ sameType ? '还是这个类型，' : '同一个我，' }}</text>
+          <text class="title-line">{{ sameType ? '也有新的自己。' : '新的章节。' }}</text>
         </view>
         <view class="poster-type-pair">
-          <text class="poster-type before">{{ a.type_code }}</text>
-          <text class="poster-arrow">{{ sameType ? '＝' : '→' }}</text>
-          <text class="poster-type after">{{ b.type_code }}</text>
+          <text class="strong">{{ a.type_code }}</text>
+          <text class="span">{{ sameType ? '＝' : '→' }}</text>
+          <text class="strong">{{ b.type_code }}</text>
         </view>
-        <text class="poster-date">
-          {{ dateLabel(a.submitted_at) }} → {{ dateLabel(b.submitted_at) }}
-        </text>
+        <view class="p">{{ dateLabel(a.submitted_at) }} → {{ dateLabel(b.submitted_at) }}</view>
         <view class="poster-line" />
-        <text class="poster-summary">{{ posterSummary }}</text>
-        <text v-if="showName" class="poster-name">{{ nickname }}</text>
-        <text v-if="showStage" class="poster-stage">{{ stageOf(a) }} → {{ stageOf(b) }}</text>
-        <text class="poster-fine">趣味复测记录，不代表人格已改变</text>
-        <text class="poster-star">✦</text>
+        <text class="b">{{ posterSummary }}</text>
+        <view v-if="showName" class="p">{{ nickname }}</view>
+        <view v-if="showStage" class="p">{{ stageOf(a) }} → {{ stageOf(b) }}</view>
+        <text class="small">趣味复测记录，不代表人格已改变</text>
+        <text class="i">✦</text>
       </view>
 
       <view class="share-privacy">
-        <view class="privacy-row">
-          <text class="privacy-label">带上我的昵称</text>
-          <switch :checked="showName" color="#7652df" @change="toggleName" />
+        <view class="label" @click="showName = !showName">
+          <view class="checkbox" :class="{ checked: showName }">
+            <text v-if="showName" class="check">✓</text>
+          </view>
+          <text>带上我的昵称</text>
         </view>
-        <view class="privacy-row">
-          <text class="privacy-label">带上这两次的阶段标签</text>
-          <switch :checked="showStage" color="#7652df" @change="toggleStage" />
+        <view class="label" @click="showStage = !showStage">
+          <view class="checkbox" :class="{ checked: showStage }">
+            <text v-if="showStage" class="check">✓</text>
+          </view>
+          <text>带上这两次的阶段标签</text>
         </view>
-        <text class="privacy-fine">
+        <view class="fine">
           默认不带昵称与阶段。近期状态、具体答案、其他记录和联系方式始终不进入分享图。
-        </text>
+        </view>
       </view>
 
-      <view class="btn-primary mt" @click="savePoster">预览并保存我的阶段图</view>
-      <view class="btn-secondary mt" @click="copyCaption">复制阶段配文</view>
-      <text class="foot">基础阶段图免费 · 可保存 PNG · 不会自动发布</text>
+      <view class="btn full" @click="savePoster">预览并保存我的阶段图</view>
+      <view class="btn secondary full mt" @click="copyCaption">复制阶段配文</view>
+      <view class="fine centered mt">基础阶段图免费 · 可保存 PNG · 不会自动发布</view>
     </template>
 
-    <view v-if="showPreview" class="poster-modal">
-      <view class="poster-modal-card">
-        <text class="modal-title">把这一段，留在相册里。</text>
-        <text class="modal-desc">1080 × 1440 PNG。手机可以长按图片保存。</text>
-        <image class="poster-image" :src="posterUrl" mode="widthFix" />
-        <view class="btn-primary modal-btn" @click="downloadPoster">下载 PNG</view>
-        <view class="btn-secondary modal-btn" @click="showPreview = false">完成</view>
-        <text class="modal-fine">仅含预览中可见的两次结果，不会自动发布。</text>
+    <view v-if="showPreview" class="modal-backdrop">
+      <view class="modal">
+        <view class="close" @click="showPreview = false">×</view>
+        <view class="h2">把这一段，留在相册里。</view>
+        <view class="p">1080 × 1440 PNG。手机可以长按图片保存。</view>
+        <image class="poster-preview-image" :src="posterUrl" mode="widthFix" />
+        <view class="btnrow">
+          <view class="btn" @click="downloadPoster">下载 PNG</view>
+          <view class="btn secondary" @click="showPreview = false">完成</view>
+        </view>
+        <view class="fine mt">仅含预览中可见的两次结果，不会自动发布。</view>
       </view>
     </view>
+  <proto-footer />
   </view>
 </template>
 
@@ -74,6 +92,7 @@ import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot, ResultSnapshotSummary } from '@/api/types'
 import { getResult, listResults } from '@/api/results'
+import { account } from '@/store/account'
 import {
   changedAnswerCount,
   chooseSummaryPair,
@@ -148,6 +167,8 @@ async function load() {
 }
 
 function readNickname(): string {
+  const accountName = account.profile.nickname.trim()
+  if (accountName) return accountName
   try {
     const raw = uni.getStorageSync('mbti_test_profile_v1')
     if (raw && typeof raw === 'object' && typeof raw.name === 'string' && raw.name.trim()) {
@@ -163,12 +184,8 @@ function stageOf(record: ResultSnapshot): string {
   return record.life_stage || '日常生活'
 }
 
-function toggleName(e: any) {
-  showName.value = !!e?.detail?.value
-}
-
-function toggleStage(e: any) {
-  showStage.value = !!e?.detail?.value
+function toastDemo() {
+  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
 }
 
 function caption(): string {
@@ -294,247 +311,65 @@ function backToJourney() {
 </script>
 
 <style scoped lang="scss">
-.share-page {
-  padding-top: 40rpx;
-  padding-bottom: 56rpx;
+.title-line {
+  display: block;
 }
 
-.kicker {
-  display: block;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: #a398af;
-  font-weight: 600;
-}
-.title {
-  margin-top: 16rpx;
-  display: flex;
-  flex-direction: column;
-  font-size: 52rpx;
-  font-weight: 800;
-  line-height: 1.35;
-  letter-spacing: -1rpx;
-}
-.sub {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #77727e;
-  line-height: 1.6;
-}
-
-
-.state {
-  padding-top: 160rpx;
-  text-align: center;
-}
-.state-text {
-  display: block;
-  font-size: 26rpx;
-  color: #77727e;
-}
-
-.journey-poster-preview {
-  position: relative;
-  overflow: hidden;
-  margin-top: 32rpx;
-  padding: 44rpx 38rpx 50rpx;
-  min-height: 720rpx;
-  border-radius: 32rpx;
-  border: 2rpx solid #e1d7f3;
-  background: #eee8fc;
-}
-.journey-poster-preview::before {
-  content: '';
-  position: absolute;
-  right: -120rpx;
-  top: -120rpx;
-  width: 400rpx;
-  height: 400rpx;
-  border-radius: 50%;
-  background: #dbe9d3;
-  opacity: 0.75;
-}
-.poster-kicker {
-  position: relative;
-  display: block;
-  font-size: 16rpx;
-  letter-spacing: 2rpx;
-  color: #9380b0;
-}
-.poster-title {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin: 40rpx 0 44rpx;
-  font-size: 52rpx;
-  font-weight: 800;
-  line-height: 1.5;
-  letter-spacing: -1rpx;
-}
-.poster-type-pair {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.poster-type {
-  font-size: 64rpx;
-  font-weight: 800;
-  letter-spacing: 2rpx;
-}
-.poster-type.before {
-  color: #a391b6;
-}
-.poster-type.after {
-  color: #7953c6;
-}
-.poster-arrow {
-  font-size: 44rpx;
-  color: #a897bd;
-}
-.poster-date {
-  position: relative;
-  display: block;
-  margin-top: 24rpx;
-  font-size: 20rpx;
-  color: #9b87ab;
-}
-.poster-line {
-  height: 2rpx;
-  margin: 36rpx 0;
-  background: #d6c8e8;
-}
-.poster-summary {
-  position: relative;
-  display: block;
-  font-size: 26rpx;
+.h2 {
   font-weight: 700;
-  color: #6a547d;
-}
-.poster-name {
-  position: relative;
-  display: block;
-  margin-top: 20rpx;
-  font-size: 22rpx;
-  color: #6a547d;
-}
-.poster-stage {
-  position: relative;
-  display: block;
-  margin-top: 12rpx;
-  font-size: 20rpx;
-  color: #9b87ab;
-}
-.poster-fine {
-  position: relative;
-  display: block;
-  margin-top: 64rpx;
-  font-size: 16rpx;
-  color: #9b8aa8;
-}
-.poster-star {
-  position: absolute;
-  right: 24rpx;
-  bottom: 20rpx;
-  font-size: 160rpx;
-  line-height: 1;
-  color: #c2b2dc;
-  opacity: 0.35;
 }
 
-.share-privacy {
-  margin-top: 32rpx;
-  padding: 12rpx 28rpx 24rpx;
-  border-radius: 24rpx;
-  border: 2rpx solid #e4ddeb;
+.poster-kicker {
+  display: block;
+}
+
+.demo-strip .textbtn {
+  font-size: 9px;
+  color: #a197ad;
+}
+.share-privacy .fine {
+  font-size: 10px;
+  margin: 10px 0 0;
+}
+.checkbox {
+  width: 17px;
+  height: 17px;
+  margin: 0 3px 0 4px;
+  flex-shrink: 0;
+  border: 1px solid #767676;
+  border-radius: 3px;
   background: #fff;
-}
-.privacy-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 0;
-}
-.privacy-label {
-  font-size: 24rpx;
-  color: #8a7997;
-}
-.privacy-fine {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 20rpx;
-  color: #a398af;
-  line-height: 1.7;
-}
-
-.foot {
-  display: block;
-  margin-top: 32rpx;
-  text-align: center;
-  font-size: 20rpx;
-  color: #a398af;
-  line-height: 1.6;
-}
-
-.mt {
-  margin-top: 28rpx;
-}
-.btn-ghost {
-  margin-top: 20rpx;
-  padding: 24rpx 40rpx;
-  text-align: center;
-  font-size: 28rpx;
-  color: #7560df;
-}
-
-.poster-modal {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 99;
-  background: rgba(24, 16, 40, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40rpx;
-  box-sizing: border-box;
 }
-.poster-modal-card {
-  width: 100%;
-  max-height: 88vh;
-  overflow-y: auto;
-  padding: 32rpx;
-  border-radius: 32rpx;
-  background: #fff;
-  box-sizing: border-box;
+.checkbox.checked {
+  background: #7652df;
+  border-color: #7652df;
 }
-.modal-title {
-  display: block;
-  font-size: 30rpx;
-  font-weight: 700;
+.checkbox .check {
+  font-size: 11px;
+  line-height: 1;
+  color: #fff;
 }
-.modal-desc {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  color: #77727e;
-}
-.poster-image {
-  width: 100%;
-  margin-top: 24rpx;
-  border-radius: 20rpx;
-}
-.modal-btn {
-  margin-top: 24rpx;
-}
-.modal-fine {
-  display: block;
-  margin-top: 20rpx;
+
+.centered {
   text-align: center;
-  font-size: 20rpx;
-  color: #a398af;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+}
+.modal .close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

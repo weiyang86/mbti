@@ -30,8 +30,8 @@ export interface StudioState {
 const KEY = 'mbti_studio_v1'
 
 export const STUDIO_STYLES: { key: StyleKey; label: string; asset: string }[] = [
-  { key: 'illustration', label: '梦境插画', asset: '/static/share-style-illustration.webp' },
   { key: 'editorial', label: '日常杂志', asset: '/static/share-style-editorial.webp' },
+  { key: 'illustration', label: '梦境插画', asset: '/static/share-style-illustration.webp' },
   { key: 'game', label: '未来角色', asset: '/static/share-style-game.webp' },
 ]
 
@@ -121,8 +121,11 @@ export function choosePlan(tier: PlanTier) {
   saveStudio()
 }
 
-/** 模拟下单：一次购买、无自动续费，不产生真实扣款；失败订单只留档不解锁 */
+/** 模拟下单：一次购买、无自动续费，不产生真实扣款；已拥有的档位不再重复下单 */
 export function purchasePlan(tier: PlanTier, success = true) {
+  if (success && (studio.tier >= tier || studio.orders.some((o) => o.status === 'paid' && o.tier >= tier))) {
+    return null
+  }
   const upgrade = studio.tier === 1 && tier === 2
   const amount = upgrade ? 10 : tier === 1 ? 9.9 : 19.9
   const order: StudioOrder = {

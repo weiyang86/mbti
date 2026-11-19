@@ -1,102 +1,109 @@
 <template>
-  <view class="page social-page compat-page">
-    <text class="kicker">TYPE × TYPE / 相处小抄</text>
-    <text class="page-title">合不合拍，<text class="hl">从了解偏好开始。</text></text>
-    <text class="page-sub">按类型标签生成的趣味建议，不提供“天生绝配”或匹配概率。</text>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="demoState">演示状态 ↗</text>
+    </view>
+
+    <view class="page-intro">
+      <view class="eyebrow">TYPE × TYPE / 相处小抄</view>
+      <view class="h1">合不合拍，从了解偏好开始。</view>
+      <view class="p">按类型标签生成的趣味建议，不提供“天生绝配”或匹配概率。</view>
+    </view>
 
     <text v-if="loading" class="notice" role="status">正在读取你的类型…</text>
     <text v-if="error" class="error" role="alert">{{ error }}</text>
 
     <view v-if="!loading && !myType" class="panel">
-      <text class="panel-title">还没有你的 MBTI 类型</text>
-      <text class="panel-desc">相处小抄需要先知道你的类型。去「我的名片」选择并保存类型后，再回来就能生成建议。</text>
-      <view class="btn-primary mt" @click="goCard">去我的名片设置类型</view>
+      <view class="h3">还没有你的 MBTI 类型</view>
+      <view class="p">相处小抄需要先知道你的类型。去「我的名片」选择并保存类型后，再回来就能生成建议。</view>
+      <button class="btn full mt" @click="goCard">去我的名片设置类型</button>
     </view>
 
     <template v-else-if="myType">
       <view class="type-pair">
-        <view class="type-card pick" @click="openMyPicker">
-          <text class="type-code">{{ myType || '未选择' }}</text>
-          <text class="type-label">我的类型 · 点此更换 ⌄</text>
+        <view class="type-side" @click="openMyPicker">
+          <text class="b">{{ myType }}</text>
+          <text class="small">我的类型</text>
         </view>
-        <text class="type-x">×</text>
-        <view class="type-card pick" @click="openOtherPicker">
-          <text class="type-code">{{ otherType }}</text>
-          <text class="type-label">点此换一种 ⌄</text>
+        <text class="span">×</text>
+        <button @click="openOtherPicker">
+          <text class="b">{{ otherType }}</text>
+          <text class="small">点此换一种 ⌄</text>
+        </button>
+      </view>
+
+      <view class="choice-row">
+        <button
+          v-for="s in scenes"
+          :key="s"
+          class="choice"
+          :class="{ sel: scene === s }"
+          @click="scene = s"
+        >{{ s }}</button>
+      </view>
+
+      <view class="compat-intro">{{ sceneTip }}</view>
+
+      <view class="manual-cards">
+        <view v-for="(n, i) in notes" :key="n.title" class="manual-card">
+          <text class="span">0{{ i + 1 }}</text>
+          <view>
+            <view class="h3">{{ n.title }}</view>
+            <view class="p">{{ n.text }}</view>
+          </view>
         </view>
       </view>
 
-      <text class="kicker sub">SCENE / 这次是什么场景</text>
-      <view class="scene-row">
-        <view v-for="s in scenes" :key="s" class="scene-chip" :class="{ on: s === scene }" @click="scene = s">{{ s }}</view>
-      </view>
-      <text class="scene-tip">{{ sceneTip }}</text>
-
-      <text class="kicker sub">NOTES / 相处建议</text>
-      <view v-for="n in notes" :key="n.title" class="note-card">
-        <text class="note-title">{{ n.title }}</text>
-        <text class="note-text">{{ n.text }}</text>
-      </view>
-
-      <text class="fine">
-        趣味建议，无配对分数，相处方式可以随情境调整。你的类型来自本人名片，对方类型由你手动选择。
-      </text>
+      <button class="btn secondary full" @click="copyNotes">复制这份相处小抄</button>
+      <button class="btn full mt" @click="goDiscover">去交换一张名片 →</button>
     </template>
 
-    <view class="sk-foot-links">
-      <text class="sk-foot-link" @click="load">重新读取我的类型</text>
-    </view>
-    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
-
-    <!-- 类型选择：点卡片才以底部弹层出现 -->
-    <view v-if="showPicker" class="picker-mask" @click="closePicker">
-      <view class="picker-sheet" @click.stop>
-        <view class="sheet-handle" />
-        <view class="sheet-head">
-          <text class="sheet-kicker">{{ pickerMode === 'mine' ? 'MY TYPE / 我的类型' : 'MBTI 搭子 / 选择类型' }}</text>
-          <view class="sheet-close" @click="closePicker"><text>×</text></view>
-        </view>
-        <text class="sheet-title">{{ pickerMode === 'mine' ? '选择我的类型' : '想了解哪种搭子？' }}</text>
+    <view v-if="showPicker" class="modal-backdrop" @click="closePicker">
+      <view class="modal" @click.stop>
+        <button class="close" @click="closePicker">×</button>
+        <view class="eyebrow">MBTI搭子 / V0.4</view>
+        <view class="h2">{{ pickerMode === 'mine' ? '选择已有的 MBTI 类型' : '想了解哪种搭子？' }}</view>
 
         <template v-if="pickerMode === 'mine'">
-          <text class="panel-desc">从你测试过或选择过的记录里挑一个。</text>
           <view v-if="myResultTypes.length" class="mine-list">
-            <view
+            <button
               v-for="item in myResultTypes"
               :key="item.type_code"
-              class="mine-item"
-              :class="{ on: item.type_code === myType }"
+              class="type-btn"
+              :class="{ sel: item.type_code === myType }"
               @click="pickMine(item.type_code)"
             >
-              <text class="mine-code">{{ item.type_code }}</text>
-              <text class="mine-name">{{ item.name }}</text>
-              <text class="mine-date">{{ item.date }}</text>
-            </view>
+              {{ item.type_code }}
+              <text class="small">{{ item.name }} · {{ item.date }}</text>
+            </button>
           </view>
-          <text v-else class="panel-desc">还没有可用的测试记录，先测一次再来。</text>
-          <view class="btn-secondary mt" @click="goQuiz">去测一次</view>
+          <view v-else class="p">还没有可用的测试记录，先测一次再来。</view>
+          <button class="btn secondary full mt" @click="goQuiz">去测一次</button>
         </template>
 
         <template v-else>
-          <view v-for="group in typeGroups" :key="group.label" class="sheet-group">
-            <text class="group-label">{{ group.label }}</text>
-            <view class="group-grid">
-              <view
+          <view v-for="group in typeGroups" :key="group.label" class="type-group">
+            <view class="group-label">{{ group.label }}</view>
+            <view class="type-grid">
+              <button
                 v-for="item in group.items"
                 :key="item.code"
-                class="type-tile"
-                :class="{ on: item.code === otherType }"
+                class="type-btn"
+                :class="{ sel: item.code === otherType }"
                 @click="pickOther(item.code)"
               >
-                <text class="tile-code">{{ item.code }}</text>
-                <text class="tile-name">{{ item.name }}</text>
-              </view>
+                {{ item.code }}
+                <text class="small">{{ item.name }}</text>
+              </button>
             </view>
           </view>
-          <text v-if="!typeGroups.length" class="panel-desc">类型列表暂不可用，当前按 {{ otherType }} 生成建议。</text>
+          <view v-if="!typeGroups.length" class="p">类型列表暂不可用，当前按 {{ otherType }} 生成建议。</view>
         </template>
       </view>
     </view>
+  <proto-footer />
   </view>
 </template>
 
@@ -131,6 +138,11 @@ let myTypeTouched = false
 const scenes = COMPAT_SCENES
 const notes = computed(() => compatNotes(myType.value, otherType.value, scene.value))
 const sceneTip = computed(() => COMPAT_SCENE_TIPS[scene.value])
+const copyText = computed(() => [
+  `${myType.value} × ${otherType.value} · ${scene.value}`,
+  ...notes.value.map((note) => `${note.title}：${note.text}`),
+  '趣味建议，无配对分数，相处方式可以随情境调整。',
+].join('\n'))
 
 /** 弹层按分析家 / 外交家 / 守护者 / 探险家分组展示类型 */
 const typeGroups = computed(() =>
@@ -175,7 +187,7 @@ async function load() {
   await loadMyResultTypes()
   // 默认优先用最近一次测试结果，没有测试记录时才用名片上保存的类型
   if (!myTypeTouched) {
-    myType.value = myResultTypes.value[0]?.type_code || cardType
+    myType.value = myResultTypes.value[0]?.type_code || cardType || 'INFP'
   }
   loading.value = false
 }
@@ -237,241 +249,79 @@ function goCard() {
   uni.switchTab({ url: '/pages/card/card', fail: () => uni.reLaunch({ url: '/pages/card/card' }) })
 }
 
+function goDiscover() {
+  uni.switchTab({ url: '/pages/discover/discover', fail: () => uni.reLaunch({ url: '/pages/discover/discover' }) })
+}
+
+function copyNotes() {
+  uni.setClipboardData({
+    data: copyText.value,
+    success: () => uni.showToast({ title: '已复制相处小抄', icon: 'none' }),
+  })
+}
+
+function demoState() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/social.scss';
-@import '@/styles/page-frame.scss';
-
-.compat-page {
-  padding-bottom: 48rpx;
+.line {
+  display: block;
+  border-top: 0;
 }
-
-.type-pair {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-top: 30rpx;
+.error {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #a43b3b;
 }
-.type-card {
+.type-side {
   flex: 1;
-  min-width: 0;
+  min-height: 110px;
+  padding: 20px 5px;
+  background: #eee7f7;
+  border: 1px solid #dfd1ee;
+  border-radius: 17px;
+  text-align: center;
+  cursor: pointer;
+}
+.type-pair > button,
+.type-pair > uni-button {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.manual-cards > .manual-card {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 46rpx 20rpx 30rpx;
-  border-radius: 28rpx;
-  background: linear-gradient(160deg, #f4efff, #efe8ff);
-  border: 2rpx solid #e6ddf8;
-}
-.type-card.pick {
-  background: linear-gradient(160deg, #f7f2ff, #f1e9ff);
-}
-.type-code {
-  font-size: 64rpx;
-  font-weight: 800;
-  letter-spacing: 2rpx;
-  color: #6c4cf3;
-}
-.type-label {
-  margin-top: 14rpx;
-  font-size: 21rpx;
-  color: #8b78b3;
-}
-.type-x {
-  font-size: 30rpx;
-  color: #c9c1d6;
-}
-
-.scene-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 22rpx;
-}
-.scene-chip {
-  padding: 16rpx 28rpx;
-  border-radius: 999rpx;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px 16px;
   background: #fff;
-  border: 2rpx solid #e9e5ed;
-  font-size: 23rpx;
-  color: #5c5368;
+  border: 1px solid #e8e0ef;
+  border-radius: 16px;
 }
-.scene-chip.on {
-  background: #6c4cf3;
-  border-color: #6c4cf3;
-  color: #fff;
+.manual-cards .h3 {
   font-weight: 700;
 }
-.scene-tip {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 23rpx;
-  line-height: 1.7;
-  color: #77727e;
+.manual-cards > .manual-card > .span {
+  font-size: 14px;
+  color: #b49aca;
 }
-
-.note-card {
-  margin-top: 18rpx;
-  padding: 26rpx 24rpx;
-  border-radius: 24rpx;
-  background: #f7f4fc;
-  border: 2rpx solid #ece7f1;
-}
-.note-title {
-  display: block;
-  font-size: 27rpx;
-  font-weight: 700;
-  color: #241f2e;
-}
-.note-text {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 23rpx;
-  line-height: 1.8;
-  color: #5c5368;
-}
-.fine {
-  display: block;
-  margin-top: 26rpx;
-  font-size: 20rpx;
-  line-height: 1.7;
-  color: #a398af;
-}
-
-.picker-mask {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 60;
-  display: flex;
-  align-items: flex-end;
-  background: rgba(24, 18, 36, 0.42);
-}
-.picker-sheet {
-  width: 100%;
-  max-height: 86vh;
-  box-sizing: border-box;
-  padding: 18rpx 26rpx 56rpx;
-  border-radius: 32rpx 32rpx 0 0;
-  background: #fff;
-  overflow-y: auto;
-}
-.sheet-handle {
-  width: 72rpx;
-  height: 8rpx;
-  border-radius: 999rpx;
-  background: #e3dcef;
-  margin: 0 auto 22rpx;
-}
-.sheet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.sheet-kicker {
-  font-size: 20rpx;
-  letter-spacing: 2rpx;
-  color: #6c4cf3;
-  font-weight: 700;
-}
-.sheet-close {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
-  background: #f4f1fa;
-  color: #6f6880;
-  font-size: 30rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.sheet-title {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 46rpx;
-  font-weight: 800;
-  color: #241f2e;
-}
-.sheet-group {
-  margin-top: 34rpx;
-}
-.group-label {
-  font-size: 22rpx;
-  color: #a398af;
-}
-.group-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14rpx;
-  margin-top: 16rpx;
-}
-.type-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20rpx 6rpx;
-  border-radius: 18rpx;
-  background: #fff;
-  border: 2rpx solid #ece7f1;
-}
-.type-tile.on {
-  border-color: #6c4cf3;
-  background: #f6f2ff;
-}
-.tile-code {
-  font-size: 26rpx;
-  font-weight: 800;
-  color: #241f2e;
-}
-.type-tile.on .tile-code {
-  color: #6c4cf3;
-}
-.tile-name {
-  margin-top: 8rpx;
-  font-size: 18rpx;
-  color: #a398af;
-}
-.type-tile.on .tile-name {
-  color: #7560df;
-}
-
 .mine-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12rpx;
-  margin-top: 20rpx;
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
 }
-.mine-item {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  padding: 24rpx 22rpx;
-  border-radius: 18rpx;
-  background: #fff;
-  border: 2rpx solid #ece7f1;
+.mine-list .type-btn {
+  text-align: left;
+  padding: 12px 14px;
 }
-.mine-item.on {
-  border-color: #6c4cf3;
-  background: #f6f2ff;
-}
-.mine-code {
-  font-size: 30rpx;
-  font-weight: 800;
-  color: #241f2e;
-}
-.mine-item.on .mine-code {
-  color: #6c4cf3;
-}
-.mine-name {
-  flex: 1;
-  font-size: 22rpx;
-  color: #77727e;
-}
-.mine-date {
-  font-size: 20rpx;
-  color: #a398af;
+.btn::after,
+.textbtn::after,
+.type-pair button::after,
+.mine-list .type-btn::after,
+.type-grid .type-btn::after,
+.close::after {
+  border: 0;
 }
 </style>

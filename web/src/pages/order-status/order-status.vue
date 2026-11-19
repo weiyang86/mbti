@@ -1,20 +1,35 @@
 <template>
-  <view class="page commerce-page">
-    <text class="heading">订单状态</text>
-    <text class="identifier">订单号：{{ orderId || '未提供' }}</text>
-    <text v-if="loading" class="notice">正在查询本人订单…</text>
-    <text v-if="error" class="error">{{ error }}</text>
-    <view v-if="order" class="card mt">
-      <text class="section">{{ orderStatusLabel(order.status) }}（{{ order.status }}）</text>
-      <text class="identifier">服务端订单号：{{ order.order_id }}</text>
-      <text class="line">订单解锁状态：{{ order.unlocked ? '已解锁' : '未解锁' }}</text>
-      <text class="notice">{{ paymentAvailabilityLabel(order.payment_availability) }}</text>
-      <text v-if="order.paid_at" class="line">支付时间：{{ order.paid_at }}</text>
-      <text v-if="order.status === 'pending'" class="notice">订单仍待支付；创建订单不会自动获得权益。</text>
+  <view class="page">
+    <proto-nav />
+    <view class="page-intro">
+      <text class="tag">订单查询</text>
+      <view class="h2">订单状态</view>
+      <view class="p">订单号：{{ orderId || '未提供' }}</view>
     </view>
-    <button class="btn-secondary mt" :disabled="loading || !orderId" @click="load">重新查询同一订单</button>
-    <button class="btn-primary mt" @click="goOrders">查看金额、本人订单与权益</button>
-    <button class="btn-secondary mt" @click="goCatalog">返回商品目录</button>
+
+    <view v-if="loading" class="notice">正在查询本人订单…</view>
+    <view v-if="error" class="notice warn">{{ error }}</view>
+
+    <view v-if="order" class="panel">
+      <view class="order">
+        <view class="order-symbol">✦</view>
+        <view class="order-info">
+          <text class="b">{{ orderStatusLabel(order.status) }}（{{ order.status }}）</text>
+          <text class="small">服务端订单号：{{ order.order_id }}</text>
+          <text class="small">{{ order.unlocked ? '已解锁' : '未解锁' }} · {{ paymentAvailabilityLabel(order.payment_availability) }}</text>
+          <text v-if="order.paid_at" class="small">支付时间：{{ order.paid_at }}</text>
+        </view>
+      </view>
+      <view v-if="order.status === 'pending'" class="notice warn">订单仍待支付；创建订单不会自动获得权益。</view>
+      <view class="fine">订单与权益以服务端记录为准，关闭页面不会改变订单状态。</view>
+    </view>
+
+    <view class="mini-list mt">
+      <button class="btn secondary full" :disabled="loading || !orderId" @click="load">重新查询同一订单</button>
+      <button class="btn full" @click="goOrders">查看金额、本人订单与权益</button>
+      <button class="btn ghost full" @click="goCatalog">返回商品目录</button>
+    </view>
+  <proto-footer />
   </view>
 </template>
 
@@ -47,5 +62,12 @@ function goCatalog() { uni.reLaunch({ url: '/pages/pricing/pricing' }) }
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/payment.scss';
+.page-intro .h2 {
+  margin: 12px 0 8px;
+  font-weight: 700;
+}
+
+.mini-list {
+  width: 100%;
+}
 </style>

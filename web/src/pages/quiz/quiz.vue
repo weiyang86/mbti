@@ -1,43 +1,50 @@
 <template>
-  <view class="page quiz">
+  <view class="page quiz-page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <button class="textbtn" @click="demoState">演示状态 ↗</button>
+    </view>
+
     <view v-if="loading" class="state"><text class="state-text">正在加载题目…</text></view>
 
     <view v-else-if="!questions.length" class="state">
       <text class="state-text">题库加载失败</text>
-      <view class="btn-secondary mt" @click="load">重试</view>
-      <text class="back" @click="goHome">返回首页</text>
+      <button class="btn secondary mt" @click="load">重试</button>
+      <text class="textbtn mt" @click="goHome">返回首页</text>
     </view>
 
-    <view v-else>
-      <view class="head">
-        <text class="head-label">选择更接近日常的你</text>
-        <text class="head-count">{{ pad(currentIndex + 1) }} / {{ pad(questions.length) }}</text>
+    <template v-else>
+      <view class="question-progress">
+        <text>选择更接近日常的你</text>
+        <text class="count">{{ pad(currentIndex + 1) }} / {{ pad(questions.length) }}</text>
       </view>
-      <view class="bar"><view class="bar-fill" :style="{ width: barWidth }" /></view>
+      <view class="progress"><view class="i" :style="{ width: barWidth }" /></view>
 
-      <text class="dim">{{ dim.left }} <text class="slash">/</text> {{ dim.right }}</text>
-      <text class="prompt">{{ question?.prompt || '' }}</text>
+      <text class="quiz-mark">{{ dim.left }} <text class="i">/</text> {{ dim.right }}</text>
+      <view class="h1">{{ question?.prompt || '' }}</view>
 
-      <view class="options">
-        <view
+      <view class="question-options">
+        <button
           v-for="(opt, i) in question?.options || []"
           :key="opt.id"
-          class="option"
+          class="question-option"
           :class="{ active: question && answers[question.id] === opt.id }"
           @click="pick(opt.id)"
         >
-          <text class="letter">{{ i === 0 ? 'A' : 'B' }}</text>
-          <text class="label">{{ opt.label }}</text>
-        </view>
+          <text class="span">{{ i === 0 ? 'A' : 'B' }}</text>
+          <text class="b">{{ opt.label }}</text>
+        </button>
       </view>
 
-      <view class="tools">
-        <text class="prev" :class="{ disabled: currentIndex === 0 }" @click="prev">← 上一题</text>
-        <text class="hint">选择后自动进入下一题</text>
+      <view class="chat-tools">
+        <text class="textbtn" :class="{ disabled: currentIndex === 0 }" @click="prev">← 上一题</text>
+        <text class="fine">选择后自动进入下一题</text>
       </view>
 
-      <view class="notice">固定选项 · 不收集自由聊天内容</view>
-    </view>
+      <view class="notice mt">固定选项 · 不收集自由聊天内容</view>
+    </template>
+  <proto-footer />
   </view>
 </template>
 
@@ -93,6 +100,10 @@ async function load() {
   } finally {
     loading.value = false
   }
+}
+
+function demoState() {
+  uni.showToast({ title: 'Mock 演示状态，不产生费用', icon: 'none' })
 }
 
 /** 同一 session 的本地草稿：恢复已答题目与当前题号 */
@@ -232,164 +243,57 @@ function readProfile(): { stage?: string; recent?: string } {
 </script>
 
 <style scoped lang="scss">
-.quiz {
-  padding-top: 24rpx;
-}
-
-
 .state {
-  padding-top: 200rpx;
+  padding-top: 200px;
   text-align: center;
 }
 .state-text {
   display: block;
   color: #77727e;
-  font-size: 26rpx;
-}
-.back {
-  display: block;
-  margin-top: 32rpx;
-  font-size: 24rpx;
-  color: #7560df;
+  font-size: 13px;
 }
 
-.head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.question-progress {
+  margin-bottom: 0;
+  font-size: 14px;
+  letter-spacing: normal;
+  color: var(--ink);
+  line-height: 1.65;
 }
-.head-label {
-  font-size: 22rpx;
-  color: #a398af;
-  letter-spacing: 1rpx;
-}
-.head-count {
-  font-size: 24rpx;
+.question-progress .count {
+  font-size: 14px;
   font-weight: 700;
-  color: #292630;
+  color: var(--ink);
 }
 
-.bar {
-  margin-top: 14rpx;
-  height: 6rpx;
-  border-radius: 999rpx;
-  background: #ece8f3;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 999rpx;
-  background: #7560df;
-  transition: width 0.25s ease;
-}
-
-.dim {
-  display: block;
-  margin-top: 56rpx;
-  font-size: 88rpx;
-  font-weight: 800;
-  letter-spacing: 6rpx;
-  color: #7559e8;
-  line-height: 1;
-}
-.slash {
-  color: #d9cdf0;
+.quiz-mark .i {
+  font-style: normal;
   font-weight: 300;
-  margin: 0 8rpx;
+  color: #d7cdeb;
 }
 
-.prompt {
-  display: block;
-  margin-top: 40rpx;
-  font-size: 48rpx;
-  font-weight: 800;
-  line-height: 1.5;
-  color: #292630;
+.question-option {
+  width: 100%;
+  margin: 0;
+  font-size: 14px;
 }
 
-.options {
-  margin-top: 48rpx;
-}
-.option {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border: 2rpx solid #e9e5ed;
-  border-radius: 24rpx;
-  padding: 32rpx 28rpx;
-  margin-bottom: 20rpx;
-  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
-}
-.option.active {
-  border-color: #7560df;
-  background: #f6f2ff;
+.question-option.active {
+  border-color: #6c4cf3;
+  background: #f0eafd;
 }
 
-/* H5 鼠标悬停反馈（构建后保留为 .option:hover） */
-.option:hover {
-  border-color: #c9b8f5;
-  background: #fbf9ff;
-  box-shadow: 0 8rpx 24rpx rgba(117, 96, 223, 0.08);
-}
-.option.active:hover {
-  border-color: #7560df;
-  background: #f6f2ff;
-  box-shadow: none;
-}
-.letter {
-  flex-shrink: 0;
-  width: 52rpx;
-  height: 52rpx;
-  border-radius: 50%;
-  background: #f1ecfb;
-  color: #7560df;
-  font-size: 24rpx;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 24rpx;
-}
-.option.active .letter {
-  background: #7560df;
-  color: #fff;
-}
-.label {
-  flex: 1;
-  font-size: 28rpx;
-  line-height: 1.5;
-  color: #292630;
+.textbtn.disabled {
+  color: var(--accent);
+  opacity: 0.5;
 }
 
-.tools {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 16rpx;
-}
-.prev {
-  font-size: 26rpx;
-  color: #7560df;
-}
-.prev.disabled {
-  color: #c9c3d4;
-}
-.hint {
-  font-size: 22rpx;
-  color: #a398af;
-}
-
-.notice {
-  margin-top: 48rpx;
-  padding: 20rpx 24rpx;
-  border-radius: 16rpx;
-  background: #f3f0f8;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.6;
+.chat-tools .fine {
+  font-size: 9px;
+  color: #b1a3be;
 }
 
 .mt {
-  margin-top: 32rpx;
+  margin-top: 20px;
 }
 </style>

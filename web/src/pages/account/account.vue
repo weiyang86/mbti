@@ -1,40 +1,64 @@
 <template>
-  <view class="page account-page">
-    <view class="profile-card">
-      <image class="avatar" src="/static/share-style-illustration.webp" mode="aspectFill" />
-      <view class="profile-body">
-        <text class="name">{{ displayName }}</text>
-        <text class="meta">{{ typeLine }}</text>
-      </view>
-    </view>
-
-    <view class="pill-grid">
-      <view class="pill" @click="goTab('/pages/history/list')">我的轨迹 →</view>
-      <view class="pill" @click="goResult">类型结果 →</view>
-      <view class="pill" @click="goTab('/pages/card/card')">我的名片 →</view>
-      <view class="pill" @click="go('/pages/exchanges/exchanges')">名片夹 →</view>
-      <view class="pill" @click="go('/pages/contacts/contacts')">联系方式 →</view>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
     </view>
 
     <view class="panel">
-      <text class="panel-title">我的订单与权益</text>
-      <text class="panel-desc">不会产生真实扣款，刷新后可在本机恢复。</text>
-      <text class="panel-link" @click="go('/pages/orders/orders')">查看订单与权益 →</text>
+      <view class="profile-head">
+        <image :src="avatarSrc" mode="aspectFill" />
+        <view>
+          <view class="h2">{{ displayName() }}</view>
+          <view class="p">{{ typeLine }}</view>
+        </view>
+      </view>
+      <view class="account-links">
+        <view class="a" @click="goTab('/pages/history/list')">我的轨迹 →</view>
+        <view class="a" @click="goResult">类型结果 →</view>
+        <view class="a" @click="goTab('/pages/card/card')">我的名片 →</view>
+        <view class="a" @click="go('/pages/exchanges/exchanges')">名片夹 →</view>
+        <view class="a" @click="go('/pages/contacts/contacts')">联系方式 →</view>
+      </view>
     </view>
 
     <view class="panel">
-      <text class="panel-title">更多</text>
-      <view class="more-row" @click="goTab('/pages/discover/discover')">
-        <text>发现搭子</text>
-        <text class="more-arrow">→</text>
+      <view class="h3">我的订单与权益</view>
+      <view class="p fine">数据来自服务端订单与权益，不会产生真实扣款。</view>
+      <view v-for="order in orders" :key="order.id" class="order">
+        <view class="order-info">
+          <text class="b">{{ productName(order.product_code) }}</text>
+          <text class="small">{{ order.id }} · {{ orderStatusLabel(order.status) }}</text>
+        </view>
+        <text class="b order-price">{{ moneyLabel(order.amount, order.currency) }}</text>
+        <text class="textbtn" @click="goOrder(order.id)">查看状态 →</text>
       </view>
-      <view class="more-row" @click="go('/pages/buddies/blocked')">
-        <text>屏蔽管理</text>
-        <text class="more-arrow">→</text>
+      <view v-if="ordersError" class="p">{{ ordersError }}</view>
+      <view v-if="!orders.length && !ordersError">
+        <view class="p">暂无订单。</view>
+        <text class="textbtn" @click="go('/pages/pricing/pricing')">看看我的 MBTI 晒图套装 →</text>
+      </view>
+      <text v-if="orders.length" class="textbtn" @click="go('/pages/orders/orders')">查看全部订单与权益 →</text>
+    </view>
+
+    <view class="panel">
+      <view class="h3">资料与工具</view>
+      <view class="mini-list">
+        <button class="btn secondary full" @click="goTab('/pages/card/card')">管理公开范围</button>
+        <button class="btn secondary full" @click="go('/pages/buddies/blocked')">管理屏蔽列表</button>
+        <button class="btn ghost full" @click="go('/pages/test-intro/test-intro')">新增阶段记录 · 免费复测</button>
+        <button class="btn ghost full" @click="toastDemo">兑换体验码</button>
+        <button class="btn ghost full" @click="confirmReset">清除本机演示数据</button>
+        <button class="btn ghost full" @click="toastDemo">产品介绍与 SOP ↗</button>
       </view>
     </view>
 
-    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
+    <view class="p fine mt">
+      本机进度可保存。 联系方式与照片仅保留在当前页面内存。
+    </view>
+  <proto-tabbar />
+  <proto-footer />
   </view>
 </template>
 
@@ -45,25 +69,76 @@ import type { MyCard } from '@/api/types-social'
 import type { ResultSnapshotSummary } from '@/api/types'
 import { getMyCard } from '@/api/cards'
 import { listResults } from '@/api/results'
+import { getMyEntitlements, listOrders, type Entitlement, type Order } from '@/api/payment'
+import { requestErrorMessage } from '@/api/client'
+import { PLAN_NAMES } from '@/store/studio'
+import { entitledTier, formatMoney, orderStatusLabel } from '@/utils/payment-display'
+import {
+  account,
+  displayName,
+  logout,
+} from '@/store/account'
+
+const PRODUCT_NAMES: Record<string, string> = {
+  studio_tier_1: 'MBTI 晒图套装',
+  studio_tier_2: '本人形象套装',
+}
 
 const card = ref<MyCard | null>(null)
 const latestResult = ref<ResultSnapshotSummary | null>(null)
+const orders = ref<Order[]>([])
+const entitlements = ref<Entitlement[]>([])
+const ordersError = ref('')
 
-const displayName = computed(() => card.value?.nickname?.trim() || '匿名搭子')
-// 类型展示以最近一次测试结果为准，名片保存的类型只作兜底
-const displayType = computed(() => latestResult.value?.type_code || card.value?.type_code || '')
-const typeLine = computed(() =>
-  displayType.value ? `${displayType.value} · 免费基础用户` : '还没有选择类型',
-)
+const avatarSrc = computed(() => account.profile.avatar || '/static/share-style-illustration.webp')
+const displayType = computed(() => card.value?.type_code || latestResult.value?.type_code || 'INFP')
+const tier = computed(() => entitledTier(entitlements.value))
+const typeLine = computed(() => `${displayType.value} · ${tier.value ? PLAN_NAMES[tier.value] : '免费基础用户'}`)
 
 onShow(async () => {
+  ordersError.value = ''
   await Promise.all([
     getMyCard().then((data) => { card.value = data }).catch(() => { card.value = null }),
     listResults({ limit: 1 })
       .then((res) => { latestResult.value = res.items[0] || null })
       .catch(() => { latestResult.value = null }),
+    listOrders({ limit: 5 })
+      .then((res) => { orders.value = res.items })
+      .catch((e) => { orders.value = []; ordersError.value = requestErrorMessage(e, '读取本人订单失败，请重试') }),
+    getMyEntitlements()
+      .then((res) => { entitlements.value = res.items })
+      .catch(() => { entitlements.value = [] }),
   ])
 })
+
+function productName(code: string) {
+  return PRODUCT_NAMES[code] || code
+}
+
+function moneyLabel(amount: number, currency: string) {
+  return formatMoney(amount, currency)
+}
+
+function goOrder(orderId: string) {
+  uni.navigateTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(orderId)}` })
+}
+
+function confirmReset() {
+  uni.showModal({
+    title: '清除本机演示数据？',
+    content: '将清除本机保存的演示数据。',
+    confirmText: '清除',
+    success: (res) => {
+      if (!res.confirm) return
+      logout()
+      uni.showToast({ title: '已清除', icon: 'none' })
+    },
+  })
+}
+
+function toastDemo() {
+  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
+}
 
 function goTab(url: string) {
   uni.switchTab({ url, fail: () => uni.reLaunch({ url }) })
@@ -81,74 +156,25 @@ function goResult() {
   }
   uni.navigateTo({ url: `/pages/result/result?id=${encodeURIComponent(id)}` })
 }
-
 </script>
 
-<style scoped lang="scss">
-@import '@/styles/page-frame.scss';
-
-.account-page {
-  padding-top: 24rpx;
-  padding-bottom: 56rpx;
-  min-height: 100vh;
-  box-sizing: border-box;
-  background: #f8f7f4;
-  color: #241f2e;
+<style scoped>
+.profile-head .h2 {
+  font-weight: 700;
 }
 
-.profile-card {
-  display: flex;
-  align-items: center;
-  gap: 24rpx;
-  padding: 34rpx 30rpx;
-  border-radius: 32rpx;
-  background: #fff;
-  border: 2rpx solid #ece7f1;
-}
-.avatar {
-  width: 128rpx;
-  height: 128rpx;
-  border-radius: 32rpx;
-  flex-shrink: 0;
-}
-.profile-body {
-  flex: 1;
-  min-width: 0;
-}
-.name {
-  display: block;
-  font-size: 42rpx;
-  font-weight: 800;
-  color: #241f2e;
-}
-.meta {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #a398af;
+.panel .h3 {
+  font-weight: 700;
 }
 
-.pill-grid {
-  margin-top: 22rpx;
-}
-.pill {
-  font-size: 24rpx;
+.panel .p.fine {
+  font-size: 10px;
+  line-height: 1.7;
+  margin-bottom: 10px;
 }
 
-.more-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 18rpx;
-  padding: 22rpx 0;
-  border-bottom: 2rpx solid #f3eef7;
-  font-size: 24rpx;
-  color: #4d4557;
-}
-.more-row:last-child {
-  border-bottom: 0;
-}
-.more-arrow {
-  color: #b9a4da;
+.order-price {
+  font-size: 14px;
 }
 </style>
+

@@ -1,59 +1,65 @@
 <template>
   <view class="page journey-page">
-    <text class="kicker">MY MBTI JOURNEY / 我的轨迹</text>
-    <view class="title">
-      <text>我还是我，</text>
-      <text>也有新的样子。</text>
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
     </view>
-    <text class="sub">留下每个阶段的答案，看看哪些在变化、哪些一直没变。</text>
 
-    <text class="private-badge">🔒 默认仅自己可见 · 本机保存</text>
+    <view class="page-intro">
+      <view class="eyebrow">MY MBTI JOURNEY / 我的轨迹</view>
+      <view class="h1">
+        <text class="title-line">我还是我，</text>
+        <text class="title-line">也有新的样子。</text>
+      </view>
+      <view class="p">留下每个阶段的答案，看看哪些在变化、哪些一直没变。</view>
+    </view>
 
-    <view v-if="loading" class="state"><text class="state-text">正在读取记录…</text></view>
+    <view class="private-badge">
+      <AppIcon name="lock" :size="13" color="#6e8064" />
+      <text>默认仅自己可见 · 本机保存</text>
+    </view>
 
-    <view v-else-if="loadError" class="state">
-      <text class="state-text">轨迹读取失败</text>
-      <view class="btn-secondary mt" @click="load">重试</view>
+    <view v-if="loading" class="notice mt">正在读取记录…</view>
+
+    <view v-else-if="loadError" class="notice warn mt">
+      <view>轨迹读取失败</view>
+      <view class="btn secondary small mt" @click="load">重试</view>
     </view>
 
     <template v-else>
       <template v-if="rows.length">
         <view class="journey-summary">
-          <text class="summary-kicker">属于自己的阶段档案</text>
+          <text class="span">属于自己的阶段档案</text>
           <view class="summary-main">
-            <text class="summary-count">{{ rows.length }}</text>
-            <text class="summary-unit">次记录</text>
-            <text class="summary-type">{{ lastValid?.type_code || rows[0].type_code }}</text>
+            <text class="strong">{{ rows.length }}</text>
+            <text class="small">次记录</text>
+            <text class="b">{{ lastValid?.type_code || rows[0].type_code }}</text>
           </view>
-          <text class="summary-text">{{ summary }}</text>
-          <text v-if="prevValid && lastValid" class="summary-link" @click="goCompare">
+          <view class="p">{{ summary }}</view>
+          <text v-if="prevValid && lastValid" class="textbtn" @click="goCompare">
             看看这两次哪里不同 →
           </text>
         </view>
 
         <view v-if="chartRows.length >= 2" class="journey-chart">
           <view class="chart-dims">
-            <view
+            <button
               v-for="d in DIM_LIST"
               :key="d.key"
-              class="chart-dim"
               :class="{ active: chartDim === d.key }"
               @click="chartDim = d.key"
             >
-              <text>{{ d.left }} / {{ d.right }}</text>
-            </view>
+              {{ d.left }} / {{ d.right }}
+            </button>
           </view>
           <view class="chart-label">
-            <text class="chart-name">{{ chartMeta.name }}</text>
-            <text class="chart-unit">{{ chartMeta.rightLabel }}选项题数 / 3</text>
+            <text class="b">{{ chartMeta.name }}</text>
+            <text class="span">{{ chartMeta.rightLabel }}选项题数 / 3</text>
           </view>
+
           <view class="plot">
-            <view
-              v-for="g in gridLines"
-              :key="g.n"
-              class="grid-line"
-              :style="{ top: g.y + 'rpx' }"
-            >
+            <view v-for="g in gridLines" :key="g.n" class="grid-line" :style="{ top: g.top }">
               <text class="grid-label">{{ g.n }}</text>
             </view>
             <view
@@ -61,17 +67,17 @@
               :key="'seg' + i"
               class="chart-seg"
               :style="{
-                left: s.cx + 'rpx',
-                top: s.cy + 'rpx',
-                width: s.len + 'rpx',
-                transform: `translate(-50%, -50%) rotate(${s.deg}deg)`,
+                left: s.left,
+                top: s.top,
+                width: s.width,
+                transform: `translate(-50%, -50%) rotate(${s.rotate})`,
               }"
             />
             <view
               v-for="(p, i) in chartPoints"
               :key="'dot' + i"
               class="chart-point"
-              :style="{ left: p.x + 'rpx', top: p.y + 'rpx' }"
+              :style="{ left: p.left, top: p.top }"
             >
               <text class="point-val">{{ p.count }}</text>
             </view>
@@ -80,18 +86,19 @@
               {{ dateLabel(chartRows[chartRows.length - 1].submitted_at, true) }}
             </text>
           </view>
+
           <view class="chart-data">
-            <text class="chart-toggle" @click="showChartTable = !showChartTable">
+            <view class="chart-summary" @click="showChartTable = !showChartTable">
               查看具体题数（{{ chartRows.length }} 次）
-            </text>
+            </view>
             <view v-if="showChartTable" class="chart-table">
-              <view class="chart-tr chart-th">
+              <view class="chart-row chart-head">
                 <text>日期</text>
                 <text>类型</text>
                 <text>{{ chartMeta.left }}</text>
                 <text>{{ chartMeta.right }}</text>
               </view>
-              <view v-for="r in chartRows" :key="r.id" class="chart-tr">
+              <view v-for="r in chartRows" :key="r.id" class="chart-row">
                 <text>{{ dateLabel(r.submitted_at) }}</text>
                 <text>{{ r.type_code }}</text>
                 <text>{{ r.dimension_counts?.[chartMeta.left] ?? 0 }}/3</text>
@@ -99,20 +106,21 @@
               </view>
             </view>
           </view>
-          <text class="chart-fine">
+
+          <text class="fine">
             最近 {{ chartRows.length }} 次同版本记录；横轴为时间，连线仅用于阅读。结果可能受作答状态和测量误差影响。
           </text>
         </view>
 
         <view v-else class="chart-empty">
-          <text class="chart-empty-step">01 → 02</text>
-          <text class="chart-empty-title">下一次回来，就有了对照。</text>
-          <text class="chart-empty-desc">同版本完成两次后显示趋势；旧版无日期记录不接入折线。</text>
+          <text class="span">01 → 02</text>
+          <view class="h3">下一次回来，就有了对照。</view>
+          <view class="p">同版本完成两次后显示趋势；旧版无日期记录不接入折线。</view>
         </view>
 
         <view class="timeline-heading">
-          <text class="timeline-title">我的阶段记录</text>
-          <text class="timeline-hint">最新在前</text>
+          <view class="h2">我的阶段记录</view>
+          <text class="span">最新在前</text>
         </view>
 
         <view class="record-timeline">
@@ -122,114 +130,95 @@
             class="record-tile"
             @click="openRecord(item)"
           >
-            <view class="record-node"><text>{{ pad(rows.length - i) }}</text></view>
+            <text class="record-node">{{ pad(rows.length - i) }}</text>
             <view class="record-body">
-              <text class="record-date">{{ recordDate(item) }}</text>
-              <view class="record-head">
-                <text class="record-type">{{ item.type_code }}</text>
-                <text class="record-stage">{{ recordTitle(item) }}</text>
-                <text v-if="item.source === 'self_select'" class="record-tag">自行选择</text>
+              <text class="small">{{ recordDate(item) }}</text>
+              <view class="h3">
+                <text>{{ item.type_code }}</text>
+                <text class="span">{{ recordTitle(item) }}</text>
               </view>
-              <text class="record-note">{{ recordNote(item) }}</text>
+              <view class="p">{{ recordNote(item) }}</view>
             </view>
-            <text class="record-chev">↗</text>
+            <text class="em">↗</text>
           </view>
         </view>
       </template>
 
       <view v-else class="history-empty">
         <view class="empty-orbits">
-          <text class="orbit-now">NOW</text>
-          <text class="orbit-star">✦</text>
-          <text class="orbit-next">NEXT</text>
+          <text class="span">NOW</text>
+          <text class="i">✦</text>
+          <text class="b">NEXT</text>
         </view>
-        <text class="empty-title">今天的你，就是第一个起点。</text>
-        <text class="empty-desc">每次完成测试都会新增一份记录。重测不覆盖过去，也不扣费。</text>
-        <view class="btn-primary empty-btn" @click="goQuiz">建立我的第一份记录</view>
+        <view class="h2">今天的你，就是第一个起点。</view>
+        <view class="p">
+          <text class="title-line">每次完成测试都会新增一份记录。</text>
+          <text class="title-line">重测不覆盖过去，也不扣费。</text>
+        </view>
+        <view class="btn full" @click="goQuiz">建立我的第一份记录</view>
+        <button class="textbtn full mt" @click="showHistoryDemo">先看三个阶段的示例 →</button>
       </view>
 
-      <view>
-        <view v-if="rows.length" class="btn-primary mt" @click="goQuiz">
-          记录现在的我 · 免费复测
-        </view>
+      <view v-if="rows.length" class="btn full mt" @click="goQuiz">
+        记录现在的我 · 免费复测
+      </view>
 
-        <view class="review-plan">
-          <text class="review-kicker">下次再认识一下自己</text>
-          <text class="review-title">
+      <view class="review-plan">
+        <view>
+          <text class="span">下次再认识一下自己</text>
+          <view class="h3">
             {{ reviewDate ? dateLabel(reviewDate + 'T12:00:00') : '给下一次回访，留个约定。' }}
-          </text>
-          <text class="review-desc">
+          </view>
+          <view class="p">
             {{ reviewDate ? '本机计划已保存，不会自动发送提醒。' : '可以隔一段时间或生活阶段变化后再来。' }}
-          </text>
-          <view class="review-actions">
-            <text class="review-btn" @click="openReviewPlan">
-              {{ reviewDate ? '修改计划' : '设定复测计划' }}
-            </text>
-            <text v-if="reviewDate" class="review-link" @click="exportCalendar">导出日历事项</text>
-            <text v-if="reviewDate" class="review-link" @click="clearReviewPlan">取消计划</text>
           </view>
         </view>
+        <view class="btn secondary small" @click="openReviewPlan">
+          {{ reviewDate ? '修改计划' : '设定复测计划' }}
+        </view>
+        <text v-if="reviewDate" class="textbtn" @click="exportCalendar">导出日历事项</text>
       </view>
 
-      <text class="notice">
+      <view class="notice mt">
         这是原创 12 题趣味记录。类型变化不等于人格已经改变；同样的四个字母，也可能有不同的具体回答。
-      </text>
+      </view>
 
       <view v-if="rows.length" class="journey-footer-actions">
         <text class="textbtn" @click="exportHistory">导出我的记录 JSON</text>
       </view>
     </template>
 
-    <!-- 设定复测计划 -->
     <view v-if="planOpen" class="modal-backdrop" @click="planOpen = false">
-      <view class="plan-sheet" @click.stop>
-        <view class="sheet-handle" />
-        <text class="sheet-close" @click="planOpen = false">✕</text>
-        <text class="sheet-kicker">— MBTI搭子 / 阶段记录</text>
-        <text class="sheet-title">下一次，什么时候回来？</text>
-        <text class="sheet-desc">
-          可以按阶段回访。时间间隔只是个人安排，不是判断人格变化的科学阈值。
-        </text>
+      <view class="modal" @click.stop>
+        <view class="close" @click="planOpen = false">×</view>
+        <view class="eyebrow">MBTI搭子 / V0.4</view>
+        <view class="h2">下一次，什么时候回来？</view>
+        <view class="p">可以按阶段回访。时间间隔只是个人安排，不是判断人格变化的科学阈值。</view>
 
-        <view class="plan-chips">
-          <view class="plan-chip" :class="{ active: planChoice === 30 }" @click="choosePreset(30)">
-            <text>30 天后</text>
-          </view>
-          <view class="plan-chip" :class="{ active: planChoice === 90 }" @click="choosePreset(90)">
-            <text>90 天后</text>
-          </view>
+        <view class="btnrow mt">
+          <view class="btn secondary" @click="choosePreset(30)">30 天后</view>
+          <view class="btn secondary" @click="choosePreset(90)">90 天后</view>
         </view>
 
-        <text class="plan-label">自己选一天</text>
-        <!-- #ifndef H5 -->
-        <picker mode="date" :value="planDate" :start="planMinDate" @change="onPickDate">
-          <view class="date-row">
-            <text class="date-value">{{ planDateText }}</text>
-            <view class="cal-icon">
-              <view class="cal-dot" />
-              <view class="cal-dot" />
-              <view class="cal-dot" />
-              <view class="cal-dot" />
-            </view>
-          </view>
-        </picker>
-        <!-- #endif -->
-        <!-- #ifdef H5 -->
-        <view class="date-row" @click="openNativeDate">
-          <text class="date-value">{{ planDateText }}</text>
-          <view class="cal-icon">
-            <view class="cal-dot" />
-            <view class="cal-dot" />
-            <view class="cal-dot" />
-            <view class="cal-dot" />
-          </view>
+        <view class="field mt">
+          <text class="label">自己选一天</text>
+          <!-- #ifndef H5 -->
+          <picker mode="date" :value="planDate" :start="planMinDate" @change="onPickDate">
+            <view class="input date-row">{{ planDateText }}</view>
+          </picker>
+          <!-- #endif -->
+          <!-- #ifdef H5 -->
+          <view class="input date-row" @click="openNativeDate">{{ planDateText }}</view>
+          <!-- #endif -->
         </view>
-        <!-- #endif -->
 
-        <view class="btn-primary plan-save" @click="saveReviewPlan">保存本机计划</view>
-        <text class="plan-foot">不会发送短信、微信或系统通知；保存后可导出日历事项。</text>
+        <view class="btn full" @click="saveReviewPlan">保存本机计划</view>
+        <view class="fine mt">不会发送短信、微信或系统通知；保存后可导出日历事项。</view>
+        <text v-if="reviewDate" class="textbtn full" @click="clearReviewPlan">取消本机计划</text>
       </view>
     </view>
+  <proto-tabbar />
+  <proto-footer />
   </view>
 </template>
 
@@ -242,6 +231,7 @@ import type {
   ResultSnapshotSummary,
 } from '@/api/types'
 import { getResult, listResults } from '@/api/results'
+import AppIcon from '@/components/AppIcon.vue'
 import {
   DIM_LIST,
   DIM_MAP,
@@ -256,12 +246,21 @@ type TimelineRow = ResultSnapshotSummary & {
 }
 
 interface ChartPoint {
-  x: number
-  y: number
+  left: string
+  top: string
   count: number
 }
 
+interface ChartSegment {
+  left: string
+  top: string
+  width: string
+  rotate: string
+}
+
 const REVIEW_KEY = 'mbti_journey_review_v1'
+const CHART_W = 320
+const CHART_H = 195
 
 const summaries = ref<ResultSnapshotSummary[]>([])
 const details = ref<JourneyRecord[]>([])
@@ -271,7 +270,6 @@ const chartDim = ref<DimKey>('EI')
 const showChartTable = ref(false)
 const reviewDate = ref('')
 const planOpen = ref(false)
-const planChoice = ref<0 | 30 | 90>(0)
 const planDate = ref('')
 const planMinDate = ref('')
 
@@ -314,7 +312,7 @@ const summary = computed(() => {
 const chartMeta = computed(() => DIM_MAP[chartDim.value])
 
 const gridLines = computed(() =>
-  [3, 2, 1, 0].map((n) => ({ n, y: 20 + (3 - n) * 60 })),
+  [3, 2, 1, 0].map((n) => ({ n, top: `${((155 - n * 40) / CHART_H) * 100}%` })),
 )
 
 function rightCount(record: ResultSnapshot, dim: DimKey): number {
@@ -322,27 +320,38 @@ function rightCount(record: ResultSnapshot, dim: DimKey): number {
   return record.dimension_counts?.[meta.right as keyof DimensionCounts] ?? 0
 }
 
+function chartX(list: JourneyRecord[], index: number): number {
+  const first = new Date(list[0].submitted_at).getTime()
+  const last = new Date(list[list.length - 1].submitted_at).getTime()
+  const span = last - first || 1
+  const offset = new Date(list[index].submitted_at).getTime() - first
+  return 35 + (offset / span) * 250
+}
+
 const chartPoints = computed<ChartPoint[]>(() => {
   const list = chartRows.value
   if (list.length < 2) return []
-  const span = 560 / (list.length - 1)
-  return list.map((r, i) => ({
-    x: Math.round(i * span),
-    y: 20 + (3 - rightCount(r, chartDim.value)) * 60,
-    count: rightCount(r, chartDim.value),
-  }))
+  return list.map((r, i) => {
+    const x = chartX(list, i)
+    const y = 155 - rightCount(r, chartDim.value) * 40
+    return {
+      left: `${(x / CHART_W) * 100}%`,
+      top: `${(y / CHART_H) * 100}%`,
+      count: rightCount(r, chartDim.value),
+    }
+  })
 })
 
-const chartSegments = computed(() =>
+const chartSegments = computed<ChartSegment[]>(() =>
   chartPoints.value.slice(1).map((p, i) => {
     const prev = chartPoints.value[i]
-    const dx = p.x - prev.x
-    const dy = p.y - prev.y
+    const dx = ((parseFloat(p.left) - parseFloat(prev.left)) / 100) * CHART_W
+    const dy = ((parseFloat(p.top) - parseFloat(prev.top)) / 100) * CHART_H
     return {
-      cx: Math.round((p.x + prev.x) / 2),
-      cy: Math.round((p.y + prev.y) / 2),
-      len: Math.round(Math.sqrt(dx * dx + dy * dy)),
-      deg: Math.round((Math.atan2(dy, dx) * 180) / Math.PI),
+      left: `${(parseFloat(p.left) + parseFloat(prev.left)) / 2}%`,
+      top: `${(parseFloat(p.top) + parseFloat(prev.top)) / 2}%`,
+      width: `${(Math.sqrt(dx * dx + dy * dy) / CHART_W) * 100}%`,
+      rotate: `${(Math.atan2(dy, dx) * 180) / Math.PI}deg`,
     }
   }),
 )
@@ -407,6 +416,10 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
+function toastDemo() {
+  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
+}
+
 function openRecord(item: TimelineRow) {
   uni.navigateTo({ url: `/pages/history/detail?id=${item.id}` })
 }
@@ -422,33 +435,21 @@ function goQuiz() {
   uni.reLaunch({ url: '/pages/index/index' })
 }
 
+function showHistoryDemo() {
+  uni.showToast({ title: '示例轨迹为演示数据', icon: 'none' })
+}
+
 function dateToStr(date: Date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
-function presetOf(date: string): 0 | 30 | 90 {
-  const target = new Date(`${date}T00:00:00`).getTime()
-  const today = new Date(`${dateToStr(new Date())}T00:00:00`).getTime()
-  const days = Math.round((target - today) / 86400000)
-  if (days === 30) return 30
-  if (days === 90) return 90
-  return 0
-}
-
 function openReviewPlan() {
   planMinDate.value = dateToStr(new Date())
-  if (reviewDate.value) {
-    planDate.value = reviewDate.value
-    planChoice.value = presetOf(reviewDate.value)
-  } else {
-    planDate.value = planMinDate.value
-    planChoice.value = 0
-  }
+  planDate.value = reviewDate.value || planMinDate.value
   planOpen.value = true
 }
 
 function choosePreset(days: 30 | 90) {
-  planChoice.value = days
   planDate.value = dateToStr(new Date(Date.now() + days * 86400000))
 }
 
@@ -456,7 +457,6 @@ function onPickDate(e: { detail: { value: number | string } }) {
   const value = String(e.detail.value || '')
   if (!value) return
   planDate.value = value
-  planChoice.value = 0
 }
 
 /** H5 用浏览器原生日期选择器，避免 uni-app 日期弹层在底部弹层内不显示 */
@@ -472,7 +472,6 @@ function openNativeDate() {
   input.addEventListener('change', () => {
     if (input.value) {
       planDate.value = input.value
-      planChoice.value = 0
     }
     clearTimeout(timer)
     input.remove()
@@ -499,6 +498,7 @@ function clearReviewPlan() {
       if (!res.confirm) return
       reviewDate.value = ''
       uni.removeStorageSync(REVIEW_KEY)
+      planOpen.value = false
       uni.showToast({ title: '已取消', icon: 'none' })
     },
   })
@@ -570,207 +570,100 @@ function downloadOrCopy(text: string, filename: string, mime: string) {
 </script>
 
 <style scoped lang="scss">
-.journey-page {
-  padding-top: 40rpx;
-  padding-bottom: 56rpx;
-}
-
-.kicker {
+.title-line {
   display: block;
-  font-size: 20rpx;
-  letter-spacing: 3rpx;
-  color: #a398af;
-  font-weight: 600;
-}
-.title {
-  margin-top: 16rpx;
-  display: flex;
-  flex-direction: column;
-  font-size: 52rpx;
-  font-weight: 800;
-  line-height: 1.35;
-  letter-spacing: -1rpx;
-}
-.sub {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #77727e;
-  line-height: 1.6;
 }
 
-.private-badge {
-  display: inline-block;
-  margin-top: 24rpx;
-  padding: 10rpx 18rpx;
-  border-radius: 12rpx;
-  background: #eef4e9;
-  color: #6e8064;
-  font-size: 20rpx;
+.demo-strip .textbtn {
+  font-size: 9px;
+  color: #a197ad;
+}
+.record-body .h3 .span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #766882;
+}
+.journey-footer-actions .textbtn {
+  font-size: 11px;
 }
 
-.state {
-  padding-top: 160rpx;
-  text-align: center;
+.history-empty .h2 {
+  font-weight: 700;
+  margin-bottom: 17.4px;
 }
-.state-text {
-  font-size: 26rpx;
-  color: #77727e;
-}
-
-.journey-summary {
-  position: relative;
-  overflow: hidden;
-  margin-top: 28rpx;
-  padding: 36rpx 32rpx;
-  border-radius: 32rpx;
-  background: #2e253e;
-  color: #fff;
-}
-.journey-summary::after {
-  content: '✦';
-  position: absolute;
-  right: 0;
-  bottom: -70rpx;
-  font-size: 200rpx;
-  color: rgba(191, 224, 171, 0.16);
-  pointer-events: none;
-}
-.summary-kicker {
-  position: relative;
-  font-size: 20rpx;
-  color: #c9bcdc;
-}
-.summary-main {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  margin-top: 18rpx;
-}
-.summary-count {
-  font-size: 76rpx;
-  font-weight: 800;
-  letter-spacing: -3rpx;
-  line-height: 1;
-}
-.summary-unit {
-  margin-left: 14rpx;
-  font-size: 22rpx;
-  color: #cbbfda;
-}
-.summary-type {
-  margin-left: auto;
-  font-size: 56rpx;
-  font-weight: 800;
-  letter-spacing: 2rpx;
-  color: #c7e3b0;
-}
-.summary-text {
-  position: relative;
-  display: block;
-  margin-top: 22rpx;
-  font-size: 24rpx;
-  line-height: 1.8;
-  color: #ddd4e7;
-}
-.summary-link {
-  position: relative;
-  display: inline-block;
-  margin-top: 14rpx;
-  font-size: 22rpx;
-  color: #d7c7ff;
-}
-
-.journey-chart {
-  margin-top: 28rpx;
-  padding: 28rpx;
-  border-radius: 28rpx;
-  background: #fff;
-  border: 2rpx solid #e9e2f0;
-}
-.chart-dims {
-  display: flex;
-  gap: 10rpx;
-  margin-bottom: 24rpx;
-}
-.chart-dim {
-  flex: 1;
-  padding: 16rpx 0;
-  border-radius: 14rpx;
-  background: #f4f1f8;
-  text-align: center;
-  font-size: 20rpx;
-  color: #8c819c;
-}
-.chart-dim.active {
-  background: #7555e8;
-  color: #fff;
-}
-.chart-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-.chart-name {
-  font-size: 26rpx;
+.review-plan .h3 {
   font-weight: 700;
 }
-.chart-unit {
-  font-size: 20rpx;
-  color: #a194ad;
+.review-plan .btn {
+  border-radius: 15px;
+}
+
+.summary-main {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin: 12px 0;
+}
+.record-body {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #eee7f3;
 }
 
 .plot {
   position: relative;
-  height: 260rpx;
-  margin: 20rpx 24rpx 0 40rpx;
+  width: 100%;
+  aspect-ratio: 320 / 195;
+  margin: 8px 0 0;
 }
 .grid-line {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 2rpx;
+  left: 9.375%;
+  right: 8.125%;
+  height: 1px;
   background: #e9e4f0;
 }
 .grid-label {
   position: absolute;
-  left: -34rpx;
-  top: -16rpx;
-  font-size: 20rpx;
+  left: -24px;
+  top: -7px;
+  font-size: 10px;
   color: #8d8399;
 }
 .chart-seg {
   position: absolute;
-  height: 4rpx;
-  border-radius: 2rpx;
+  height: 2.5px;
+  border-radius: 2px;
   background: #7151e8;
   transform-origin: center;
 }
 .chart-point {
   position: absolute;
-  width: 18rpx;
-  height: 18rpx;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #7151e8;
-  border: 4rpx solid #fff;
+  border: 2px solid #fff;
   box-sizing: border-box;
   transform: translate(-50%, -50%);
 }
 .point-val {
   position: absolute;
   left: 50%;
-  top: -34rpx;
-  width: 60rpx;
+  top: -17px;
+  width: 30px;
   transform: translateX(-50%);
   text-align: center;
-  font-size: 22rpx;
+  font-size: 12px;
   font-weight: 700;
   color: #5841ac;
 }
 .axis-label {
   position: absolute;
   bottom: 0;
-  font-size: 20rpx;
+  font-size: 10px;
   color: #8d8399;
 }
 .axis-label.first {
@@ -780,433 +673,47 @@ function downloadOrCopy(text: string, filename: string, mime: string) {
   right: 0;
 }
 
-.chart-data {
-  margin-top: 12rpx;
-}
-.chart-toggle {
-  display: inline-block;
-  padding: 12rpx 0;
-  font-size: 22rpx;
+.chart-summary {
+  font-size: 11px;
   color: #8b789d;
+  padding: 10px 0;
 }
-.chart-table {
-  margin-top: 6rpx;
-}
-.chart-tr {
+.chart-row {
   display: flex;
-  padding: 12rpx 0;
-  border-bottom: 2rpx solid #eee9f3;
-  font-size: 22rpx;
-  color: #292630;
+  padding: 9px 0;
+  border-bottom: 1px solid #eee9f3;
+  font-size: 11px;
 }
-.chart-tr > text {
+.chart-row > text {
   flex: 1;
 }
-.chart-th {
+.chart-head {
   color: #8d7c9c;
 }
-.chart-fine {
-  display: block;
-  margin-top: 14rpx;
-  font-size: 20rpx;
-  color: #a398af;
-  line-height: 1.7;
-}
 
-.chart-empty {
-  margin-top: 28rpx;
-  padding: 48rpx 28rpx;
-  border-radius: 28rpx;
-  border: 2rpx dashed #d7cbe7;
-  background: rgba(255, 255, 255, 0.6);
-  text-align: center;
-}
-.chart-empty-step {
-  display: block;
-  font-size: 36rpx;
-  letter-spacing: 12rpx;
-  color: #b9a4da;
-}
-.chart-empty-title {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-}
-.chart-empty-desc {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.7;
-}
-
-.timeline-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 40rpx 0 16rpx;
-}
-.timeline-title {
-  font-size: 30rpx;
-  font-weight: 700;
-}
-.timeline-hint {
-  font-size: 20rpx;
-  color: #a395af;
-}
-
-.record-timeline {
-  position: relative;
-}
-.record-timeline::before {
-  content: '';
-  position: absolute;
-  left: 30rpx;
-  top: 30rpx;
-  bottom: 30rpx;
-  width: 2rpx;
-  background: #ded5eb;
-}
-.record-tile {
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: 20rpx 0;
-}
-.record-node {
-  flex-shrink: 0;
-  width: 60rpx;
-  height: 60rpx;
-  margin-top: 6rpx;
-  border-radius: 50%;
-  background: #eee7f8;
-  border: 8rpx solid #faf8ff;
-  color: #8a74ad;
-  font-size: 18rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-}
-.record-body {
-  flex: 1;
-  min-width: 0;
-  margin-left: 20rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 2rpx solid #eee7f3;
-}
-.record-date {
-  display: block;
-  font-size: 20rpx;
-  color: #9b8ba9;
-}
-.record-head {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 14rpx;
-  margin-top: 8rpx;
-}
-.record-type {
-  font-size: 40rpx;
-  font-weight: 800;
-  letter-spacing: 2rpx;
-}
-.record-stage {
-  font-size: 22rpx;
-  color: #766882;
-}
-.record-tag {
-  font-size: 18rpx;
-  color: #2f8f6b;
-  background: #e3f4ec;
-  border-radius: 999rpx;
-  padding: 2rpx 12rpx;
-}
-.record-note {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 20rpx;
-  color: #a398ac;
-}
-.record-chev {
-  margin-left: 10rpx;
-  font-size: 30rpx;
-  color: #b6a5c7;
-}
-
-.history-empty {
-  margin-top: 32rpx;
-  padding: 56rpx 28rpx 44rpx;
-  border-radius: 32rpx;
-  border: 2rpx solid #ece5f3;
-  background: #fff;
-  text-align: center;
-}
-.empty-orbits {
-  position: relative;
-  height: 190rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 24rpx;
-}
-.orbit-now,
-.orbit-next {
-  width: 150rpx;
-  height: 150rpx;
-  border: 2rpx solid #d5cae8;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22rpx;
-  letter-spacing: 3rpx;
-  color: #6d578d;
-}
-.orbit-now {
-  background: #eee6fb;
-  transform: rotate(-12deg);
-  margin-right: -24rpx;
-}
-.orbit-next {
-  background: #e9f0df;
-  transform: rotate(12deg);
-  margin-left: -24rpx;
-}
-.orbit-star {
-  position: relative;
-  z-index: 1;
-  font-size: 60rpx;
-  color: #8b6fc1;
-}
-.empty-title {
-  display: block;
-  font-size: 34rpx;
-  font-weight: 800;
-}
-.empty-desc {
-  display: block;
-  margin-top: 14rpx;
-  font-size: 22rpx;
-  color: #77727e;
-  line-height: 1.9;
-}
-.empty-btn {
-  margin: 36rpx 0 20rpx;
-}
-.textbtn {
-  font-size: 22rpx;
-  color: #7560df;
-}
-
-.review-plan {
-  margin-top: 32rpx;
-  padding: 28rpx;
-  border-radius: 28rpx;
-  border: 2rpx solid #e0e7d6;
-  background: #f0f4e9;
-}
-.review-kicker {
-  font-size: 20rpx;
-  letter-spacing: 1rpx;
-  color: #8a977c;
-}
-.review-title {
-  display: block;
-  margin-top: 12rpx;
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #526148;
-}
-.review-desc {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #8c9483;
-}
-.review-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20rpx;
-  margin-top: 20rpx;
-}
-.review-btn {
-  padding: 14rpx 28rpx;
-  border-radius: 999rpx;
-  border: 2rpx solid #d8e1cb;
-  background: #fff;
-  font-size: 22rpx;
-  color: #526148;
-}
-.review-link {
-  font-size: 22rpx;
-  color: #728264;
-}
-
-.notice {
-  display: block;
-  margin-top: 36rpx;
-  padding: 24rpx;
-  border-radius: 20rpx;
-  background: #f1ecfb;
-  font-size: 20rpx;
-  color: #77727e;
-  line-height: 1.8;
-}
-
-.journey-footer-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 20rpx;
-  margin-top: 32rpx;
-}
-
-.mt {
-  margin-top: 36rpx;
+.review-plan .btn {
+  margin-top: 10px;
 }
 
 .modal-backdrop {
   position: fixed;
-  left: 0;
-  right: 0;
   top: 0;
+  right: 0;
   bottom: 0;
+  left: 0;
   z-index: 1000;
-  background: rgba(43, 33, 51, 0.37);
-  display: flex;
   align-items: flex-end;
+  padding: 0;
 }
-.plan-sheet {
-  position: relative;
-  width: 100%;
-  background: #f8f7f4;
-  border-radius: 36rpx 36rpx 0 0;
-  padding: 20rpx 36rpx calc(48rpx + env(safe-area-inset-bottom));
-  box-sizing: border-box;
-}
-.sheet-handle {
-  width: 64rpx;
-  height: 6rpx;
-  border-radius: 999rpx;
-  background: #d9d2dd;
-  margin: 0 auto 28rpx;
-}
-.sheet-close {
-  position: absolute;
-  top: 28rpx;
-  right: 32rpx;
-  width: 60rpx;
-  height: 60rpx;
-  line-height: 60rpx;
-  text-align: center;
-  border-radius: 50%;
-  background: #efeaf0;
-  font-size: 26rpx;
-  color: #77727e;
-}
-.sheet-kicker {
-  display: block;
-  font-size: 20rpx;
-  letter-spacing: 2rpx;
-  color: #7560df;
-}
-.sheet-title {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 44rpx;
-  font-weight: 800;
-  line-height: 1.35;
-  letter-spacing: -1rpx;
-  color: #17141c;
-}
-.sheet-desc {
-  display: block;
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  line-height: 1.7;
-  color: #77727e;
-}
-.plan-chips {
-  display: flex;
-  gap: 20rpx;
-  margin-top: 32rpx;
-}
-.plan-chip {
-  flex: 1;
-  height: 96rpx;
+.modal .close {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 20rpx;
-  border: 2rpx solid #ece7f1;
-  background: #fff;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #292630;
-  box-sizing: border-box;
-}
-.plan-chip.active {
-  border-color: #7560df;
-  background: #f4f0ff;
-  color: #7560df;
-}
-.plan-label {
-  display: block;
-  margin-top: 32rpx;
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #292630;
 }
 .date-row {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 96rpx;
-  margin-top: 16rpx;
-  padding: 0 28rpx;
-  border-radius: 20rpx;
-  border: 2rpx solid #ece7f1;
-  background: #fff;
-  box-sizing: border-box;
-}
-.date-value {
-  font-size: 30rpx;
-  color: #292630;
-}
-.cal-icon {
-  width: 34rpx;
-  height: 34rpx;
-  border: 2rpx solid #292630;
-  border-radius: 6rpx;
-  padding: 11rpx 7rpx 5rpx;
-  box-sizing: border-box;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: space-between;
-  justify-content: space-between;
-}
-.cal-dot {
-  width: 4rpx;
-  height: 4rpx;
-  border-radius: 1rpx;
-  background: #292630;
-}
-.plan-save {
-  margin-top: 36rpx;
-  border-radius: 24rpx;
-  padding: 28rpx;
-  font-size: 30rpx;
-  font-weight: 700;
-}
-.plan-foot {
-  display: block;
-  margin-top: 20rpx;
-  font-size: 20rpx;
-  line-height: 1.7;
-  color: #a398af;
 }
 </style>
+

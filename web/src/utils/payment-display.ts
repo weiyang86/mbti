@@ -1,7 +1,15 @@
-import type { OrderStatusValue, PaymentAvailability } from '@/api/payment'
+import type { Entitlement, OrderStatusValue, PaymentAvailability } from '@/api/payment'
 
 export function formatMoney(amount: number, currency: string): string {
   return `${currency} ${(amount / 100).toFixed(2)}`
+}
+
+/** 从服务端权益推导当前档位；不读取本机解锁缓存 */
+export function entitledTier(items: Entitlement[]): 0 | 1 | 2 {
+  return items.reduce<0 | 1 | 2>((max, item) => {
+    const tier: 1 | 2 = /tier[_-]?2/i.test(`${item.kind} ${item.product_code}`) ? 2 : 1
+    return tier > max ? tier : max
+  }, 0)
 }
 
 export function orderStatusLabel(status: OrderStatusValue): string {

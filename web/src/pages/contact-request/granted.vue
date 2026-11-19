@@ -1,26 +1,40 @@
 <template>
-  <view class="page social-page granted-page">
-    <text class="kicker">GRANTED / 当前授权读取</text>
-    <text class="page-title">只读，<text class="hl">且只到撤回为止。</text></text>
-    <text class="page-sub">只允许原请求人实时读取确切批准的渠道；离页或重读时清空旧值。</text>
+  <view class="page">
+    <proto-nav />
+    <view class="demo-strip">
+      <text>V0.4 · Mock 演示 · 不产生费用</text>
+      <text class="textbtn" @click="demoState">演示状态 ↗</text>
+    </view>
+
+    <view class="page-intro">
+      <view class="eyebrow">MUTUAL CONSENT / 双向确认</view>
+      <view class="h1">只读，<text class="line">且只到撤回为止。</text></view>
+      <view class="p">只允许原请求人实时读取确切批准的渠道；离页或重读时清空旧值。</view>
+    </view>
 
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <text v-if="loading" class="notice">正在验证当前授权…</text>
+    <text v-if="loading" class="notice" role="status">正在验证当前授权…</text>
+
     <template v-if="loaded">
-      <text class="success">本次服务端读取成功，仅显示当前批准渠道。</text>
-      <view v-for="item in granted" :key="item.channel" class="panel">
-        <text class="panel-title">{{ channelLabel(item.channel) }}</text>
-        <text class="private-contact-value">{{ item.value }}</text>
+      <view class="notice green">双方已确认（模拟） · 仅授权本次所选渠道</view>
+
+      <view class="contact-granted">
+        <view v-for="item in granted" :key="item.channel">
+          <text class="span">对方的{{ channelLabel(item.channel) }}</text>
+          <text class="b">{{ item.value }}</text>
+          <button class="btn secondary small" @click="copy(item.value)">复制</button>
+        </view>
       </view>
-      <button class="btn-secondary mt" :disabled="loading || busy" @click="revoke">撤回本次渠道申请并清空</button>
+
+      <view class="fine">以上为本次批准的渠道，仅在本页显示；请勿添加或拨打来路不明的账号 / 号码。</view>
+      <button class="btn ghost full" :disabled="loading || busy" @click="revoke">撤销本次联系方式授权</button>
     </template>
 
-    <view class="sk-foot-links">
-      <text class="sk-foot-link" @click="load">重新验证并读取</text>
-      <text class="sk-foot-link" @click="go('/pages/contact-request/contact-request')">联系方式请求</text>
-    </view>
-    <text class="sk-foot">MBTI 搭子 · 原创趣味版 · 非官方测评</text>
+    <text class="textbtn mt" @click="load">重新验证并读取</text>
+
+    <view class="fine mt">本次授权仅存在当前页面会话；刷新后需重新验证。撤销后应用停止展示，无法撤回已经复制的内容。</view>
+  <proto-footer />
   </view>
 </template>
 <script setup lang="ts">
@@ -55,17 +69,49 @@ async function load() {
 async function revoke() {
   if (busy.value || loading.value || !loaded.value) return
   const ticket = scope.begin(); busy.value = true; error.value = ''
-  try { await revokeContactRequest(id.value); if (scope.current(ticket)) message.value = '本次授权已撤回，页面已清空；无法收回已经复制或截图的内容。' }
+  try { await revokeContactRequest(id.value); if (scope.current(ticket)) { granted.value = []; loaded.value = false; message.value = '本次授权已撤回，页面已清空；无法收回已经复制或截图的内容。' } }
   catch (e) { if (scope.current(ticket)) error.value = contactErrorMessage(e, '撤回失败，页面已清空，请重新验证当前状态。') }
   finally { if (scope.current(ticket)) busy.value = false }
 }
-function go(url: string) { uni.navigateTo({ url }) }
+function copy(value: string) {
+  uni.setClipboardData({ data: value, success: () => uni.showToast({ title: '已复制', icon: 'none' }) })
+}
+function demoState() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 </script>
 <style scoped lang="scss">
-@import '@/styles/social.scss';
-@import '@/styles/page-frame.scss';
-
-.granted-page {
-  padding-bottom: 48rpx;
+.line {
+  display: block;
+  border-top: 0;
+}
+.error {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #a43b3b;
+}
+.success {
+  display: block;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #286747;
+}
+.textbtn {
+  display: inline-block;
+  margin-top: 14px;
+}
+.contact-granted > view {
+  border: 1px solid #ddd4e6;
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+}
+.fine {
+  margin-bottom: 10px;
+}
+.btn::after,
+.textbtn::after {
+  border: 0;
 }
 </style>

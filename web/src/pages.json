@@ -9,7 +9,6 @@
     { "path": "pages/history/list", "style": { "navigationBarTitleText": "阶段记录" } },
     { "path": "pages/history/detail", "style": { "navigationBarTitleText": "记录详情" } },
     { "path": "pages/pricing/pricing", "style": { "navigationBarTitleText": "商品目录" } },
-    { "path": "pages/unlock/unlock", "style": { "navigationBarTitleText": "确认测试订单" } },
     { "path": "pages/order-status/order-status", "style": { "navigationBarTitleText": "订单状态" } },
     { "path": "pages/orders/orders", "style": { "navigationBarTitleText": "我的订单与权益" } },
     { "path": "pages/card/card", "style": { "navigationBarTitleText": "我的 MBTI 名片" } },
@@ -69,9 +68,10 @@
     ]
   },
   "globalStyle": {
+    "navigationStyle": "custom",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "MBTI搭子",
-    "navigationBarBackgroundColor": "#F8F7F4",
-    "backgroundColor": "#F8F7F4"
+    "navigationBarBackgroundColor": "#FAF8FF",
+    "backgroundColor": "#FAF8FF"
   }
 }
