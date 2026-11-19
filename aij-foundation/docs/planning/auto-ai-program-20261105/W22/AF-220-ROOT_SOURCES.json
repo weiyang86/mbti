@@ -1,0 +1,109 @@
+{
+  "task": "AF-220",
+  "stage": "UNVERIFIED_INPUT_FREEZE",
+  "files": [
+    {
+      "path": "docs/execution/AF-220-candidate.md",
+      "sha256": "4824cb5f80ec8ef28ba7061a3a821e5461e37e6251aab7e1635b574cb2dff7a2"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W22/AF-220-ROOT_WIRING.md",
+      "sha256": "641ffae310b1866020b56349baf502f13d44cba2608d8bc4e0611a83444541ae"
+    },
+    {
+      "path": "scripts/ai-local-development/build.mjs",
+      "sha256": "1b6dcc909fd50566b7ad8b6f27863eb3a225442a5bc2edee5e3b4a0e4611d8ea"
+    },
+    {
+      "path": "scripts/ai-local-development/cli.mjs",
+      "sha256": "348b5e5813872beed106a92acf0c798dae37558b67efa10f2774634c0c1a14e2"
+    },
+    {
+      "path": "scripts/ai-local-development/config.mjs",
+      "sha256": "19ba7036b199008f7be3b946a79aa01d0ef57368fd8391144d8faa364cd24d9f"
+    },
+    {
+      "path": "scripts/ai-local-development/database.mjs",
+      "sha256": "8fcf84f27b5039a49bde6f9e814daecf0f0fba97ac41b95df6f9002a76398aab"
+    },
+    {
+      "path": "scripts/ai-local-development/docker.mjs",
+      "sha256": "c7aa72bf04d9349e2fe13fb572c6ec4689e7c1d1a3a376a7274fcdd4d7697d4a"
+    },
+    {
+      "path": "scripts/ai-local-development/processes.mjs",
+      "sha256": "bb3c6431e82bb019129ccdfc6ba2ba807d693e9750595ba6343a13a4951c879d"
+    },
+    {
+      "path": "scripts/ai-local-development/service.mjs",
+      "sha256": "627efde45c0664a33131458f2c0a79e88a4c0df3d7c185311c452b214b7e041d"
+    },
+    {
+      "path": "scripts/verification/ai-local-development.test.mjs",
+      "sha256": "0732ee9f6480dc47660a32fb6ac4051ac2254cb4cfa88311bbb82e3db2fb001f"
+    },
+    {
+      "path": "scripts/ai-local-development/root-initialization.mjs",
+      "sha256": "8fbcac73d5b2df1c24972d350ef5cd46ca6688fb603eeb3b85fe08c61f9b7c94"
+    },
+    {
+      "path": "scripts/ai-local-development/initialize-application.mjs",
+      "sha256": "c43a14ce352177cc49d3580d055dc9fc3a6d341973f5a03c73b51e138bb4a790"
+    },
+    {
+      "path": "scripts/verification/ai-local-development-acceptance.mjs",
+      "sha256": "ce72084f0bb3334e612eb592ee13a858eb96ea11667d5e2acfd9c6799e359b88"
+    },
+    {
+      "path": "scripts/verification/ai-local-development-prerequisite.mjs",
+      "sha256": "e1b0b91efc6cdcaacf4e0498b5d00d92da22bd94f4760a0d67e25e3169002cd1"
+    },
+    {
+      "path": "scripts/verification/ai-local-explicit-environment.test.mjs",
+      "sha256": "8bc29fde8adc34979b1bf2c63bc06d9a0bbfb8d2ede1f6e6879dd8b07458cc61"
+    },
+    {
+      "path": "ops/compose.ai-local-development.yml",
+      "sha256": "a21f7509182a90e900246e2e9bf6fc57659ff87520f6439534a129e7d8d2fa97"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "40b7c6d568a0bcaa361dd875c6e6fb696f4781287560d6fd958ab632e443b368"
+    },
+    {
+      "path": "package.json",
+      "sha256": "a9e888640857d9c90743398549af706b90cd8455d0843efa84b24cb63ca93a23"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha256": "1eb61e8bcd810a6b20e88ae6e07c5943922133722c1c61caf1cae26e00b3341b"
+    }
+  ],
+  "sharedFunctionSlices": [
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "begin": "function readRepositoryEnvironment(",
+      "end": "function loadRuntimeEnvironment(",
+      "sha256": "5a66d4c422159f4fc7622f67d9d04601179f5561ab50e4e5c2da37b599976f42"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "begin": "async function createProject(",
+      "end": "async function createAdmin(",
+      "sha256": "914a623329b587e1c0f22288238313612be78586f1c45d6c70635d1fbf8fa0c5"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "begin": "async function seedTransaction(",
+      "end": "export async function registerBaseMenus(",
+      "sha256": "1b65220089816096e18b9563c07399cbc4feba955da5970716aa5ebfd41b7e89"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "begin": "export async function seedAiLocalDevelopment(",
+      "end": null,
+      "sha256": "36a9206cb7ceb024ba31b73203b2b44970529ecfd639ae9da9f53836777cce40"
+    }
+  ],
+  "isolation": "Owned file hashes plus exact owned shared function slices; unrelated pending AF191 lease arrays excluded."
+}

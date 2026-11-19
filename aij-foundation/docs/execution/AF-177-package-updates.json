@@ -1,0 +1,410 @@
+{
+  "schemaVersion": 1,
+  "task": "AF-177",
+  "title": "修复生产依赖严重漏洞并建立核验门禁",
+  "status": "PROPOSAL_ROOT_ONLY",
+  "checkedAt": "2026-11-05T19:23:37.164Z",
+  "workerBase": "94b0236f775fa40a07944c5e0545ac6ce0e123f3",
+  "bootstrapCommit": "e71ed87c4fe59f5a352309bff3f116b1f5261b68",
+  "sourceCommit": "b7783dca67475a116e9a72a922fdba293e16cb57",
+  "baseline": {
+    "command": [
+      "pnpm",
+      "audit",
+      "--prod",
+      "--json"
+    ],
+    "exitCode": 1,
+    "counts": {
+      "info": 0,
+      "low": 2,
+      "moderate": 12,
+      "high": 18,
+      "critical": 5
+    },
+    "total": 37,
+    "artifact": ".artifacts/af-177/audit-before.json"
+  },
+  "selection": {
+    "target": "16.4.1",
+    "latestObserved": "16.4.5",
+    "targetPublishedAt": "2026-10-14T17:43:55.246Z",
+    "rationale": "Minimum stable supported Next 16 release above every observed critical patched floor; latest observed is recorded, not substituted for this bounded security change.",
+    "releaseUrl": "https://github.com/vercel/next.js/releases/tag/v16.4.1",
+    "supportPolicyUrl": "https://nextjs.org/support-policy",
+    "support": "Next 16 Active LTS at check time; metadata/release verification is not product compatibility proof."
+  },
+  "updates": [
+    {
+      "file": "apps/web/package.json",
+      "section": "dependencies",
+      "package": "next",
+      "oldVersion": "16.2.6",
+      "newVersion": "16.4.1",
+      "reason": "Remove all five observed critical Next advisories, retaining Next 16 and React 19.",
+      "registryUrl": "https://registry.npmjs.org/next/16.4.1",
+      "releaseUrl": "https://github.com/vercel/next.js/releases/tag/v16.4.1",
+      "integrity": "sha512-uc657V62E34fOI6W5NtG9IzwsPcms0Z60grz2MJGtglgD+pTFnNt4Yw2PzaU622tfX4vhrDgLZzicE2YlhI20Q==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=20.9.0"
+      },
+      "peerDependencies": {
+        "sass": "^1.3.0",
+        "react": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0",
+        "react-dom": "^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0",
+        "@playwright/test": "^1.51.1",
+        "@opentelemetry/api": "^1.1.0",
+        "babel-plugin-react-compiler": "*"
+      },
+      "peerDependenciesMeta": {
+        "sass": {
+          "optional": true
+        },
+        "@playwright/test": {
+          "optional": true
+        },
+        "@opentelemetry/api": {
+          "optional": true
+        },
+        "babel-plugin-react-compiler": {
+          "optional": true
+        }
+      },
+      "compatibility": "Node 24.21.0/pnpm 10.0.0 satisfy repository engines; React/react-dom 19.2.6 and ESLint 9.39.2/TypeScript 5.9.3 satisfy declared relevant peers; other Next peers remain optional and unchanged.",
+      "knownRisk": "Minor changes and native sharp/SWC updates need isolated production build and real native workflow/auth smoke."
+    },
+    {
+      "file": "package.json",
+      "section": "devDependencies",
+      "package": "eslint-config-next",
+      "oldVersion": "16.2.6",
+      "newVersion": "16.4.1",
+      "reason": "Keep Next lint rules paired with runtime release; dev dependency only.",
+      "registryUrl": "https://registry.npmjs.org/eslint-config-next/16.4.1",
+      "releaseUrl": "https://github.com/vercel/next.js/releases/tag/v16.4.1",
+      "integrity": "sha512-6AsojbCfRdpWkP6BIUnMBv3MH4OvtfmH9p4hSfLh8ZgsW7nfhu7DpUMNBB7leisDyyMz+YYxTc+NAdBOQfovlA==",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "eslint": ">=9.0.0",
+        "typescript": ">=3.3.1"
+      },
+      "peerDependenciesMeta": {
+        "typescript": {
+          "optional": true
+        }
+      },
+      "compatibility": "Node 24.21.0/pnpm 10.0.0 satisfy repository engines; React/react-dom 19.2.6 and ESLint 9.39.2/TypeScript 5.9.3 satisfy declared relevant peers; other Next peers remain optional and unchanged.",
+      "knownRisk": "Config now resolves typescript-eslint ^8.56.0 and react-hooks ^7.1.0 internally; preserve root pins and run actual lint to detect rule drift."
+    }
+  ],
+  "overrides": [],
+  "criticalAdvisories": [
+    {
+      "id": 1193676,
+      "ghsa": "GHSA-p293-qw3h-jr36",
+      "module": "next",
+      "lockedVersion": "16.2.6",
+      "auditVulnerableRange": ">=16.0.0 <16.3.3",
+      "auditPatchedRange": ">=16.3.3",
+      "paths": [
+        "apps__web>next"
+      ],
+      "primaryUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-p293-qw3h-jr36",
+      "registryAdvisoryUrl": "https://github.com/advisories/GHSA-p293-qw3h-jr36",
+      "published": "2026-08-25",
+      "patched": "16.3.3",
+      "applicability": "Windows filesystem hosting with Pages/App router without Cache Components; current worker macOS is not a deployment-scope exemption."
+    },
+    {
+      "id": 1193732,
+      "ghsa": "GHSA-2xp9-vwfh-vxw4",
+      "module": "next",
+      "lockedVersion": "16.2.6",
+      "auditVulnerableRange": ">=16.0.0 <16.3.3",
+      "auditPatchedRange": ">=16.3.3",
+      "paths": [
+        "apps__web>next"
+      ],
+      "primaryUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-2xp9-vwfh-vxw4",
+      "registryAdvisoryUrl": "https://github.com/advisories/GHSA-2xp9-vwfh-vxw4",
+      "published": "2026-08-25",
+      "patched": "16.3.3",
+      "applicability": "AVIF image optimization via sharp/libheif; conditional feature exposure, package remains affected."
+    },
+    {
+      "id": 1240609,
+      "ghsa": "GHSA-vcvr-r3jv-pc5j",
+      "module": "next",
+      "lockedVersion": "16.2.6",
+      "auditVulnerableRange": ">=16.2.0 <16.3.6",
+      "auditPatchedRange": ">=16.3.6",
+      "paths": [
+        "apps__web>next"
+      ],
+      "primaryUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j",
+      "registryAdvisoryUrl": "https://github.com/advisories/GHSA-vcvr-r3jv-pc5j",
+      "published": "2026-09-22",
+      "patched": "16.3.6",
+      "applicability": "Node next/og ImageResponse with attacker-controlled SVG values; static scan found no current use, not grounds for audit suppression."
+    },
+    {
+      "id": 1242816,
+      "ghsa": "GHSA-2464-fhr4-w9xw",
+      "module": "next",
+      "lockedVersion": "16.2.6",
+      "auditVulnerableRange": ">=16.0.0 <=16.4.0",
+      "auditPatchedRange": ">=16.4.1",
+      "paths": [
+        "apps__web>next"
+      ],
+      "primaryUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-2464-fhr4-w9xw",
+      "registryAdvisoryUrl": "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+      "published": "2026-10-14",
+      "patched": "16.4.1",
+      "applicability": "Image optimization SVG path on glibc Linux; fixed sharp >=0.35.5 must enter the actual lock."
+    },
+    {
+      "id": 1242859,
+      "ghsa": "GHSA-673q-mjm6-r5xr",
+      "module": "next",
+      "lockedVersion": "16.2.6",
+      "auditVulnerableRange": ">=16.0.0 <=16.4.0",
+      "auditPatchedRange": ">=16.4.1",
+      "paths": [
+        "apps__web>next"
+      ],
+      "primaryUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-673q-mjm6-r5xr",
+      "registryAdvisoryUrl": "https://github.com/advisories/GHSA-673q-mjm6-r5xr",
+      "published": "2026-10-14",
+      "patched": "16.4.1",
+      "applicability": "App router Cache Components/use cache returning multiple typed arrays; maintainer recommends upgrade even without matching functions."
+    }
+  ],
+  "expectedTransitiveClosure": [
+    {
+      "package": "@next/env",
+      "old": "16.2.6",
+      "new": "16.4.1"
+    },
+    {
+      "package": "@next/swc-*",
+      "old": "16.2.6",
+      "new": "16.4.1",
+      "scope": "matching optional platform binaries"
+    },
+    {
+      "package": "@next/eslint-plugin-next",
+      "old": "16.2.6",
+      "new": "16.4.1"
+    },
+    {
+      "package": "postcss",
+      "old": "8.4.31",
+      "new": "8.5.23"
+    },
+    {
+      "package": "@swc/helpers",
+      "old": "0.5.15",
+      "new": "0.5.23"
+    },
+    {
+      "package": "sharp",
+      "old": "0.34.5",
+      "newDeclaredRange": "^0.35.5",
+      "minimumFixed": "0.35.5",
+      "engine": ">=20.9.0",
+      "license": "Apache-2.0",
+      "registryUrl": "https://registry.npmjs.org/sharp/0.35.5",
+      "scope": "Next optional dependency; root resolves exact official package and its @img/sharp-*/libvips closure in lock"
+    },
+    {
+      "package": "typescript-eslint",
+      "oldDeclaredRange": "^8.46.0",
+      "newDeclaredRange": "^8.56.0",
+      "scope": "eslint-config-next internal dependency only; root direct 8.53.1 unchanged"
+    },
+    {
+      "package": "eslint-plugin-react-hooks",
+      "oldDeclaredRange": "^7.0.0",
+      "newDeclaredRange": "^7.1.0",
+      "scope": "eslint-config-next internal dependency only"
+    }
+  ],
+  "preserved": {
+    "htmlparser2": "10.1.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "nestDirection": "11",
+    "apiManifest": "unchanged",
+    "sdkPublicContracts": "unchanged",
+    "noUnrelatedDirectUpgrades": true
+  },
+  "remainingBaselineFindings": [
+    {
+      "id": 1115356,
+      "ghsa": "GHSA-38f7-945m-qr2g",
+      "module": "effect",
+      "severity": "high",
+      "lockedVersions": [
+        "3.18.4"
+      ],
+      "paths": [
+        "apps__api>@prisma/client>prisma>@prisma/config>effect"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-38f7-945m-qr2g",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1121089,
+      "ghsa": "GHSA-72gw-mp4g-v24j",
+      "module": "multer",
+      "severity": "high",
+      "lockedVersions": [
+        "2.1.1"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>multer"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-72gw-mp4g-v24j",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1121091,
+      "ghsa": "GHSA-3p4h-7m6x-2hcm",
+      "module": "multer",
+      "severity": "moderate",
+      "lockedVersions": [
+        "2.1.1"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>multer"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-3p4h-7m6x-2hcm",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1145093,
+      "ghsa": "GHSA-ggr8-5vv4-36mx",
+      "module": "deepmerge-ts",
+      "severity": "high",
+      "lockedVersions": [
+        "7.1.5"
+      ],
+      "paths": [
+        "apps__api>@prisma/client>prisma>@prisma/config>deepmerge-ts"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-ggr8-5vv4-36mx",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1193790,
+      "ghsa": "GHSA-wc9g-mqfw-jrwm",
+      "module": "multer",
+      "severity": "high",
+      "lockedVersions": [
+        "2.1.1"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>multer"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-wc9g-mqfw-jrwm",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1193792,
+      "ghsa": "GHSA-qvfw-j98x-7q72",
+      "module": "multer",
+      "severity": "low",
+      "lockedVersions": [
+        "2.1.1"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>multer"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-qvfw-j98x-7q72",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1193793,
+      "ghsa": "GHSA-535w-7cp7-47q4",
+      "module": "multer",
+      "severity": "high",
+      "lockedVersions": [
+        "2.1.1"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>multer"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-535w-7cp7-47q4",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1243074,
+      "ghsa": "GHSA-27r3-jxmh-p828",
+      "module": "body-parser",
+      "severity": "high",
+      "lockedVersions": [
+        "2.3.0"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>express>body-parser"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-27r3-jxmh-p828",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1243083,
+      "ghsa": "GHSA-q7qp-rjg7-q26m",
+      "module": "multer",
+      "severity": "high",
+      "lockedVersions": [
+        "2.1.1"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>multer"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-q7qp-rjg7-q26m",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    },
+    {
+      "id": 1243687,
+      "ghsa": "GHSA-6pq8-jhm2-2vcw",
+      "module": "qs",
+      "severity": "moderate",
+      "lockedVersions": [
+        "6.16.0"
+      ],
+      "paths": [
+        "apps__api>@nestjs/platform-express>express>qs"
+      ],
+      "officialReference": "https://github.com/advisories/GHSA-6pq8-jhm2-2vcw",
+      "disposition": "REMAINING_RISK_NO_SUPPRESSION; root post-change audit is authoritative"
+    }
+  ],
+  "expectedOutcome": {
+    "critical": 0,
+    "status": "UNVERIFIED_UNTIL_ROOT_ACTUAL_PRODUCTION_AUDIT",
+    "remaining": "Ten baseline findings outside Next closure: 7 high, 2 moderate, 1 low if those paths remain locked; resolver may change this, report actual remaining paths/severities.",
+    "fullSecurityAcceptance": "PENDING",
+    "ownerAcceptance": "OWNER_CHECK_PENDING"
+  },
+  "rootOnlyAcceptance": [
+    "Apply exactly two direct pins; generate official lock without unrelated direct updates, overrides or htmlparser2 changes.",
+    "Review registry integrity/license/native closure and lock diff; frozen independent installation.",
+    "Register five applicable guards and fresh AF177 owned environment/lease; serialize heavy builds and database work.",
+    "Run source/helper tests, actual API types/build/lint, isolated production Web build, native browser auth/workflow success and refusal smoke.",
+    "Run original dev explicit-gated actual production audit; critical count over every advisory must be zero; retain exit 1 and noncritical paths.",
+    "Run formal verify:task and update execution/queue; exact-title local commit and readback, no push; I178/I179 require real I177 integration Task ID."
+  ],
+  "notRunByWorker": [
+    "actual dependency changes/lock generation",
+    "post-change audit",
+    "API/Web builds and types",
+    "DB/services/browser native smoke",
+    "formal verify:task",
+    "root guard registry/fresh acceptance lease",
+    "owner/product/security acceptance"
+  ]
+}

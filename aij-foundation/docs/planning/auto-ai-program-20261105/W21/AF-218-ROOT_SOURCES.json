@@ -1,0 +1,32 @@
+{
+  "task": "AF-218",
+  "phase": "Bounded parent privacy rejection follow-up after initial verified0e7f3b1; AF217 WIP preserved/excluded, old20inputs retained in INITIAL_ROOT_SOURCES",
+  "initialVerifiedCommit": "0e7f3b1c2131bb52370123edc836d1ce9e7e6350",
+  "sourceBaseline": "f0e12d76b0c2c5dccf4d1c56369019e979e52902",
+  "files": [
+    {
+      "path": "apps/web/app/components/client-agent-library.tsx",
+      "sha256": "9b3e044759f8fea0241753edaa7320fe922ad7e64933b4a97b31dbd82bff510c"
+    },
+    {
+      "path": "apps/web/app/components/client-agent-version-restore-state.mjs",
+      "sha256": "3a13b12fb678d1c90d623ea262970cf6ccb559c8bec4ad19e029c43539696cee"
+    },
+    {
+      "path": "apps/web/app/components/client-agent-version-restore-state.d.mts",
+      "sha256": "586f13a25ae46bb94e22f4f79e6e329a77aafe1dfe4c48fcde18e93e6930aa16"
+    },
+    {
+      "path": "apps/web/app/components/client-agent-version-restore-panel.tsx",
+      "sha256": "6fd72abe41687c3b21e40451c4a7441a086ca7d9fd801e887ce9083b1e8f3b6a"
+    },
+    {
+      "path": "scripts/verification/client-agent-version-restore-state.test.mjs",
+      "sha256": "c0243f5e57618f045d33df07334e7701fe014cf3140db61573d7fea35faccf84"
+    },
+    {
+      "path": "scripts/verification/client-agent-version-restore-live.test.mjs",
+      "sha256": "9a8d0718c0598ea486681b005824d54b03d396dcad3bf88c49c67e7871475a85"
+    }
+  ]
+}

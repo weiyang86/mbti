@@ -1,0 +1,50 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import { taskRegistry } from "./registry.mjs";
+
+const baseline = JSON.parse(readFileSync(".artifacts/continuous/2026-11-02-to-G19B/batch-baseline.json", "utf8"));
+const start = JSON.parse(readFileSync(".artifacts/continuous/2026-11-02-to-G19B/AF-114-prechange-evidence.json", "utf8"));
+const queue = JSON.parse(readFileSync("docs/planning/CODING_QUEUE.json", "utf8"));
+const batch = queue.proposedBatches.find(item => item.id === "NEXT-19B");
+const af112 = queue.taskExecutions.find(item => item.formalTaskId === "AF-112");
+const af113 = queue.taskExecutions.find(item => item.formalTaskId === "AF-113");
+const af114 = queue.taskExecutions.find(item => item.formalTaskId === "AF-114");
+const ownerHash = createHash("sha256").update(JSON.stringify(queue.ownerAcceptanceRecords)).digest("hex");
+const indexHash = createHash("sha256").update(readFileSync(".git/index")).digest("hex");
+const ids = batch?.formalTaskIds;
+
+assert.equal(execFileSync("git", ["--no-optional-locks", "branch", "--show-current"], { encoding: "utf8" }).trim(), "dev");
+assert.equal(execFileSync("git", ["--no-optional-locks", "rev-parse", "HEAD"], { encoding: "utf8" }).trim(), baseline.head);
+assert.equal(execFileSync("git", ["--no-optional-locks", "rev-parse", "origin/dev"], { encoding: "utf8" }).trim(), baseline.originDevTrackingRef);
+assert.equal(indexHash, baseline.ordinaryIndexSha256, "ordinary Git index remains untouched");
+assert.equal(ownerHash, start.ownerAcceptanceRecordsSha256, "owner acceptance history remains unchanged");
+assert.deepEqual(ids, { "G19-05": "AF-112", "G19-06": "AF-113", "G19-07": "AF-114" });
+assert.equal(batch?.status, "IN_PROGRESS");
+assert.equal(batch?.executionProgress?.currentCard, "G19-07/AF-114");
+assert.deepEqual(batch?.executionProgress?.remaining, ["G19-07/AF-114"]);
+assert.ok(batch?.executionProgress?.codeVerified?.includes("G19-06/AF-113"));
+assert.equal(batch?.executionProgress?.liveDeepSeek, false);
+assert.equal(batch?.executionProgress?.liveCustomerData, false);
+assert.equal(batch?.executionProgress?.paidRequests, false);
+assert.equal(batch?.executionProgress?.fileImport, false);
+assert.equal(af112?.status, "CODE_VERIFIED");
+assert.equal(af112?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK");
+assert.equal(af113?.status, "CODE_VERIFIED");
+assert.equal(af113?.verification?.status, "PASS");
+assert.equal(af113?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK");
+assert.equal(af113?.verification?.results?.browserObservation, "PENDING_OWNER_MANUAL_CHECK");
+assert.equal(af114?.alias, "G19-07");
+assert.equal(af114?.status, "IN_PROGRESS");
+assert.equal(af114?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK");
+assert.equal(taskRegistry["AF-114"]?.steps?.some(step => step.testFiles?.includes("scripts/verification/g19-knowledge-questions-web-http-db.test.mjs")), true);
+assert.equal(existsSync("apps/web/app/client/knowledge/questions/page.tsx"), true);
+assert.equal(existsSync("scripts/verification/g19-knowledge-questions-web-http-db.test.mjs"), true);
+for (const id of ["AF-108", "AF-109", "AF-110", "AF-111"]) {
+  const dependency = queue.taskExecutions.find(item => item.formalTaskId === id);
+  assert.equal(dependency?.status, "CODE_VERIFIED", `${id} remains code-verified`);
+  assert.equal(dependency?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK", `${id} owner acceptance is not inferred`);
+}
+assert.equal(existsSync(".artifacts/continuous/2026-11-02-to-G19B/AF-112-working.index"), true, "reuse the isolated sidecar index");
+console.log("AF-114 preflight: authorized card mapping, AF-112/113 dependencies, owner boundary, dev/origin, test-only scope and untouched ordinary index verified.");

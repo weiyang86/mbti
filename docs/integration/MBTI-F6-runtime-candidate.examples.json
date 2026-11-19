@@ -1,0 +1,11 @@
+{
+  "status": "candidate / needs_human_review",
+  "note": "Shape examples only; no people, tokens, location, contact values or measured counts.",
+  "participation_default": {"enrolled": false},
+  "participation_put": {"enrolled": true},
+  "not_enrolled": {"count": null, "status": "unavailable", "reason": "not_enrolled"},
+  "enrolled_without_source": {"count": null, "status": "unavailable", "reason": "location_source_not_configured"},
+  "invalid_input": {"code": "INVALID_RADAR_INPUT", "message": "雷达请求参数无效"},
+  "missing_own_type": {"code": "RADAR_TYPE_REQUIRED", "message": "请先设置本人的 MBTI 类型"},
+  "mismatched_own_type": {"code": "RADAR_TYPE_MISMATCH", "message": "查询类型与本人名片不一致"}
+}

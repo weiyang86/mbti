@@ -1,0 +1,54 @@
+{
+  "candidate": "3d049a27e2f5fd1b19feb23a7a6d6cacc78b40d7",
+  "rootAdjustments": "Separate generated metadata assembly preserves unchanged DB-free FilesModule; original singleton Prisma/FileAsset/storage owners. ExactAF201 only lease+auth+safe fixture fresh-storage optin, actual PG lock/rollback/cancel/legacyHTTP proof. No source implementation owner changes beyond stopped revision.",
+  "files": [
+    {
+      "path": "apps/api/src/files/generated-file-assets.module.ts",
+      "sha256": "84a1e7fa0cff3a27fd5afe903323043791e4b6d80e7bc2e51d15ede0bab8594f"
+    },
+    {
+      "path": "apps/api/src/app.module.ts",
+      "sha256": "2a2dbcedceec5745c8b3992affc84200455f13106db705ba1b8892702e31e7e9"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "9767a0ea3f14bb5da669bfd713c30ffb86226ae20b9a8a5f7c726693b6dced62"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "cc5fe9b04774fdaa9d3fad7d9c9c10ace9fe547e71d5bb12c46bc12e294d6cec"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "0cb7fcaac702be777bce5581ff366ce2b1b26386e8df39d45d294d7eb1c76390"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "64e3b820be2fd4c98571c12c50f28aad2c7ead52e12f68ab3f03e1fbf4f6048c"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "cdbe5e8997c58fbac5cde69b6856520683e0aba1da7ac971829d74405b63ac6f"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "7fbc8ab77a860868f0b67599637d72f30c9bc9423172b1883fdfef3f92d0fd15"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "06ef97ed0383accc8d7b6b9102a72a3fe662ab2a3837f0e16ccd448d1aca54fd"
+    },
+    {
+      "path": "scripts/verification/generated-file-assets-live.test.mjs",
+      "sha256": "b2cb32c5cd6b14b396adfcedd95ee9f1e55e841f53136e0f8b7dea9bb30896db"
+    },
+    {
+      "path": "scripts/verification/generated-file-assets-acceptance.mjs",
+      "sha256": "0847f64e595108713882a91d284adb5392501d88eae970ed9d20aa04a2be0485"
+    },
+    {
+      "path": "scripts/verification/generated-file-assets-prerequisite.mjs",
+      "sha256": "4c4af2e4be01f0876e5c0360220f325e20c01925540d26f7c6b8aded45295c73"
+    }
+  ]
+}

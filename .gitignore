@@ -20,6 +20,8 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+# 生产构建默认值（无密钥），随仓库提供
+!web/.env.production
 *.pem
 *.key
 credentials.json

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "baseline": "d8847d2fa6a7f87f657387b497891f5103914dc8",
+  "branch": "dev",
+  "status": "CODE_VERIFIED_OWNER_REVIEW_PENDING",
+  "verification": [
+    {
+      "taskId": "AF-121",
+      "title": "异步任务租约围栏与 AI 插件生命周期修复",
+      "report": ".artifacts/verification/AF-121/run-KBECjI/report.json",
+      "prerequisites": 1,
+      "steps": 5,
+      "structuredTests": 1,
+      "status": "PASS",
+      "finishedAt": "2026-11-03T23:46:54.495Z"
+    },
+    {
+      "taskId": "AF-122",
+      "title": "通用 AI 厂商模型与 Agent Skill 配置中心",
+      "report": ".artifacts/verification/AF-122/run-zaQW2R/report.json",
+      "prerequisites": 1,
+      "steps": 6,
+      "structuredTests": 1,
+      "status": "PASS",
+      "finishedAt": "2026-11-03T23:52:37.096Z"
+    },
+    {
+      "taskId": "AF-123",
+      "title": "通用 Agent 文本生图执行与预算计量",
+      "report": ".artifacts/verification/AF-123/run-3Zt9FO/report.json",
+      "prerequisites": 1,
+      "steps": 8,
+      "structuredTests": 17,
+      "status": "PASS",
+      "finishedAt": "2026-11-04T00:06:33.296Z"
+    },
+    {
+      "taskId": "AF-124",
+      "title": "AI 中心后台与 MBTI 接入统一交付",
+      "report": ".artifacts/verification/AF-124/run-Iz7Mfi/report.json",
+      "prerequisites": 1,
+      "steps": 16,
+      "structuredTests": 30,
+      "status": "PASS",
+      "finishedAt": "2026-11-04T00:32:06.014Z"
+    }
+  ],
+  "finalDefaultTests": {
+    "root": 84,
+    "api": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browserSelfCheck": {
+    "tool": "Orca embedded browser CLI",
+    "independentReview": false,
+    "ownerAcceptance": false,
+    "syntheticOnly": true,
+    "skillSaveAndRevision": "PASS",
+    "agentSaveAndBinding": "PASS",
+    "imageModelPriceSave": "PASS",
+    "usagePage": "PASS",
+    "desktopWidth": 1440,
+    "mobileClientWidth": 390,
+    "mobileVisualViewportWidth": 390,
+    "mobileBodyScrollWidth": 390,
+    "consoleErrors": 0,
+    "screenshotsLocalOnly": ".artifacts/mbti-ai-20261104/"
+  },
+  "externalPaidCalls": 0,
+  "paymentTransactions": 0,
+  "developmentOrProductionMigrationsPerformed": false,
+  "ownerAcceptanceRecordsChanged": false,
+  "ownerAcceptanceCanonicalSha256": "879b448d7843649e959acb2ac66e88ae3a45c73975844bd6d67d4fb93da3b141",
+  "gitCloseoutEvidenceLocal": ".artifacts/mbti-ai-20261104/git-closeout.json",
+  "remainingLaunchGates": [
+    "Real provider/model verification and approved data/credentials/budget",
+    "Merchant payment provider and business orders/entitlements",
+    "Independent project composition/Seed if deploying a separate MBTI host",
+    "Deployment/migration/storage/worker acceptance and load/content-policy verification"
+  ]
+}

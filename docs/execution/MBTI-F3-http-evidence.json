@@ -1,0 +1,430 @@
+{
+  "source": "Real HTTP; synthetic project test identities only; no real provider charging",
+  "evidence": [
+    {
+      "method": "GET",
+      "path": "/v1/products",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "items": [
+          {
+            "code": "studio_tier_1",
+            "name": "MBTI 晒图套装",
+            "description": "成图 + 头像 + 相处卡 + 配文",
+            "amount": 990,
+            "currency": "CNY",
+            "saleable": true,
+            "pricing_mode": "controlled_test_fixture",
+            "highlights": [
+              "朋友圈 MBTI 海报",
+              "同款人格头像",
+              "相处卡与发圈文案"
+            ],
+            "tier": 1
+          },
+          {
+            "code": "studio_tier_2",
+            "name": "本人形象套装",
+            "description": "全部内容 + 本人照片风格方案",
+            "amount": 1990,
+            "currency": "CNY",
+            "saleable": false,
+            "pricing_mode": "controlled_test_fixture",
+            "unavailable_reason": "FULFILLMENT_UNCONFIGURED",
+            "highlights": [
+              "包含晒图套装全部内容",
+              "本人照片风格方案（本机预览）"
+            ],
+            "tier": 2
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/entitlements/me",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "items": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/orders",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 404,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/orders",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "PRODUCT_NOT_SALEABLE",
+        "message": "此商品暂不可下单"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/orders",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 201,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "id": "MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+        "result_id": "bd279b03-dbdc-4244-ba1a-d34120e02828",
+        "product_code": "studio_tier_1",
+        "amount": 990,
+        "currency": "CNY",
+        "status": "pending",
+        "unlocked": false,
+        "created_at": "2026-11-09T03:35:59.122Z",
+        "payment_availability": "unconfigured",
+        "pricing_mode": "controlled_test_fixture"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/orders",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "IDEMPOTENCY_CONFLICT",
+        "message": "此重试标识已用于另一购买意图"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/orders/MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 404,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "NOT_FOUND",
+        "message": "资源不存在"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/orders/MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "order_id": "MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+        "status": "pending",
+        "unlocked": false,
+        "payment_availability": "unconfigured"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/mbti/orders/MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+      "request_authentication": "none",
+      "status": 401,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/mbti/orders/MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 401,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/mbti/orders/MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+      "request_authentication": "Authorization: [REDACTED Foundation session]",
+      "status": 403,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/mbti/orders/MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+      "request_authentication": "Authorization: [REDACTED Foundation session]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "id": "MBTI-0c039665-5766-4216-b703-6b2525c633fb",
+        "result_id": "bd279b03-dbdc-4244-ba1a-d34120e02828",
+        "product_code": "studio_tier_1",
+        "amount": 990,
+        "currency": "CNY",
+        "status": "pending",
+        "unlocked": false,
+        "created_at": "2026-11-09T03:35:59.122Z",
+        "payment_availability": "unconfigured",
+        "pricing_mode": "controlled_test_fixture"
+      }
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/v1/orders",
+      "origin": "http://127.0.0.1:4155",
+      "status": 204,
+      "allow_origin": "http://127.0.0.1:4155",
+      "allow_headers": "content-type,x-guest-token,idempotency-key"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/v1/orders",
+      "origin": "http://192.168.0.200:4155",
+      "status": 204,
+      "allow_origin": "http://192.168.0.200:4155",
+      "allow_headers": "content-type,x-guest-token,idempotency-key"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/v1/orders",
+      "origin": "http://unapproved.invalid",
+      "status": 204,
+      "allow_origin": null,
+      "allow_headers": "content-type,x-guest-token,idempotency-key"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 401,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "989",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "USD",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "accepted": true
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 409,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "code": "INVALID_REQUEST",
+        "message": "请求格式不正确"
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-a96d8f33-76bc-4929-85d1-6837c1663b21",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "succeeded"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/orders/MBTI-a6c297d8-1e50-4a8a-88b3-e044bdd0b89b",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "order_id": "MBTI-a6c297d8-1e50-4a8a-88b3-e044bdd0b89b",
+        "status": "paid",
+        "unlocked": true,
+        "payment_availability": "controlled_test",
+        "paid_at": "2026-11-09T03:35:59.448Z"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/entitlements/me",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "items": [
+          {
+            "id": "407ef411-dab2-4dc4-a0e2-fccb1b9f7799",
+            "order_id": "MBTI-a6c297d8-1e50-4a8a-88b3-e044bdd0b89b",
+            "result_id": "d285c4d3-1899-431e-9fdc-56fc496037f4",
+            "product_code": "studio_tier_1",
+            "kind": "studio_tier_1",
+            "status": "active",
+            "granted_at": "2026-11-09T03:35:59.507Z",
+            "scope": "controlled_test"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/v1/payments/controlled-test/callback",
+      "request_authentication": "HMAC signature/timestamp/event-id: [REDACTED]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "accepted": true
+      },
+      "request_summary": {
+        "orderNo": "AIJPAY-f6b2c430-21b3-4e12-b7ab-d26dd6195dc1",
+        "amountMinor": "990",
+        "currency": "CNY",
+        "status": "failed"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/v1/orders/MBTI-9318f380-3266-41ba-8af3-fbc78849d786",
+      "request_authentication": "X-Guest-Token: [REDACTED synthetic guest]",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "body": {
+        "order_id": "MBTI-9318f380-3266-41ba-8af3-fbc78849d786",
+        "status": "failed",
+        "unlocked": false,
+        "payment_availability": "controlled_test"
+      }
+    }
+  ],
+  "api_base": "http://127.0.0.1:4156/api",
+  "lan_base": "http://192.168.0.200:4156/api",
+  "run_id": "run_594d408d15de",
+  "task_id": "task_a9c6a2af5905",
+  "dispatch_id": "ctx_f0a372b66e02",
+  "baseline": "777a5ea1c4229f6540582345827a316d90afd6fe"
+}

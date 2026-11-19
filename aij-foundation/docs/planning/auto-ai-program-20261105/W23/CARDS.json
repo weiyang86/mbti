@@ -1,0 +1,130 @@
+[
+  {
+    "id": "AF-223",
+    "title": "提供个人文档章节索引只读接口",
+    "hours": 3.25,
+    "workerHoursLimit": 1.5,
+    "allowPaths": [
+      "apps/api/src/documents/personal-document-sections.ts",
+      "apps/api/src/documents/personal-document-sections.service.ts",
+      "apps/api/src/documents/personal-document-sections.controller.ts",
+      "apps/api/test/personal-document-sections.test.ts",
+      "docs/execution/AF-223-candidate.md",
+      "docs/planning/auto-ai-program-20261105/W23/AF-223-ROOT_WIRING.md"
+    ],
+    "spec": "docs/planning/auto-ai-program-20261105/AF-223.md",
+    "status": "READY_FOR_CANDIDATE_DISPATCH",
+    "requirements": [
+      "REQ-022",
+      "REQ-037",
+      "REQ-040"
+    ],
+    "codeDeps": [
+      "task_99c0c174bf9e",
+      "task_a89f862fbff4",
+      "task_1f770e22492a"
+    ],
+    "candidateTaskId": "task_f5c4ef57ec62",
+    "integrationTaskId": "task_f09046b94694",
+    "integrationDeps": [
+      "task_99c0c174bf9e",
+      "task_f5c4ef57ec62",
+      "task_a89f862fbff4"
+    ],
+    "scopeBaseVerifiedEqual": true,
+    "bootstrap": [],
+    "bootstrapManifest": {
+      "path": "docs/planning/auto-ai-program-20261105/W23/SOURCE_BOOTSTRAP.json",
+      "sha256": "16075959b0ea95f4c71c218bf2e9a594314fb746fe32acfa02a2683a741a0014",
+      "sourceCommit": "5289bd1eabff8d2c8891ba0baeab7f1bf323c8d2"
+    },
+    "plannedWorktreeName": "AIJ-W23-AF223",
+    "model": "inherited-default",
+    "effort": "inherited-default"
+  },
+  {
+    "id": "AF-224",
+    "title": "提供文档章节读取与局部草稿组合SDK",
+    "hours": 3.5,
+    "workerHoursLimit": 1.5,
+    "allowPaths": [
+      "packages/sdk/src/personal-document-sections.ts",
+      "scripts/verification/personal-document-sections-sdk.test.mjs",
+      "docs/execution/AF-224-candidate.md",
+      "docs/planning/auto-ai-program-20261105/W23/AF-224-ROOT_WIRING.md"
+    ],
+    "spec": "docs/planning/auto-ai-program-20261105/AF-224.md",
+    "status": "READY_FOR_CANDIDATE_DISPATCH",
+    "requirements": [
+      "REQ-022",
+      "REQ-037",
+      "REQ-040"
+    ],
+    "codeDeps": [
+      "task_99c0c174bf9e",
+      "task_a89f862fbff4",
+      "task_1f770e22492a"
+    ],
+    "candidateTaskId": "task_f3fabfde50a6",
+    "integrationTaskId": "task_3c0cca5be140",
+    "integrationDeps": [
+      "task_99c0c174bf9e",
+      "task_f3fabfde50a6",
+      "task_f09046b94694"
+    ],
+    "scopeBaseVerifiedEqual": true,
+    "bootstrap": [],
+    "bootstrapManifest": {
+      "path": "docs/planning/auto-ai-program-20261105/W23/SOURCE_BOOTSTRAP.json",
+      "sha256": "16075959b0ea95f4c71c218bf2e9a594314fb746fe32acfa02a2683a741a0014",
+      "sourceCommit": "5289bd1eabff8d2c8891ba0baeab7f1bf323c8d2"
+    },
+    "plannedWorktreeName": "AIJ-W23-AF224",
+    "model": "inherited-default",
+    "effort": "inherited-default"
+  },
+  {
+    "id": "AF-225",
+    "title": "提供个人文档章节导航与局部草稿预览",
+    "hours": 4,
+    "workerHoursLimit": 1.5,
+    "allowPaths": [
+      "apps/web/app/components/client-document-sections-state.mjs",
+      "apps/web/app/components/client-document-sections-state.d.mts",
+      "apps/web/app/components/client-document-sections-panel.tsx",
+      "scripts/verification/client-document-sections-state.test.mjs",
+      "docs/execution/AF-225-candidate.md",
+      "docs/planning/auto-ai-program-20261105/W23/AF-225-ROOT_WIRING.md"
+    ],
+    "spec": "docs/planning/auto-ai-program-20261105/AF-225.md",
+    "status": "READY_FOR_CANDIDATE_DISPATCH",
+    "requirements": [
+      "REQ-022",
+      "REQ-037",
+      "REQ-040"
+    ],
+    "codeDeps": [
+      "task_99c0c174bf9e",
+      "task_a89f862fbff4",
+      "task_1f770e22492a"
+    ],
+    "candidateTaskId": "task_83a9f53175da",
+    "integrationTaskId": "task_21a29f8ab349",
+    "integrationDeps": [
+      "task_99c0c174bf9e",
+      "task_83a9f53175da",
+      "task_3c0cca5be140",
+      "task_f09046b94694"
+    ],
+    "scopeBaseVerifiedEqual": true,
+    "bootstrap": [],
+    "bootstrapManifest": {
+      "path": "docs/planning/auto-ai-program-20261105/W23/SOURCE_BOOTSTRAP.json",
+      "sha256": "16075959b0ea95f4c71c218bf2e9a594314fb746fe32acfa02a2683a741a0014",
+      "sourceCommit": "5289bd1eabff8d2c8891ba0baeab7f1bf323c8d2"
+    },
+    "plannedWorktreeName": "AIJ-W23-AF225",
+    "model": "inherited-default",
+    "effort": "inherited-default"
+  }
+]

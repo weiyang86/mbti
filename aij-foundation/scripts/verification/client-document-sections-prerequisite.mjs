@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {resolve} from 'node:path';
+const read=p=>JSON.parse(readFileSync(p,'utf8'));
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+assert.equal(git('branch','--show-current'),'dev');assert.equal(resolve(git('rev-parse','--git-dir')),resolve(git('rev-parse','--git-common-dir')));
+assert.equal(git('remote','get-url','origin'),'git@github.com:weiyang86/aij-foundation.git');
+const base='docs/planning/auto-ai-program-20261105/W23/',sources=read(base+'AF-225-ROOT_SOURCES.json');
+assert.equal(read('.artifacts/verification/AF-223/run-KiXoJV/report.json').status,'PASS');git('merge-base','--is-ancestor','100e1c66a740584c76fe93aab5e967f64a054815','HEAD');
+assert.equal(read('.artifacts/verification/AF-224/run-np7hUq/report.json').status,'PASS');git('merge-base','--is-ancestor','1fcd269e8fe3c9d87a652c5fda8501f7b15ecbfa','HEAD');
+const tasks=JSON.parse(execFileSync('/usr/local/bin/orca',['orchestration','task-list','--run','run_72ed314cead8','--json'],{maxBuffer:16*1024*1024})).result.tasks;
+for(const id of sources.completedDependencies)assert.equal(tasks.find(t=>t.id===id)?.status,'completed',id);
+assert.equal(sources.originalStop,'msg_e0e7b9ccf6ee');assert.equal(sources.candidate,'e1ab1fd97c6381d726453967fe3a56d81fb0f743');
+assert.equal(git('rev-parse',sources.candidate+'^'),sources.bootstrap);assert.equal(git('show','-s','--format=%s',sources.candidate),'提供个人文档章节导航与局部草稿预览');
+assert.deepEqual(git('diff','--name-only',sources.bootstrap,sources.candidate).split('\n').sort(),sources.candidateFiles.map(f=>f.path).sort());
+assert.equal(sha(readFileSync(base+'SOURCE_BOOTSTRAP.json')),'16075959b0ea95f4c71c218bf2e9a594314fb746fe32acfa02a2683a741a0014');
+const m=read(base+'SOURCE_BOOTSTRAP.json');assert.equal(m.files.length,1061);
+const bytes=execFileSync('git',['cat-file','--batch'],{input:m.files.map(f=>f.oid+'\n').join(''),stdio:['pipe','pipe','pipe'],maxBuffer:64*1024*1024});let offset=0;
+for(const f of m.files){const end=bytes.indexOf(10,offset),[oid,kind,size]=bytes.subarray(offset,end).toString().split(' ');assert.equal(oid,f.oid);assert.equal(kind,'blob');assert.equal(Number(size),f.bytes);assert.equal(sha(bytes.subarray(end+1,end+1+Number(size))),f.sha256);offset=end+2+Number(size);}
+assert.equal(offset,bytes.length);
+for(const f of sources.files)assert.equal(sha(readFileSync(f.path)),f.sha256,f.path);
+for(const f of sources.candidateFiles)assert.equal(sha(execFileSync('git',['show',sources.candidate+':'+f.path],{stdio:['ignore','pipe','pipe']})),f.sha256,f.path);
+for(const a of sources.sharedAdmissions)assert.equal(readFileSync(a.path,'utf8').split(a.literal).length-1,a.count,a.path);
+for(const f of read('.artifacts/auto-ai-program-20261105/W23/protected.json'))assert.equal(sha(readFileSync(f.path)),f.sha256,f.path);
+console.log(JSON.stringify({task:'AF-225',actualCompletedDependencies:sources.completedDependencies.length,immutableBlobs:1061,exactStoppedCandidate:true,rootSourceVerified:true,realTarget:'REQUIRED_NOT_CLAIMED_BY_PREREQUISITE'}));

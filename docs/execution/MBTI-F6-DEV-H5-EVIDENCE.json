@@ -1,0 +1,210 @@
+{
+  "base": "http://192.168.0.200:4056/api/v1",
+  "h5": "http://192.168.0.200:5173/#/",
+  "profiles": {
+    "A": "9e0920b9-3295-457d-b083-70cecdb880ce",
+    "B": "4ec77cfe-73f3-4880-97b1-3efddbeea033",
+    "C": "f74b674d-ef35-48f4-b3aa-9379d1573e87"
+  },
+  "pages": {
+    "A": "1f52b534-a0c4-4df2-9f34-f8e2d89cf212",
+    "B": "abdecaaa-7709-4d8e-8284-2b62645e361a",
+    "C": "b3a41618-c941-408f-956a-e0b1749cfb09"
+  },
+  "steps": [
+    {
+      "at": "2026-11-09T06:07:39.766004+00:00",
+      "label": "A home to default unenrolled/no type",
+      "data": {
+        "card_id": "card_-SFSLe6q9tYFS7ZH1M4DX5qSZdbcMSkn",
+        "enrolled": false,
+        "type_unset": true,
+        "private": true,
+        "join_disabled": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:41.001292+00:00",
+      "label": "B home to default unenrolled/no type",
+      "data": {
+        "card_id": "card_K4UetlwFebtW0ye4eeQDyFZpSRSDlZv5",
+        "enrolled": false,
+        "type_unset": true,
+        "private": true,
+        "join_disabled": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:42.239909+00:00",
+      "label": "C home to default unenrolled/no type",
+      "data": {
+        "card_id": "card_MHHvQUxyHG267GGJhUTcX5KvECxw1Vr7",
+        "enrolled": false,
+        "type_unset": true,
+        "private": true,
+        "join_disabled": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:43.998231+00:00",
+      "label": "A explicit private card type ready",
+      "data": {
+        "type_code": "ESTJ",
+        "discoverable": false,
+        "visibility_all_false": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:45.761476+00:00",
+      "label": "B explicit private card type ready",
+      "data": {
+        "type_code": "ENFP",
+        "discoverable": false,
+        "visibility_all_false": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:46.726478+00:00",
+      "label": "dev GUI radius unavailable",
+      "data": {
+        "radius_m": 1000,
+        "count": null,
+        "reason": "location_source_not_configured",
+        "status": "unavailable"
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:47.197439+00:00",
+      "label": "dev GUI radius unavailable",
+      "data": {
+        "radius_m": 3000,
+        "count": null,
+        "reason": "location_source_not_configured",
+        "status": "unavailable"
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:47.672739+00:00",
+      "label": "dev GUI radius unavailable",
+      "data": {
+        "radius_m": 500,
+        "count": null,
+        "reason": "location_source_not_configured",
+        "status": "unavailable"
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:48.746665+00:00",
+      "label": "dev private card participation and isolated exit",
+      "data": {
+        "A": true,
+        "B_was_true": true,
+        "B_now": false,
+        "C_default": false,
+        "private_cards_unchanged": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:49.698699+00:00",
+      "label": "dev additional HTTP denials",
+      "data": {
+        "missing_type": 422,
+        "wrong_type": 422,
+        "bad_radius_duplicate_query_owner_boolean_location": 422,
+        "anonymous": 401,
+        "no_store": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:07:53.090970+00:00",
+      "label": "dev reload persists choice without publishing cards",
+      "data": {
+        "A": true,
+        "B": false,
+        "C": false,
+        "same_cards_and_visibility": true,
+        "fresh_guests_after_reload": 0,
+        "real_aggregation": "blocked_external"
+      }
+    },
+    {
+      "at": "2026-11-09T06:08:41.615267+00:00",
+      "label": "A dev API reboot persisted",
+      "data": {
+        "enrolled": true,
+        "same_card_and_visibility": true,
+        "fresh_guest_after_reload": 0
+      }
+    },
+    {
+      "at": "2026-11-09T06:08:42.845571+00:00",
+      "label": "B dev API reboot persisted",
+      "data": {
+        "enrolled": false,
+        "same_card_and_visibility": true,
+        "fresh_guest_after_reload": 0
+      }
+    },
+    {
+      "at": "2026-11-09T06:08:43.952020+00:00",
+      "label": "C dev API reboot persisted",
+      "data": {
+        "enrolled": false,
+        "same_card_and_visibility": true,
+        "fresh_guest_after_reload": 0
+      }
+    },
+    {
+      "at": "2026-11-09T06:08:45.674723+00:00",
+      "label": "F5 original private records after F6 reboot",
+      "data": {
+        "own_values_unchanged": true,
+        "valid_grant_requester": 200,
+        "recipient": 404,
+        "third_person": 404,
+        "old_revoked": 404,
+        "pending_reverse": 404,
+        "base_exchange_preserved": true
+      }
+    },
+    {
+      "at": "2026-11-09T06:08:45.804638+00:00",
+      "label": "F1 original result after F6 reboot",
+      "data": {
+        "id": "8a3d4793-93ab-43e4-8988-d3b6962d4b32",
+        "type_code": "ESTJ",
+        "status": 200
+      }
+    },
+    {
+      "at": "2026-11-09T06:08:45.924858+00:00",
+      "label": "F1 original result after F6 reboot",
+      "data": {
+        "id": "4b177e28-89d8-410f-ad90-b111a9e66e83",
+        "type_code": "INFP",
+        "status": 200
+      }
+    },
+    {
+      "at": "2026-11-09T06:08:46.062788+00:00",
+      "label": "F3 original order after F6 reboot",
+      "data": {
+        "id": "MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "amount": 990,
+        "status": "pending",
+        "unlocked": false
+      }
+    }
+  ],
+  "outcome": "passed",
+  "dev_reboot_passed": true,
+  "dev_reboot_at": "2026-11-09T06:08:46.063639+00:00",
+  "phase": "F6",
+  "status": "candidate / needs_human_review",
+  "source_tree": "cc8fd97bda1f9d7e1acae317075b95d33866d176",
+  "backend_source": "008455bbab20f85f6348cf54a40b7e23512eec90",
+  "web_source": "515b3fb1b4d38aa6729129f2b273fdaa2531b17b",
+  "real_aggregation": "blocked_external / not_available",
+  "cross_physical_device": "NOT_RUN",
+  "wechat_browser": "NOT_RUN"
+}

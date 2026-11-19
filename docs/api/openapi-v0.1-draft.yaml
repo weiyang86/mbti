@@ -1,0 +1,599 @@
+# openapi-v0.1-draft.yaml
+# verification_status: pending
+# needs_human_review: true
+# source_ref: UIhtml/mbti-buddy-product-sop-v0.4.html
+# Status: draft / pending Remy 定稿 — NOT authoritative until published by Remy.
+
+openapi: 3.0.3
+info:
+  title: MBTI搭子 API
+  version: 0.1-draft
+  description: |
+    Draft contract for MBTI搭子 V0.4 teaching slice (测 → 结果 → 晒预览 → 阶段记录).
+    **Pending Remy 定稿.** Do not treat as published contract.
+    Not a clinical MBTI assessment; no validity claims.
+  contact:
+    name: Remy (contract owner)
+
+servers:
+  - url: /api/v1
+    description: Relative to deployment host
+
+tags:
+  - name: health
+  - name: quiz
+  - name: results
+  - name: types
+  - name: share
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: Health check
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: Service OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  version:
+                    type: string
+                    example: 0.1-draft
+
+  /quiz/versions/current:
+    get:
+      tags: [quiz]
+      summary: Current question bank and 12 questions
+      operationId: getCurrentQuizVersion
+      responses:
+        "200":
+          description: Current bank
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizVersionPayload"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /quiz/sessions:
+    post:
+      tags: [quiz]
+      summary: Create quiz session
+      operationId: createQuizSession
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question_bank_version:
+                  type: string
+                  description: Optional pin; defaults to current if omitted
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizSession"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /quiz/sessions/{session_id}/answers:
+    put:
+      tags: [quiz]
+      summary: Upsert answers for in-progress session
+      operationId: updateQuizSessionAnswers
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answers]
+              properties:
+                answers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Answer"
+      responses:
+        "200":
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizSession"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /quiz/sessions/{session_id}/submit:
+    post:
+      tags: [quiz]
+      summary: Submit session once; creates immutable result snapshot
+      operationId: submitQuizSession
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                life_stage:
+                  type: string
+                  description: Optional background label only
+                recent_status:
+                  type: string
+                  description: Optional background label only
+      responses:
+        "201":
+          description: Result snapshot created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultSnapshot"
+        "409":
+          description: Already submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /results:
+    get:
+      tags: [results]
+      summary: List result snapshots for current user
+      operationId: listResults
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Snapshot list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ResultSnapshotSummary"
+                  next_cursor:
+                    type: string
+                    nullable: true
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    post:
+      tags: [results]
+      summary: Create self-selected type snapshot
+      operationId: createSelfSelectResult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type_code, source]
+              properties:
+                type_code:
+                  type: string
+                  pattern: "^[EI][SN][TF][JP]$"
+                  example: INFP
+                source:
+                  type: string
+                  enum: [self_select]
+                life_stage:
+                  type: string
+                recent_status:
+                  type: string
+      responses:
+        "201":
+          description: Snapshot created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultSnapshot"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /results/compare:
+    get:
+      tags: [results]
+      summary: Compare two snapshots with same question_bank_version
+      operationId: compareResults
+      parameters:
+        - name: baseline_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: target_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Comparison
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompareResult"
+        "422":
+          description: Version mismatch or incomparable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /results/{id}:
+    get:
+      tags: [results]
+      summary: Get result snapshot by id
+      operationId: getResult
+      parameters:
+        - $ref: "#/components/parameters/ResultId"
+      responses:
+        "200":
+          description: Snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultSnapshot"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    delete:
+      tags: [results]
+      summary: Delete user snapshot
+      operationId: deleteResult
+      parameters:
+        - $ref: "#/components/parameters/ResultId"
+      responses:
+        "204":
+          description: Deleted
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /types:
+    get:
+      tags: [types]
+      summary: Sixteen type metadata for self-select and display
+      operationId: listTypes
+      responses:
+        "200":
+          description: Type list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TypeMeta"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+  /share/preview:
+    post:
+      tags: [share]
+      summary: Request share preview image (stub OK)
+      operationId: createSharePreview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [result_id]
+              properties:
+                result_id:
+                  type: string
+                template_id:
+                  type: string
+                  description: Visual template key; optional in draft
+                scene:
+                  type: string
+                  enum: [moments, avatar, meet_card]
+                  description: Product scene selector
+      responses:
+        "200":
+          description: Sync preview URL and/or async job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview_url:
+                    type: string
+                    format: uri
+                  job_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [ready, pending]
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Stub access token. WeChat login TODO — pending Remy.
+    guestToken:
+      type: apiKey
+      in: header
+      name: X-Guest-Token
+      description: Guest stub for local dev
+
+  parameters:
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: string
+    ResultId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    ErrorResponse:
+      description: Error envelope
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    Question:
+      type: object
+      required: [id, index, dimension, prompt, options]
+      properties:
+        id:
+          type: string
+        index:
+          type: integer
+          minimum: 1
+          maximum: 12
+        dimension:
+          type: string
+          enum: [EI, SN, TF, JP]
+        prompt:
+          type: string
+        options:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [id, label]
+            properties:
+              id:
+                type: string
+              label:
+                type: string
+
+    Answer:
+      type: object
+      required: [question_id, option_id]
+      properties:
+        question_id:
+          type: string
+        option_id:
+          type: string
+
+    QuizSession:
+      type: object
+      required: [id, question_bank_version, status, answers]
+      properties:
+        id:
+          type: string
+        question_bank_version:
+          type: string
+        status:
+          type: string
+          enum: [in_progress, submitted]
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Answer"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    QuizVersionPayload:
+      type: object
+      required: [question_bank_version, questions]
+      properties:
+        question_bank_version:
+          type: string
+          example: qb-v0.4-teach-1
+        lookback_hint:
+          type: string
+          description: UX copy only — recent 4 weeks
+          example: 请按最近四周的通常状态作答
+        questions:
+          type: array
+          minItems: 12
+          maxItems: 12
+          items:
+            $ref: "#/components/schemas/Question"
+
+    DimensionCounts:
+      type: object
+      required: [E, I, S, N, T, F, J, P]
+      properties:
+        E:
+          type: integer
+          minimum: 0
+          maximum: 3
+        I:
+          type: integer
+          minimum: 0
+          maximum: 3
+        S:
+          type: integer
+          minimum: 0
+          maximum: 3
+        N:
+          type: integer
+          minimum: 0
+          maximum: 3
+        T:
+          type: integer
+          minimum: 0
+          maximum: 3
+        F:
+          type: integer
+          minimum: 0
+          maximum: 3
+        J:
+          type: integer
+          minimum: 0
+          maximum: 3
+        P:
+          type: integer
+          minimum: 0
+          maximum: 3
+
+    ResultSnapshot:
+      type: object
+      required:
+        - id
+        - source
+        - type_code
+        - question_bank_version
+        - submitted_at
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+          enum: [quiz, self_select]
+        type_code:
+          type: string
+          pattern: "^[EI][SN][TF][JP]$"
+        dimension_counts:
+          $ref: "#/components/schemas/DimensionCounts"
+        question_bank_version:
+          type: string
+          description: For self_select may use sentinel e.g. n/a-self-select (TBD Remy)
+        submitted_at:
+          type: string
+          format: date-time
+        life_stage:
+          type: string
+        recent_status:
+          type: string
+        session_id:
+          type: string
+          description: Present when source=quiz
+
+    ResultSnapshotSummary:
+      type: object
+      required: [id, source, type_code, question_bank_version, submitted_at]
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+          enum: [quiz, self_select]
+        type_code:
+          type: string
+        question_bank_version:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+        life_stage:
+          type: string
+
+    TypeMeta:
+      type: object
+      required: [type_code, name_zh, tagline]
+      properties:
+        type_code:
+          type: string
+        name_zh:
+          type: string
+        tagline:
+          type: string
+        description:
+          type: string
+
+    CompareResult:
+      type: object
+      required: [baseline_id, target_id, question_bank_version, type_changed]
+      properties:
+        baseline_id:
+          type: string
+        target_id:
+          type: string
+        question_bank_version:
+          type: string
+        type_changed:
+          type: boolean
+        baseline_type_code:
+          type: string
+        target_type_code:
+          type: string
+        dimension_deltas:
+          type: object
+          additionalProperties:
+            type: integer
+        stability_notes:
+          type: array
+          items:
+            type: string
+
+security:
+  - bearerAuth: []
+  - guestToken: []

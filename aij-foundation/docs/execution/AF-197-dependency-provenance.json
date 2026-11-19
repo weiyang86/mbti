@@ -1,0 +1,412 @@
+{
+  "schemaVersion": 1,
+  "task": "AF-197",
+  "scope": "Exact new dependency source and installed license verification; not publication or owner acceptance",
+  "sourceHead": "0075ab6f23ae33b5b7ac9757e084aada2afc580b",
+  "lockSha256": "a78a4c5e892d1147719fe6fdc652a5c23ce832e8820ffceb29074142461ab7d6",
+  "verifiedAt": "2026-11-06T20:21:20.253407+00:00",
+  "existingPackagesUnchanged": 792,
+  "newPackages": [
+    {
+      "name": "@noble/ciphers",
+      "version": "1.3.0",
+      "registryMetadata": "https://registry.npmjs.org/%40noble%2Fciphers/1.3.0",
+      "tarball": "https://registry.npmjs.org/@noble/ciphers/-/ciphers-1.3.0.tgz",
+      "verifiedIntegrity": "sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==",
+      "tarballSha256": "e02e7c03c26b8dd88ab0bd5e46f2996689e33f252bacb551a1cf504bc912501f",
+      "installedRelativeDirectory": "node_modules/@noble/ciphers",
+      "installedPackageJsonSha256": "d4fd92770dc4d2af454902aaea3e16f053e6f8b48ad2d95c016c662a5f1be2d4",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "f36671a5487c9c5050efacb58011c37c24c55a889803cb036cf9d9a6347c1e2d"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "@noble/hashes",
+      "version": "1.8.0",
+      "registryMetadata": "https://registry.npmjs.org/%40noble%2Fhashes/1.8.0",
+      "tarball": "https://registry.npmjs.org/@noble/hashes/-/hashes-1.8.0.tgz",
+      "verifiedIntegrity": "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==",
+      "tarballSha256": "e8a765d92c04faaccba8776411c5038cb195f812ee629fce07e1d2e6aec80ea0",
+      "installedRelativeDirectory": "node_modules/@noble/hashes",
+      "installedPackageJsonSha256": "7c4657c5e616c22cefa2691cc30670824a639dc71d97bf83925be2d239dc60e3",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "4f221aee6e072336700c408c68ab3b96a3fc09f6aebe6f48f1bd99e5ef13faec"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "@types/node",
+      "version": "26.6.6",
+      "registryMetadata": "https://registry.npmjs.org/%40types%2Fnode/26.6.6",
+      "tarball": "https://registry.npmjs.org/@types/node/-/node-26.6.6.tgz",
+      "verifiedIntegrity": "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==",
+      "tarballSha256": "7ef006842f7a647868e9d53588148cb058008b107aea6a728143730bee020456",
+      "installedRelativeDirectory": "node_modules/docx/node_modules/@types/node",
+      "installedPackageJsonSha256": "2520fc33dc754e75d61e6e49c174b439244537c3f2cff1897432806156a054fd",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "@types/pdfkit",
+      "version": "0.17.7",
+      "registryMetadata": "https://registry.npmjs.org/%40types%2Fpdfkit/0.17.7",
+      "tarball": "https://registry.npmjs.org/@types/pdfkit/-/pdfkit-0.17.7.tgz",
+      "verifiedIntegrity": "sha512-VMOZDWw7HtNtLbjIuHIhVArm9PlV0gxpz32jAl1IuXWlIgbr1lKFoTsrtvEzY8a9BIpQJEE5DwNPKD50otTs6g==",
+      "tarballSha256": "62adb3fca053fc3f5ffba27534fc3c81af3b34e51b4f53ef8fba520d8725d043",
+      "installedRelativeDirectory": "node_modules/@types/pdfkit",
+      "installedPackageJsonSha256": "81f2c85c0ad21f2eeda57c750e3368fdbce6ed4c91deadbe3351c9a8fd3cbc7d",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "base64-js",
+      "version": "0.0.8",
+      "registryMetadata": "https://registry.npmjs.org/base64-js/0.0.8",
+      "tarball": "https://registry.npmjs.org/base64-js/-/base64-js-0.0.8.tgz",
+      "verifiedIntegrity": "sha512-3XSA2cR/h/73EzlXXdU6YNycmYI7+kicTxks4eJg2g39biHR84slg2+des+p7iHYhbRg/udIS4TD53WabcOUkw==",
+      "tarballSha256": "441ef6db48ce61bfece3ed439d294febca4308eaaf7eff9de0683f62ffc7f3c0",
+      "installedRelativeDirectory": "node_modules/linebreak/node_modules/base64-js",
+      "installedPackageJsonSha256": "c02b020c7ee58e1dd08812e7fe2808881433a4aaa4331b0a440961e8ce853e3e",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE.MIT",
+          "sha256": "136239d1783a151cdbf6fd7935dd945082b9d0ee2cbb8497cc0ae49e8a743a47"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "brotli",
+      "version": "1.3.3",
+      "registryMetadata": "https://registry.npmjs.org/brotli/1.3.3",
+      "tarball": "https://registry.npmjs.org/brotli/-/brotli-1.3.3.tgz",
+      "verifiedIntegrity": "sha512-oTKjJdShmDuGW94SyyaoQvAjf30dZaHnjJ8uAF+u2/vGJkJbJPJAT1gDiOJP5v1Zb6f9KEyW/1HpuaWIXtGHPg==",
+      "tarballSha256": "3c7c260f6263df95fee49a9119e9fd21227d628b6c9d99080a75edfd9e2bdb24",
+      "installedRelativeDirectory": "node_modules/brotli",
+      "installedPackageJsonSha256": "387b47d00ea96cab9b4c521629fbcdc7621053ac061812526f3c69700924cef5",
+      "declaredLicense": "MIT",
+      "licenseFiles": [],
+      "missingIndependentLicense": true,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES",
+      "publishedSource": {
+        "repository": "https://github.com/devongovett/brotli.js",
+        "gitHead": "e36051345f6d27a56e5f39ea70d2f789b8574046"
+      },
+      "licenseEvidenceLimit": "Publisher package.json declares MIT, but official npm tarball contains no separate license file. Original source/README retained; this record is not distribution approval."
+    },
+    {
+      "name": "clone",
+      "version": "2.1.2",
+      "registryMetadata": "https://registry.npmjs.org/clone/2.1.2",
+      "tarball": "https://registry.npmjs.org/clone/-/clone-2.1.2.tgz",
+      "verifiedIntegrity": "sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==",
+      "tarballSha256": "7df63a618a362185c642f0a65db6f654e586fa727543872b5ba65e59d604e93d",
+      "installedRelativeDirectory": "node_modules/clone",
+      "installedPackageJsonSha256": "07e9c7efd55a99cbe2909d1fd46b032b67cba6b493d1fbc974fddf4f2adebc83",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "3fb0857ef0133928cf72c88dfc464e931486e88778961eedec25585e2321507f"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "dfa",
+      "version": "1.2.0",
+      "registryMetadata": "https://registry.npmjs.org/dfa/1.2.0",
+      "tarball": "https://registry.npmjs.org/dfa/-/dfa-1.2.0.tgz",
+      "verifiedIntegrity": "sha512-ED3jP8saaweFTjeGX8HQPjeC1YYyZs98jGNZx6IiBvxW7JG5v492kamAQB3m2wop07CvU/RQmzcKr6bgcC5D/Q==",
+      "tarballSha256": "d781eb3a307ab6aa2d97028f695b17dbeadf6fd27788c333b1fb96d18d2a23ad",
+      "installedRelativeDirectory": "node_modules/dfa",
+      "installedPackageJsonSha256": "96c0ce3cc17b34aabd58fd442157766d9e244cba735e54ee4fe10d7841f0460c",
+      "declaredLicense": "MIT",
+      "licenseFiles": [],
+      "missingIndependentLicense": true,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES",
+      "publishedSource": {
+        "repository": "https://github.com/devongovett/dfa",
+        "gitHead": "3f5e603e5082caedabefefdf53e8a6ca3111e966"
+      },
+      "licenseEvidenceLimit": "Publisher package.json declares MIT, but official npm tarball contains no separate license file. Original source/README retained; this record is not distribution approval."
+    },
+    {
+      "name": "docx",
+      "version": "9.15.2",
+      "registryMetadata": "https://registry.npmjs.org/docx/9.15.2",
+      "tarball": "https://registry.npmjs.org/docx/-/docx-9.15.2.tgz",
+      "verifiedIntegrity": "sha512-G/R41dlYE5RS3TG2ybX1DIodQv+TchMspmdvrrovFyzTpvLZe0pLKVqiGosBhZszLkRonrK9+zxJDPWHDYx4NA==",
+      "tarballSha256": "ea914c30ea8a17b6e4459c6c3caa8083caeb293f2a490e0344d69e625be60a00",
+      "installedRelativeDirectory": "node_modules/docx",
+      "installedPackageJsonSha256": "be2e05069532bdb9049e2c5d8b5bb9dedffef29e7d4a0b80769f2cc29d4669cb",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "b5b2364c0c95a26b2a2399d7e706a61acac680be1d5b180b00592ee85830bffb"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "fflate",
+      "version": "0.8.3",
+      "registryMetadata": "https://registry.npmjs.org/fflate/0.8.3",
+      "tarball": "https://registry.npmjs.org/fflate/-/fflate-0.8.3.tgz",
+      "verifiedIntegrity": "sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==",
+      "tarballSha256": "38c2cd824402407b43153c782274aec2ea83ea688e4aa0b743c5f2c305857d92",
+      "installedRelativeDirectory": "node_modules/fflate",
+      "installedPackageJsonSha256": "5922d8150b307bc0e4e441491c779c45379e9913d348848fca8d5cf02db4d134",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "fontkit",
+      "version": "2.0.4",
+      "registryMetadata": "https://registry.npmjs.org/fontkit/2.0.4",
+      "tarball": "https://registry.npmjs.org/fontkit/-/fontkit-2.0.4.tgz",
+      "verifiedIntegrity": "sha512-syetQadaUEDNdxdugga9CpEYVaQIxOwk7GlwZWWZ19//qW4zE5bknOKeMBDYAASwnpaSHKJITRLMF9m1fp3s6g==",
+      "tarballSha256": "f686a9515af33fce16ab4bffe50570728197e53165068548c6f75a1793797a08",
+      "installedRelativeDirectory": "node_modules/fontkit",
+      "installedPackageJsonSha256": "49c60605b92316a5d5fe57b9a3bca8950ad9a8beab1cb633d6f29862d1bd163d",
+      "declaredLicense": "MIT",
+      "licenseFiles": [],
+      "missingIndependentLicense": true,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES",
+      "publishedSource": {
+        "repository": "https://github.com/foliojs/fontkit",
+        "gitHead": "fbf3b9ef21eebd219eb73e666faed573af0fba09"
+      },
+      "licenseEvidenceLimit": "Publisher package.json declares MIT, but official npm tarball contains no separate license file. Original source/README retained; this record is not distribution approval."
+    },
+    {
+      "name": "linebreak",
+      "version": "1.1.0",
+      "registryMetadata": "https://registry.npmjs.org/linebreak/1.1.0",
+      "tarball": "https://registry.npmjs.org/linebreak/-/linebreak-1.1.0.tgz",
+      "verifiedIntegrity": "sha512-MHp03UImeVhB7XZtjd0E4n6+3xr5Dq/9xI/5FptGk5FrbDR3zagPa2DS6U8ks/3HjbKWG9Q1M2ufOzxV2qLYSQ==",
+      "tarballSha256": "3828486cc52edbedd8c36a3db68ccaa93164d8af19af6c2b12e22ce6e2755fd6",
+      "installedRelativeDirectory": "node_modules/linebreak",
+      "installedPackageJsonSha256": "53f67b29d3d0c3bc43501bf17d658aa611a668128eeba39ae9eabeb1cdb505d0",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "cf22b8198f0886a8d4626121579114f23141070e1fceab02ab3c1c361e163440"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "nanoid",
+      "version": "6.0.2",
+      "registryMetadata": "https://registry.npmjs.org/nanoid/6.0.2",
+      "tarball": "https://registry.npmjs.org/nanoid/-/nanoid-6.0.2.tgz",
+      "verifiedIntegrity": "sha512-hIvVOb9Qr1p/9CNNLOe0OlWvgx/ziTsVwKN/GDSsuArN2K0wDiafP3s0SWmsm7o2BdnyS8Z9Z64NFBUbn6ziBg==",
+      "tarballSha256": "91f1fbef0fc30de371dbf9dfe668942b317503477d267920c5a9ea9b994be569",
+      "installedRelativeDirectory": "node_modules/nanoid",
+      "installedPackageJsonSha256": "db4529bba6a049e176f5a43b131f903047b72c9b609f4cc12f9230c83e379682",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "4383cb2c3608397ce7a4159502614ed66890f8999c2a9c056dd3b1024d6721f0"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "pako",
+      "version": "0.2.9",
+      "registryMetadata": "https://registry.npmjs.org/pako/0.2.9",
+      "tarball": "https://registry.npmjs.org/pako/-/pako-0.2.9.tgz",
+      "verifiedIntegrity": "sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==",
+      "tarballSha256": "4a9319f1b7d155022ae088ff67d4bb739f81d29c8f82b7e6bde6bce461c3cd9f",
+      "installedRelativeDirectory": "node_modules/pako",
+      "installedPackageJsonSha256": "dc1090fc2228e15fb13cc8aa81f3c99c9c0a4237f99a42d1c7ffda1b137cf1cf",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "3bc404ffa7888053253eedcc5a667619aa08dc1be0bea400e5ff28c51602180f"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "pdfkit",
+      "version": "0.20.2",
+      "registryMetadata": "https://registry.npmjs.org/pdfkit/0.20.2",
+      "tarball": "https://registry.npmjs.org/pdfkit/-/pdfkit-0.20.2.tgz",
+      "verifiedIntegrity": "sha512-Q/w03ICAQyXfHNfTsg1udp0ADerdBN0s7a6XSPL7J7Ro6ABnafoBOCDBstIO9U02mvzHEV8HrvFIw5iV5ejIRA==",
+      "tarballSha256": "a9b2daf39e77df3e17553593ab2c467ab82c59d753d97b7f2473e840ee503511",
+      "installedRelativeDirectory": "node_modules/pdfkit",
+      "installedPackageJsonSha256": "2356214bbf00ab5b9d008746b92483c92c6644373c5f070d893574b0d8235b97",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "5f0d5197d2b5d91f41de43143b0be42fb55515bc2b894f2a9b62de9f7056c0f8"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "png-js",
+      "version": "2.0.0",
+      "registryMetadata": "https://registry.npmjs.org/png-js/2.0.0",
+      "tarball": "https://registry.npmjs.org/png-js/-/png-js-2.0.0.tgz",
+      "verifiedIntegrity": "sha512-GdzJuUMc6ZSpxFJWVxtOH1bzYHym+TOnveqUjb+VJIbZWbZzyiRGFiKhbiielfpYbgMlhHVhsJ0FTazfuRFkMA==",
+      "tarballSha256": "a5e7cd8278d15fd1f7da9c22794913bad288997fd567abde8fdba0478563452d",
+      "installedRelativeDirectory": "node_modules/png-js",
+      "installedPackageJsonSha256": "58659c7b894f4d9248a2845a1a9a9b457b1f54f461aef65ad77c183ae944358a",
+      "declaredLicense": null,
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "bdb26a2ec815931ed6a38f3416362566204ee85ecdef96702b636402da4c75c3"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "restructure",
+      "version": "3.0.2",
+      "registryMetadata": "https://registry.npmjs.org/restructure/3.0.2",
+      "tarball": "https://registry.npmjs.org/restructure/-/restructure-3.0.2.tgz",
+      "verifiedIntegrity": "sha512-gSfoiOEA0VPE6Tukkrr7I0RBdE0s7H1eFCDBk05l1KIQT1UIKNc5JZy6jdyW6eYH3aR3g5b3PuL77rq0hvwtAw==",
+      "tarballSha256": "11c295b72e9326606649d26bde924942dd560183e0d6395564dbb54254134b41",
+      "installedRelativeDirectory": "node_modules/restructure",
+      "installedPackageJsonSha256": "f28780f515208c0fc417a2e49340b0cd1c146ff20ce6bfeee3593e64a8f74d14",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "c0df7f551401f8f80197ff31bf69b8cd23727d127423403282514d242a3ab132"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "tiny-inflate",
+      "version": "1.0.3",
+      "registryMetadata": "https://registry.npmjs.org/tiny-inflate/1.0.3",
+      "tarball": "https://registry.npmjs.org/tiny-inflate/-/tiny-inflate-1.0.3.tgz",
+      "verifiedIntegrity": "sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==",
+      "tarballSha256": "73932b339424e5ffaeaf043e6481229cab407ee277b2a01fa23938dfad6a8f4e",
+      "installedRelativeDirectory": "node_modules/tiny-inflate",
+      "installedPackageJsonSha256": "7a97c9567b054c9294036537d42a112f4bd4263892fbfe2714e6acdf25816c6d",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "c0df7f551401f8f80197ff31bf69b8cd23727d127423403282514d242a3ab132"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "undici-types",
+      "version": "8.9.0",
+      "registryMetadata": "https://registry.npmjs.org/undici-types/8.9.0",
+      "tarball": "https://registry.npmjs.org/undici-types/-/undici-types-8.9.0.tgz",
+      "verifiedIntegrity": "sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==",
+      "tarballSha256": "3a587851ccbf1021b20eac8a38eb819d7e2a1ab77aa477cb24cae5473a3e78c6",
+      "installedRelativeDirectory": "node_modules/docx/node_modules/undici-types",
+      "installedPackageJsonSha256": "7f3c1a0498b1b7f74402f76d2958bf5a35fc89403036188dc5f8ede1b4e0638b",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "unicode-properties",
+      "version": "1.4.1",
+      "registryMetadata": "https://registry.npmjs.org/unicode-properties/1.4.1",
+      "tarball": "https://registry.npmjs.org/unicode-properties/-/unicode-properties-1.4.1.tgz",
+      "verifiedIntegrity": "sha512-CLjCCLQ6UuMxWnbIylkisbRj31qxHPAurvena/0iwSVbQ2G1VY5/HjV0IRabOEbDHlzZlRdCrD4NhB0JtU40Pg==",
+      "tarballSha256": "dffa8478c712c4d6938cf72e3778f4d652e5d28285e4bc1ea4b2922fa5849962",
+      "installedRelativeDirectory": "node_modules/unicode-properties",
+      "installedPackageJsonSha256": "4dba3776474dc9f928749684eeaeabacb40fd0e58ef704b2c2a976201830183b",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "43439dbd4f43837aadab215cdbe5a422cc6323a50c4ea84d8d6bbc3671666a1d"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    },
+    {
+      "name": "unicode-trie",
+      "version": "2.0.0",
+      "registryMetadata": "https://registry.npmjs.org/unicode-trie/2.0.0",
+      "tarball": "https://registry.npmjs.org/unicode-trie/-/unicode-trie-2.0.0.tgz",
+      "verifiedIntegrity": "sha512-x7bc76x0bm4prf1VLg79uhAzKw8DVboClSN5VxJuQ+LKDOVEW9CdH+VY7SP+vX7xCYQqzzgQpFqz15zeLvAtZQ==",
+      "tarballSha256": "7db9750429590d5ec42bd544b5ee7b69e6b1f39beafec1d8e5c1635096deceb5",
+      "installedRelativeDirectory": "node_modules/unicode-trie",
+      "installedPackageJsonSha256": "11742ae162c45a0f55a4d85ae1c6dc7dd380e203173d3bca04e72ca3b68729b6",
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "filename": "LICENSE",
+          "sha256": "43439dbd4f43837aadab215cdbe5a422cc6323a50c4ea84d8d6bbc3671666a1d"
+        }
+      ],
+      "missingIndependentLicense": false,
+      "status": "VERIFIED_OFFICIAL_TARBALL_AND_INSTALLED_BYTES"
+    }
+  ],
+  "fontSource": "docs/planning/auto-ai-program-20261105/W16/RENDERER_DEPENDENCY_PLAN.json",
+  "productionAudit": ".artifacts/auto-ai-program-20261105/W16/AF-197-production-audit.json"
+}

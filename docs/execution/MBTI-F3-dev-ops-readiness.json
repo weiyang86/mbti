@@ -1,0 +1,19 @@
+{
+  "observed_at": "2026-11-09T03:49:41.174Z",
+  "project": "mbti-foundation",
+  "environment": "development",
+  "AUTH_ENABLED": "false",
+  "JWT_SECRET_configured": false,
+  "JWT_ISSUER": "urn:aij:mbti-foundation:development:api",
+  "COOKIE_PREFIX": "mbti_foundation_development",
+  "API_PORT": "4056",
+  "WEB_URL": "http://127.0.0.1:5173",
+  "f3_migration_present": false,
+  "active_admins": 0,
+  "active_super_admins": 0,
+  "existing_permission_definitions": [],
+  "inspection": "READ ONLY; no credentials or administrator identities exposed",
+  "dev_auth_session_http_status": 404,
+  "dev_ops_route_http_status": 404,
+  "dev_health_http_status": 200
+}

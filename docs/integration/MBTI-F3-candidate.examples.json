@@ -1,0 +1,16 @@
+{
+  "status": "needs_human_review",
+  "products": { "items": [
+    { "code": "studio_tier_1", "name": "MBTI 晒图套装", "description": "成图 + 头像 + 相处卡 + 配文", "amount": 990, "currency": "CNY", "saleable": true, "pricing_mode": "controlled_test_fixture", "highlights": ["朋友圈 MBTI 海报", "同款人格头像", "相处卡与发圈文案"], "tier": 1 },
+    { "code": "studio_tier_2", "name": "本人形象套装", "description": "全部内容 + 本人照片风格方案", "amount": 1990, "currency": "CNY", "saleable": false, "pricing_mode": "controlled_test_fixture", "unavailable_reason": "FULFILLMENT_UNCONFIGURED", "highlights": ["包含晒图套装全部内容", "本人照片风格方案（本机预览）"], "tier": 2 }
+  ] },
+  "create_request": { "result_id": "example-result-id", "product_code": "studio_tier_1" },
+  "create_headers": { "Idempotency-Key": "example_intent_000001" },
+  "order": { "id": "MBTI-example-persistent-order-number", "result_id": "example-result-id", "product_code": "studio_tier_1", "amount": 990, "currency": "CNY", "status": "pending", "unlocked": false, "created_at": "2026-11-09T00:00:00.000Z", "payment_availability": "unconfigured", "pricing_mode": "controlled_test_fixture" },
+  "orders_empty": { "items": [], "next_cursor": null },
+  "orders": { "items": [{ "id": "MBTI-example-persistent-order-number", "result_id": "example-result-id", "product_code": "studio_tier_1", "amount": 990, "currency": "CNY", "status": "pending", "unlocked": false, "created_at": "2026-11-09T00:00:00.000Z", "payment_availability": "unconfigured", "pricing_mode": "controlled_test_fixture" }], "next_cursor": null },
+  "order_status": { "order_id": "MBTI-example-persistent-order-number", "status": "pending", "unlocked": false, "payment_availability": "unconfigured" },
+  "entitlements_empty": { "items": [] },
+  "controlled_test_entitlement": { "id": "example-entitlement-id", "order_id": "MBTI-example-persistent-order-number", "result_id": "example-result-id", "product_code": "studio_tier_1", "kind": "studio_tier_1", "status": "active", "granted_at": "2026-11-09T00:00:00.000Z", "scope": "controlled_test" },
+  "idempotency_conflict": { "code": "IDEMPOTENCY_CONFLICT", "message": "此重试标识已用于另一购买意图" }
+}

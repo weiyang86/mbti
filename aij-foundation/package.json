@@ -1,0 +1,49 @@
+{
+  "name": "mbti-foundation",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=10.0.0 <11"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @aij/api --filter @aij/web dev",
+    "dev:api": "pnpm --filter @aij/api dev",
+    "dev:web": "pnpm --filter @aij/web dev",
+    "start:api": "pnpm --filter @aij/api start",
+    "start:web": "pnpm --filter @aij/web start",
+    "build": "pnpm -r build",
+    "lint": "eslint apps scripts --max-warnings=0",
+    "typecheck": "pnpm -r typecheck",
+    "test": "node --test scripts/test/*.test.mjs && pnpm --filter @aij/api test",
+    "verify:dev": "node scripts/verify-dev-reload.mjs",
+    "verify:task": "node scripts/verification/runner.mjs",
+    "db:check": "node scripts/db-check.mjs",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "db:seed": "node scripts/db-seed.mjs",
+    "db:up": "node scripts/database/cli.mjs up",
+    "db:stop": "node scripts/database/cli.mjs stop",
+    "db:restart": "node scripts/database/cli.mjs restart",
+    "db:cleanup": "node scripts/database/cli.mjs cleanup",
+    "aij:project": "node scripts/project/cli.mjs",
+    "verify:product": "node scripts/verification/product/runner.mjs",
+    "base:dev": "node scripts/base-development/cli.mjs",
+    "ai:local": "node scripts/ai-local-development/cli.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.2",
+    "eslint": "9.39.2",
+    "eslint-config-next": "16.4.1",
+    "globals": "16.4.0",
+    "pg": "8.16.3",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.53.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "@prisma/config@6.19.3>deepmerge-ts": "8.0.0",
+      "@nestjs/platform-express@11.1.19>multer": "2.5.0"
+    }
+  }
+}

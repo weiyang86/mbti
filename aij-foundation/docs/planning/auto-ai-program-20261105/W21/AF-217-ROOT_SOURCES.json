@@ -1,0 +1,110 @@
+{
+  "task": "AF-217",
+  "sourceBaseline": "f0e12d76b0c2c5dccf4d1c56369019e979e52902",
+  "candidate": "f948d5e81c61dc6be6d2cc66343e1b246b534782",
+  "files": [
+    {
+      "path": "apps/web/app/components/client-workflow-execution-panel.tsx",
+      "sha256": "626b144d618d52374d57e4d5c04aa470f3a1d377c99d73eb022a67f62a7090c3"
+    },
+    {
+      "path": "apps/web/app/components/client-workflow-execution-state.mjs",
+      "sha256": "7a98d47a7beb84fefe7adc085c230527f4faf567bd56018525e4c676519043ab"
+    },
+    {
+      "path": "apps/web/app/components/client-workflow-execution-state.d.mts",
+      "sha256": "e6e0933cb71415f622d45722dcae39a47dbc63df0ee54c88c01531d55c8f6436"
+    },
+    {
+      "path": "scripts/verification/client-workflow-execution-state.test.mjs",
+      "sha256": "c862376747183f9cd033adec34e2b07a497c896046b9baf887dfa92b8a16474f"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W21/AF-217-ROOT_WIRING.md",
+      "sha256": "354e03e66f28ce7c802a5020bc09ec48b641d072d0375315f7ee05669aa46c70"
+    },
+    {
+      "path": "docs/execution/AF-217-candidate.md",
+      "sha256": "62c06fe578d7e1b3d76af91ef4c3a1e16ca9fa2d54110cbd25235d6d4d293fb0"
+    },
+    {
+      "path": "apps/web/app/components/client-workflow-library.tsx",
+      "sha256": "c81b162b021a44df9e223e50fa9933c27635e63750f8c2ada75e332c8d9f1559"
+    },
+    {
+      "path": "scripts/verification/w21-ui-host.mjs",
+      "sha256": "0f694bf1c89778d5099ba6341bdeb1d82c7cfb2009c1085c1f029d58a90b5628"
+    },
+    {
+      "path": "scripts/verification/w21-candidate-prerequisite.mjs",
+      "sha256": "6a80add8655eae12444bc9fe33d1e378a6792ba0fcd36b2ff1ddd8a843232fa3"
+    },
+    {
+      "path": "scripts/verification/client-workflow-execution-live.test.mjs",
+      "sha256": "ecc7d8192e888b233bb0be303784f1e731c419a5cb6e6d62e4dfa9f7cd80c1aa"
+    },
+    {
+      "path": "scripts/verification/client-workflow-execution-acceptance.mjs",
+      "sha256": "2fb9303c5f58830364ac5dd7676be58b846a0e955d469ea3733279fd7cc85f9f"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-runtime-fixture.mjs",
+      "sha256": "209dbbe0ca9f7ce73513197e7d89f38a4840020ee7409420f899fb45c4430079"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "e8603c654de4fe8cd18d123e4ea63f321795a3ba478b3cab35f9bd3b550810f2"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "19caa686264b88327e7b62128f2854e3bea0d4257d9a3ed10a81242c3c5bbdda"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "8ef501d0d6893d1706468cac87111ae11c476f9d8c6c51fdc4def87cd0b917b2"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "8686026d6e30f66fb46973741f7ee0156a3b8a9028a5324f1a90ec066c076779"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "806fc7d77cb4eac5a05b4d7453c7105e8bae61038a2cc2b39e6005b70d9d5ef6"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "7f1bd9e43919a654440a3709175c18aeaede9a12f340b489f9df7669eb6fe4b5"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "d77a4ae8008978c9fe1e1c61955b270fcd61df1ac93f83cb136152929f7e9761"
+    },
+    {
+      "path": "scripts/verification/web-build-isolated.mjs",
+      "sha256": "3ef72418b657d5e2ed2a415b374b20ad98b9dc1a7778e3c94973f576b75c2cac"
+    },
+    {
+      "path": "apps/web/app/components/client-workflow-library-state.mjs",
+      "sha256": "aee6caf8bd73a95a2fd5a75d507592587cc7be808d2164ecbd9116c5edb5b6dd"
+    },
+    {
+      "path": "apps/web/app/components/client-workflow-library-state.d.mts",
+      "sha256": "d3655ceae22e8942c13bb3ffd6406c4b1fba8dcaf5c5f4e828f481caf8bab793"
+    },
+    {
+      "path": "scripts/verification/client-workflow-library.test.mjs",
+      "sha256": "02d24800163f75df93b70719330d4c907f45e943029806f79fbb2ba8ff1c364f"
+    },
+    {
+      "path": "scripts/verification/client-workflow-linear-editor.test.mjs",
+      "sha256": "7114319dfd9477eb2ff65ca61129da4018dacbc3a70f415e4099d97d562818b9"
+    }
+  ],
+  "rootCorrections": [
+    "current whole-parent rejection notification",
+    "original strict context accepts exact current7 fields with64hex generation, no unknown fields",
+    "actual driver honors canonical saved graph and original old-publication409; explicit scope restoration after suspension",
+    "owned resources close even after native cleanup failure",
+    "native screen-only scrolling/focus geometry before real Enter, no injected DOM activation"
+  ]
+}

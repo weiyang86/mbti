@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: MBTI F6 radar runtime candidate
+  version: 0.1.0-candidate
+  description: >-
+    Internal candidate / needs_human_review. Not a published API contract.
+    Participation records a choice only, never location permission. No location is collected.
+    Real radius aggregation is blocked_external / not_available: voluntary source, consent,
+    distance algorithm, radius semantics and approved small-sample policy are missing.
+x-status: candidate
+x-needs-human-review: true
+x-run: run_594d408d15de
+servers:
+  - url: http://192.168.0.200:4156/api/v1
+security:
+  - guest: []
+paths:
+  /radar/participation:
+    get:
+      operationId: getRadarParticipation
+      description: Current guard owner only. No query keys. Missing row returns false; creates no card or participation.
+      responses:
+        '200':
+          description: Current committed choice; raw business object, Cache-Control no-store.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      operationId: updateRadarParticipation
+      description: >-
+        No query keys; exactly one required boolean enrolled. Identity/type/location/radius
+        keys are rejected. true requires an existing valid own card type (private card allowed);
+        false is always allowed without a card/type/location. Same owner transaction lock as F5,
+        one unique owner FK row, same-value retries stable. Returns after commit. Does not change
+        discoverable, visibility, contacts or history. JSON parser errors precede controller guards.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Participation'
+      responses:
+        '200':
+          description: Committed choice; raw business object, Cache-Control no-store.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participation'
+        '400':
+          description: INVALID_JSON (malformed or strict-parser primitive/null JSON).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: BODY_TOO_LARGE.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /radar/same-type:
+    get:
+      operationId: getSameTypeCount
+      description: >-
+        Strict query whitelist; duplicate/array/object/unknown keys rejected with 422.
+        Order: guard, query structure/radius/type enum, existing own valid card type,
+        type equality, own participation, capability. No lazy card, query-derived type,
+        latest-result fallback or default INFP. All valid responses are unavailable with count null;
+        never numeric, low_sample or available. No aggregate COUNT query, people, positions,
+        contact values or other-owner identifiers. DB/HTTP failure stays failure.
+        status/reason and errors are new candidate fields/codes requiring review.
+      parameters:
+        - name: type_code
+          in: query
+          required: false
+          description: Exact uppercase 16-type code; must equal existing own card. Omit to use that card.
+          schema:
+            type: string
+            enum: [ISTJ, ISFJ, INFJ, INTJ, ISTP, ISFP, INFP, INTP, ESTP, ESFP, ENFP, ENTP, ESTJ, ESFJ, ENFJ, ENTJ]
+        - name: radius_m
+          in: query
+          required: false
+          description: One exact decimal string; UI-derived candidate tiers, not a published distance policy.
+          schema:
+            type: string
+            enum: ['500', '1000', '3000']
+            default: '500'
+      responses:
+        '200':
+          description: Explicit capability state; raw business object, Cache-Control no-store.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '500':
+          $ref: '#/components/responses/InternalError'
+components:
+  securitySchemes:
+    guest:
+      type: apiKey
+      in: header
+      name: X-Guest-Token
+  schemas:
+    Participation:
+      type: object
+      additionalProperties: false
+      required: [enrolled]
+      properties:
+        enrolled:
+          type: boolean
+    Unavailable:
+      type: object
+      additionalProperties: false
+      required: [count, status, reason]
+      properties:
+        count:
+          type: integer
+          nullable: true
+          enum: [null]
+        status:
+          type: string
+          enum: [unavailable]
+          x-needs-human-review: true
+        reason:
+          type: string
+          enum: [not_enrolled, location_source_not_configured]
+          x-needs-human-review: true
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+  responses:
+    Unauthorized:
+      description: Missing, malformed or expired token; 401 GUEST_UNAUTHORIZED, no-store. No identity replacement.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidInput:
+      description: >-
+        422 no-store. INVALID_RADAR_INPUT for whitelist/type/enum/radius errors;
+        RADAR_TYPE_REQUIRED for missing/invalid stored own card type;
+        RADAR_TYPE_MISMATCH for a valid query type different from own card.
+        New codes are candidate / needs_human_review.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: 500 INTERNAL_ERROR, no-store; never converted into unavailable.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

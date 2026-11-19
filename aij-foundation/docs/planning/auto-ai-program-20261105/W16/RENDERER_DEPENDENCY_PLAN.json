@@ -1,0 +1,34 @@
+{
+  "docx": {
+    "version": "9.15.2",
+    "integrity": "sha512-G/R41dlYE5RS3TG2ybX1DIodQv+TchMspmdvrrovFyzTpvLZe0pLKVqiGosBhZszLkRonrK9+zxJDPWHDYx4NA==",
+    "source": "https://registry.npmjs.org/docx/-/docx-9.15.2.tgz"
+  },
+  "pdfkit": {
+    "version": "0.20.2",
+    "integrity": "sha512-Q/w03ICAQyXfHNfTsg1udp0ADerdBN0s7a6XSPL7J7Ro6ABnafoBOCDBstIO9U02mvzHEV8HrvFIw5iV5ejIRA==",
+    "source": "https://registry.npmjs.org/pdfkit/-/pdfkit-0.20.2.tgz"
+  },
+  "typesPdfkit": {
+    "version": "0.17.7",
+    "source": "https://registry.npmjs.org/@types/pdfkit/-/pdfkit-0.17.7.tgz"
+  },
+  "font": {
+    "commit": "f8d157532fbfaeda587e826d4cd5b21a49186f7c",
+    "files": [
+      {
+        "path": "NotoSansCJKsc-Regular.otf",
+        "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+        "size": 16437364,
+        "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+      },
+      {
+        "path": "LICENSE",
+        "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/LICENSE",
+        "size": 4301,
+        "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+      }
+    ]
+  },
+  "linuxNodeImage": "docker.io/library/node@sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20"
+}

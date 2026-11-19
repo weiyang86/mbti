@@ -1,0 +1,38 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+
+const queue = JSON.parse(readFileSync("docs/planning/CODING_QUEUE.json", "utf8"));
+const baselinePath = ".artifacts/continuous/2026-11-01-to-G19/AF-107-baseline.json";
+const baseline = JSON.parse(readFileSync(baselinePath, "utf8"));
+const snapshotPath = ".artifacts/continuous/2026-10-31-to-G19/queue-start.json";
+const snapshot = readFileSync(snapshotPath);
+const snapshotHash = createHash("sha256").update(snapshot).digest("hex");
+const task = queue.taskExecutions.find(item => item.formalTaskId === "AF-107");
+const assignment = queue.formalTaskIdAssignments;
+const history = queue.formalTaskIdAssignmentsHistory.filter(entry => entry.ids?.["G18-05"] === "AF-107");
+const previousCallback = queue.taskExecutions.find(item => item.formalTaskId === "AF-105");
+const previousAdmin = queue.taskExecutions.find(item => item.formalTaskId === "AF-106");
+const batch = queue.proposedBatches.find(item => item.id === "NEXT-18C");
+
+assert.equal(execFileSync("git", ["--no-optional-locks", "branch", "--show-current"], { encoding: "utf8" }).trim(), "dev");
+assert.equal(execFileSync("git", ["--no-optional-locks", "rev-parse", "HEAD"], { encoding: "utf8" }).trim(), baseline.head);
+assert.equal(execFileSync("git", ["--no-optional-locks", "rev-parse", "origin/dev"], { encoding: "utf8" }).trim(), baseline.originDevTrackingRef);
+assert.equal(snapshotHash, baseline.queueSnapshotSha256);
+assert.equal(baseline.ordinaryGitIndex.recoveredOriginalSha, false, "the missing original index is not falsely marked restored");
+assert.equal(assignment.ids["G18-05"], "AF-107");
+assert.equal(history.length, 1, "AF-107 is assigned once to G18-05");
+assert.equal(queue.taskExecutions.filter(item => item.formalTaskId === "AF-107").length, 1);
+assert.equal(task?.alias, "G18-05");
+assert.equal(task?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK");
+assert.ok(["IN_PROGRESS", "CODE_VERIFIED"].includes(task?.status));
+assert.equal(task?.dataOwner, "apps/api/src/plugins/aij-payment owns reconciliation evidence and review state; payment ledger truth remains owned by existing payment orders, attempts, callbacks and transactions.");
+assert.equal(previousCallback?.status, "COMMITTED_AND_PUSHED");
+assert.equal(previousAdmin?.status, "CODE_VERIFIED");
+assert.equal(previousAdmin?.git?.status, "COMMITTED_AND_PUSHED");
+assert.equal(batch?.formalTaskIds?.["G18-05"], "AF-107");
+assert.equal(queue.activeRun?.currentCard, "G18-05/AF-107");
+assert.equal(queue.continuousQueueRun?.currentCard, "G18-05/AF-107");
+assert.equal(queue.activeRun?.ownerAcceptance, "PENDING_UNIFIED_OWNER_CHECK");
+console.log("AF-107 assignment, frozen queue, AF-105/AF-106 dependencies, isolated payment owner, and pending owner acceptance verified.");

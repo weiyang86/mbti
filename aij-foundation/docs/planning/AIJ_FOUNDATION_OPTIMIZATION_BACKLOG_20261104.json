@@ -1,0 +1,732 @@
+{
+  "schemaVersion": 1,
+  "kind": "ARCHITECTURE_OPTIMIZATION_PROPOSAL",
+  "date": "2026-11-04",
+  "baseline": "5bd33fdbf30306d56d38525e665daa2cd0bf2fbd",
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "executorInstalled": false,
+  "formalAFIdsAssigned": false,
+  "targetAssumption": "通用业务底座 + 可选AI应用能力；多独立产品复用",
+  "estimatePolicy": "有效工程小时，含实现、目标验证、适用构建与一次常规修正；排除外部等待/正式环境/许可决定。每项是优化工作包，开工前拆成<=4小时卡片；默认每批<=4卡/12小时。各阶段有先后/跨阶段依赖，不按表顺序盲目执行。",
+  "milestones": [
+    {
+      "id": "M0",
+      "name": "一致性与可靠性修复",
+      "gate": "租约、目录、门禁、健康与当前状态入口修复，关键跨模块回归可复现",
+      "taskIds": [
+        "OPT-001",
+        "OPT-002",
+        "OPT-003",
+        "OPT-004",
+        "OPT-008"
+      ],
+      "estimateHours": {
+        "low": 13,
+        "high": 25
+      }
+    },
+    {
+      "id": "M1",
+      "name": "新产品可复用的受控试点版",
+      "gate": "base 与 ai-standard 正常生成/安装/扩展，两参考产品证明复用与升级边界",
+      "taskIds": [
+        "OPT-005",
+        "OPT-006",
+        "OPT-007",
+        "OPT-009",
+        "OPT-010",
+        "OPT-011"
+      ],
+      "estimateHours": {
+        "low": 52,
+        "high": 84
+      }
+    },
+    {
+      "id": "M2",
+      "name": "所选范围的生产候选版",
+      "gate": "生产配置、容量/可观测、必要外部适配、版本恢复与负责人接收通过",
+      "taskIds": [
+        "OPT-012",
+        "OPT-013",
+        "OPT-014",
+        "OPT-015",
+        "OPT-016",
+        "OPT-017",
+        "OPT-027",
+        "OPT-028"
+      ],
+      "estimateHours": {
+        "low": 64,
+        "high": 106
+      }
+    },
+    {
+      "id": "M3",
+      "name": "通用 AI 应用层",
+      "gate": "多模型执行、路由/配额、提示/会话与版本化检索/评测形成闭环",
+      "taskIds": [
+        "OPT-018",
+        "OPT-019",
+        "OPT-020",
+        "OPT-021",
+        "OPT-022"
+      ],
+      "estimateHours": {
+        "low": 56,
+        "high": 96
+      }
+    },
+    {
+      "id": "M4",
+      "name": "按需 Agent / Tool / MCP / Workflow",
+      "gate": "工具授权/批准及可恢复编排经参考流程验证，按需求选做",
+      "taskIds": [
+        "OPT-023",
+        "OPT-024",
+        "OPT-025"
+      ],
+      "estimateHours": {
+        "low": 44,
+        "high": 74
+      }
+    },
+    {
+      "id": "M5",
+      "name": "按需企业身份增强",
+      "gate": "有企业客户需求后实施SSO/MFA/邀请，不作为所有内部应用先决条件",
+      "taskIds": [
+        "OPT-026"
+      ],
+      "estimateHours": {
+        "low": 12,
+        "high": 24
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "OPT-001",
+      "title": "修复租约接管与编排任务副作用准入",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 4,
+        "high": 8
+      },
+      "dependsOn": [],
+      "owner": "AsyncRuntime / JobService",
+      "findingIds": [
+        "F01"
+      ],
+      "scope": "执行前校验租约 owner/attempt，处理中幂等记录需有有效执行者；为外部调用定义 fencing、幂等键与不确定结果策略；复用现有 RuntimeJob/Idempotency。",
+      "acceptance": "旧 claim 在新 owner 接管后不能进入 handler；两个独立连接/进程竞争只允许当前有效 owner 执行；崩溃前后和未知外部结果有明确重试/对账语义，不承诺无法证明的外部 exactly-once。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-002",
+      "title": "统一启动、管理与生命周期插件目录",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [],
+      "owner": "PluginRuntime / composition root",
+      "findingIds": [
+        "F02"
+      ],
+      "scope": "以一个可信注册源生成运行时装配、管理 catalog 和启动白名单；补齐 aij-ai 正常安装/启停入口。",
+      "acceptance": "默认应用目录包含 AI/通知/支付；空库可经管理入口安装并启用 AI；未知插件拒绝，三处目录自动一致，无手工补数据库行。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-003",
+      "title": "统一 AI 全部知识接口与菜单的停用门禁",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [
+        "OPT-002"
+      ],
+      "owner": "aij-ai / PluginRuntimeAccess / menu availability",
+      "findingIds": [
+        "F03"
+      ],
+      "scope": "覆盖手工创建、列表、编辑、查询、问答、评测及文件导入；读路径有统一启用检查，写路径与生命周期锁保持一致；区分启动 opt-in 与持久启用状态。",
+      "acceptance": "插件停用后全部受管 API 与菜单按统一契约拒绝/隐藏；失败写入无副作用；恢复后允许；保留匿名、角色和跨 Workspace 拒绝路径。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-004",
+      "title": "修复运行时健康度与心跳时效",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [],
+      "owner": "AsyncRuntime / RuntimeHealthService",
+      "findingIds": [
+        "F04"
+      ],
+      "scope": "定义 lastPollAt 新鲜度、启动宽限、错误/积压与 worker/scheduler 角色所需健康语义，区分 liveness、DB readiness 与 runtime readiness。",
+      "acceptance": "心跳过期、poll 停滞、依赖故障能在管理运行时 readiness 中变为 degraded/503；恢复后转绿；DB ready 不等于 worker ready，disabled 模式按配置说明。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-005",
+      "title": "交付 base 与 ai-standard 两条生成器完整路径",
+      "priority": "P1",
+      "milestone": "M1",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 6,
+        "high": 10
+      },
+      "dependsOn": [
+        "OPT-002",
+        "OPT-003"
+      ],
+      "owner": "Project CLI / distribution / AI composition",
+      "findingIds": [
+        "F05"
+      ],
+      "scope": "显式 edition/profile 定义、项目配置校验、插件选择、SecretRef/预算变量转发和安装引导；保留独立项目与测试库保护。",
+      "acceptance": "仓库外干净目录创建 base 和 ai-standard；base 默认无插件，AI 项目通过正常配置/管理入口跑通离线问答；缺配置和非法依赖拒绝，过程不直接写业务/插件数据库行。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-006",
+      "title": "建立干净 clone 可复现的 CI 和产品回归命令",
+      "priority": "P1",
+      "milestone": "M1",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-002",
+        "OPT-003",
+        "OPT-004",
+        "OPT-005"
+      ],
+      "owner": "Verification / CI",
+      "findingIds": [
+        "F11",
+        "F12"
+      ],
+      "scope": "将卡片历史基线校验与长期产品回归拆开；提供安全本机/CI 测试库准备和串行 DB 用例编排；CI 执行构建、类型、lint、隔离与生命周期矩阵。",
+      "acceptance": "全新 checkout 无历史 .artifacts 也可完成约定门禁；缺环境明确失败，零用例/跳过不能PASS；关键跨模块探针有回归用例，报告可追溯到 commit。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-007",
+      "title": "收敛模块、权限、菜单和数据迁移声明边界",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 6,
+        "high": 10
+      },
+      "dependsOn": [
+        "OPT-002",
+        "OPT-005"
+      ],
+      "owner": "Host composition / plugin contracts",
+      "findingIds": [
+        "F07"
+      ],
+      "scope": "明确 Core、可选 AI/通知/支付/Integration 的依赖和数据 owner；统一权限/菜单/任务声明；先消除多处硬编码，不要求立即拆多库。",
+      "acceptance": "base 关闭 Integration/AI 后无对应入口与任务；增加示例插件不用修改核心 Workspace 权限常量；manifest 与实际权限/路由/任务一致，迁移归属可查。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-008",
+      "title": "整理当前架构、发行能力表与任务状态源",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 3,
+        "high": 5
+      },
+      "dependsOn": [],
+      "owner": "Docs / verification metadata",
+      "findingIds": [
+        "F12"
+      ],
+      "scope": "把历史快照移入明确历史区；提供机器可读能力地图、owner/入口/验证命令；当前架构/发行表由明确源码与队列摘要生成或校验，拆分过长 registry 与队列历史。",
+      "acceptance": "CURRENT/ARCHITECTURE/RELEASE_PROFILES 对同一能力无“已完成/未迁入”冲突；当前状态入口唯一，历史验收不改写，链接与生成校验通过。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-009",
+      "title": "用两个差异化参考产品验证真实扩展成本",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-005",
+        "OPT-006",
+        "OPT-007",
+        "OPT-010"
+      ],
+      "owner": "Reference application hosts",
+      "findingIds": [
+        "F07",
+        "F14"
+      ],
+      "scope": "参考 A：通用管理应用；参考 B：多租户知识助理。各有新增领域模型、权限、页面与配置，使用独立项目数据/存储；不改原轻企仓库。",
+      "acceptance": "两项目从生成到新增领域功能、独立升级均可演示；记录改动底座源码的次数和范围；纯新增业务不应要求复制/修改底座核心服务。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-010",
+      "title": "建立版本化 API 契约与可生成 SDK",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-007"
+      ],
+      "owner": "Contracts / SDK / API / Web",
+      "findingIds": [
+        "F14"
+      ],
+      "scope": "补齐标准错误 code/requestId/retryable、资源 DTO 与版本规则；使用单一 schema/OpenAPI/等效契约生成类型客户端，统一鉴权和 multipart/stream 消费。",
+      "acceptance": "至少 Workspace、文件、知识/问答三组 API 有契约漂移检查；前端不手写平行 DTO；错误不会泄露内部细节，升级保留向后兼容测试。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-011",
+      "title": "按真实消费者抽取稳定运行包并设计升级路径",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-009",
+        "OPT-010"
+      ],
+      "owner": "Packages / domain owners",
+      "findingIds": [
+        "F07"
+      ],
+      "scope": "基于两个参考项目识别真正稳定的身份、租户、配置与运行时模块，形成框架适配实现包和公开扩展端口；source-template 仍作为一种交付形式。",
+      "acceptance": "参考项目新增业务不用复制底座实现；底座补丁可通过明确依赖/升级边界应用；不制造第二个数据/队列/成本 owner，有 workspace 与 packed consumer 证据。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-012",
+      "title": "新增与本地保护隔离的生产运行配置",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-005",
+        "OPT-006"
+      ],
+      "owner": "Runtime config / deployment",
+      "findingIds": [
+        "F10"
+      ],
+      "scope": "单独定义生产域名/TLS/可信代理/数据库与密钥策略、Linux 容器启动方式、迁移运维权限；保留 dev/test loopback 与目标校验。",
+      "acceptance": "专用隔离生产模拟环境运行 API/Web/worker；错误域名、凭据、跨环境目标拒绝；正常域名与独立 DB 可用，有最小权限与部署/恢复说明。",
+      "condition": "准备对外生产运行时必需；不自动连接正式库/部署"
+    },
+    {
+      "id": "OPT-013",
+      "title": "连接池、worker 角色与并发背压实测",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-004",
+        "OPT-006"
+      ],
+      "owner": "Prisma / AsyncRuntime",
+      "findingIds": [
+        "F01",
+        "F10"
+      ],
+      "scope": "连接池与超时可配置且有边界；API/worker/scheduler 可独立角色启动；按可用容量领取任务，补续租/租约监控与背压。",
+      "acceptance": "至少两个独立 worker/连接执行慢任务与并发请求；无因批量预领后顺序等待导致的重复执行；输出队列等待、吞吐和 p95 实测基线，不凭默认池大小承诺容量。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-014",
+      "title": "可观测性与错误追踪闭环",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-004",
+        "OPT-010"
+      ],
+      "owner": "Core telemetry / AI / runtime",
+      "findingIds": [
+        "F04",
+        "F10"
+      ],
+      "scope": "关联 HTTP、Job、Provider、Trace 和预算记录；结构化日志、指标与告警；采用可版本化的 OpenTelemetry/GenAI 字段映射，正文默认不采集。",
+      "acceptance": "能定位一次请求到任务/模型/失败分类；查看延迟、失败率、积压、token、预算预留滞留；告警与去敏可实测，采样/禁采敏感内容有配置。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-015",
+      "title": "版本、私有发行、升级兼容与恢复产品化",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-006",
+        "OPT-009",
+        "OPT-011",
+        "OPT-012"
+      ],
+      "owner": "Release / distribution / migrations",
+      "findingIds": [
+        "F11"
+      ],
+      "scope": "明确稳定基线、SemVer 与兼容矩阵，构建不可变私有产物及来源/摘要清单；跨版本迁移、备份、回退与恢复按 edition 验证。",
+      "acceptance": "新消费者得到明确已验版本；前一版升级与失败恢复实测；从真实打包产物运行而非源码路径；main/tag/default branch 接收节点由负责人决定。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-016",
+      "title": "将客户验证/找回接到可运行的通知交付端口",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-002",
+        "OPT-007"
+      ],
+      "owner": "ClientAuth / aij-notification",
+      "findingIds": [
+        "F06"
+      ],
+      "scope": "复用通知 intent/attempt owner 连接注册验证、找回与重发；提供本地可观察的邮件接收环境与投递状态，不把 testDeliveries 当实际送达。",
+      "acceptance": "非测试运行配置通过正常适配器完成注册→验证→登录→找回，覆盖令牌重放/过期/限流/投递失败；真实外发需负责人配置凭据与确认。",
+      "condition": "开放自助注册/找回前必需"
+    },
+    {
+      "id": "OPT-017",
+      "title": "文件存储可替换与多实例验证",
+      "priority": "P2",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 6,
+        "high": 10
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-012"
+      ],
+      "owner": "File storage / adapter port",
+      "findingIds": [
+        "F10"
+      ],
+      "scope": "基于已有 StorageAdapter 增加可选择的对象存储/共享存储实现，统一鉴权、校验与保留策略；本地模式继续可用。",
+      "acceptance": "两实例读写同一受控资产，跨租户/缺失/损坏/删除恢复行为一致；不暴露裸 object key，适配器契约测试复用。",
+      "condition": "多实例部署/大文件业务需要时执行"
+    },
+    {
+      "id": "OPT-018",
+      "title": "通用 AI 请求/响应协议与流式执行",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-005",
+        "OPT-010"
+      ],
+      "owner": "aij-ai / Provider ports",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "从 query/evidence 专用形状演进为版本化 messages/content/schema/usage 协议，保持知识问答适配层；至少两个可信 provider 适配证明可替换，支持可取消流式响应。",
+      "acceptance": "现有知识问答兼容；多 provider 的成功/错误/取消/超时/结构化输出协议通过；服务端选择 model/credential，客户端不能注入 endpoint/SecretRef。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-019",
+      "title": "模型路由、价格快照与按租户配额治理",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-013",
+        "OPT-018"
+      ],
+      "owner": "aij-ai / budget & cost owners",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "将单次10元评测策略保留为一种 policy；增加项目/Workspace/用户预算周期、模型能力/路由策略、Provider限流/熔断与失败后的预留处置。",
+      "acceptance": "独立连接并发不超额；周期、上下文、模型/价格不匹配拒绝；余额、占额、内部估算与 Provider 收据成本区分；无配置默认拒绝。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-020",
+      "title": "Prompt 版本、对话状态与记忆边界",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-018"
+      ],
+      "owner": "aij-ai / conversation & prompt owners",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "提示模板版本、参数契约、会话/消息关联及 TTL；将具体知识 Prompt 留在能力模块；业务 Prompt 由业务项目持有。",
+      "acceptance": "一次执行可追溯模板/模型版本；同一会话跨 Workspace 不可访问；记忆窗口和删除策略明确，回放不会重新执行外部动作。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-021",
+      "title": "知识索引、检索质量与内容生命周期",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 16,
+        "high": 28
+      },
+      "dependsOn": [
+        "OPT-019",
+        "OPT-022"
+      ],
+      "owner": "aij-ai knowledge / storage adapters",
+      "findingIds": [
+        "F09"
+      ],
+      "scope": "增加异步解析/分块/索引状态与文档版本；先建立评测基线，再比较全文/混合/向量检索，按实测选择；按明确需求扩展格式。",
+      "acceptance": "超过500候选文档仍能正确检索，更新/停用/删除及时失效；引用指向可追溯版本；覆盖语义改写、中文、无依据、跨租户及过期内容，报告检索与答案质量。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-022",
+      "title": "版本化评测与对抗回归门禁",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-018"
+      ],
+      "owner": "AI evaluation / verification",
+      "findingIds": [
+        "F08",
+        "F09"
+      ],
+      "scope": "把20例合成样本转为版本化数据集/评分规则/运行记录，区分检索、答案、引用、隔离、成本和延迟；增加不依赖生产数据的恶意内容/注入/边界样例。",
+      "acceptance": "评分结果由服务端评测器生成而非客户端声明；基线回归与版本比较可重现；离线协议结果和真实模型质量分开记录，live 仍保留先前授权条件。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-023",
+      "title": "受控 Tool 调用、资源授权与人工批准",
+      "priority": "P2",
+      "milestone": "M4",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 20,
+        "high": 32
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-010",
+        "OPT-014",
+        "OPT-019",
+        "OPT-022"
+      ],
+      "owner": "AI tool gateway / domain adapters",
+      "findingIds": [
+        "F08",
+        "F13"
+      ],
+      "scope": "统一工具注册/参数校验、调用主体与 Workspace 资源范围，区分只读和有副作用动作；批准状态持久化，调用前复核、撤销/过期及审计。",
+      "acceptance": "不可信文档不能授予工具权限；未批准/过期/越权动作服务端拒绝；重放和崩溃不重复外部动作；业务工具注册在业务宿主，复用现有队列和审计。",
+      "condition": "目标包含 Agent/工具执行时执行"
+    },
+    {
+      "id": "OPT-024",
+      "title": "MCP 接入适配与授权边界",
+      "priority": "P2",
+      "milestone": "M4",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-012",
+        "OPT-023"
+      ],
+      "owner": "MCP adapter / tool gateway",
+      "findingIds": [
+        "F08",
+        "F13"
+      ],
+      "scope": "MCP 作为 Tool port 的一种适配，不直接暴露全部后端接口；固定服务 allowlist、连接/会话策略、资源 audience/scope 校验和网络访问边界。",
+      "acceptance": "错 audience/缺 scope/撤销授权拒绝；无裸 token 透传或任意地址访问；工具定义变更可审计；停用服务不残留可执行工具。",
+      "condition": "确有外部 MCP 服务消费需求时执行"
+    },
+    {
+      "id": "OPT-025",
+      "title": "可恢复 Workflow/Agent 最小编排",
+      "priority": "P3",
+      "milestone": "M4",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 16,
+        "high": 28
+      },
+      "dependsOn": [
+        "OPT-020",
+        "OPT-022",
+        "OPT-023"
+      ],
+      "owner": "AI orchestration / AsyncRuntime",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "节点状态、checkpoint、批准等待、取消、恢复、步数/时间/预算上限；Agent 以受控循环运行，不新建第二套通用队列。",
+      "acceptance": "重启后从已确认checkpoint继续；待审批动作不自动执行；取消/超预算停止后续调用；重放不重复写入，两条真实参考流程通过后再评估可视化编辑器。",
+      "condition": "多步长任务/Agent 为明确产品需求时执行"
+    },
+    {
+      "id": "OPT-026",
+      "title": "企业身份与成员邀请增强",
+      "priority": "P2",
+      "milestone": "M5",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 12,
+        "high": 24
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-012"
+      ],
+      "owner": "Identity / Workspace",
+      "findingIds": [
+        "F13"
+      ],
+      "scope": "按目标客户选择 OIDC/企业SSO、管理员 MFA、邀请/接受/失效流程及可扩展资源授权；保留管理身份与客户身份区分。",
+      "acceptance": "邀请单次且过期、撤销可验证；SSO issuer/audience/租户绑定严格校验；MFA/失效后会话正确撤销，不写死业务角色。",
+      "condition": "企业客户/高权限运营场景需要时执行"
+    },
+    {
+      "id": "OPT-027",
+      "title": "租户查询约束与跨域数据留存治理",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-003",
+        "OPT-010",
+        "OPT-014"
+      ],
+      "owner": "Workspace / repository scopes / audit",
+      "findingIds": [
+        "F13"
+      ],
+      "scope": "以 scoped repository/复合约束强化新增模型的租户边界；统一问答、评测、Trace、审计、原件的不同保留/删除规则；评估 RLS 的收益与角色/连接池要求。",
+      "acceptance": "所有新增租户实体有服务端上下文与越权负例；导出/删除/恢复/后台任务也遵守scope；保留与删除证据可查；RLS若采用必须验证 owner bypass 与事务上下文，不靠打开开关宣称安全。",
+      "condition": "通用底座路线"
+    },
+    {
+      "id": "OPT-028",
+      "title": "完成所选 edition 的负责人接收与发行决定",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [
+        "OPT-015"
+      ],
+      "owner": "Owner / release documentation",
+      "findingIds": [
+        "F11"
+      ],
+      "scope": "准备所选edition统一验收包，核定许可、私有/公开渠道、支持平台、运维责任及稳定分支/tag策略；基础版不以所有高级扩展完成作为接收前提。",
+      "acceptance": "负责人明确接收范围与未接收项，决定稳定版本/分发方式；未确认的真实调用、资金动作或生产部署仍不执行，等待时间不计入估时。",
+      "condition": "负责人决策节点；本清单不代为做许可/发布决定"
+    }
+  ]
+}

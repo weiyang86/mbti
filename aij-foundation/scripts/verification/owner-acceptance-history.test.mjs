@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {verifyOwnerAcceptanceHistory as check} from './owner-acceptance-history.mjs';
+const historical=[{status:'OLD_OWNER_RECORD',cards:['AF-010'],source:'historical exact source'}];
+const proof={schemaVersion:1,id:'OWNER-W22-20261108',status:'ACCEPTED_BY_OWNER',sourceKind:'CURRENT_OWNER_CHAT',sourceQuote:'Owner accepted this batch only.',acceptedAt:'2026-11-08T12:00:00Z',cards:[{formalTaskId:'AF-219',title:'Governance',commit:'a'.repeat(40),integrationTaskId:'task_123456789abc',report:'.artifacts/verification/AF-219/run-abc123/report.json'}]};
+const row={id:proof.id,status:proof.status,source:proof.sourceQuote,acceptedAt:proof.acceptedAt,cards:['AF-219'],scope:['AF-219'],evidencePath:'docs/governance/W22_OWNER_ACCEPTANCE_20261108.json',evidenceSha256:'b'.repeat(64)};
+const evidence=()=>({data:structuredClone(proof),sha256:'b'.repeat(64)});
+test('Original acceptance is retained and one evidenced bounded append is accepted',()=>assert.equal(check([...historical,row],historical,evidence).length,1));
+test('Historical record changes, removal and reordering reject',()=>{assert.throws(()=>check([{...historical[0],source:'changed'},row],historical,evidence));assert.throws(()=>check([],historical,evidence));assert.throws(()=>check([row,...historical],historical,evidence));});
+test('Unscoped blanket acceptance and scope expansion reject',()=>{assert.throws(()=>check([...historical,{...row,cards:['AF-219','AF-220']}],historical,evidence));assert.throws(()=>check([...historical,{...row,scope:['ALL40']}],historical,evidence));});
+test('Provenance hash or source mismatch cannot accept',()=>{assert.throws(()=>check([...historical,{...row,evidenceSha256:'c'.repeat(64)}],historical,evidence));assert.throws(()=>check([...historical,{...row,source:'Different owner instruction'}],historical,evidence));});
+test('Path traversal, duplicate ids and unconfirmed status reject',()=>{assert.throws(()=>check([...historical,{...row,evidencePath:'docs/governance/../.env.json'}],historical,evidence));assert.throws(()=>check([...historical,row,row],historical,evidence));assert.throws(()=>check([...historical,{...row,status:'CODE_VERIFIED'}],historical,evidence));});
+test('Malformed commit/report/task and duplicate or excessive card proofs reject',()=>{for(const key of ['commit','report','integrationTaskId'])assert.throws(()=>check([...historical,row],historical,()=>({data:{...proof,cards:[{...proof.cards[0],[key]:'invalid'}]},sha256:'b'.repeat(64)})));assert.throws(()=>check([...historical,row],historical,()=>({data:{...proof,cards:Array(5).fill(proof.cards[0])},sha256:'b'.repeat(64)})));});

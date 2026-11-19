@@ -1,0 +1,111 @@
+/* 统一页面骨架：kicker / 大标题 / 说明 / 白色面板 / 页脚
+   供社交子页面共用，配色与「换名片」「我的名片」保持一致 */
+$pf-accent: #6c4cf3;
+$pf-ink: #241f2e;
+$pf-muted: #77727e;
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 20rpx;
+  letter-spacing: 2rpx;
+  color: $pf-accent;
+  font-weight: 600;
+}
+.kicker::before {
+  content: '';
+  width: 36rpx;
+  height: 3rpx;
+  border-radius: 2rpx;
+  background: $pf-accent;
+}
+.kicker-plain::before,
+.kicker.plain::before {
+  display: none;
+}
+.kicker.sub {
+  margin-top: 44rpx;
+}
+
+.page-title {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 56rpx;
+  font-weight: 800;
+  line-height: 1.3;
+  color: $pf-ink;
+}
+.page-title .hl {
+  color: $pf-accent;
+}
+.page-sub {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  color: $pf-muted;
+  line-height: 1.7;
+}
+
+.panel {
+  margin-top: 24rpx;
+  padding: 30rpx 26rpx;
+  border-radius: 32rpx;
+  background: #fff;
+  border: 2rpx solid #ece7f1;
+}
+.panel-title {
+  display: block;
+  font-size: 29rpx;
+  font-weight: 800;
+  color: $pf-ink;
+}
+.panel-desc {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 21rpx;
+  color: #a398af;
+  line-height: 1.7;
+}
+.panel-link {
+  display: block;
+  margin-top: 18rpx;
+  font-size: 23rpx;
+  color: $pf-accent;
+}
+
+.pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+  margin-top: 24rpx;
+}
+.pill {
+  box-sizing: border-box;
+  width: calc(50% - 7rpx);
+  padding: 26rpx 22rpx;
+  border-radius: 20rpx;
+  background: #efecfd;
+  font-size: 25rpx;
+  color: #4b3f6b;
+}
+
+.sk-foot {
+  display: block;
+  margin-top: 44rpx;
+  text-align: center;
+  font-size: 19rpx;
+  color: #b9b3c4;
+  line-height: 1.7;
+}
+.sk-foot-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 26rpx;
+  margin-top: 20rpx;
+}
+.sk-foot-link {
+  font-size: 21rpx;
+  color: $pf-accent;
+}

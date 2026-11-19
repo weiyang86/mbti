@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+const root = '/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation';
+assert.equal(process.cwd(), root);
+assert.equal(execFileSync('git', ['branch', '--show-current'], { encoding: 'utf8' }).trim(), 'dev');
+const folder = resolve('.artifacts/auto-ai-program-20261105/AF-190'); mkdirSync(folder, { recursive: true });
+const run = mkdtempSync(join(folder, 'packed-')), packs = join(run, 'packs'), consumer = join(run, 'consumer');
+mkdirSync(packs, { recursive: true }); mkdirSync(consumer, { recursive: true });
+for (const name of ['contracts', 'sdk']) execFileSync('pnpm', ['pack', '--pack-destination', packs], { cwd: join(root, 'packages', name), stdio: 'pipe' });
+writeFileSync(join(consumer, 'package.json'), JSON.stringify({ private: true, name: 'af190-packed-consumer', version: '0.0.0' }));
+execFileSync('npm', ['install', '--ignore-scripts', '--offline', '--no-audit', '--no-fund', '--package-lock=false', join(packs, 'aij-contracts-0.1.0.tgz'), join(packs, 'aij-sdk-0.1.0.tgz')], { cwd: consumer, stdio: 'pipe' });
+writeFileSync(join(folder, 'native-documents.mjs'), "export { preparePersonalDocumentsHost, verifyPersonalDocumentsBrowser } from '../../../scripts/verification/personal-documents-browser.mjs';\n");
+process.env.AIJ_AF190_ROOT_LIVE = '1';
+process.env.AIJ_AF190_PACKED_CONSUMER = consumer;
+process.env.AIJ_AF190_BROWSER_ADAPTER = join(folder, 'native-documents.mjs');
+await import('./personal-documents-live.test.mjs');

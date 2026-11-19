@@ -1,0 +1,51 @@
+{
+  "task": "AF-198",
+  "candidate": "540a09ca0bc3dea06b9ffb8b22458f804b4792e5",
+  "reason": "Root sole writer after STOP: exact task admission, opt-in safe startup/failure cleanup, actual HTTP submit counts, distinct refusal actor and same-owner projections. Source freeze only, not acceptance. Retained formal failure: PG refuses disabling its current DB (22023); use validated test-control observer to disable only owned fresh child, measure child by explicit datname, restore before observer ends and require actual readiness DATABASE_UNAVAILABLE.",
+  "files": [
+    {
+      "path": "scripts/verification/workbench-sdk-target-runtime.mjs",
+      "sha256": "d9908fada7839ba167fb82cdfd3f40b6e9479d60a7c65f562df2b8e1c55d6a90"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-runtime-live.test.mjs",
+      "sha256": "61060b1e945eefd1193ddec44effa9c0a4b8643aaeecacd751bcdde2c8f33d06"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "bc06c96a3c06b1db4d723ac983d1b464e49c82e604bbc64daff3c33aa8318109"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-failure-live.test.mjs",
+      "sha256": "7d1013e02f182689378d95ecb2c532ed129145d83df01d3ad550cf4e70e4fa90"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-runtime-acceptance.mjs",
+      "sha256": "f07510f919be29caf5600bb6001b765d9a319a8b266c5ffaad309b8e18e96818"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "16f9c805bfb5206888252af73d0cf60d40cc26471ce4e9a91f82005034449158"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "5ab033cd5e73ea99a74aeb56bbcff18a6e745a8fc59339a86aab0f6af3e7cc0e"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "742dc0750dc08959db1905a00d4daeba18e7aafb0838e290b475d8c2bcf7be95"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "ed189615e1bb9f4197883269ae4c955132bb664a60808c03a74a54c3b8dfd1f2"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "71c9c06ab466de245784ff5ccae033ed94024dd662e00a6049b4f773bd2f8bf0"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "558509e295bb4d5222cc777de3de9b3103e85fc35726017a91f621f7a93f2c6a"
+    }
+  ]
+}

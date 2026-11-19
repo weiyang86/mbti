@@ -1,0 +1,322 @@
+{
+  "batch": "ORCA-B02",
+  "runId": "run_d4eae5ba3a3b",
+  "priorRunId": "run_ffaba3dac618",
+  "baselineHead": "94b0236f775fa40a07944c5e0545ac6ce0e123f3",
+  "source": "Owner current message; attachment not yet readable",
+  "attachmentStatus": "NOT_READ_NOT_REQUIRED_FOR_CURRENT_REPAIR_SCOPE",
+  "maxCards": 3,
+  "estimatedHours": 8,
+  "mode": "SEQUENTIAL_CURRENT_WORKSPACE_LOCAL_COMMITS_ONLY",
+  "pushAuthorized": false,
+  "ownerAcceptance": "PENDING",
+  "cards": [
+    {
+      "formalTaskId": "AF-129",
+      "title": "核验 AI 菜单来源并给出基础版入口",
+      "hours": 2,
+      "candidateTaskId": "task_6b3272e480a9",
+      "integrationTaskId": "task_02198480a518",
+      "dependsOnIntegration": [],
+      "status": "CODE_VERIFIED",
+      "requiredGates": [
+        "exact current message audit scope only"
+      ],
+      "dispatchId": "ctx_d912b233f878",
+      "writer": "Codex menu evidence worker",
+      "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation",
+      "report": ".artifacts/verification/AF-129/run-ZzDLZV/report.json",
+      "evidence": ".artifacts/orca-b02/AF-129/latest.json",
+      "workerStopped": true,
+      "workerHoursEstimated": 0.6,
+      "coordinatorHoursEstimated": 0.25,
+      "gitCloseout": "EXACT_TITLE_LOCAL_COMMIT_ONLY",
+      "localCommitReceipt": ".artifacts/orca-b02/AF-129/local-closeout.json",
+      "localCommitLocator": "containing commit of docs/execution/AF-129.md"
+    },
+    {
+      "formalTaskId": "AF-130",
+      "title": "打通 base 普通账号只读角色与审计闭环",
+      "hours": 4,
+      "candidateTaskId": "task_766e5e9f3411",
+      "integrationTaskId": "task_f351efee8cb6",
+      "dependsOnIntegration": [
+        "task_02198480a518"
+      ],
+      "status": "CODE_VERIFIED",
+      "requiredGates": [
+        "AF-129 verified exact-title local commit",
+        "UI-1/AF-026..029 owner acceptance for browser login/session dependency",
+        "other necessary core owner acceptances checked precisely",
+        "attachment reviewed before implementing any expanded attachment requirements"
+      ],
+      "dispatchId": "ctx_455adcc583b2",
+      "writer": "Codex AF-130 worker; stopped and handed to coordinator",
+      "blockedBy": [],
+      "report": ".artifacts/verification/AF-130/AF-130-final.json",
+      "execution": "docs/execution/AF-130.md",
+      "browserObservation": "PASS_AUTOMATED_NOT_OWNER_ACCEPTANCE",
+      "browserReport": ".artifacts/orca-b02/AF-130/resume-20261105/browser-observations.json",
+      "candidateStopped": true,
+      "gitCloseout": "EXACT_TITLE_LOCAL_COMMIT_ONLY",
+      "localCommitLocator": "containing commit of docs/execution/AF-130.md",
+      "localCommitReceipt": ".artifacts/orca-b02/AF-130/local-closeout.json",
+      "tests": {
+        "pure": 12,
+        "liveIntegration": 1
+      },
+      "currentBlocker": null,
+      "openDownstreamGap": null
+    },
+    {
+      "formalTaskId": "AF-131",
+      "title": "核验仓库外 base 启动并拆分独立消费缺口",
+      "hours": 2,
+      "candidateTaskId": "task_7af28bc2eb2f",
+      "integrationTaskId": "task_fc9ee15f4de9",
+      "dependsOnIntegration": [
+        "task_f351efee8cb6"
+      ],
+      "status": "BLOCKED_UNACCEPTED_PREREQUISITE",
+      "requiredGates": [
+        "AF-130 local integration complete",
+        "AF-127 and required distribution subscopes owner accepted",
+        "outside-directory and independent DB preparation scope registered"
+      ],
+      "dispatchId": null,
+      "writer": null,
+      "blockedBy": [
+        "AF-127 configuration contract owner acceptance pending",
+        "AF-077..080 necessary distribution subscopes owner acceptance pending"
+      ]
+    }
+  ],
+  "status": "OWNER_CHECK_PENDING",
+  "ownerReview": "OWNER_CHECK_PENDING",
+  "nextCard": null,
+  "effectiveEngineeringHoursEstimated": 0.85,
+  "stopReason": "AF-134/135/130 authorized three-card Base batch code verified; AF-131 necessary AF-127/077..080 owner acceptance remains pending; no inferred acceptance or external project readiness",
+  "repairBatch": {
+    "id": "B02-UI1-REPAIR",
+    "source": "Owner current instruction: 解决以上发现的问题",
+    "maxCards": 3,
+    "cards": [
+      {
+        "formalTaskId": "AF-132",
+        "alias": "AF-132",
+        "title": "修复 UI-1 验收实例续建与入口归属",
+        "status": "CODE_VERIFIED",
+        "ownerAcceptance": "PENDING",
+        "baselineHead": "b13a3468c08c2021fed06e9aa289192dd68ca829",
+        "runId": "run_d4eae5ba3a3b",
+        "candidateTaskId": "task_3e78e81ef791",
+        "integrationTaskId": "task_82ddd8126e84",
+        "spec": "docs/planning/orca-product-goal-20261104/AF-132.md",
+        "hoursLimit": 3,
+        "pushAuthorized": false,
+        "dispatchId": "ctx_7354934da18c",
+        "writer": "Codex AF-132 worker",
+        "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation",
+        "candidateStopped": true,
+        "report": ".artifacts/verification/AF-132/run-ZUg6uV/report.json",
+        "fullAf029FailureReport": ".artifacts/verification/AF-029/run-AzFp1v/report.json",
+        "additionalRequiredCandidateTaskIds": [
+          "task_513ff54d23ec"
+        ],
+        "repairDispatchId": "ctx_7c0680378f0f",
+        "repairWriter": "Codex original AF-132 Writer follow-up",
+        "integrationGate": "Both candidate Tasks settled successfully, explicit handoff, full AF-029+prepare/browser and exact-title local commit; no push or acceptance",
+        "repairCandidateStopped": true,
+        "requiredIntegrationTaskId": "task_421e7ef2c551",
+        "additionalFullAf029FailureReport": ".artifacts/verification/AF-029/run-ZzV97a/report.json",
+        "fullAf029Report": ".artifacts/verification/AF-029/run-Pfon1z/report.json",
+        "manualPreparation": "PREPARED",
+        "manualReport": ".artifacts/verification/AF-029/run-2eVdFW/report.json",
+        "browserReport": ".artifacts/orca-b02/AF-132/browser-observations.json",
+        "browserObservation": "AUTOMATED_SIX_PATHS_PASS_NOT_OWNER_ACCEPTANCE",
+        "requiredPredecessorCommit": "16949e4be368c0318526bda43fa97c85544de18f",
+        "gitCloseout": "EXACT_TITLE_LOCAL_COMMIT_ONLY",
+        "localCommitLocator": "containing commit of docs/execution/AF-132.md",
+        "localCommitReceipt": ".artifacts/orca-b02/AF-132/local-closeout.json",
+        "ownerReview": "docs/review/B02_UI1_REPAIR_REVIEW_20261104.md"
+      },
+      {
+        "formalTaskId": "AF-133",
+        "alias": "AF-133",
+        "title": "修复管理员宿主对客户认证的隐式依赖",
+        "status": "CODE_VERIFIED",
+        "ownerAcceptance": "PENDING",
+        "baselineHead": "b13a3468c08c2021fed06e9aa289192dd68ca829",
+        "runId": "run_d4eae5ba3a3b",
+        "candidateTaskId": "task_edce47e6dbb2",
+        "integrationTaskId": "task_421e7ef2c551",
+        "spec": "docs/planning/orca-product-goal-20261104/AF-133.md",
+        "hoursLimit": 2,
+        "pushAuthorized": false,
+        "dispatchId": "ctx_974fafaadb4f",
+        "writer": "Codex AF-133 worker",
+        "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation",
+        "candidateStopped": true,
+        "report": ".artifacts/verification/AF-133/run-e9vpPd/report.json",
+        "tests": {
+          "http": 17,
+          "configuration": 3
+        },
+        "gitCloseout": "EXACT_TITLE_LOCAL_COMMIT_ONLY",
+        "localCommitLocator": "containing commit of docs/execution/AF-133.md",
+        "localCommitReceipt": ".artifacts/orca-b02/AF-133/local-closeout.json"
+      }
+    ],
+    "af130Gate": "PENDING_UI1_OWNER_ACCEPTANCE_OR_EXPLICIT_OVERRIDE_REPLY",
+    "priorAcceptanceRecordsSha256": "3f212e89885646861ca9b62751f443be83e7c3066d1ec5401c721059dcc5949d",
+    "originalBatchPreserved": true,
+    "status": "OWNER_CHECK_PENDING",
+    "currentLoginUrl": "http://localhost:3655/login",
+    "ownerReview": "docs/review/B02_UI1_REPAIR_REVIEW_20261104.md",
+    "nextRequiredOwnerAction": "Complete finite UI-1 AF-026..029 checks and explicitly decide acceptance; AF-130/131 have not started"
+  },
+  "latestOwnerReview": "docs/review/ORCA_B02_REVIEW_20261104.md",
+  "latestDelivery": {
+    "date": "2026-11-05",
+    "task": "AF-130",
+    "execution": "docs/execution/AF-130.md",
+    "review": "docs/review/ORCA_B02_REVIEW_20261104.md",
+    "status": "OWNER_CHECK_PENDING"
+  },
+  "af130ImplementationBatch": {
+    "source": "Owner explicitly verified UI-1 and authorized independent persistent Base AF-130 implementation/self-test without further continue; no AF131",
+    "maxCards": 3,
+    "cards": [
+      {
+        "formalTaskId": "AF-134",
+        "alias": "AF130-BASE-INIT",
+        "title": "正式初始化并启动持续可用的 Base 开发后台",
+        "parentFormalTaskId": "AF-130",
+        "status": "CODE_VERIFIED",
+        "ownerAcceptance": "PENDING",
+        "baselineHead": "a19995a446abbce49101a091ecdce46973c544aa",
+        "runId": "run_d4eae5ba3a3b",
+        "candidateTaskId": "task_fc8f25244b67",
+        "integrationTaskId": "task_860aa66579d5",
+        "hoursLimit": 4,
+        "spec": "docs/planning/orca-product-goal-20261104/AF-134.md",
+        "dispatchId": "ctx_471e6d87dc3e",
+        "terminal": "term_3dbf7f78-8360-4287-a47a-295e396fc5a9",
+        "writer": "Codex AF-134 worker",
+        "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation",
+        "defaultModelConfiguration": true,
+        "turnStartObserved": true,
+        "observedMessageId": "msg_64c0c3c02fdd",
+        "candidateStopped": true,
+        "report": ".artifacts/verification/AF-134/run-c1Q1Zx/report.json",
+        "tests": {
+          "pure": 118,
+          "liveIntegration": 5
+        },
+        "webUrl": "http://127.0.0.1:3855/login",
+        "guide": "docs/development/BASE_DEVELOPMENT.md",
+        "execution": "docs/execution/AF-134.md",
+        "gitCloseout": "EXACT_TITLE_LOCAL_COMMIT_ONLY",
+        "localCommitLocator": "containing commit of docs/execution/AF-134.md",
+        "localCommitReceipt": ".artifacts/orca-b02/AF-134/local-closeout.json"
+      },
+      {
+        "formalTaskId": "AF-135",
+        "status": "CODE_VERIFIED",
+        "title": "字典只读授权与服务端写入拒绝",
+        "hoursLimit": 4,
+        "parentFormalTaskId": "AF-130",
+        "ownerAcceptance": "PENDING",
+        "baselineHead": "e5447680360c1bb569a411fe0c1dee3dbf31a250",
+        "runId": "run_d4eae5ba3a3b",
+        "candidateTaskId": "task_42e072720d90",
+        "integrationTaskId": "task_640043a5132e",
+        "spec": "docs/planning/orca-product-goal-20261104/AF-135.md",
+        "dependencies": [
+          "task_860aa66579d5"
+        ],
+        "pushAuthorized": false,
+        "defaultModelConfiguration": true,
+        "dispatchId": "ctx_a03f2913bfd4",
+        "terminal": "term_c63da606-51e3-4e0d-b051-723fa4e58ddf",
+        "writer": "Codex AF-135 worker",
+        "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation",
+        "integrationGateForParent": "gate_ad2837388025",
+        "candidateStopped": true,
+        "report": ".artifacts/verification/AF-135/run-WDjoeb/report.json",
+        "tests": {
+          "pure": 126,
+          "dictionaryHttp": 7,
+          "baseRegression": 5
+        },
+        "execution": "docs/execution/AF-135.md",
+        "browserReadonly": "PASSED",
+        "openDownstreamGap": "AF130: generic /admin overview wrongly requires aij.bootstrap.admin; fix authenticated landing without granting marker",
+        "gitCloseout": "EXACT_TITLE_LOCAL_COMMIT_ONLY",
+        "localCommitLocator": "containing commit of docs/execution/AF-135.md",
+        "localCommitReceipt": ".artifacts/orca-b02/AF-135/local-closeout.json"
+      },
+      {
+        "formalTaskId": "AF-130",
+        "status": "CODE_VERIFIED",
+        "candidateTaskId": "task_766e5e9f3411",
+        "integrationTaskId": "task_f351efee8cb6",
+        "title": "打通 base 普通账号只读角色与审计闭环",
+        "hoursLimit": 4,
+        "baselineHead": "580cba1f8363cf63ab637e070b20d9e8d7ce49e0",
+        "requiredChildIntegrationTaskIds": [
+          "task_860aa66579d5",
+          "task_640043a5132e"
+        ],
+        "requiredChildIntegrationsVerified": true,
+        "technicalGate": "gate_ad2837388025",
+        "technicalGateStatus": "RESOLVED",
+        "currentBlocker": null,
+        "spec": "docs/planning/orca-product-goal-20261104/AF-130.md",
+        "ownerAcceptance": "PENDING",
+        "dispatchId": "ctx_455adcc583b2",
+        "terminal": "term_11f81f42-9d1c-456e-a2b0-94a2531c32ab",
+        "writer": "Codex AF-130 worker",
+        "worktree": "ab33c63f-00b7-40ab-a5de-fa58b189046d::/Volumes/Lexar/日常工作/2026/aij底座/aij-foundation",
+        "defaultModelConfiguration": true,
+        "report": ".artifacts/verification/AF-130/AF-130-final.json",
+        "execution": "docs/execution/AF-130.md",
+        "browserObservation": "PASS_AUTOMATED_NOT_OWNER_ACCEPTANCE",
+        "browserReport": ".artifacts/orca-b02/AF-130/resume-20261105/browser-observations.json",
+        "candidateStopped": true,
+        "gitCloseout": "EXACT_TITLE_LOCAL_COMMIT_ONLY",
+        "localCommitLocator": "containing commit of docs/execution/AF-130.md",
+        "localCommitReceipt": ".artifacts/orca-b02/AF-130/local-closeout.json",
+        "tests": {
+          "pure": 12,
+          "liveIntegration": 1
+        },
+        "openDownstreamGap": null
+      }
+    ],
+    "base": {
+      "projectId": "aij-base-dev",
+      "environment": "development",
+      "webPort": 3855,
+      "apiPort": 3856,
+      "databasePort": 55434,
+      "stateRoot": ".local-data/base-development/"
+    },
+    "af029Preserve": true,
+    "af131Authorized": false,
+    "pushAuthorized": false,
+    "currentCard": null,
+    "status": "OWNER_CHECK_PENDING",
+    "completed": [
+      "AF-134",
+      "AF-135",
+      "AF-130"
+    ],
+    "ownerAcceptance": "PENDING",
+    "centralReview": "docs/review/ORCA_B02_REVIEW_20261104.md",
+    "resumeSource": "Owner 2026-11-05: 请继续完成未完成的任务; finish existing candidate integration, preserve acceptance records and batch boundary",
+    "coordinatorResumeTerminal": "term_a1b633bc-6ace-4602-868a-dc2c12c5849e",
+    "candidateHandoffMessageId": "msg_0006bfbb64f3",
+    "af130EffectiveEngineeringHoursEstimated": 1.4
+  }
+}

@@ -1,0 +1,1348 @@
+{
+  "schemaVersion": 1,
+  "kind": "ORCA_OPTIMIZATION_ORCHESTRATION_PLAN",
+  "status": "PLANNED_NOT_DISPATCHED",
+  "date": "2026-11-04",
+  "baseline": "bb00ffdd0e0d5c103c6595b02315513407a0a575",
+  "sourceBacklog": "docs/planning/AIJ_FOUNDATION_OPTIMIZATION_BACKLOG_20261104.json",
+  "sourceSha256": "db5a7f65d6ce572742701fde7c0f78743808d7e9339e2b668040a84f1b748b56",
+  "sourceEstimateHours": {
+    "low": 241,
+    "high": 409,
+    "meaning": "历史候选总工时，不是当前剩余工时或日历承诺"
+  },
+  "repoId": "ab33c63f-00b7-40ab-a5de-fa58b189046d",
+  "cli": "/usr/local/bin/orca",
+  "runCreated": false,
+  "workersStarted": false,
+  "formalAFIdsAssigned": false,
+  "developmentActivated": false,
+  "observedHost": {
+    "memoryGiB": 32,
+    "logicalCpu": 10,
+    "recommendedMaxActiveWorkers": 3,
+    "heavyBuildConcurrency": 1,
+    "databaseAdminConcurrency": 1,
+    "devIntegrationWriters": 1
+  },
+  "lanes": {
+    "P": "工程/契约/复用",
+    "A": "AI能力与成本",
+    "R": "运行时/生产/隔离",
+    "Q": "验证与状态材料"
+  },
+  "stages": [
+    {
+      "id": "S0",
+      "title": "差量对齐与可靠性收尾",
+      "workPackages": [
+        "OPT-001",
+        "OPT-002",
+        "OPT-003",
+        "OPT-004",
+        "OPT-008"
+      ]
+    },
+    {
+      "id": "S1",
+      "title": "工程复用与契约验证",
+      "workPackages": [
+        "OPT-005",
+        "OPT-006",
+        "OPT-007",
+        "OPT-010"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "参考产品与通用AI增强",
+      "workPackages": [
+        "OPT-009",
+        "OPT-013",
+        "OPT-018",
+        "OPT-019",
+        "OPT-020",
+        "OPT-022"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "生产候选能力",
+      "workPackages": [
+        "OPT-012",
+        "OPT-014",
+        "OPT-016",
+        "OPT-017",
+        "OPT-021",
+        "OPT-027"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "稳定包、升级恢复与所选版本接收",
+      "workPackages": [
+        "OPT-011",
+        "OPT-015",
+        "OPT-028"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "需求驱动的高级扩展",
+      "workPackages": [
+        "OPT-023",
+        "OPT-024",
+        "OPT-025",
+        "OPT-026"
+      ]
+    }
+  ],
+  "workPackages": [
+    {
+      "id": "OPT-001",
+      "title": "修复租约接管与编排任务副作用准入",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "IMPLEMENTED_NEEDS_DELTA_VERIFICATION",
+      "estimateHours": {
+        "low": 4,
+        "high": 8
+      },
+      "dependsOn": [],
+      "owner": "AsyncRuntime / JobService",
+      "findingIds": [
+        "F01"
+      ],
+      "scope": "执行前校验租约 owner/attempt，处理中幂等记录需有有效执行者；为外部调用定义 fencing、幂等键与不确定结果策略；复用现有 RuntimeJob/Idempotency。",
+      "acceptance": "旧 claim 在新 owner 接管后不能进入 handler；两个独立连接/进程竞争只允许当前有效 owner 执行；崩溃前后和未知外部结果有明确重试/对账语义，不承诺无法证明的外部 exactly-once。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "AF-121/123已修旧租约与重复准入，并为AI未知结果保留预算；仍按原完整验收复核独立执行者、恢复及各外部副作用语义。",
+      "evidencePaths": [
+        "apps/api/src/async-runtime/job.service.ts",
+        "scripts/verification/ai-runtime-fencing.test.mjs"
+      ],
+      "stage": "S0",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-002",
+      "title": "统一启动、管理与生命周期插件目录",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [],
+      "owner": "PluginRuntime / composition root",
+      "findingIds": [
+        "F02"
+      ],
+      "scope": "以一个可信注册源生成运行时装配、管理 catalog 和启动白名单；补齐 aij-ai 正常安装/启停入口。",
+      "acceptance": "默认应用目录包含 AI/通知/支付；空库可经管理入口安装并启用 AI；未知插件拒绝，三处目录自动一致，无手工补数据库行。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "P",
+      "reconciliation": "运行与管理共用TRUSTED_PLUGINS；启动脚本仍有单独数组，AI正常安装启用尚需管理API闭环证据。",
+      "evidencePaths": [
+        "apps/api/src/plugin-runtime/trusted-plugins.ts",
+        "scripts/plugin-launch-policy.mjs"
+      ],
+      "stage": "S0",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-003",
+      "title": "统一 AI 全部知识接口与菜单的停用门禁",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [
+        "OPT-002"
+      ],
+      "owner": "aij-ai / PluginRuntimeAccess / menu availability",
+      "findingIds": [
+        "F03"
+      ],
+      "scope": "覆盖手工创建、列表、编辑、查询、问答、评测及文件导入；读路径有统一启用检查，写路径与生命周期锁保持一致；区分启动 opt-in 与持久启用状态。",
+      "acceptance": "插件停用后全部受管 API 与菜单按统一契约拒绝/隐藏；失败写入无副作用；恢复后允许；保留匿名、角色和跨 Workspace 拒绝路径。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "知识入口与菜单已有启停检查；补全部受管API矩阵及停用/写事务竞争验证。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-knowledge.service.ts",
+        "apps/api/src/menus/menus.service.ts"
+      ],
+      "stage": "S0",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-004",
+      "title": "修复运行时健康度与心跳时效",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [],
+      "owner": "AsyncRuntime / RuntimeHealthService",
+      "findingIds": [
+        "F04"
+      ],
+      "scope": "定义 lastPollAt 新鲜度、启动宽限、错误/积压与 worker/scheduler 角色所需健康语义，区分 liveness、DB readiness 与 runtime readiness。",
+      "acceptance": "心跳过期、poll 停滞、依赖故障能在管理运行时 readiness 中变为 degraded/503；恢复后转绿；DB ready 不等于 worker ready，disabled 模式按配置说明。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "已检查30秒心跳与错误；角色、启动宽限、积压与HTTP健康语义仍按原范围核验。",
+      "evidencePaths": [
+        "apps/api/src/async-runtime/runtime-health.service.ts"
+      ],
+      "stage": "S0",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-005",
+      "title": "交付 base 与 ai-standard 两条生成器完整路径",
+      "priority": "P1",
+      "milestone": "M1",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 6,
+        "high": 10
+      },
+      "dependsOn": [
+        "OPT-002",
+        "OPT-003"
+      ],
+      "owner": "Project CLI / distribution / AI composition",
+      "findingIds": [
+        "F05"
+      ],
+      "scope": "显式 edition/profile 定义、项目配置校验、插件选择、SecretRef/预算变量转发和安装引导；保留独立项目与测试库保护。",
+      "acceptance": "仓库外干净目录创建 base 和 ai-standard；base 默认无插件，AI 项目通过正常配置/管理入口跑通离线问答；缺配置和非法依赖拒绝，过程不直接写业务/插件数据库行。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "P",
+      "reconciliation": "生成器仍仅接受aij-base且禁止插件；Seed仍限定本宿主，必须补AI profile与独立项目初始化。",
+      "evidencePaths": [
+        "scripts/project/cli.mjs",
+        "scripts/database/seed.mjs"
+      ],
+      "stage": "S1",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-006",
+      "title": "建立干净 clone 可复现的 CI 和产品回归命令",
+      "priority": "P1",
+      "milestone": "M1",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-002",
+        "OPT-003",
+        "OPT-004",
+        "OPT-005"
+      ],
+      "owner": "Verification / CI",
+      "findingIds": [
+        "F11",
+        "F12"
+      ],
+      "scope": "将卡片历史基线校验与长期产品回归拆开；提供安全本机/CI 测试库准备和串行 DB 用例编排；CI 执行构建、类型、lint、隔离与生命周期矩阵。",
+      "acceptance": "全新 checkout 无历史 .artifacts 也可完成约定门禁；缺环境明确失败，零用例/跳过不能PASS；关键跨模块探针有回归用例，报告可追溯到 commit。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "Q",
+      "reconciliation": "已有卡片验证及串行回归；尚未证明全新clone不依赖历史.artifacts的长期CI入口。",
+      "evidencePaths": [
+        "scripts/verification/registry.mjs",
+        "scripts/verification/runner.mjs"
+      ],
+      "stage": "S1",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-007",
+      "title": "收敛模块、权限、菜单和数据迁移声明边界",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 6,
+        "high": 10
+      },
+      "dependsOn": [
+        "OPT-002",
+        "OPT-005"
+      ],
+      "owner": "Host composition / plugin contracts",
+      "findingIds": [
+        "F07"
+      ],
+      "scope": "明确 Core、可选 AI/通知/支付/Integration 的依赖和数据 owner；统一权限/菜单/任务声明；先消除多处硬编码，不要求立即拆多库。",
+      "acceptance": "base 关闭 Integration/AI 后无对应入口与任务；增加示例插件不用修改核心 Workspace 权限常量；manifest 与实际权限/路由/任务一致，迁移归属可查。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "P",
+      "reconciliation": "目录有收敛；权限、菜单、迁移和宿主扩展声明仍需统一，不能视为已完成插件契约。",
+      "evidencePaths": [
+        "apps/api/src/client-workspaces/client-workspace-permissions.ts",
+        "apps/api/src/plugins/aij-ai/ai-plugin.ts"
+      ],
+      "stage": "S1",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-008",
+      "title": "整理当前架构、发行能力表与任务状态源",
+      "priority": "P1",
+      "milestone": "M0",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 3,
+        "high": 5
+      },
+      "dependsOn": [],
+      "owner": "Docs / verification metadata",
+      "findingIds": [
+        "F12"
+      ],
+      "scope": "把历史快照移入明确历史区；提供机器可读能力地图、owner/入口/验证命令；当前架构/发行表由明确源码与队列摘要生成或校验，拆分过长 registry 与队列历史。",
+      "acceptance": "CURRENT/ARCHITECTURE/RELEASE_PROFILES 对同一能力无“已完成/未迁入”冲突；当前状态入口唯一，历史验收不改写，链接与生成校验通过。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "Q",
+      "reconciliation": "README/CURRENT新增当前入口；历史快照、长队列和registry仍未收敛成唯一状态源。",
+      "evidencePaths": [
+        "docs/current/CURRENT_STATE.md",
+        "docs/planning/CODING_QUEUE.json"
+      ],
+      "stage": "S0",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-009",
+      "title": "用两个差异化参考产品验证真实扩展成本",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-005",
+        "OPT-006",
+        "OPT-007",
+        "OPT-010"
+      ],
+      "owner": "Reference application hosts",
+      "findingIds": [
+        "F07",
+        "F14"
+      ],
+      "scope": "参考 A：通用管理应用；参考 B：多租户知识助理。各有新增领域模型、权限、页面与配置，使用独立项目数据/存储；不改原轻企仓库。",
+      "acceptance": "两项目从生成到新增领域功能、独立升级均可演示；记录改动底座源码的次数和范围；纯新增业务不应要求复制/修改底座核心服务。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "P",
+      "reconciliation": "原计划两个差异化参考产品尚未完成；MBTI可加作真实消费者，不静默替换原验收范围。",
+      "evidencePaths": [
+        "docs/planning/AIJ_FOUNDATION_OPTIMIZATION_BACKLOG_20261104.md"
+      ],
+      "stage": "S2",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-010",
+      "title": "建立版本化 API 契约与可生成 SDK",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-007"
+      ],
+      "owner": "Contracts / SDK / API / Web",
+      "findingIds": [
+        "F14"
+      ],
+      "scope": "补齐标准错误 code/requestId/retryable、资源 DTO 与版本规则；使用单一 schema/OpenAPI/等效契约生成类型客户端，统一鉴权和 multipart/stream 消费。",
+      "acceptance": "至少 Workspace、文件、知识/问答三组 API 有契约漂移检查；前端不手写平行 DTO；错误不会泄露内部细节，升级保留向后兼容测试。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "P",
+      "reconciliation": "已有共享类型和手写createAiClient；尚未建立可生成SDK、统一错误与契约漂移检查。",
+      "evidencePaths": [
+        "packages/contracts/src/index.ts",
+        "packages/sdk/src/index.ts"
+      ],
+      "stage": "S1",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-011",
+      "title": "按真实消费者抽取稳定运行包并设计升级路径",
+      "priority": "P2",
+      "milestone": "M1",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-009",
+        "OPT-010"
+      ],
+      "owner": "Packages / domain owners",
+      "findingIds": [
+        "F07"
+      ],
+      "scope": "基于两个参考项目识别真正稳定的身份、租户、配置与运行时模块，形成框架适配实现包和公开扩展端口；source-template 仍作为一种交付形式。",
+      "acceptance": "参考项目新增业务不用复制底座实现；底座补丁可通过明确依赖/升级边界应用；不制造第二个数据/队列/成本 owner，有 workspace 与 packed consumer 证据。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "P",
+      "reconciliation": "保持先有消费者证据，再抽稳定实现包与升级端口。",
+      "evidencePaths": [
+        "scripts/distribution/pack-aij-base.mjs"
+      ],
+      "stage": "S4",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-012",
+      "title": "新增与本地保护隔离的生产运行配置",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-005",
+        "OPT-006"
+      ],
+      "owner": "Runtime config / deployment",
+      "findingIds": [
+        "F10"
+      ],
+      "scope": "单独定义生产域名/TLS/可信代理/数据库与密钥策略、Linux 容器启动方式、迁移运维权限；保留 dev/test loopback 与目标校验。",
+      "acceptance": "专用隔离生产模拟环境运行 API/Web/worker；错误域名、凭据、跨环境目标拒绝；正常域名与独立 DB 可用，有最小权限与部署/恢复说明。",
+      "condition": "准备对外生产运行时必需；不自动连接正式库/部署",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "生产配置仍需与本地保护隔离，当前不连接正式环境。",
+      "evidencePaths": [
+        "scripts/runtime-environment.cjs"
+      ],
+      "stage": "S3",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-013",
+      "title": "连接池、worker 角色与并发背压实测",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-004",
+        "OPT-006"
+      ],
+      "owner": "Prisma / AsyncRuntime",
+      "findingIds": [
+        "F01",
+        "F10"
+      ],
+      "scope": "连接池与超时可配置且有边界；API/worker/scheduler 可独立角色启动；按可用容量领取任务，补续租/租约监控与背压。",
+      "acceptance": "至少两个独立 worker/连接执行慢任务与并发请求；无因批量预领后顺序等待导致的重复执行；输出队列等待、吞吐和 p95 实测基线，不凭默认池大小承诺容量。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "已改容量较保守的逐任务领取；尚无两worker容量/连接池/p95压测与独立角色证据。",
+      "evidencePaths": [
+        "apps/api/src/async-runtime/runtime-worker.service.ts"
+      ],
+      "stage": "S2",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-014",
+      "title": "可观测性与错误追踪闭环",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-004",
+        "OPT-010"
+      ],
+      "owner": "Core telemetry / AI / runtime",
+      "findingIds": [
+        "F04",
+        "F10"
+      ],
+      "scope": "关联 HTTP、Job、Provider、Trace 和预算记录；结构化日志、指标与告警；采用可版本化的 OpenTelemetry/GenAI 字段映射，正文默认不采集。",
+      "acceptance": "能定位一次请求到任务/模型/失败分类；查看延迟、失败率、积压、token、预算预留滞留；告警与去敏可实测，采样/禁采敏感内容有配置。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "已有Trace、用量页与预算摘要；完整请求关联、指标与告警仍未交付。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-center-usage.service.ts"
+      ],
+      "stage": "S3",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-015",
+      "title": "版本、私有发行、升级兼容与恢复产品化",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-006",
+        "OPT-009",
+        "OPT-011",
+        "OPT-012"
+      ],
+      "owner": "Release / distribution / migrations",
+      "findingIds": [
+        "F11"
+      ],
+      "scope": "明确稳定基线、SemVer 与兼容矩阵，构建不可变私有产物及来源/摘要清单；跨版本迁移、备份、回退与恢复按 edition 验证。",
+      "acceptance": "新消费者得到明确已验版本；前一版升级与失败恢复实测；从真实打包产物运行而非源码路径；main/tag/default branch 接收节点由负责人决定。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "P",
+      "reconciliation": "私有源码打包已存在，但完整版本、升级失败恢复与所选edition发行验收未完成。",
+      "evidencePaths": [
+        "scripts/distribution/pack-aij-base.mjs"
+      ],
+      "stage": "S4",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-016",
+      "title": "将客户验证/找回接到可运行的通知交付端口",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 8,
+        "high": 12
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-002",
+        "OPT-007"
+      ],
+      "owner": "ClientAuth / aij-notification",
+      "findingIds": [
+        "F06"
+      ],
+      "scope": "复用通知 intent/attempt owner 连接注册验证、找回与重发；提供本地可观察的邮件接收环境与投递状态，不把 testDeliveries 当实际送达。",
+      "acceptance": "非测试运行配置通过正常适配器完成注册→验证→登录→找回，覆盖令牌重放/过期/限流/投递失败；真实外发需负责人配置凭据与确认。",
+      "condition": "开放自助注册/找回前必需",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "客户验证/找回尚无真实可运行的生产通知交付适配。",
+      "evidencePaths": [
+        "apps/api/src/client-auth/client-auth-notification.adapter.ts"
+      ],
+      "stage": "S3",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-017",
+      "title": "文件存储可替换与多实例验证",
+      "priority": "P2",
+      "milestone": "M2",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 6,
+        "high": 10
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-012"
+      ],
+      "owner": "File storage / adapter port",
+      "findingIds": [
+        "F10"
+      ],
+      "scope": "基于已有 StorageAdapter 增加可选择的对象存储/共享存储实现，统一鉴权、校验与保留策略；本地模式继续可用。",
+      "acceptance": "两实例读写同一受控资产，跨租户/缺失/损坏/删除恢复行为一致；不暴露裸 object key，适配器契约测试复用。",
+      "condition": "多实例部署/大文件业务需要时执行",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "当前私有PNG复用本地FileAsset；对象/共享存储与多实例验证未完成。",
+      "evidencePaths": [
+        "apps/api/src/files/local-storage.adapter.ts"
+      ],
+      "stage": "S3",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-018",
+      "title": "通用 AI 请求/响应协议与流式执行",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-005",
+        "OPT-010"
+      ],
+      "owner": "aij-ai / Provider ports",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "从 query/evidence 专用形状演进为版本化 messages/content/schema/usage 协议，保持知识问答适配层；至少两个可信 provider 适配证明可替换，支持可取消流式响应。",
+      "acceptance": "现有知识问答兼容；多 provider 的成功/错误/取消/超时/结构化输出协议通过；服务端选择 model/credential，客户端不能注入 endpoint/SecretRef。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "已通用文本/JSON/单张PNG与兼容厂商选择；版本化消息协议、流式和原生多协议能力仍有差量。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-center-provider.ts"
+      ],
+      "stage": "S2",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-019",
+      "title": "模型路由、价格快照与按租户配额治理",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 12,
+        "high": 20
+      },
+      "dependsOn": [
+        "OPT-013",
+        "OPT-018"
+      ],
+      "owner": "aij-ai / budget & cost owners",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "将单次10元评测策略保留为一种 policy；增加项目/Workspace/用户预算周期、模型能力/路由策略、Provider限流/熔断与失败后的预留处置。",
+      "acceptance": "独立连接并发不超额；周期、上下文、模型/价格不匹配拒绝；余额、占额、内部估算与 Provider 收据成本区分；无配置默认拒绝。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "已项目/Workspace月预算、配置价与快照；缺用户配额、路由/熔断、未知费用处置等。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-center-budget.service.ts"
+      ],
+      "stage": "S2",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-020",
+      "title": "Prompt 版本、对话状态与记忆边界",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-018"
+      ],
+      "owner": "aij-ai / conversation & prompt owners",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "提示模板版本、参数契约、会话/消息关联及 TTL；将具体知识 Prompt 留在能力模块；业务 Prompt 由业务项目持有。",
+      "acceptance": "一次执行可追溯模板/模型版本；同一会话跨 Workspace 不可访问；记忆窗口和删除策略明确，回放不会重新执行外部动作。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "已有Agent/Skill修订号和执行快照；尚无完整历史回滚、会话与记忆边界。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-center-configuration.service.ts"
+      ],
+      "stage": "S2",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-021",
+      "title": "知识索引、检索质量与内容生命周期",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "NOT_STARTED",
+      "estimateHours": {
+        "low": 16,
+        "high": 28
+      },
+      "dependsOn": [
+        "OPT-019",
+        "OPT-022"
+      ],
+      "owner": "aij-ai knowledge / storage adapters",
+      "findingIds": [
+        "F09"
+      ],
+      "scope": "增加异步解析/分块/索引状态与文档版本；先建立评测基线，再比较全文/混合/向量检索，按实测选择；按明确需求扩展格式。",
+      "acceptance": "超过500候选文档仍能正确检索，更新/停用/删除及时失效；引用指向可追溯版本；覆盖语义改写、中文、无依据、跨租户及过期内容，报告检索与答案质量。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "现有知识问答是基础；异步索引、文档版本与大规模检索质量路线未完成。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-knowledge-retrieval.ts"
+      ],
+      "stage": "S3",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-022",
+      "title": "版本化评测与对抗回归门禁",
+      "priority": "P2",
+      "milestone": "M3",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-018"
+      ],
+      "owner": "AI evaluation / verification",
+      "findingIds": [
+        "F08",
+        "F09"
+      ],
+      "scope": "把20例合成样本转为版本化数据集/评分规则/运行记录，区分检索、答案、引用、隔离、成本和延迟；增加不依赖生产数据的恶意内容/注入/边界样例。",
+      "acceptance": "评分结果由服务端评测器生成而非客户端声明；基线回归与版本比较可重现；离线协议结果和真实模型质量分开记录，live 仍保留先前授权条件。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "已有合成协议和知识评测；通用版本化数据集/服务端评分/对抗比较尚未完成。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-evaluation.service.ts"
+      ],
+      "stage": "S2",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-023",
+      "title": "受控 Tool 调用、资源授权与人工批准",
+      "priority": "P2",
+      "milestone": "M4",
+      "status": "CONDITIONAL",
+      "estimateHours": {
+        "low": 20,
+        "high": 32
+      },
+      "dependsOn": [
+        "OPT-001",
+        "OPT-010",
+        "OPT-014",
+        "OPT-019",
+        "OPT-022"
+      ],
+      "owner": "AI tool gateway / domain adapters",
+      "findingIds": [
+        "F08",
+        "F13"
+      ],
+      "scope": "统一工具注册/参数校验、调用主体与 Workspace 资源范围，区分只读和有副作用动作；批准状态持久化，调用前复核、撤销/过期及审计。",
+      "acceptance": "不可信文档不能授予工具权限；未批准/过期/越权动作服务端拒绝；重放和崩溃不重复外部动作；业务工具注册在业务宿主，复用现有队列和审计。",
+      "condition": "目标包含 Agent/工具执行时执行",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "仅有明确Tool执行需求后开卡；当前提示词Skill不算工具网关。",
+      "evidencePaths": [
+        "docs/development/AI_CENTER_MBTI_INTEGRATION.md"
+      ],
+      "stage": "S5",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-024",
+      "title": "MCP 接入适配与授权边界",
+      "priority": "P2",
+      "milestone": "M4",
+      "status": "CONDITIONAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-012",
+        "OPT-023"
+      ],
+      "owner": "MCP adapter / tool gateway",
+      "findingIds": [
+        "F08",
+        "F13"
+      ],
+      "scope": "MCP 作为 Tool port 的一种适配，不直接暴露全部后端接口；固定服务 allowlist、连接/会话策略、资源 audience/scope 校验和网络访问边界。",
+      "acceptance": "错 audience/缺 scope/撤销授权拒绝；无裸 token 透传或任意地址访问；工具定义变更可审计；停用服务不残留可执行工具。",
+      "condition": "确有外部 MCP 服务消费需求时执行",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "MCP是工具端口适配，不能跳过OPT-023资源授权。",
+      "evidencePaths": [
+        "docs/development/AI_CENTER_MBTI_INTEGRATION.md"
+      ],
+      "stage": "S5",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-025",
+      "title": "可恢复 Workflow/Agent 最小编排",
+      "priority": "P3",
+      "milestone": "M4",
+      "status": "CONDITIONAL",
+      "estimateHours": {
+        "low": 16,
+        "high": 28
+      },
+      "dependsOn": [
+        "OPT-020",
+        "OPT-022",
+        "OPT-023"
+      ],
+      "owner": "AI orchestration / AsyncRuntime",
+      "findingIds": [
+        "F08"
+      ],
+      "scope": "节点状态、checkpoint、批准等待、取消、恢复、步数/时间/预算上限；Agent 以受控循环运行，不新建第二套通用队列。",
+      "acceptance": "重启后从已确认checkpoint继续；待审批动作不自动执行；取消/超预算停止后续调用；重放不重复写入，两条真实参考流程通过后再评估可视化编辑器。",
+      "condition": "多步长任务/Agent 为明确产品需求时执行",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "A",
+      "reconciliation": "Orca研发编排不等于产品内Workflow；产品Workflow另按checkpoint与副作用语义开发。",
+      "evidencePaths": [
+        "apps/api/src/async-runtime/registry.ts"
+      ],
+      "stage": "S5",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-026",
+      "title": "企业身份与成员邀请增强",
+      "priority": "P2",
+      "milestone": "M5",
+      "status": "CONDITIONAL",
+      "estimateHours": {
+        "low": 12,
+        "high": 24
+      },
+      "dependsOn": [
+        "OPT-010",
+        "OPT-012"
+      ],
+      "owner": "Identity / Workspace",
+      "findingIds": [
+        "F13"
+      ],
+      "scope": "按目标客户选择 OIDC/企业SSO、管理员 MFA、邀请/接受/失效流程及可扩展资源授权；保留管理身份与客户身份区分。",
+      "acceptance": "邀请单次且过期、撤销可验证；SSO issuer/audience/租户绑定严格校验；MFA/失效后会话正确撤销，不写死业务角色。",
+      "condition": "企业客户/高权限运营场景需要时执行",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "有企业客户需求后做SSO/MFA/邀请，非MBTI首发一概前置。",
+      "evidencePaths": [
+        "apps/api/src/client-workspaces/workspace-context.service.ts"
+      ],
+      "stage": "S5",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-027",
+      "title": "租户查询约束与跨域数据留存治理",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "PARTIAL",
+      "estimateHours": {
+        "low": 8,
+        "high": 14
+      },
+      "dependsOn": [
+        "OPT-003",
+        "OPT-010",
+        "OPT-014"
+      ],
+      "owner": "Workspace / repository scopes / audit",
+      "findingIds": [
+        "F13"
+      ],
+      "scope": "以 scoped repository/复合约束强化新增模型的租户边界；统一问答、评测、Trace、审计、原件的不同保留/删除规则；评估 RLS 的收益与角色/连接池要求。",
+      "acceptance": "所有新增租户实体有服务端上下文与越权负例；导出/删除/恢复/后台任务也遵守scope；保留与删除证据可查；RLS若采用必须验证 owner bypass 与事务上下文，不靠打开开关宣称安全。",
+      "condition": "通用底座路线",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "R",
+      "reconciliation": "新增AI结果已按成员/Workspace隔离并有TTL；全域导出/删除/恢复与留存治理仍需完成。",
+      "evidencePaths": [
+        "apps/api/src/plugins/aij-ai/ai-center-run.service.ts"
+      ],
+      "stage": "S3",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    },
+    {
+      "id": "OPT-028",
+      "title": "完成所选 edition 的负责人接收与发行决定",
+      "priority": "P1",
+      "milestone": "M2",
+      "status": "OWNER_DECISION",
+      "estimateHours": {
+        "low": 2,
+        "high": 4
+      },
+      "dependsOn": [
+        "OPT-015"
+      ],
+      "owner": "Owner / release documentation",
+      "findingIds": [
+        "F11"
+      ],
+      "scope": "准备所选edition统一验收包，核定许可、私有/公开渠道、支持平台、运维责任及稳定分支/tag策略；基础版不以所有高级扩展完成作为接收前提。",
+      "acceptance": "负责人明确接收范围与未接收项，决定稳定版本/分发方式；未确认的真实调用、资金动作或生产部署仍不执行，等待时间不计入估时。",
+      "condition": "负责人决策节点；本清单不代为做许可/发布决定",
+      "originalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "remainingEstimateHours": null,
+      "dispatchableAsSingleTask": false,
+      "lane": "Q",
+      "reconciliation": "准备验收材料可交付，负责人接收、main/tag、渠道/许可决定不可由Worker代填通过。",
+      "evidencePaths": [
+        "docs/governance/SOURCE_PROVENANCE.md"
+      ],
+      "stage": "S4",
+      "completionRule": "原工作包全部验收满足后才关闭；局部卡完成不自动关闭工作包。"
+    }
+  ],
+  "firstBatch": {
+    "id": "ORCA-B01",
+    "cardLimit": 4,
+    "estimatedEffectiveHours": 12,
+    "budgetHours": 12,
+    "cards": [
+      {
+        "id": "ORCH-GOV-01",
+        "title": "建立 Orca 并行写入与单点集成约束",
+        "hours": 2,
+        "role": "coordinator",
+        "workPackages": [
+          "OPT-006",
+          "OPT-008"
+        ],
+        "codeDeps": [],
+        "integrationDeps": [],
+        "writeScope": [
+          "AGENTS.md",
+          "docs/planning/orca-optimization-20261104/coordination-policy.md"
+        ],
+        "protectedRequests": [
+          "scripts/verification/registry.mjs",
+          "docs/planning/CODING_QUEUE.json"
+        ],
+        "acceptance": [
+          "明确本仓库已注册Orca子worktree可写、每卡一个Writer、dev仅总控集成，原轻企仍只读。",
+          "约定共享文件/DB/构建资源、worker交接、候选提交和正式提交边界，保留历史负责人验收。",
+          "核验origin/dev及每个新worker起始SHA；子worktree若未通过环境/数据库保护校验，DB验证仍回到原dev工作区执行。"
+        ],
+        "resources": [
+          "governance-writer"
+        ],
+        "closesWorkPackage": false
+      },
+      {
+        "id": "ORCH-DELTA-01",
+        "title": "复核既有可靠性修复与剩余差量",
+        "hours": 3,
+        "role": "worker-R",
+        "workPackages": [
+          "OPT-001",
+          "OPT-002",
+          "OPT-003",
+          "OPT-004",
+          "OPT-008"
+        ],
+        "codeDeps": [
+          "I-ORCH-GOV-01"
+        ],
+        "integrationDeps": [
+          "I-ORCH-GOV-01"
+        ],
+        "writeScope": [
+          "scripts/verification/optimization-delta/",
+          "docs/execution/optimization-delta/"
+        ],
+        "protectedRequests": [
+          "scripts/verification/registry.mjs"
+        ],
+        "acceptance": [
+          "把AF-121..124证据逐项映射原验收；覆盖启动/管理目录、正常安装AI、全知识接口启停、旧租约与心跳。",
+          "纯读审计和新测试可以交付；未达项必须记录可复现证据并拆修复卡，不把差量报告PASS写成对应功能全部PASS。",
+          "真实DB/HTTP矩阵由总控在原dev受保护测试目标串行执行；审计结果区分实际执行、既有记录和待验证。"
+        ],
+        "resources": [
+          "delta-tests-writer"
+        ],
+        "closesWorkPackage": false
+      },
+      {
+        "id": "ORCH-GEN-01",
+        "title": "新增 base 与 ai-standard 配置契约",
+        "hours": 4,
+        "role": "worker-P",
+        "workPackages": [
+          "OPT-005"
+        ],
+        "codeDeps": [
+          "I-ORCH-GOV-01"
+        ],
+        "integrationDeps": [
+          "I-ORCH-GOV-01"
+        ],
+        "writeScope": [
+          "scripts/project/cli.mjs",
+          "scripts/project/editions.mjs",
+          "scripts/test/project-configuration.test.mjs",
+          "docs/development/PROJECT_EDITIONS.md"
+        ],
+        "protectedRequests": [
+          "scripts/runtime-environment.cjs",
+          "scripts/database/seed.mjs"
+        ],
+        "acceptance": [
+          "base默认无插件；ai-standard显式声明可信AI依赖、允许转发的非秘密配置及SecretRef变量名，未知edition/插件拒绝。",
+          "create/show项目身份保持隔离，不能通过手改PROJECT_ID绕过约束，不复制真实.env或密钥。",
+          "仅关闭配置子范围；独立项目Seed、正常管理安装与可运行的AI消费证明留给GEN-02/03，不能宣称OPT-005整体完成。"
+        ],
+        "resources": [
+          "project-cli-writer"
+        ],
+        "closesWorkPackage": false
+      },
+      {
+        "id": "ORCH-CI-01",
+        "title": "建立不依赖历史报告的产品验证入口",
+        "hours": 3,
+        "role": "worker-Q",
+        "workPackages": [
+          "OPT-006"
+        ],
+        "codeDeps": [
+          "I-ORCH-GOV-01"
+        ],
+        "integrationDeps": [
+          "I-ORCH-GOV-01"
+        ],
+        "writeScope": [
+          "scripts/verification/product/",
+          "docs/development/PRODUCT_VERIFICATION.md"
+        ],
+        "protectedRequests": [
+          "package.json",
+          "scripts/verification/registry.mjs"
+        ],
+        "acceptance": [
+          "提供产品级验证入口和分类清单，与历史AF基线分离，不要求已有.artifacts作为通过条件。",
+          "缺DB/缺迁移/零用例/跳过不能PASS；支持串行DB组与纯检查组，报告绑定被测SHA。",
+          "本卡不宣称干净clone的ai-standard端到端已完成；待GEN-03后由CI-02完成产品矩阵。"
+        ],
+        "resources": [
+          "product-verification-writer"
+        ],
+        "closesWorkPackage": false
+      }
+    ],
+    "taskNodes": [
+      {
+        "id": "ORCH-GOV-01",
+        "kind": "implementation_candidate",
+        "cardId": "ORCH-GOV-01",
+        "deps": [],
+        "role": "coordinator",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/ORCH-GOV-01.md"
+      },
+      {
+        "id": "I-ORCH-GOV-01",
+        "kind": "dev_integration_gate",
+        "cardId": "ORCH-GOV-01",
+        "deps": [
+          "ORCH-GOV-01"
+        ],
+        "role": "coordinator-only",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/INTEGRATION_GATE.md",
+        "resources": [
+          "dev-writer",
+          "shared-metadata-writer",
+          "db-admin-and-acceptance-slot",
+          "heavy-build-slot"
+        ],
+        "completionRule": "精确集成、注册验证与适用门禁通过、正式卡提交、推送dev、远端SHA一致；不等于负责人验收。"
+      },
+      {
+        "id": "ORCH-DELTA-01",
+        "kind": "implementation_candidate",
+        "cardId": "ORCH-DELTA-01",
+        "deps": [
+          "I-ORCH-GOV-01"
+        ],
+        "role": "worker-R",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/ORCH-DELTA-01.md"
+      },
+      {
+        "id": "I-ORCH-DELTA-01",
+        "kind": "dev_integration_gate",
+        "cardId": "ORCH-DELTA-01",
+        "deps": [
+          "ORCH-DELTA-01",
+          "I-ORCH-GOV-01"
+        ],
+        "role": "coordinator-only",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/INTEGRATION_GATE.md",
+        "resources": [
+          "dev-writer",
+          "shared-metadata-writer",
+          "db-admin-and-acceptance-slot",
+          "heavy-build-slot"
+        ],
+        "completionRule": "精确集成、注册验证与适用门禁通过、正式卡提交、推送dev、远端SHA一致；不等于负责人验收。"
+      },
+      {
+        "id": "ORCH-GEN-01",
+        "kind": "implementation_candidate",
+        "cardId": "ORCH-GEN-01",
+        "deps": [
+          "I-ORCH-GOV-01"
+        ],
+        "role": "worker-P",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/ORCH-GEN-01.md"
+      },
+      {
+        "id": "I-ORCH-GEN-01",
+        "kind": "dev_integration_gate",
+        "cardId": "ORCH-GEN-01",
+        "deps": [
+          "ORCH-GEN-01",
+          "I-ORCH-GOV-01"
+        ],
+        "role": "coordinator-only",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/INTEGRATION_GATE.md",
+        "resources": [
+          "dev-writer",
+          "shared-metadata-writer",
+          "db-admin-and-acceptance-slot",
+          "heavy-build-slot"
+        ],
+        "completionRule": "精确集成、注册验证与适用门禁通过、正式卡提交、推送dev、远端SHA一致；不等于负责人验收。"
+      },
+      {
+        "id": "ORCH-CI-01",
+        "kind": "implementation_candidate",
+        "cardId": "ORCH-CI-01",
+        "deps": [
+          "I-ORCH-GOV-01"
+        ],
+        "role": "worker-Q",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/ORCH-CI-01.md"
+      },
+      {
+        "id": "I-ORCH-CI-01",
+        "kind": "dev_integration_gate",
+        "cardId": "ORCH-CI-01",
+        "deps": [
+          "ORCH-CI-01",
+          "I-ORCH-GOV-01"
+        ],
+        "role": "coordinator-only",
+        "status": "PLANNED_NOT_DISPATCHED",
+        "specFile": "docs/planning/orca-optimization-20261104/INTEGRATION_GATE.md",
+        "resources": [
+          "dev-writer",
+          "shared-metadata-writer",
+          "db-admin-and-acceptance-slot",
+          "heavy-build-slot"
+        ],
+        "completionRule": "精确集成、注册验证与适用门禁通过、正式卡提交、推送dev、远端SHA一致；不等于负责人验收。"
+      }
+    ]
+  },
+  "nextBatchCandidates": [
+    {
+      "id": "GEN-02",
+      "scope": "独立项目Seed/管理员/权限与安装引导，保留数据库目标保护",
+      "dependsOn": [
+        "I-ORCH-GEN-01",
+        "差量核验中相关插件/门禁残项已验收集成"
+      ]
+    },
+    {
+      "id": "GEN-03",
+      "scope": "仓库外base/ai-standard从生成到离线AI消费完整验证",
+      "dependsOn": [
+        "GEN-02已验证集成"
+      ]
+    },
+    {
+      "id": "CI-02",
+      "scope": "干净clone产品矩阵、隔离DB准备、CI环境验证",
+      "dependsOn": [
+        "GEN-03已验证集成",
+        "I-ORCH-CI-01"
+      ]
+    },
+    {
+      "id": "STATE-01",
+      "scope": "唯一当前状态源与能力表，保留历史验收",
+      "dependsOn": [
+        "I-ORCH-DELTA-01",
+        "I-ORCH-CI-01"
+      ]
+    }
+  ],
+  "mbtiParallelTrack": [
+    {
+      "id": "MBTI-AI-LIVE",
+      "scope": "目标模型真实小额度验收",
+      "externalInputs": [
+        "厂商/模型",
+        "SecretRef",
+        "用途/数据分类",
+        "允许的金额"
+      ],
+      "codePreparationCanProceed": true,
+      "liveActionsAuthorizedByThisPlan": false
+    },
+    {
+      "id": "MBTI-PAYMENT",
+      "scope": "底座商户Provider与另一个业务仓库的订单/权益适配",
+      "externalInputs": [
+        "支付渠道",
+        "商户/回调环境",
+        "业务订单权益接口"
+      ],
+      "codePreparationCanProceed": true,
+      "liveActionsAuthorizedByThisPlan": false
+    },
+    {
+      "id": "MBTI-CONSUMER",
+      "scope": "测评确定性评分、受控结果与Agent消费；业务真值留在业务项目",
+      "externalInputs": [
+        "业务仓库位置",
+        "题库/评分与产品边界"
+      ],
+      "codePreparationCanProceed": true,
+      "newBusinessRepoCreatedByThisPlan": false
+    }
+  ],
+  "rules": {
+    "automaticFileLocksProvidedByOrca": false,
+    "automaticGitIntegrationProvidedByOrca": false,
+    "downstreamDependsOnIntegratedDev": true,
+    "workerDoneIsOwnerAcceptance": false,
+    "conditionalFeaturesAutoEnabled": false,
+    "globalQueueAndRegistryWriter": "coordinator-only",
+    "oldBarracudaEligibleAsBase": false,
+    "oldProductWritable": false
+  }
+}

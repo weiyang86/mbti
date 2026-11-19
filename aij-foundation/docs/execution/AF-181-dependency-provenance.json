@@ -1,0 +1,242 @@
+{
+  "status": "PASS",
+  "packages": [
+    {
+      "name": "@prisma/client",
+      "version": "6.19.3",
+      "officialMetadata": "https://registry.npmjs.org/%40prisma%2Fclient/6.19.3",
+      "tarball": "https://registry.npmjs.org/@prisma/client/-/client-6.19.3.tgz",
+      "integrity": "sha512-mKq3jQFhjvko5LTJFHGilsuQs+W+T3Gm451NzuTDGQxwCzwXHYnIu2zGkRoW+Exq3Rob7yp2MfzSrdIiZVhrBg==",
+      "downloadedBytes": 27252219,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": {
+        "node": ">=18.18"
+      }
+    },
+    {
+      "name": "@prisma/config",
+      "version": "6.19.3",
+      "officialMetadata": "https://registry.npmjs.org/%40prisma%2Fconfig/6.19.3",
+      "tarball": "https://registry.npmjs.org/@prisma/config/-/config-6.19.3.tgz",
+      "integrity": "sha512-CBPT44BjlQxEt8kiMEauji2WHTDoVBOKl7UlewXmUgBPnr/oPRZC3psci5chJnYmH0ivEIog2OU9PGWoki3DLQ==",
+      "downloadedBytes": 16812,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": null
+    },
+    {
+      "name": "@prisma/debug",
+      "version": "6.19.3",
+      "officialMetadata": "https://registry.npmjs.org/%40prisma%2Fdebug/6.19.3",
+      "tarball": "https://registry.npmjs.org/@prisma/debug/-/debug-6.19.3.tgz",
+      "integrity": "sha512-ljkJ+SgpXNktLG0Q/n4JGYCkKf0f8oYLyjImS2I8e2q2WCfdRRtWER062ZV/ixaNP2M2VKlWXVJiGzZaUgbKZw==",
+      "downloadedBytes": 8176,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": null
+    },
+    {
+      "name": "@prisma/engines-version",
+      "version": "7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7",
+      "officialMetadata": "https://registry.npmjs.org/%40prisma%2Fengines-version/7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7",
+      "tarball": "https://registry.npmjs.org/@prisma/engines-version/-/engines-version-7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7.tgz",
+      "integrity": "sha512-03bgb1VD5gvuumNf+7fVGBzfpJPjmqV423l/WxsWk2cNQ42JD0/SsFBPhN6z8iAvdHs07/7ei77SKu7aZfq8bA==",
+      "downloadedBytes": 4822,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": null
+    },
+    {
+      "name": "@prisma/engines",
+      "version": "6.19.3",
+      "officialMetadata": "https://registry.npmjs.org/%40prisma%2Fengines/6.19.3",
+      "tarball": "https://registry.npmjs.org/@prisma/engines/-/engines-6.19.3.tgz",
+      "integrity": "sha512-RSYxtlYFl5pJ8ZePgMv0lZ9IzVCOdTPOegrs2qcbAEFrBI1G33h6wyC9kjQvo0DnYEhEVY0X4LsuFHXLKQk88g==",
+      "downloadedBytes": 22666,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": null
+    },
+    {
+      "name": "@prisma/fetch-engine",
+      "version": "6.19.3",
+      "officialMetadata": "https://registry.npmjs.org/%40prisma%2Ffetch-engine/6.19.3",
+      "tarball": "https://registry.npmjs.org/@prisma/fetch-engine/-/fetch-engine-6.19.3.tgz",
+      "integrity": "sha512-tKtl/qco9Nt7LU5iKhpultD8O4vMCZcU2CHjNTnRrL1QvSUr5W/GcyFPjNL87GtRrwBc7ubXXD9xy4EvLvt8JA==",
+      "downloadedBytes": 187903,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": null
+    },
+    {
+      "name": "@prisma/get-platform",
+      "version": "6.19.3",
+      "officialMetadata": "https://registry.npmjs.org/%40prisma%2Fget-platform/6.19.3",
+      "tarball": "https://registry.npmjs.org/@prisma/get-platform/-/get-platform-6.19.3.tgz",
+      "integrity": "sha512-xFj1VcJ1N3MKooOQAGO0W5tsd0W2QzIvW7DD7c/8H14Zmp4jseeWAITm+w2LLoLrlhoHdPPh0NMZ8mfL6puoHA==",
+      "downloadedBytes": 257518,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": null
+    },
+    {
+      "name": "body-parser",
+      "version": "2.4.0",
+      "officialMetadata": "https://registry.npmjs.org/body-parser/2.4.0",
+      "tarball": "https://registry.npmjs.org/body-parser/-/body-parser-2.4.0.tgz",
+      "integrity": "sha512-Ifk1KcLrxaGt1occQagQNFNNOqRt1LFuehEnHHzB8Z6cRgIxRU1TBaiIsUiCdA+gy5PL7Y1IX31DNKkRmxtXjQ==",
+      "downloadedBytes": 11417,
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "23d466b1b134b415b66fa50c6526b4cf3e7b9258554da88d3abb371721e7ce68"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    {
+      "name": "deepmerge-ts",
+      "version": "8.0.0",
+      "officialMetadata": "https://registry.npmjs.org/deepmerge-ts/8.0.0",
+      "tarball": "https://registry.npmjs.org/deepmerge-ts/-/deepmerge-ts-8.0.0.tgz",
+      "integrity": "sha512-ICNjaP0ML+eSdEpJYQC46XiAn/UjAdwbEl0dE8p85ZTeNDinN4Kd4+9jS4OSAuH7st6eC7rQhsqTF5zIDaUm2g==",
+      "downloadedBytes": 41012,
+      "declaredLicense": "BSD-3-Clause",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "734d8fd2baff4a5b7450a5b8242d4a960bc4ade3b0ade5e6cad642965d1d496d"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": {
+        "node": ">=16.0.0"
+      }
+    },
+    {
+      "name": "effect",
+      "version": "3.21.0",
+      "officialMetadata": "https://registry.npmjs.org/effect/3.21.0",
+      "tarball": "https://registry.npmjs.org/effect/-/effect-3.21.0.tgz",
+      "integrity": "sha512-PPN80qRokCd1f015IANNhrwOnLO7GrrMQfk4/lnZRE/8j7UPWrNNjPV0uBrZutI/nHzernbW+J0hdqQysHiSnQ==",
+      "downloadedBytes": 4206673,
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "774c3bc5924ad8ae6c5a75f1c53db13feb238ade15989625c513d07b60dedf30"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": null
+    },
+    {
+      "name": "multer",
+      "version": "2.5.0",
+      "officialMetadata": "https://registry.npmjs.org/multer/2.5.0",
+      "tarball": "https://registry.npmjs.org/multer/-/multer-2.5.0.tgz",
+      "integrity": "sha512-BsqOzYGVq49JcW2IzoSAxeKYRevb+dGGPPWleOR8Lrlk4igwxu1/9pwSXlByhCb7MVZDrNJFC0IBP5/O5nLYRw==",
+      "downloadedBytes": 17451,
+      "declaredLicense": "MIT",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "cc8f87aafbf72a74bafed2a8f6925d8895e1c716b36bd3df7ee0c46be54e87bb"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": {
+        "node": ">= 10.16.0"
+      }
+    },
+    {
+      "name": "prisma",
+      "version": "6.19.3",
+      "officialMetadata": "https://registry.npmjs.org/prisma/6.19.3",
+      "tarball": "https://registry.npmjs.org/prisma/-/prisma-6.19.3.tgz",
+      "integrity": "sha512-++ZJ0ijLrDJF6hNB4t4uxg2br3fC4H9Yc9tcbjr2fcNFP3rh/SBNrAgjhsqBU4Ght8JPrVofG/ZkXfnSfnYsFg==",
+      "downloadedBytes": 17620006,
+      "declaredLicense": "Apache-2.0",
+      "licenseFiles": [
+        {
+          "file": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": {
+        "node": ">=18.18"
+      }
+    },
+    {
+      "name": "qs",
+      "version": "6.16.1",
+      "officialMetadata": "https://registry.npmjs.org/qs/6.16.1",
+      "tarball": "https://registry.npmjs.org/qs/-/qs-6.16.1.tgz",
+      "integrity": "sha512-5Px6J7rfHBAGUhNQ3es4YzcOdBBw0SDcVtThJml4RdnKw4tKs2epA0kPZ+K8X+WiHktT93RHVcQ/3ym5aTCgtg==",
+      "downloadedBytes": 85495,
+      "declaredLicense": "BSD-3-Clause",
+      "licenseFiles": [
+        {
+          "file": "LICENSE.md",
+          "sha256": "e7dc37bf662d7f786efcb46c545615e70c1daf458a38385521c63cf6607cdfe1"
+        }
+      ],
+      "standaloneLicenseFilePresent": true,
+      "engines": {
+        "node": ">=0.6"
+      }
+    }
+  ],
+  "scope": "13 actual new locked+installed packages; official tarball SHA512 and license file hashes. Package declarations are not publication authorization; no paid services, data or credentials accessed.",
+  "taskId": "AF-181",
+  "verifiedAt": "2026-11-05T21:45:12.196Z",
+  "baseline": "4e4f2638bf09a69be63c61dba8cac387e655c422"
+}

@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: MBTI F3 internal integration candidate
+  version: 0.4.0-f3-candidate.1
+  description: >-
+    Internal candidate only; needs_human_review. Not the authoritative docs/api contract.
+    All prices are controlled test fixtures from PR20, never production commercial pricing.
+    Guest ownership is not recoverable account binding. No real charging or generation enabled.
+servers:
+  - url: http://192.168.0.200:4156/api/v1
+x-status: needs_human_review
+x-unknowns:
+  - Production SKU pricing, fulfillment and refund rules need human approval.
+  - Recoverable account binding and cross-device entitlement recovery are blocked_external.
+  - Real payment provider credentials and channel verification are blocked_external.
+security:
+  - GuestToken: []
+paths:
+  /products:
+    get:
+      summary: '#47 Server catalog, including unavailable SKUs'
+      responses:
+        '200':
+          description: Fixture catalog; saleable means controlled pending-order testing only
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/Product' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /orders:
+    post:
+      summary: '#48 Create or replay an owned pending test order'
+      description: >-
+        The persisted business order number is id. Same guest + Idempotency-Key + identical
+        result_id/product_code returns the same order (201 on both initial and replay).
+        A different intent with that key returns 409, including concurrent requests.
+        Unknown body fields (amount/status/owner/unlocked/etc) return 422.
+        Without provider configuration pending/unlocked=false and payment_availability=unconfigured;
+        pay_params and paid_at are absent. Replay remains valid after result deletion.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string, pattern: '^[A-Za-z0-9_-]{16,128}$' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [result_id, product_code]
+              properties:
+                result_id: { type: string }
+                product_code: { type: string }
+      responses:
+        '201':
+          description: Persistent Order (including replay)
+          content: { application/json: { schema: { $ref: '#/components/schemas/Order' } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: Result missing or belongs to another guest }
+        '409': { description: IDEMPOTENCY_CONFLICT or PRODUCT_NOT_SALEABLE }
+        '422': { description: INVALID_INPUT or INVALID_IDEMPOTENCY_KEY }
+    get:
+      summary: '#49 Owned orders, newest first'
+      parameters:
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { in: query, name: cursor, schema: { type: string }, description: Previous next_cursor }
+      responses:
+        '200':
+          description: Persistent owned order snapshots, retained after result deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, next_cursor]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/Order' } }
+                  next_cursor: { type: string, nullable: true }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { description: Invalid pagination }
+  /orders/{id}:
+    get:
+      summary: '#50 Owned status; order_id equals create Order.id and ops Order.id'
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Owned persisted state
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [order_id, status, unlocked, payment_availability]
+                properties:
+                  order_id: { type: string }
+                  status: { type: string, enum: [pending, paid, failed] }
+                  unlocked: { type: boolean }
+                  payment_availability: { type: string, enum: [unconfigured, controlled_test] }
+                  paid_at: { type: string, format: date-time }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: Missing or other guest order }
+  /entitlements/me:
+    get:
+      summary: '#53 Owned entitlements; pending orders grant nothing'
+      responses:
+        '200':
+          description: Empty items until a verified test payment succeeds; no local-cache unlock
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/Entitlement' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+components:
+  securitySchemes:
+    GuestToken: { type: apiKey, in: header, name: X-Guest-Token }
+  responses:
+    Unauthorized: { description: GUEST_UNAUTHORIZED; missing/invalid/expired guest credential }
+  schemas:
+    Product:
+      type: object
+      required: [code, name, description, amount, currency, saleable, pricing_mode, highlights, tier]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        description: { type: string }
+        amount: { type: integer, description: Minor units (fen), minimum: 1 }
+        currency: { type: string, enum: [CNY] }
+        saleable: { type: boolean }
+        pricing_mode: { type: string, enum: [controlled_test_fixture] }
+        unavailable_reason: { type: string }
+        highlights: { type: array, items: { type: string } }
+        tier: { type: integer, enum: [1, 2] }
+    Order:
+      type: object
+      required: [id, result_id, product_code, amount, currency, status, unlocked, created_at, payment_availability, pricing_mode]
+      properties:
+        id: { type: string, description: Persistent business order number shared by create/list/status/ops }
+        result_id: { type: string, description: Immutable original reference retained after result deletion }
+        product_code: { type: string }
+        amount: { type: integer, minimum: 1, description: Frozen minor units (fen) }
+        currency: { type: string, enum: [CNY] }
+        status: { type: string, enum: [pending, paid, failed] }
+        unlocked: { type: boolean }
+        created_at: { type: string, format: date-time }
+        paid_at: { type: string, format: date-time }
+        payment_availability: { type: string, enum: [unconfigured, controlled_test] }
+        pricing_mode: { type: string, enum: [controlled_test_fixture] }
+    Entitlement:
+      type: object
+      required: [id, order_id, result_id, product_code, kind, status, granted_at, scope]
+      properties:
+        id: { type: string }
+        order_id: { type: string, description: Order.id }
+        result_id: { type: string }
+        product_code: { type: string }
+        kind: { type: string, enum: [studio_tier_1] }
+        status: { type: string, enum: [active] }
+        granted_at: { type: string, format: date-time }
+        scope: { type: string, enum: [controlled_test] }
+x-internal-operations:
+  path: GET /api/admin/mbti/orders/{id}
+  permission: mbti:orders:read
+  authentication: Existing Foundation Auth login + persisted admin session + RBAC guards
+  response: Same Order projection; no guest credentials, owner identity or payment secrets
+  rejection: '401 for absent/guest credentials; 403 for authenticated role without permission; 404 missing order'
+x-internal-controlled-tests:
+  status: Internal protocol fixture only; not an external provider sandbox charge
+  runtime: NODE_ENV=test and APP_ENV=test and AUTH_ENABLED=true and explicit local random test secret
+  prepare:
+    path: POST /api/admin/mbti/test-payments/{id}
+    permission: mbti:payments:test
+    description: >-
+      Explicit test operator only. Reuses Foundation PaymentService, SyntheticTestPaymentProvider
+      and existing payment_order/payment_attempt ledger, with a trusted MBTI payable snapshot.
+      Internal synthetic member/workspace is a ledger fixture, not recoverable account binding.
+  callback:
+    path: POST /api/v1/payments/controlled-test/callback
+    authentication: Existing Foundation HMAC raw-byte signature, timestamp and event replay verification
+    responses: '200 accepted; 401 invalid/stale signature; 404 wrong order; 409 wrong amount/currency/replay/terminal-state conflict'
+  entitlement_projection: >-
+    Only matching succeeded Foundation charge facts can produce paid plus one controlled_test entitlement.
+    Business projection is transactionally idempotent and reads repair a callback/projection crash gap.
+    No real provider, production commercial fulfillment, model generation or external charge is invoked.

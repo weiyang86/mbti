@@ -1,0 +1,41 @@
+{
+  "status": "candidate / needs_human_review",
+  "redaction": "Illustrative shapes; no raw contact values. Placeholders are NOT valid input.",
+  "my_contacts_empty": {},
+  "my_contacts_redacted": {
+    "wechat": "<redacted>"
+  },
+  "request": {
+    "id": "contact_example",
+    "buddy_id": "card_example",
+    "direction": "outgoing",
+    "status": "accepted",
+    "channels": [
+      "wechat"
+    ],
+    "created_at": "2026-11-09T00:00:00.000Z",
+    "simulated": false
+  },
+  "granted_redacted": {
+    "channels": [
+      {
+        "channel": "wechat",
+        "value": "<redacted>"
+      }
+    ]
+  },
+  "errors": {
+    "422": {
+      "code": "INVALID_CONTACT_INPUT",
+      "message": "联系方式或申请参数无效"
+    },
+    "409": {
+      "code": "CONTACT_CONFLICT",
+      "message": "当前状态或请求渠道不可用"
+    },
+    "503": {
+      "code": "CONTACT_STORAGE_UNAVAILABLE",
+      "message": "联系方式暂不可用，请稍后重试"
+    }
+  }
+}

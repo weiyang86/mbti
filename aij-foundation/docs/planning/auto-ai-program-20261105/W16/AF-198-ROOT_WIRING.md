@@ -1,0 +1,36 @@
+# AF-198 ROOT_WIRING — candidate, not CODE_VERIFIED
+
+Worker only implemented the three allowlisted verification modules. No shared fixture, database guard, schema, manifest, lock, registry, queue, program or production code was changed. Root must apply the following minimum shared changes after the worker stops, before running acceptance. This is a reusable synthetic HTTP execution fixture; it does not close AF-191, native fourteen, or the original forty targets.
+
+## Required shared integration
+
+1. Admit exact AF-198 in migration and runtime database guards and client fixture task allowlist, retaining fresh acceptance ownership checks and rejecting unknown tasks. AF-191 is supported by this interface only when root separately authorizes and admits that exact task; never substitute an AF-198 lease for AF-191. Follow existing task-specific auth/seed checks where needed, without wildcard admission.
+2. `remaining-client-fixture.mjs`: export `workbenchTargetSafetyVersion = 1` only after implementing the safety contract below. Accept `workbenchTargetSafety: true` only for AF-198/AF-191 and admit these exact tasks for `realPluginLifecycle`. Keep existing callers compatible. Actual install/enable must use PluginLifecycleService.
+3. For that option, guard the complete lease/migrate/prepare/environment/application/listen/login/workspace/lifecycle sequence with cleanup on failure. Capture partially created App before init failure, use Nest creation with `abortOnError:false`, close acquired App/server/pools, restore environment and Nest Logger static state on all exits, and preserve a sanitized private failure-stage report. A rejected promise before fixture return cannot be repaired by this wrapper because it has no handle. No process exit, leaked pool, adopted old lease or hidden failure is acceptable.
+4. Return `artifactDirectory`: an absolute, git-ignored, fresh, owned directory inside root `.artifacts`, chmod 0700. Do not copy credentials or prompt/body into it. On `close()`, actually close the App and sockets and query the protected fresh test database through the existing authorized observer to prove application sessions/pools are gone; close that observer too. Return `{applicationPools0:true, ownedSockets0:true}` only from measured evidence, not a hardcoded result. Capture application names/PIDs while alive. Return rejection on unknown cleanup. Repeated close must be safe. The wrapper additionally measures its synthetic server socket set and writes `af198-close.json` mode 0600.
+5. Root must cover initialization failure before App return, listen/login failure after creation, and database-unavailable failure using separate new AF-198 leases. Assert fetch/env/logger restore and actual zero resources for each. Do not contaminate a future AF-191 unique-run lease. Worker did not add test-only DB failure switches or change general fixture outside its allowed scope.
+
+The safety-version check fails closed (`AF198_ROOT_WIRING_REQUIRED`) until root supplies this contract. It is not evidence that cleanup passed. These shared modifications are root-owned integration dependencies, not part of the candidate.
+
+## Interface and evidence
+
+`startWorkbenchTargetRuntime({task:'AF-198'|'AF-191', transport:'AiCenterHttpTransport:owned-loopback', concurrency:1, freshLease:true})` requires the task-specific `AIJ_AF198_ROOT_ACCEPTANCE=true` or `AIJ_AF191_ROOT_ACCEPTANCE=true`, main root path, main Git worktree, and branch dev before importing database fixtures. No existing acceptance ID is accepted. One process owns one runtime.
+
+RAM-only helpers: `request` returns `{status,body}` where body is the actual API JSON envelope; `fetchAsActor(actor,url,init,capturedFetch)` returns the untouched real Response. Capture fetch before starting the runtime (or omit the fourth parameter); passing another function is rejected. Actor is `owner`, `other` (read-only member in primary), or null. Credentials are injected only into exact owned `/api/client/` URLs and never returned. `workspaceIds.second` belongs to owner, `workspaceIds.other` belongs to other. `withOwnerReadOnly(callback)` temporarily updates the real membership role, restores in finally, and must run serially. `revokeOwnerSessions()` permanently revokes this fresh fixture's owner session; call at the end. Neither helper replaces authorization guards.
+
+`counters()` is asynchronous and returns database counts plus actual upstream/POST counts. `submits` counts every outgoing POST to a run endpoint, including rejected requests; it is not an idempotency counter. `databaseSnapshot(runId)` excludes input/snapshot/output, cookies and lease nonces; it returns narrow Run/Job/Trace identities, statuses, attempt and cost truth. `pumpJobs()` claims at most one actual Job, invokes real execute and returns its ID, rejects overlapping pumps; a second empty pump must be proven. `close()` awaits active pumping, closes App and owned server, restores fetch/environment, and only reports zero after the root shared close proof and socket observation succeed.
+
+Transport request is never assigned or wrapped. Original instance/prototype function identities and absence of instance override are checked. Global fetch permits exact `https://api.openai.com/v1/chat/completions`, POST, redirect:error, translating only destination to owned loopback and calling captured real fetch. Other provider/internet/loopback URLs reject; owned API calls remain local. No Response object is manufactured or modified. The synthetic HTTP server supplies only `Synthetic goal completed.` and token usage; external paid/provider acceptance remains DEFERRED_NOT_PASSED. This wire exercise does not prove real vendor TLS or service acceptance.
+
+## Root validation and acceptance boundary
+
+After integrating shared safety fixes and doing root-controlled build/database admission, register AF-198 in verify:task with:
+
+- `node --test scripts/verification/workbench-sdk-target-runtime.test.mjs`
+- `AIJ_AF198_ROOT_ACCEPTANCE=true node --test --test-concurrency=1 scripts/verification/workbench-sdk-target-runtime-live.test.mjs`
+- Root shared failure-cleanup tests described above, with safe reports.
+- Applicable root quality gates and `pnpm verify:task AF-198` using the repository runner's registered invocation.
+
+Live test requires fresh zero counts, exactly one POST → one Run/Job/Trace/upstream, real successful result, budget settled, cost unreported/null, one claimed execution and empty second pump; original method identity/real wire/illegal endpoint no-upstream; anonymous401/read-only403/other-member404; owner second space context200/run404; current role revoke403/restore200 and session revoke401; final pools/sockets/fetch/env restoration. Missing dependencies fail, never skip to PASS. Root should inspect private close evidence and request/run/job identity linkage. No persistent URL is running; fixture binds ephemeral loopback ports and closes them.
+
+Later AF-191 adapter owns packed SDK/contracts, real Next same-origin proxy, lost POST receipt, delayed GET, consumers and native evidence. This candidate provides none of native14, OS hidden, charts, attachments, AI rewrite, Word/PDF end-user chain or all40 completion. Downstream integration must cite actual integration Task IDs, not this candidate Task.

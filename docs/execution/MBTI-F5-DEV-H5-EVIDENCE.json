@@ -1,0 +1,191 @@
+{
+  "base": "http://192.168.0.200:4056/api/v1",
+  "h5": "http://192.168.0.200:5173/#/",
+  "profiles": {
+    "A": "95aa28d3-b176-4bda-9281-92c7706cab13",
+    "B": "a03a080b-5a9e-4141-896f-6d17d0bc431f",
+    "C": "72e2afa8-2653-456c-b132-c360d129697f"
+  },
+  "pages": {
+    "A": "2831cadd-9bc5-4574-bfa2-a000af17d530",
+    "B": "af8dce10-1752-4bfc-ac1e-8ffd90ada583",
+    "C": "77b2eec1-b743-493e-9ce6-f438e69904a9",
+    "originalA": "5ba747e6-3e6f-461a-9573-bff7a120abf4"
+  },
+  "cards": {
+    "A": "card_c1r6G_HdGduSXvgEuqPbbOUB9yTzUtEe",
+    "B": "card_OEcriwR5yOPdyfT9J6hDiajltLi3gWuu",
+    "C": "card_KO01OPUU2yGL4gvVf87dNhutOadWmOK5"
+  },
+  "steps": [
+    {
+      "at": "2026-11-09T05:40:02.544698+00:00",
+      "label": "A dev home to private contacts",
+      "data": {
+        "same_existing_card": true,
+        "channels": [
+          "wechat",
+          "qq",
+          "phone"
+        ],
+        "own_only": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:40:05.456506+00:00",
+      "label": "B dev home to private contacts",
+      "data": {
+        "same_existing_card": true,
+        "channels": [
+          "wechat",
+          "qq",
+          "phone"
+        ],
+        "own_only": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:40:06.871432+00:00",
+      "label": "C dev home to private contacts",
+      "data": {
+        "same_existing_card": true,
+        "channels": [],
+        "own_only": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:40:08.984187+00:00",
+      "label": "dev own clear/refill UI",
+      "data": {
+        "delete_status": 204,
+        "empty_after_clear": true,
+        "refill_same_values": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:40:15.815607+00:00",
+      "label": "dev exact directional grant UI/HTTP",
+      "data": {
+        "id": "contact_3RXlGxQgZr6iaAu3vY-wmmnDtnwJtR_Q",
+        "channels": [
+          "wechat"
+        ],
+        "A": 200,
+        "B": 404,
+        "C": 404,
+        "only_approved_value_matches": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:40:16.560217+00:00",
+      "label": "dev revoke invalidates and clears UI",
+      "data": {
+        "id": "contact_3RXlGxQgZr6iaAu3vY-wmmnDtnwJtR_Q",
+        "delete": 204,
+        "old_granted": 404,
+        "value_nodes": 0
+      }
+    },
+    {
+      "at": "2026-11-09T05:40:27.629309+00:00",
+      "label": "dev refresh identity and private-value scans",
+      "data": {
+        "same_cards": true,
+        "fresh_guests_after_reload": 0,
+        "public_projection_storage_console_values": false,
+        "pending_reverse_unreadable": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:14.430432+00:00",
+      "label": "A dev reboot persisted",
+      "data": {
+        "same_card": true,
+        "own_channels_same": true,
+        "fresh_guest_after_reload": 0,
+        "blocked_empty": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:15.668305+00:00",
+      "label": "B dev reboot persisted",
+      "data": {
+        "same_card": true,
+        "own_channels_same": true,
+        "fresh_guest_after_reload": 0,
+        "blocked_empty": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:16.912532+00:00",
+      "label": "C dev reboot persisted",
+      "data": {
+        "same_card": true,
+        "own_channels_same": true,
+        "fresh_guest_after_reload": 0,
+        "blocked_empty": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:18.114988+00:00",
+      "label": "dev reboot grant and denial states",
+      "data": {
+        "valid_request": "contact_SBWDg40PUSmp9mAVZ_dJXdLl_8VcOIhr",
+        "approved_channels": [
+          "wechat"
+        ],
+        "requester": 200,
+        "recipient": 404,
+        "third_person": 404,
+        "old_revoked": 404,
+        "reverse_pending": 404,
+        "base_exchange_preserved": true
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:18.116300+00:00",
+      "label": "dev API log scan",
+      "data": {
+        "test_contact_values_present": false
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:18.242956+00:00",
+      "label": "original F1 result after F5 reboot",
+      "data": {
+        "id": "8a3d4793-93ab-43e4-8988-d3b6962d4b32",
+        "type_code": "ESTJ",
+        "status": 200
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:18.366869+00:00",
+      "label": "original F1 result after F5 reboot",
+      "data": {
+        "id": "4b177e28-89d8-410f-ad90-b111a9e66e83",
+        "type_code": "INFP",
+        "status": 200
+      }
+    },
+    {
+      "at": "2026-11-09T05:41:18.507606+00:00",
+      "label": "original F3 order after F5 reboot",
+      "data": {
+        "id": "MBTI-8aa0b305-9c93-4dfb-9817-7f4a82c2a804",
+        "amount": 990,
+        "status": "pending",
+        "unlocked": false
+      }
+    }
+  ],
+  "outcome": "passed",
+  "dev_reboot_passed": true,
+  "dev_reboot_at": "2026-11-09T05:41:18.508305+00:00",
+  "phase": "F5",
+  "status": "candidate / needs_human_review",
+  "source_tree": "2b79dca1219d53bed9a3a4b0fcaad9e9db7ceeaf",
+  "backend_source": "a8d458e11bdc9cdf6b487b84bc5b2fbe605cc36a",
+  "web_source": "ea12901f997f721b6b4966bb635fb3ed54920c5c",
+  "cross_physical_device": "NOT_RUN",
+  "wechat_browser": "NOT_RUN"
+}

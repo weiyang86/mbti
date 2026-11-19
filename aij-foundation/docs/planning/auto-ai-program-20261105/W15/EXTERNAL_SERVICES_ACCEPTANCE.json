@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 2,
+  "task": "AF-195",
+  "contract": "docs/planning/auto-ai-program-20261105/W15/CONTRACT.md",
+  "vendorAcceptance": "DEFERRED_NOT_PASSED",
+  "scenarios": [
+    {
+      "id": "blank-draft",
+      "title": "空凭据保存草稿",
+      "steps": [
+        "选择目录 provider",
+        "不填写凭据引用",
+        "保存并重新读取"
+      ],
+      "expected": [
+        "草稿可保存",
+        "缺项被标示",
+        "不创建假引用"
+      ],
+      "checks": [
+        {
+          "layer": "HTTP_PG",
+          "assertion": "真实空草稿保存/读回、缺项与空引用",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-193/run-OrObxQ/report.json",
+          "remaining": ""
+        },
+        {
+          "layer": "GUI",
+          "assertion": "DeepSeek空表单真实保存版本1",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json#desktop-blank-draft",
+          "remaining": ""
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PASS_LOCAL_SCOPE"
+    },
+    {
+      "id": "catalog-14",
+      "title": "读取固定14项目录",
+      "steps": [
+        "请求服务端 catalog",
+        "核对 providerCode 与分类"
+      ],
+      "expected": [
+        "目录含契约规定的14项",
+        "字段来自服务端",
+        "目录不暗示适配器已运行"
+      ],
+      "checks": [
+        {
+          "layer": "API_SDK",
+          "assertion": "目录14项严格解析及分类，非运行适配器清单",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-193/run-OrObxQ/report.json",
+          "remaining": ""
+        },
+        {
+          "layer": "GUI",
+          "assertion": "实际DeepSeek与七牛切换使用目录和新GET；没有遍历14种表单",
+          "status": "PARTIAL",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json",
+          "remaining": "其他12种表单交互未逐项GUI验收"
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PARTIAL"
+    },
+    {
+      "id": "no-autostart",
+      "title": "保存不自动启用",
+      "steps": [
+        "保存完整字段和有效引用",
+        "读取 View"
+      ],
+      "expected": [
+        "runtimeEnabled 为 false",
+        "externalVerification 为 not_run",
+        "不触发外部调用"
+      ],
+      "checks": [
+        {
+          "layer": "HTTP_PG_SOURCE",
+          "assertion": "草稿disabled、runtimeEnabled false、externalVerification not_run；无运行入口",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-193/run-OrObxQ/report.json",
+          "remaining": ""
+        },
+        {
+          "layer": "VENDOR",
+          "assertion": "真实厂商启用/调用与资质",
+          "status": "NOT_RUN",
+          "evidenceRef": null,
+          "remaining": "按负责人指示留空并暂缓，不能由合成证据替代"
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PASS_LOCAL_SCOPE"
+    },
+    {
+      "id": "cas-conflict",
+      "title": "CAS冲突保留编辑内容",
+      "steps": [
+        "使用过期 expectedVersion 保存",
+        "查看冲突后的编辑界面"
+      ],
+      "expected": [
+        "返回冲突",
+        "草稿仍保留",
+        "须显式重读并确认版本"
+      ],
+      "checks": [
+        {
+          "layer": "HTTP_PG",
+          "assertion": "真实竞争CAS和事务审计失败回滚",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-193/run-OrObxQ/report.json",
+          "remaining": ""
+        },
+        {
+          "layer": "GUI",
+          "assertion": "实际409保留编辑→读取最新→确认版本→手动保存",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json#cas-preserves-user-draft",
+          "remaining": ""
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PASS_LOCAL_SCOPE"
+    },
+    {
+      "id": "unknown-save",
+      "title": "未知保存结果显式读回",
+      "steps": [
+        "自有代理在真实提交后丢弃响应",
+        "UI显式读取最新并核对",
+        "确认版本后由操作者决定是否再保存"
+      ],
+      "expected": [
+        "不自动重发",
+        "读回核对版本后再由操作者决定"
+      ],
+      "checks": [
+        {
+          "layer": "GUI_HTTP_PG",
+          "assertion": "自有代理在实际提交后丢弃响应，只有一次写入，显式GET/确认且不自动重发",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json#unknown-save-explicit-get",
+          "remaining": ""
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PASS_LOCAL_SCOPE"
+    },
+    {
+      "id": "authorization",
+      "title": "权限、项目边界与CSRF",
+      "steps": [
+        "无权限尝试读写",
+        "跨项目尝试读写",
+        "缺少有效CSRF令牌尝试写入"
+      ],
+      "expected": [
+        "服务端拒绝未授权请求",
+        "不接受客户端项目身份",
+        "写入受CSRF保护"
+      ],
+      "checks": [
+        {
+          "layer": "HTTP_PG",
+          "assertion": "实际Cookie/CSRF/当前权限/服务端项目与组织边界拒绝",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-193/run-OrObxQ/report.json",
+          "remaining": ""
+        },
+        {
+          "layer": "GUI",
+          "assertion": "真实当前403清除私有表单",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json#current-permission-refusal",
+          "remaining": ""
+        },
+        {
+          "layer": "STATE",
+          "assertion": "恢复GET的401/403清理",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-194/run-kTlPd3/report.json#private-form-actual-state-regressions",
+          "remaining": ""
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PASS_LOCAL_SCOPE"
+    },
+    {
+      "id": "secret-ref",
+      "title": "引用保留、清除与不回显",
+      "steps": [
+        "缺省引用字段保存",
+        "显式传null清除",
+        "读取响应及错误/审计投影"
+      ],
+      "expected": [
+        "缺省保留旧引用，null需权限并明确清除",
+        "GET仅提供非秘密字段、布尔可用状态和缺项键",
+        "配置服务不调用resolveTrusted；底层exists可用性检查可能读取/解密"
+      ],
+      "checks": [
+        {
+          "layer": "HTTP_PG",
+          "assertion": "缺省保留、null清除、拒绝未知/明文引用，不回显原始引用或值",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-193/run-OrObxQ/report.json",
+          "remaining": ""
+        },
+        {
+          "layer": "STATE",
+          "assertion": "UI清除意图/空白保留的DTO",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-194/run-kTlPd3/report.json#private-form-actual-state-regressions",
+          "remaining": ""
+        },
+        {
+          "layer": "GUI",
+          "assertion": "实际已有引用输入/明确清除按钮",
+          "status": "NOT_RUN",
+          "evidenceRef": null,
+          "remaining": "真实页面仅留空引用；不能把状态检查写成按钮已实测"
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PARTIAL"
+    },
+    {
+      "id": "private-data",
+      "title": "敏感编辑数据不落持久客户端存储",
+      "steps": [
+        "编辑草稿并切换身份/角色/会话",
+        "检查URL、storage、日志及卸载后的响应"
+      ],
+      "expected": [
+        "数据仅驻留RAM",
+        "身份变化隔离旧响应",
+        "无URL/storage/日志泄露"
+      ],
+      "checks": [
+        {
+          "layer": "STATE",
+          "assertion": "RAM/epoch与dispose晚到响应、401403清空",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/verification/AF-194/run-kTlPd3/report.json#private-form-actual-state-regressions",
+          "remaining": ""
+        },
+        {
+          "layer": "GUI",
+          "assertion": "实际held GET在卸载后不能恢复旧字段，当前403清除",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json#unmount-stale-read",
+          "remaining": ""
+        },
+        {
+          "layer": "OS_STORAGE_LOGS",
+          "assertion": "真OS隐藏、全部身份/会话/角色变换、所有storage和日志泄漏检查",
+          "status": "NOT_RUN",
+          "evidenceRef": null,
+          "remaining": "AF191和完整隐私目标仍待验；不保证底层请求被取消"
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PARTIAL"
+    },
+    {
+      "id": "responsive-keyboard",
+      "title": "390px与键盘操作",
+      "steps": [
+        "在390px视口打开配置",
+        "仅用键盘完成读取和保存"
+      ],
+      "expected": [
+        "布局可用",
+        "控件可聚焦且状态可感知"
+      ],
+      "checks": [
+        {
+          "layer": "GUI",
+          "assertion": "390px表单边界、模型Tab到提交和Enter真实一次保存",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json#mobile390",
+          "remaining": ""
+        },
+        {
+          "layer": "FULL_ACCESSIBILITY",
+          "assertion": "完整键盘/全部指针/辅助技术与所有服务表单",
+          "status": "NOT_RUN",
+          "evidenceRef": null,
+          "remaining": "本批是有限路径，非完整无障碍验收"
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PARTIAL"
+    },
+    {
+      "id": "cleanup",
+      "title": "关闭资源并核对清理",
+      "steps": [
+        "完成合成验收",
+        "检查临时数据、会话和资源清理"
+      ],
+      "expected": [
+        "自有页面/服务/连接池关闭，合成业务行和会话清除",
+        "验收库、租约和私有证据受控保留；不reset/drop，不声称无测试痕迹"
+      ],
+      "checks": [
+        {
+          "layer": "GUI_HTTP_PG",
+          "assertion": "自有fixture关闭、ownedSockets0、applicationPools0，合成业务行/会话清除",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/closed-15299139377d232b.json",
+          "remaining": ""
+        },
+        {
+          "layer": "EVIDENCE_POLICY",
+          "assertion": "隔离验收库/租约与受控私有失败和截图证据保留，不reset/drop",
+          "status": "PASS",
+          "evidenceRef": ".artifacts/auto-ai-program-20261105/AF-194/closed-15299139377d232b.json",
+          "remaining": "不声称无测试痕迹或全盘敏感文件审计"
+        }
+      ],
+      "evidenceReviewedByRoot": true,
+      "overallStatus": "PASS_LOCAL_SCOPE"
+    }
+  ],
+  "scope": "LOCAL_CONFIGURATION_DRAFT_CODE_AND_DOCUMENTATION_ONLY",
+  "targetAcceptance": "NOT_RUN_TARGET_ACCEPTANCE",
+  "ownerAcceptance": "PENDING",
+  "evidenceSources": [
+    {
+      "path": ".artifacts/verification/AF-193/run-OrObxQ/report.json",
+      "sha256": "efa0f9939eb9b5420010280675f53ca24b4896acfbaff07750374499cd951acc"
+    },
+    {
+      "path": ".artifacts/verification/AF-194/run-kTlPd3/report.json",
+      "sha256": "8a7d80403f954054766ed1940cbb1b31cf72a87ba0581d2d7403d7bc9c59fd52"
+    },
+    {
+      "path": ".artifacts/auto-ai-program-20261105/AF-194/browser-15299139377d232b-evidence.json",
+      "sha256": "6e95dd7cbe6f9455160150496d79c669762d311a8f0272bd066137fd86b03790"
+    },
+    {
+      "path": ".artifacts/auto-ai-program-20261105/AF-194/closed-15299139377d232b.json",
+      "sha256": "d7d08c7c3d0204293e7727300e2f4b577ce120702c4b371ff783a8892a3eb1a4"
+    }
+  ],
+  "integrations": [
+    {
+      "card": "AF-193",
+      "taskId": "task_b3d70e6bb6cd",
+      "commit": "c40f28762e838bf959164a203b4a6f66110f20c4"
+    },
+    {
+      "card": "AF-194",
+      "taskId": "task_11b965155119",
+      "commit": "7203fa0313e3eeec542bd735c25fe9a47a7eedba"
+    }
+  ],
+  "sourceCommit": "7203fa0313e3eeec542bd735c25fe9a47a7eedba",
+  "sourceAnchors": [
+    {
+      "path": "apps/api/src/configuration/external-services.catalog.ts",
+      "sha256": "4e711ef258c65dd4c479f204310a6f36c970788197a6c7e2810ce8ebde1f7ded"
+    },
+    {
+      "path": "apps/api/src/configuration/external-services.dto.ts",
+      "sha256": "cfdb65eeff6cd327ec1258ad8150e072ee0ed47762c719634efefaab0746110e"
+    },
+    {
+      "path": "apps/api/src/configuration/external-services.service.ts",
+      "sha256": "7b36c87a265b48f53cc0b893ecd3c247a5aa779248c2d9cbbdfbc4e59e31f857"
+    },
+    {
+      "path": "packages/sdk/src/external-services.ts",
+      "sha256": "b4da34e9d696cd0f83098d897a26d0677f0bec3f01bd5c6e5d5d1c3e691bad58"
+    },
+    {
+      "path": "apps/web/app/components/admin-configuration.tsx",
+      "sha256": "deb0b5fd09a18996dd198481b86ed796ee7cc205aba01dd10295e20f6bacf861"
+    },
+    {
+      "path": "apps/web/app/components/admin-external-services.tsx",
+      "sha256": "e689de8ff9b9bdabe4a8ba4738b61d64bf1c41960e8503b3bae673a7b4da7ac9"
+    },
+    {
+      "path": "apps/web/app/components/admin-external-services-state.mjs",
+      "sha256": "fc99818aa8e94c915af39dd699b02668f1e67d04b44d66f565b5c20b3343ebc4"
+    },
+    {
+      "path": "scripts/verification/external-services-browser-live.test.mjs",
+      "sha256": "ce56ae2ed4b96280969858e4010a096bbe603e1ee9fe40539e58c55546b6f4f6"
+    }
+  ]
+}

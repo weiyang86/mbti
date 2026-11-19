@@ -1,0 +1,174 @@
+{
+  "schema": "mbti-c2-local-checks/v1",
+  "run": "run_801f9322af2e",
+  "task": "task_79f69865ab99",
+  "dispatch": "ctx_d32fe5fca289",
+  "baseline": "dfc0cbe07a9e7a136d6b9ce110b7940ca4d5ada3",
+  "branch": "dev",
+  "publicApproval": "PENDING_HUMAN_APPROVAL",
+  "anonymousConfigurationValues": "HARD_DISABLED",
+  "databaseAndAuth": "Transaction storage and auth transport doubles; production owner/controller code where described",
+  "realDatabaseTwoBrowser": "BLOCKED/NOT_RUN",
+  "publicDomainSameOrder": "BLOCKED/NOT_RUN",
+  "historicalSnapshotPersistence": "NOT_VERIFIED",
+  "results": {
+    "admin": [
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "admin",
+          "test"
+        ],
+        "exitCode": 0,
+        "seconds": 1.88,
+        "log": "/tmp/mbti-c2-final-admin-0.txt",
+        "testCounts": [
+          62
+        ]
+      },
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "admin",
+          "lint"
+        ],
+        "exitCode": 0,
+        "seconds": 3.52,
+        "log": "/tmp/mbti-c2-final-admin-1.txt"
+      },
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "admin",
+          "typecheck"
+        ],
+        "exitCode": 0,
+        "seconds": 4.87,
+        "log": "/tmp/mbti-c2-final-admin-2.txt"
+      },
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "admin",
+          "build"
+        ],
+        "exitCode": 0,
+        "seconds": 4.21,
+        "log": "/tmp/mbti-c2-final-admin-3.txt"
+      }
+    ],
+    "foundation": [
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "aij-foundation",
+          "test"
+        ],
+        "exitCode": 0,
+        "seconds": 15.23,
+        "log": "/tmp/mbti-c2-final-foundation-0.txt",
+        "testCounts": [
+          97,
+          95
+        ]
+      },
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "aij-foundation",
+          "exec",
+          "node",
+          "--test",
+          "scripts/verification/plugin-manifest.test.mjs",
+          "scripts/verification/configuration-schema.test.mjs"
+        ],
+        "exitCode": 0,
+        "seconds": 4.75,
+        "log": "/tmp/mbti-c2-final-foundation-1.txt",
+        "testCounts": [
+          39
+        ]
+      },
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "aij-foundation",
+          "lint"
+        ],
+        "exitCode": 0,
+        "seconds": 14.55,
+        "log": "/tmp/mbti-c2-final-foundation-2.txt"
+      },
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "aij-foundation",
+          "typecheck"
+        ],
+        "exitCode": 0,
+        "seconds": 7.8,
+        "log": "/tmp/mbti-c2-final-foundation-3.txt"
+      },
+      {
+        "command": [
+          "pnpm",
+          "--dir",
+          "aij-foundation",
+          "build"
+        ],
+        "exitCode": 0,
+        "seconds": 38.82,
+        "log": "/tmp/mbti-c2-final-foundation-4.txt"
+      }
+    ],
+    "web": [
+      {
+        "command": [
+          "npm",
+          "--prefix",
+          "web",
+          "run",
+          "test:api"
+        ],
+        "exitCode": 0,
+        "seconds": 1.33,
+        "log": "/tmp/mbti-c2-final-web-0.txt",
+        "testCounts": [
+          42
+        ]
+      },
+      {
+        "command": [
+          "npm",
+          "--prefix",
+          "web",
+          "run",
+          "type-check"
+        ],
+        "exitCode": 0,
+        "seconds": 3.07,
+        "log": "/tmp/mbti-c2-final-web-1.txt"
+      },
+      {
+        "command": [
+          "npm",
+          "--prefix",
+          "web",
+          "run",
+          "build:h5"
+        ],
+        "exitCode": 0,
+        "seconds": 10.33,
+        "log": "/tmp/mbti-c2-final-web-2.txt"
+      }
+    ]
+  }
+}

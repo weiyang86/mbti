@@ -1,0 +1,43 @@
+// Proposal only. Root appends these models and the three backrelations after Writer STOPPED.
+// MemberUser: personalAiMemories AiPersonalMemory[]
+// ClientWorkspace: personalAiMemories AiPersonalMemory[]
+// AiPersonalAgent: personalMemoryGrants AiPersonalMemoryAgentGrant[]
+// Reuse existing AiPersonalAgent @@unique([id, workspaceId, memberId]); no extra Agent index needed.
+// SQL-only CHECKs/triggers in 20261105040000 enforce live/null tombstone shape, quota, scope immutability,
+// revision increment, initial digest immutability, active Agent grant checks, max16 and deletion erasure.
+model AiPersonalMemory {
+  id String @id @default(cuid())
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  code String @db.VarChar(63)
+  title String? @db.VarChar(100)
+  content String?
+  kind String? @db.VarChar(14)
+  enabled Boolean?
+  initialDigest String? @db.VarChar(64) @map("initial_digest")
+  revision Int @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  workspace ClientWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_workspace_fkey")
+  member MemberUser @relation(fields: [memberId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_member_fkey")
+  agentGrants AiPersonalMemoryAgentGrant[]
+  @@unique([workspaceId, memberId, code], map: "ai_personal_memory_owner_code_key")
+  @@unique([id, workspaceId, memberId], map: "ai_personal_memory_id_scope_key")
+  @@index([workspaceId, memberId, deletedAt, id], map: "ai_personal_memory_owner_page_idx")
+  @@index([memberId], map: "ai_personal_memory_member_idx")
+  @@map("ai_personal_memory")
+}
+model AiPersonalMemoryAgentGrant {
+  id String @id @default(cuid())
+  memoryId String @map("memory_id")
+  workspaceId String @map("workspace_id")
+  memberId String @map("member_id")
+  agentId String @map("agent_id")
+  memory AiPersonalMemory @relation(fields: [memoryId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_grant_memory_scope_fkey")
+  agent AiPersonalAgent @relation(fields: [agentId, workspaceId, memberId], references: [id, workspaceId, memberId], onDelete: Restrict, onUpdate: Restrict, map: "ai_personal_memory_grant_agent_scope_fkey")
+  @@unique([memoryId, agentId], map: "ai_personal_memory_grant_agent_key")
+  @@index([agentId, workspaceId, memberId], map: "ai_personal_memory_grant_agent_scope_idx")
+  @@index([memoryId, workspaceId, memberId], map: "ai_personal_memory_grant_memory_scope_idx")
+  @@map("ai_personal_memory_agent_grant")
+}

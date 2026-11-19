@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import { readFileSync, existsSync } from 'node:fs';
+const read = path => readFileSync(path, 'utf8');
+const plan = JSON.parse(read('docs/planning/AIJ_FOUNDATION_ORCA_ORCHESTRATION_20261104.json'));
+const runtime = JSON.parse(read('docs/planning/orca-optimization-20261104/ORCA-B01-runtime.json'));
+const queue = JSON.parse(read('docs/planning/CODING_QUEUE.json'));
+const policy = read('docs/planning/orca-optimization-20261104/coordination-policy.md');
+const agents = read('AGENTS.md');
+assert.equal(runtime.batch, 'ORCA-B01');
+assert.match(runtime.runId, /^run_[a-z0-9]+$/);
+assert.equal(runtime.cards.length, 4);
+assert.equal(runtime.cards.reduce((n, c) => n + c.hours, 0), 12);
+assert.equal(runtime.budgetHours, 12);
+const ids = runtime.cards.flatMap(c => [c.candidateTaskId, c.integrationTaskId]);
+assert.equal(new Set(ids).size, 8);
+assert(ids.every(id => /^task_[a-z0-9]+$/.test(id)));
+for (const [i, card] of runtime.cards.entries()) {
+  assert.equal(card.formalTaskId, 'AF-' + (125 + i));
+  assert.equal(card.title, plan.firstBatch.cards[i].title);
+  assert(card.hours <= 4);
+  assert.deepEqual(card.integrationDeps, i ? [runtime.cards[0].integrationTaskId] : []);
+  assert(existsSync(`docs/planning/orca-optimization-20261104/${card.alias}.md`));
+  assert(queue.taskExecutions.some(c => c.formalTaskId === card.formalTaskId && c.title === card.title));
+}
+for (const phrase of ['已注册', 'Orca 子 Worktree', '每卡只有一个 Writer', 'dev 仅总控集成', '原轻企仓库继续只读', 'worker_done', 'OWNER_CHECK_PENDING']) assert(policy.includes(phrase), phrase);
+for (const phrase of ['已注册的 Orca 子 Worktree', '原 `dev` 仅由总控串行集成', '集成 Task 的真实 ID', '不自动 push；负责人已明确授权']) assert(agents.includes(phrase), phrase);
+assert.equal(queue.orcaBatchRun.ownerAcceptanceRecordsUnchanged, true);
+for (const key of ['databaseAcceptanceConcurrency', 'heavyBuildConcurrency']) assert.equal(queue.orcaBatchRun.resources[key], 1);
+const ranges = plan.firstBatch.cards.flatMap(c => c.writeScope);
+assert.equal(new Set(ranges).size, ranges.length);
+console.log('PASS: ORCA-B01 governance, 4 cards/12h, 8 actual task IDs, integration dependencies, exclusive resources and owner boundaries');

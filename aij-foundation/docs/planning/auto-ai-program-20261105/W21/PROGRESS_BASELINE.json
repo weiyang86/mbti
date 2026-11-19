@@ -1,0 +1,270 @@
+{
+  "sourceHead": "f0e12d76b0c2c5dccf4d1c56369019e979e52902",
+  "method": "equal-weight rough functionality coverage index, NOT engineering hours or full target acceptance",
+  "indexPercent": 33.75,
+  "scoreTotal": 1350,
+  "maximum": 4000,
+  "groups": [
+    {
+      "requirements": 14,
+      "score": 775,
+      "messageId": "msg_e10dc21b5c2c",
+      "taskId": "task_a4eb80626149"
+    },
+    {
+      "requirements": 9,
+      "score": 325,
+      "messageId": "msg_81efc2907608",
+      "taskId": "task_eb4d68ce61d0"
+    },
+    {
+      "requirements": 17,
+      "score": 250,
+      "messageId": "msg_f00e91c23733",
+      "taskId": "task_df3d85227c3f"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "独立部署",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-002",
+      "title": "装配配置",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-003",
+      "title": "工作台与SDK",
+      "score": 75,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-004",
+      "title": "管理员及系统管理",
+      "score": 75,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-005",
+      "title": "客户端身份",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-006",
+      "title": "个人与多组织",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-007",
+      "title": "动作授权",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-008",
+      "title": "统一附件与七牛",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-009",
+      "title": "多源知识导入",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-010",
+      "title": "检索与引用",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-011",
+      "title": "首批模型能力",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-012",
+      "title": "多级厂商配置",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-013",
+      "title": "受控切换",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-014",
+      "title": "计量与对客结算",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-015",
+      "title": "多级Agent资产",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-016",
+      "title": "可执行Skill包",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-017",
+      "title": "多Agent协作",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-018",
+      "title": "长期记忆",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-019",
+      "title": "可视化与自主执行",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-020",
+      "title": "五种触发入口",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-021",
+      "title": "任务中心与可靠性",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-022",
+      "title": "在线文档与导出",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-023",
+      "title": "图表编辑与生成",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-024",
+      "title": "完整插件开发",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-025",
+      "title": "生命周期与局部升级",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-026",
+      "title": "两层市场",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-027",
+      "title": "商业授权",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-028",
+      "title": "真实支付渠道",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-029",
+      "title": "订阅续费",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-030",
+      "title": "优惠券",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-031",
+      "title": "分账与结算",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-032",
+      "title": "任务退款与余额",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-033",
+      "title": "全部通知渠道",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-034",
+      "title": "Linux私有化与升级",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-035",
+      "title": "整实例灾备",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-036",
+      "title": "组织恢复与冲突",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-037",
+      "title": "资源版本恢复",
+      "score": 25,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-038",
+      "title": "保留周期",
+      "score": 0,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-039",
+      "title": "唯一真值与权限复检",
+      "score": 75,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    },
+    {
+      "id": "REQ-040",
+      "title": "真实验收与运营状态",
+      "score": 50,
+      "fullTarget": "NOT_RUN_TARGET_ACCEPTANCE"
+    }
+  ],
+  "limits": "Read-only source/report audit, no current test rerun. Unverified AF191/203 excluded. Rubric0/25/50/75/100. No100 claims. Historical W13 unchanged; remaining work estimates not simply additive."
+}

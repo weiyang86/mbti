@@ -1,0 +1,118 @@
+{
+  "status": "illustrative candidate samples; not HTTP evidence; needs_human_review",
+  "private_new_card": {
+    "id": "card_SYNTHETIC_PUBLIC_ID_A_192BIT",
+    "nickname": "",
+    "type_code": "INFP",
+    "type_name": "调停者",
+    "declaration": "",
+    "interests": [],
+    "style": "illustration",
+    "visibility": {
+      "name": false,
+      "interests": false,
+      "declaration": false,
+      "manual": false
+    },
+    "discoverable": false,
+    "has_visual_set": false,
+    "updated_at": "2026-11-09T00:00:00.000Z"
+  },
+  "explicit_publish_put": {
+    "type_code": "INFP",
+    "discoverable": true
+  },
+  "hidden_public_card": {
+    "id": "card_SYNTHETIC_PUBLIC_ID_A_192BIT",
+    "nickname": "",
+    "type_code": "INFP",
+    "type_name": "调停者",
+    "declaration": "",
+    "interests": [],
+    "style": "illustration"
+  },
+  "buddy_summary": {
+    "id": "card_SYNTHETIC_PUBLIC_ID_A_192BIT",
+    "nickname": "",
+    "type_code": "INFP",
+    "type_name": "调停者",
+    "interests": [],
+    "avatar_text": "IN",
+    "avatar_color": "#53677a",
+    "tagline": "内在理想",
+    "same_type": false,
+    "shared_interests": [],
+    "exchange_status": "pending",
+    "is_demo": false
+  },
+  "outgoing_exchange": {
+    "id": "exchange_SYNTHETIC_ID",
+    "buddy_id": "card_SYNTHETIC_PUBLIC_ID_A_192BIT",
+    "buddy": {
+      "id": "card_SYNTHETIC_PUBLIC_ID_A_192BIT",
+      "nickname": "",
+      "type_code": "INFP",
+      "type_name": "调停者",
+      "interests": [],
+      "avatar_text": "IN",
+      "avatar_color": "#53677a",
+      "tagline": "内在理想",
+      "same_type": false,
+      "shared_interests": [],
+      "exchange_status": "pending",
+      "is_demo": false
+    },
+    "direction": "outgoing",
+    "status": "pending",
+    "created_at": "2026-11-09T00:00:00.000Z",
+    "simulated": false
+  },
+  "incoming_exchange": {
+    "id": "exchange_SYNTHETIC_ID",
+    "buddy_id": "card_SYNTHETIC_PUBLIC_ID_B_192BIT",
+    "direction": "incoming",
+    "status": "pending",
+    "buddy": {
+      "id": "card_SYNTHETIC_PUBLIC_ID_B_192BIT",
+      "nickname": "",
+      "type_code": "INFP",
+      "type_name": "调停者",
+      "interests": [],
+      "avatar_text": "IN",
+      "avatar_color": "#53677a",
+      "tagline": "内在理想",
+      "same_type": false,
+      "shared_interests": [],
+      "exchange_status": "pending",
+      "is_demo": false
+    },
+    "created_at": "2026-11-09T00:00:00.000Z",
+    "simulated": false
+  },
+  "blocked_management_item": {
+    "id": "card_SYNTHETIC_PUBLIC_ID_A_192BIT",
+    "nickname": "匿名搭子",
+    "type_code": "",
+    "type_name": "",
+    "interests": [],
+    "avatar_text": "匿",
+    "avatar_color": "#53677a",
+    "tagline": "",
+    "same_type": false,
+    "shared_interests": [],
+    "exchange_status": "none",
+    "is_demo": false
+  },
+  "not_found": {
+    "code": "NOT_FOUND",
+    "message": "资源不存在"
+  },
+  "conflict": {
+    "code": "SOCIAL_CONFLICT",
+    "message": "当前关系状态或操作角色不允许此操作"
+  },
+  "invalid": {
+    "code": "INVALID_SOCIAL_INPUT",
+    "message": "名片或社交请求参数无效"
+  }
+}

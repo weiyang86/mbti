@@ -1,0 +1,39 @@
+# AF-005: independent local PostgreSQL. No production/shared database lifecycle.
+name: aij-foundation-test
+services:
+  postgres:
+    image: postgres:16-alpine@sha256:e013e867e712fec275706a6c51c966f0bb0c93cfa8f51000f85a15f9865a28cb
+    restart: "no"
+    environment:
+      POSTGRES_DB: aij_foundation_test
+      POSTGRES_USER: aij_foundation_test
+      POSTGRES_PASSWORD: "${AIJ_DB_PASSWORD:?Run pnpm db:up first}"
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    labels:
+      io.aij.owner: aij-foundation
+      io.aij.mode: test
+      io.aij.instance: "${AIJ_DB_INSTANCE_ID:?Run pnpm db:up first}"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "aij_foundation_test", "-d", "aij_foundation_test"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 3s
+    stop_grace_period: 20s
+volumes:
+  postgres_data:
+    labels:
+      io.aij.owner: aij-foundation
+      io.aij.mode: test
+      io.aij.instance: "${AIJ_DB_INSTANCE_ID:?Run pnpm db:up first}"
+networks:
+  default:
+    labels:
+      io.aij.owner: aij-foundation
+      io.aij.mode: test
+      io.aij.instance: "${AIJ_DB_INSTANCE_ID:?Run pnpm db:up first}"

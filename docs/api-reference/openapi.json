@@ -1,0 +1,5085 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "MBTI Web API · 开发联调参考",
+    "version": "0.4.0-reference-candidate.1",
+    "description": "内部候选 / needs_human_review。40项可联调，#46仅提供明确不可用分支；真实支付与真实位置统计未开放。此文件汇总现有候选，不替代docs/api正式契约。"
+  },
+  "servers": [
+    {
+      "url": "https://mbti-dev.bestshizhongyu.com/api/v1",
+      "description": "HTTPS 公网开发联调环境"
+    }
+  ],
+  "tags": [
+    {
+      "name": "F1",
+      "description": "基础与测评 · 从独立游客到两次测评结果"
+    },
+    {
+      "name": "F2",
+      "description": "结果与分享 · 本人历史、自选、对比与真实图片"
+    },
+    {
+      "name": "F3",
+      "description": "测试订单 · 服务端商品、测试下单与本人权益"
+    },
+    {
+      "name": "F4",
+      "description": "名片与搭子 · 字段可见性、屏蔽与双向交换"
+    },
+    {
+      "name": "F5",
+      "description": "联系方式授权 · 明确渠道，批准后单向读取"
+    },
+    {
+      "name": "F6",
+      "description": "雷达参与 · 参与可用，真实人数暂不可用"
+    }
+  ],
+  "x-status": "candidate / needs_human_review",
+  "x-api-validated-revision": "81279efd6f4c085060b7ab237236c16ec5a700ba",
+  "x-real-payments": "unconfigured",
+  "x-real-location-aggregation": "blocked_external / not_available",
+  "x-sources": [
+    {
+      "id": "F12",
+      "path": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml",
+      "sha256": "a960c2d6673a4bacfdb6a52a70694d8c6dcfd123f040c35d50d89ed042a14b63",
+      "title": "F1 / F2 原始候选",
+      "version": "0.4.0-fastlane-candidate.1",
+      "originalOpenapi": "3.0.3"
+    },
+    {
+      "id": "F3",
+      "path": "docs/integration/MBTI-F3-candidate.openapi.yaml",
+      "sha256": "0ce1ca427dad09ab13485f477e9d87555f72cb2b8a033cd38da6a5a9839f3e30",
+      "title": "F3 交易候选",
+      "version": "0.4.0-f3-candidate.1",
+      "originalOpenapi": "3.0.3"
+    },
+    {
+      "id": "F4",
+      "path": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml",
+      "sha256": "ae030fd2b4189cc233cc77a8b4b610cbd455f2a9a0205d3d1841aa7a1734dd14",
+      "title": "F4 名片交换候选",
+      "version": "0.4.0-f4-candidate.1",
+      "originalOpenapi": "3.0.3"
+    },
+    {
+      "id": "F5",
+      "path": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml",
+      "sha256": "58f6f742abd74873d05b27282517fe1c77d729da0313c7b4aa9aa57988345577",
+      "title": "F5 联系授权候选",
+      "version": "f5-candidate-1",
+      "originalOpenapi": "3.1.0"
+    },
+    {
+      "id": "F6",
+      "path": "docs/integration/MBTI-F6-runtime-candidate.openapi.yaml",
+      "sha256": "fc0a348ee5367e2f768c58792450998352cae784008529d49ce980b949c178e5",
+      "title": "F6 参与及不可用候选",
+      "version": "0.1.0-candidate",
+      "originalOpenapi": "3.0.3"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "F1"
+        ],
+        "summary": "业务探活",
+        "operationId": "mbti_1_get",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Service OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "version": {
+                      "type": "string",
+                      "example": "0.1-draft"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-intake-number": 1,
+        "x-delivery-wave": "F1",
+        "x-source-summary": "Health check",
+        "x-requirement-number": 1,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/auth/guest": {
+      "post": {
+        "tags": [
+          "F1"
+        ],
+        "operationId": "mbti_2_post",
+        "summary": "领取独立游客凭证",
+        "description": "无需请求体。HTTP 201 返回新游客凭证；客户端仅在没有本机身份时调用，避免并发初始化。",
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "游客身份已建立",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_GuestSession"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 2,
+        "x-delivery-wave": "F1",
+        "x-source-summary": "创建一个独立的浏览器游客身份",
+        "x-requirement-number": 2,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/quiz/versions/current": {
+      "get": {
+        "tags": [
+          "F1"
+        ],
+        "summary": "读取当前 12 题题库",
+        "operationId": "mbti_4_get",
+        "responses": {
+          "200": {
+            "description": "Current bank",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_QuizVersionPayload"
+                },
+                "example": {
+                  "question_bank_version": "qb-v0.4-prototype-1",
+                  "questions": [
+                    {
+                      "id": "q1",
+                      "index": 1,
+                      "dimension": "EI",
+                      "prompt": "忙完一周，你更想用哪种方式恢复电量？",
+                      "options": [
+                        {
+                          "id": "e",
+                          "label": "和熟悉的人一起吃饭、出门"
+                        },
+                        {
+                          "id": "i",
+                          "label": "给自己一段安静独处的时间"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q2",
+                      "index": 2,
+                      "dimension": "SN",
+                      "prompt": "去一个没去过的地方，你通常先关注什么？",
+                      "options": [
+                        {
+                          "id": "s",
+                          "label": "路线、环境、吃住这些具体信息"
+                        },
+                        {
+                          "id": "n",
+                          "label": "它有什么故事，还有哪些新可能"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q3",
+                      "index": 3,
+                      "dimension": "TF",
+                      "prompt": "朋友和你商量一个难题，你更习惯先做什么？",
+                      "options": [
+                        {
+                          "id": "t",
+                          "label": "梳理事实，找出可执行的办法"
+                        },
+                        {
+                          "id": "f",
+                          "label": "了解他的感受和真正的在意"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q4",
+                      "index": 4,
+                      "dimension": "JP",
+                      "prompt": "准备周末出游，你更舒服的方式是？",
+                      "options": [
+                        {
+                          "id": "j",
+                          "label": "先定好安排，到了照着走"
+                        },
+                        {
+                          "id": "p",
+                          "label": "留出弹性，到时看心情"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q5",
+                      "index": 5,
+                      "dimension": "EI",
+                      "prompt": "来到一个不太熟悉的聚会，你通常会？",
+                      "options": [
+                        {
+                          "id": "e",
+                          "label": "主动找人认识，在互动中进入状态"
+                        },
+                        {
+                          "id": "i",
+                          "label": "先观察，找到合适的人再靠近"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q6",
+                      "index": 6,
+                      "dimension": "SN",
+                      "prompt": "开始学习一件新事，你更想先看到？",
+                      "options": [
+                        {
+                          "id": "s",
+                          "label": "清楚的步骤和具体示范"
+                        },
+                        {
+                          "id": "n",
+                          "label": "整体思路和背后的原理"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q7",
+                      "index": 7,
+                      "dimension": "TF",
+                      "prompt": "意见不一致时，你更希望讨论围绕什么？",
+                      "options": [
+                        {
+                          "id": "t",
+                          "label": "依据是否充分，方案是否合理"
+                        },
+                        {
+                          "id": "f",
+                          "label": "各方在意什么，怎样彼此尊重"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q8",
+                      "index": 8,
+                      "dimension": "JP",
+                      "prompt": "一件事有截止日期，你更倾向于？",
+                      "options": [
+                        {
+                          "id": "j",
+                          "label": "拆好步骤，提前完成"
+                        },
+                        {
+                          "id": "p",
+                          "label": "保留调整空间，灵感来了集中完成"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q9",
+                      "index": 9,
+                      "dimension": "EI",
+                      "prompt": "有一个新想法时，你更常？",
+                      "options": [
+                        {
+                          "id": "e",
+                          "label": "先说出来，和别人一起理清"
+                        },
+                        {
+                          "id": "i",
+                          "label": "先自己想清楚，再与人分享"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q10",
+                      "index": 10,
+                      "dimension": "SN",
+                      "prompt": "听别人讲经历，什么更吸引你？",
+                      "options": [
+                        {
+                          "id": "s",
+                          "label": "实际发生的细节与体验"
+                        },
+                        {
+                          "id": "n",
+                          "label": "这段经历带来的联想与意义"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q11",
+                      "index": 11,
+                      "dimension": "TF",
+                      "prompt": "必须做一个取舍时，你通常优先考虑？",
+                      "options": [
+                        {
+                          "id": "t",
+                          "label": "尽量一致的标准与逻辑"
+                        },
+                        {
+                          "id": "f",
+                          "label": "它对具体人的影响与感受"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "q12",
+                      "index": 12,
+                      "dimension": "JP",
+                      "prompt": "原定计划临时有变，你更接近哪种反应？",
+                      "options": [
+                        {
+                          "id": "j",
+                          "label": "先重新整理安排，再继续"
+                        },
+                        {
+                          "id": "p",
+                          "label": "顺势看看有没有更有趣的选择"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 4,
+        "x-delivery-wave": "F1",
+        "description": "客户端缓存这份题库并用同版标识创建会话，完成期间保持题目与计分版本一致。",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Current question bank and 12 questions",
+        "x-requirement-number": 4,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/quiz/sessions": {
+      "post": {
+        "tags": [
+          "F1"
+        ],
+        "summary": "创建测评会话",
+        "operationId": "mbti_5_post",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question_bank_version": {
+                    "type": "string",
+                    "description": "Optional pin; defaults to current if omitted"
+                  }
+                }
+              },
+              "example": {
+                "question_bank_version": "qb-v0.4-prototype-1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_QuizSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "请求的题库版本无法用于新建会话；重新获取当前版本",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 5,
+        "x-delivery-wave": "F1",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Create quiz session",
+        "x-requirement-number": 5,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/quiz/sessions/{session_id}/answers": {
+      "put": {
+        "tags": [
+          "F1"
+        ],
+        "summary": "保存本次答案",
+        "operationId": "mbti_6_put",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/F12_SessionId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "answers"
+                ],
+                "properties": {
+                  "answers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/F12_Answer"
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "partial": {
+                  "summary": "保存一题",
+                  "value": {
+                    "answers": [
+                      {
+                        "question_id": "q1",
+                        "option_id": "e"
+                      }
+                    ]
+                  }
+                },
+                "complete": {
+                  "summary": "保存 12 题",
+                  "value": {
+                    "answers": [
+                      {
+                        "question_id": "q1",
+                        "option_id": "e"
+                      },
+                      {
+                        "question_id": "q2",
+                        "option_id": "s"
+                      },
+                      {
+                        "question_id": "q3",
+                        "option_id": "t"
+                      },
+                      {
+                        "question_id": "q4",
+                        "option_id": "j"
+                      },
+                      {
+                        "question_id": "q5",
+                        "option_id": "e"
+                      },
+                      {
+                        "question_id": "q6",
+                        "option_id": "s"
+                      },
+                      {
+                        "question_id": "q7",
+                        "option_id": "t"
+                      },
+                      {
+                        "question_id": "q8",
+                        "option_id": "j"
+                      },
+                      {
+                        "question_id": "q9",
+                        "option_id": "e"
+                      },
+                      {
+                        "question_id": "q10",
+                        "option_id": "s"
+                      },
+                      {
+                        "question_id": "q11",
+                        "option_id": "t"
+                      },
+                      {
+                        "question_id": "q12",
+                        "option_id": "j"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_QuizSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "目标资源不存在或不属于当前游客",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "会话已经提交",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "答案不属于该版本题库，或提交时题目尚未答满",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 6,
+        "x-delivery-wave": "F1",
+        "description": "按 question_id 更新传入项。逐题和整批提交都可用；未传题目保持原值。",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Upsert answers for in-progress session",
+        "x-requirement-number": 6,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/quiz/sessions/{session_id}/submit": {
+      "post": {
+        "tags": [
+          "F1"
+        ],
+        "summary": "交卷并生成结果",
+        "operationId": "mbti_7_post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/F12_SessionId"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "life_stage": {
+                    "type": "string",
+                    "description": "Optional background label only"
+                  },
+                  "recent_status": {
+                    "type": "string",
+                    "description": "Optional background label only"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Result snapshot created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_ResultSnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "目标资源不存在或不属于当前游客",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "会话已经提交",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "答案不属于该版本题库，或提交时题目尚未答满",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 7,
+        "x-delivery-wave": "F1",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Submit session once; creates immutable result snapshot",
+        "x-requirement-number": 7,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/results": {
+      "get": {
+        "tags": [
+          "F1"
+        ],
+        "summary": "读取本人结果列表",
+        "operationId": "mbti_8_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Snapshot list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F12_ResultSnapshotSummary"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "items": [],
+                  "next_cursor": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 8,
+        "x-delivery-wave": "F1",
+        "description": "首次访问可返回空 items。列表按提交时间倒序并以 ID 稳定断序，只返回本人记录。",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "List result snapshots for current user",
+        "x-requirement-number": 8,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      },
+      "post": {
+        "tags": [
+          "F2"
+        ],
+        "summary": "保存自选类型结果",
+        "operationId": "mbti_12_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type_code",
+                  "source"
+                ],
+                "properties": {
+                  "type_code": {
+                    "type": "string",
+                    "pattern": "^[EI][SN][TF][JP]$",
+                    "example": "INFP"
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "self_select"
+                    ]
+                  },
+                  "life_stage": {
+                    "type": "string"
+                  },
+                  "recent_status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "source": "self_select",
+                "type_code": "INFP"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Snapshot created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_ResultSnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "未知的自选类型或来源",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 12,
+        "x-delivery-wave": "F2",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Create self-selected type snapshot",
+        "x-requirement-number": 12,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/results/compare": {
+      "get": {
+        "tags": [
+          "F2"
+        ],
+        "summary": "对比本人两次结果",
+        "operationId": "mbti_11_get",
+        "parameters": [
+          {
+            "name": "baseline_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comparison",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_CompareResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "目标资源不存在或不属于当前游客",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Version mismatch or incomparable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 11,
+        "x-delivery-wave": "F2",
+        "description": "先检查两项归属，再判是否可比。同版本测评快照可比，自选或版本不同返回 422。",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Compare two snapshots with same question_bank_version",
+        "x-requirement-number": 11,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/results/{id}": {
+      "get": {
+        "tags": [
+          "F1"
+        ],
+        "summary": "读取本人结果详情",
+        "operationId": "mbti_9_get",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/F12_ResultId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_ResultSnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "目标资源不存在或不属于当前游客",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 9,
+        "x-delivery-wave": "F1",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Get result snapshot by id",
+        "x-requirement-number": 9,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      },
+      "delete": {
+        "tags": [
+          "F2"
+        ],
+        "summary": "删除本人结果",
+        "operationId": "mbti_10_delete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/F12_ResultId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "目标资源不存在或不属于当前游客",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 10,
+        "x-delivery-wave": "F2",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Delete user snapshot",
+        "x-requirement-number": 10,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/types": {
+      "get": {
+        "tags": [
+          "F2"
+        ],
+        "summary": "读取 16 型元数据",
+        "operationId": "mbti_14_get",
+        "responses": {
+          "200": {
+            "description": "Type list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F12_TypeMeta"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 14,
+        "x-delivery-wave": "F2",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "Sixteen type metadata for self-select and display",
+        "x-requirement-number": 14,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/share/preview": {
+      "post": {
+        "tags": [
+          "F2"
+        ],
+        "summary": "生成真实分享预览图",
+        "operationId": "mbti_17_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "result_id"
+                ],
+                "properties": {
+                  "result_id": {
+                    "type": "string"
+                  },
+                  "template_id": {
+                    "type": "string",
+                    "description": "Visual template key; optional in draft"
+                  },
+                  "scene": {
+                    "type": "string",
+                    "enum": [
+                      "moments",
+                      "avatar",
+                      "meet_card"
+                    ],
+                    "description": "Product scene selector"
+                  }
+                }
+              },
+              "example": {
+                "result_id": "REPLACE_WITH_OWN_RESULT_ID",
+                "scene": "moments"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "图片已就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "preview_url"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ready"
+                      ]
+                    },
+                    "preview_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "可加载的绝对 HTTP(S) 图片地址。"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺少、过期或无效的业务凭证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "目标资源不存在或不属于当前游客",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "预览暂不可用，可稍后重试",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F12_Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/F12_ErrorResponse"
+          }
+        },
+        "x-intake-number": 17,
+        "x-delivery-wave": "F2",
+        "description": "仅本人结果可生成。响应返回可打开的去隐私图片 URL；暂不可用时返回结构化错误。",
+        "security": [
+          {
+            "F12_guestToken": []
+          }
+        ],
+        "x-source-summary": "同步生成一张可访问的分享预览",
+        "x-requirement-number": 17,
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/fastlane/MBTI-WebAPI-13.openapi.yaml"
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "读取服务端测试商品",
+        "responses": {
+          "200": {
+            "description": "Fixture catalog; saleable means controlled pending-order testing only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F3_Product"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F3_Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "F3_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F3"
+        ],
+        "operationId": "mbti_47_get",
+        "x-source-summary": "#47 Server catalog, including unavailable SKUs",
+        "x-requirement-number": 47,
+        "x-delivery-wave": "F3",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F3-candidate.openapi.yaml"
+      }
+    },
+    "/orders": {
+      "post": {
+        "summary": "创建或复用本人测试订单",
+        "description": "The persisted business order number is id. Same guest + Idempotency-Key + identical result_id/product_code returns the same order (201 on both initial and replay). A different intent with that key returns 409, including concurrent requests. Unknown body fields (amount/status/owner/unlocked/etc) return 422. Without provider configuration pending/unlocked=false and payment_availability=unconfigured; pay_params and paid_at are absent. Replay remains valid after result deletion.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "result_id",
+                  "product_code"
+                ],
+                "properties": {
+                  "result_id": {
+                    "type": "string"
+                  },
+                  "product_code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Persistent Order (including replay)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F3_Order"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F3_Unauthorized"
+          },
+          "404": {
+            "description": "Result missing or belongs to another guest"
+          },
+          "409": {
+            "description": "IDEMPOTENCY_CONFLICT or PRODUCT_NOT_SALEABLE"
+          },
+          "422": {
+            "description": "INVALID_INPUT or INVALID_IDEMPOTENCY_KEY"
+          }
+        },
+        "security": [
+          {
+            "F3_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F3"
+        ],
+        "operationId": "mbti_48_post",
+        "x-source-summary": "#48 Create or replay an owned pending test order",
+        "x-requirement-number": 48,
+        "x-delivery-wave": "F3",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F3-candidate.openapi.yaml"
+      },
+      "get": {
+        "summary": "读取本人订单列表",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Previous next_cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Persistent owned order snapshots, retained after result deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "next_cursor"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F3_Order"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F3_Unauthorized"
+          },
+          "422": {
+            "description": "Invalid pagination"
+          }
+        },
+        "security": [
+          {
+            "F3_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F3"
+        ],
+        "operationId": "mbti_49_get",
+        "x-source-summary": "#49 Owned orders, newest first",
+        "x-requirement-number": 49,
+        "x-delivery-wave": "F3",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F3-candidate.openapi.yaml"
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "summary": "查询本人订单状态",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owned persisted state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "order_id",
+                    "status",
+                    "unlocked",
+                    "payment_availability"
+                  ],
+                  "properties": {
+                    "order_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "paid",
+                        "failed"
+                      ]
+                    },
+                    "unlocked": {
+                      "type": "boolean"
+                    },
+                    "payment_availability": {
+                      "type": "string",
+                      "enum": [
+                        "unconfigured",
+                        "controlled_test"
+                      ]
+                    },
+                    "paid_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F3_Unauthorized"
+          },
+          "404": {
+            "description": "Missing or other guest order"
+          }
+        },
+        "security": [
+          {
+            "F3_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F3"
+        ],
+        "operationId": "mbti_50_get",
+        "x-source-summary": "#50 Owned status; order_id equals create Order.id and ops Order.id",
+        "x-requirement-number": 50,
+        "x-delivery-wave": "F3",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F3-candidate.openapi.yaml"
+      }
+    },
+    "/entitlements/me": {
+      "get": {
+        "summary": "读取本人权益",
+        "responses": {
+          "200": {
+            "description": "Empty items until a verified test payment succeeds; no local-cache unlock",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F3_Entitlement"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F3_Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "F3_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F3"
+        ],
+        "operationId": "mbti_53_get",
+        "x-source-summary": "#53 Owned entitlements; pending orders grant nothing",
+        "x-requirement-number": 53,
+        "x-delivery-wave": "F3",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F3-candidate.openapi.yaml"
+      }
+    },
+    "/cards/me": {
+      "get": {
+        "operationId": "mbti_24_get",
+        "x-requirement-number": 24,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_MyCard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "读取本人私密名片",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      },
+      "put": {
+        "operationId": "mbti_25_put",
+        "x-requirement-number": 25,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_MyCard"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/F4_UpdateCardBody"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "保存本人名片及可见性",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/cards/{card_id}": {
+      "get": {
+        "operationId": "mbti_26_get",
+        "x-requirement-number": 26,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_PublicCard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "读取当前允许的公开名片",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/buddies": {
+      "get": {
+        "operationId": "mbti_27_get",
+        "x-requirement-number": 27,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F4_BuddySummary"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "recommend",
+                "same"
+              ],
+              "default": "recommend"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type_code",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "INTJ",
+                "INTP",
+                "ENTJ",
+                "ENTP",
+                "INFJ",
+                "INFP",
+                "ENFJ",
+                "ENFP",
+                "ISTJ",
+                "ISFJ",
+                "ESTJ",
+                "ESFJ",
+                "ISTP",
+                "ISFP",
+                "ESTP",
+                "ESFP"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "发现公开搭子",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/buddies/blocked": {
+      "get": {
+        "operationId": "mbti_28_get",
+        "x-requirement-number": 28,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F4_BuddySummary"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "读取本人屏蔽列表",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/buddies/{id}": {
+      "get": {
+        "operationId": "mbti_29_get",
+        "x-requirement-number": 29,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_BuddyDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "读取搭子详情",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/buddies/{id}/block": {
+      "post": {
+        "operationId": "mbti_30_post",
+        "x-requirement-number": 30,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "blocked": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "blocked"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "屏蔽搭子",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      },
+      "delete": {
+        "operationId": "mbti_31_delete",
+        "x-requirement-number": 31,
+        "responses": {
+          "204": {
+            "description": "No body, including idempotent own retry"
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "解除本人发起的屏蔽",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/card-exchanges": {
+      "get": {
+        "operationId": "mbti_32_get",
+        "x-requirement-number": 32,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/F4_CardExchange"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "读取本人名片交换记录",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      },
+      "post": {
+        "operationId": "mbti_33_post",
+        "x-requirement-number": 33,
+        "responses": {
+          "200": {
+            "description": "Same-direction pending retry returns same ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_CardExchange"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_CardExchange"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "buddy_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "buddy_id"
+                ]
+              }
+            }
+          }
+        },
+        "description": "Both participants require an existing legal typed, discoverable card under the pair lock; unknown/private/untyped sender or target returns 404, without creating an unreachable pending.",
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "发起名片交换",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/card-exchanges/{id}/respond": {
+      "post": {
+        "operationId": "mbti_34_post",
+        "x-requirement-number": 34,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_CardExchange"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "accept",
+                      "decline"
+                    ]
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "本人接受或拒绝名片交换",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/card-exchanges/{id}": {
+      "delete": {
+        "operationId": "mbti_35_delete",
+        "x-requirement-number": 35,
+        "responses": {
+          "204": {
+            "description": "No body, including idempotent own retry"
+          },
+          "400": {
+            "description": "Existing strict JSON parser rejection, including malformed JSON or a top-level primitive document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/invisible/blocked/third party",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible participant role/state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F4_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F4_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F4"
+        ],
+        "x-source-summary": "",
+        "summary": "撤回本人发起的名片交换",
+        "x-delivery-wave": "F4",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F4-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/contacts/me": {
+      "get": {
+        "operationId": "mbti_36_get",
+        "x-requirement-number": 36,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_MyContacts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "读取本人私密联系渠道",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      },
+      "put": {
+        "operationId": "mbti_37_put",
+        "x-requirement-number": 37,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_MyContacts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "wechat": {
+                    "type": "string",
+                    "description": "Trim; omitted or empty removes. Candidate validation range."
+                  },
+                  "qq": {
+                    "type": "string",
+                    "description": "Trim; omitted or empty removes. Candidate validation range."
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "Trim; omitted or empty removes. Candidate validation range."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "整份替换本人联系渠道",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      },
+      "delete": {
+        "operationId": "mbti_38_delete",
+        "x-requirement-number": 38,
+        "responses": {
+          "204": {
+            "description": "Candidate success; Cache-Control: no-store"
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "清除本人联系渠道",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/contact-requests": {
+      "get": {
+        "operationId": "mbti_39_get",
+        "x-requirement-number": 39,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_ContactRequestList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "buddy_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Other public card ID only"
+          }
+        ],
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "读取本人联系方式申请",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      },
+      "post": {
+        "operationId": "mbti_40_post",
+        "x-requirement-number": 40,
+        "responses": {
+          "200": {
+            "description": "Identical normalized pending retry, same ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_ContactRequest"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_ContactRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "buddy_id",
+                  "channels"
+                ],
+                "properties": {
+                  "buddy_id": {
+                    "type": "string"
+                  },
+                  "channels": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "wechat",
+                        "qq",
+                        "phone"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "申请对方的明确渠道",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/contact-requests/{id}/respond": {
+      "post": {
+        "operationId": "mbti_41_post",
+        "x-requirement-number": 41,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_ContactRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "accept",
+                      "decline"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "本人批准或拒绝渠道申请",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/contact-requests/{id}": {
+      "delete": {
+        "operationId": "mbti_42_delete",
+        "x-requirement-number": 42,
+        "responses": {
+          "204": {
+            "description": "Candidate success; Cache-Control: no-store"
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "撤回渠道申请或授权",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/contact-requests/{id}/granted": {
+      "get": {
+        "operationId": "mbti_43_get",
+        "x-requirement-number": 43,
+        "responses": {
+          "200": {
+            "description": "Candidate success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_GrantedContacts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Strict JSON parser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid guest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/nonparty/invisible/unavailable grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Visible role/state/channel conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid candidate input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Private storage unavailable, no cached values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F5_Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "F5_GuestToken": []
+          }
+        ],
+        "tags": [
+          "F5"
+        ],
+        "x-source-summary": "",
+        "summary": "实时读取本次获批渠道",
+        "x-delivery-wave": "F5",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F5-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/radar/participation": {
+      "get": {
+        "operationId": "mbti_44_get",
+        "description": "Current guard owner only. No query keys. Missing row returns false; creates no card or participation.",
+        "responses": {
+          "200": {
+            "description": "Current committed choice; raw business object, Cache-Control no-store.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F6_Participation"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F6_Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/F6_InvalidInput"
+          },
+          "500": {
+            "$ref": "#/components/responses/F6_InternalError"
+          }
+        },
+        "security": [
+          {
+            "F6_guest": []
+          }
+        ],
+        "tags": [
+          "F6"
+        ],
+        "x-source-summary": "",
+        "summary": "读取本人参与选择",
+        "x-requirement-number": 44,
+        "x-delivery-wave": "F6",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F6-runtime-candidate.openapi.yaml"
+      },
+      "put": {
+        "operationId": "mbti_45_put",
+        "description": "No query keys; exactly one required boolean enrolled. Identity/type/location/radius keys are rejected. true requires an existing valid own card type (private card allowed); false is always allowed without a card/type/location. Same owner transaction lock as F5, one unique owner FK row, same-value retries stable. Returns after commit. Does not change discoverable, visibility, contacts or history. JSON parser errors precede controller guards.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/F6_Participation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed choice; raw business object, Cache-Control no-store.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F6_Participation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INVALID_JSON (malformed or strict-parser primitive/null JSON).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F6_Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F6_Unauthorized"
+          },
+          "413": {
+            "description": "BODY_TOO_LARGE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F6_Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/F6_InvalidInput"
+          },
+          "500": {
+            "$ref": "#/components/responses/F6_InternalError"
+          }
+        },
+        "security": [
+          {
+            "F6_guest": []
+          }
+        ],
+        "tags": [
+          "F6"
+        ],
+        "x-source-summary": "",
+        "summary": "保存本人加入或退出",
+        "x-requirement-number": 45,
+        "x-delivery-wave": "F6",
+        "x-availability": "ready",
+        "x-contract-source": "docs/integration/MBTI-F6-runtime-candidate.openapi.yaml"
+      }
+    },
+    "/radar/same-type": {
+      "get": {
+        "operationId": "mbti_46_get",
+        "description": "Strict query whitelist; duplicate/array/object/unknown keys rejected with 422. Order: guard, query structure/radius/type enum, existing own valid card type, type equality, own participation, capability. No lazy card, query-derived type, latest-result fallback or default INFP. All valid responses are unavailable with count null; never numeric, low_sample or available. No aggregate COUNT query, people, positions, contact values or other-owner identifiers. DB/HTTP failure stays failure. status/reason and errors are new candidate fields/codes requiring review.",
+        "parameters": [
+          {
+            "name": "type_code",
+            "in": "query",
+            "required": false,
+            "description": "Exact uppercase 16-type code; must equal existing own card. Omit to use that card.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ISTJ",
+                "ISFJ",
+                "INFJ",
+                "INTJ",
+                "ISTP",
+                "ISFP",
+                "INFP",
+                "INTP",
+                "ESTP",
+                "ESFP",
+                "ENFP",
+                "ENTP",
+                "ESTJ",
+                "ESFJ",
+                "ENFJ",
+                "ENTJ"
+              ]
+            }
+          },
+          {
+            "name": "radius_m",
+            "in": "query",
+            "required": false,
+            "description": "One exact decimal string; UI-derived candidate tiers, not a published distance policy.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "500",
+                "1000",
+                "3000"
+              ],
+              "default": "500"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Explicit capability state; raw business object, Cache-Control no-store.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/F6_Unavailable"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/F6_Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/F6_InvalidInput"
+          },
+          "500": {
+            "$ref": "#/components/responses/F6_InternalError"
+          }
+        },
+        "security": [
+          {
+            "F6_guest": []
+          }
+        ],
+        "tags": [
+          "F6"
+        ],
+        "x-source-summary": "",
+        "summary": "查询同型统计的可用状态",
+        "x-requirement-number": 46,
+        "x-delivery-wave": "F6",
+        "x-availability": "unavailable",
+        "x-contract-source": "docs/integration/MBTI-F6-runtime-candidate.openapi.yaml"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "F12_guestToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Guest-Token",
+        "description": "通过 POST /auth/guest 获取当前浏览器专用凭证。每次受保护请求携带 X-Guest-Token。"
+      },
+      "F3_GuestToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Guest-Token"
+      },
+      "F4_GuestToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Guest-Token"
+      },
+      "F5_GuestToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Guest-Token"
+      },
+      "F6_guest": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Guest-Token"
+      }
+    },
+    "parameters": {
+      "F12_SessionId": {
+        "name": "session_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "F12_ResultId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "F12_ErrorResponse": {
+        "description": "Error envelope",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/F12_Error"
+            }
+          }
+        }
+      },
+      "F3_Unauthorized": {
+        "description": "GUEST_UNAUTHORIZED; missing/invalid/expired guest credential"
+      },
+      "F6_Unauthorized": {
+        "description": "Missing, malformed or expired token; 401 GUEST_UNAUTHORIZED, no-store. No identity replacement.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/F6_Error"
+            }
+          }
+        }
+      },
+      "F6_InvalidInput": {
+        "description": "422 no-store. INVALID_RADAR_INPUT for whitelist/type/enum/radius errors; RADAR_TYPE_REQUIRED for missing/invalid stored own card type; RADAR_TYPE_MISMATCH for a valid query type different from own card. New codes are candidate / needs_human_review.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/F6_Error"
+            }
+          }
+        }
+      },
+      "F6_InternalError": {
+        "description": "500 INTERNAL_ERROR, no-store; never converted into unavailable.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/F6_Error"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "F12_Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "F12_Question": {
+        "type": "object",
+        "required": [
+          "id",
+          "index",
+          "dimension",
+          "prompt",
+          "options"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "index": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "EI",
+              "SN",
+              "TF",
+              "JP"
+            ]
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "label"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "F12_Answer": {
+        "type": "object",
+        "required": [
+          "question_id",
+          "option_id"
+        ],
+        "properties": {
+          "question_id": {
+            "type": "string"
+          },
+          "option_id": {
+            "type": "string"
+          }
+        }
+      },
+      "F12_QuizSession": {
+        "type": "object",
+        "required": [
+          "id",
+          "question_bank_version",
+          "status",
+          "answers"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "question_bank_version": {
+            "type": "string",
+            "description": "会话创建后冻结。"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "in_progress",
+              "submitted"
+            ]
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/F12_Answer"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "F12_QuizVersionPayload": {
+        "type": "object",
+        "required": [
+          "question_bank_version",
+          "questions"
+        ],
+        "properties": {
+          "question_bank_version": {
+            "type": "string",
+            "example": "qb-v0.4-teach-1"
+          },
+          "lookback_hint": {
+            "type": "string",
+            "description": "UX copy only — recent 4 weeks",
+            "example": "请按最近四周的通常状态作答"
+          },
+          "questions": {
+            "type": "array",
+            "minItems": 12,
+            "maxItems": 12,
+            "items": {
+              "$ref": "#/components/schemas/F12_Question"
+            }
+          }
+        }
+      },
+      "F12_DimensionCounts": {
+        "type": "object",
+        "required": [
+          "E",
+          "I",
+          "S",
+          "N",
+          "T",
+          "F",
+          "J",
+          "P"
+        ],
+        "properties": {
+          "E": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "I": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "S": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "N": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "T": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "F": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "J": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "P": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          }
+        }
+      },
+      "F12_ResultSnapshot": {
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "type_code",
+          "question_bank_version",
+          "submitted_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "quiz",
+              "self_select"
+            ]
+          },
+          "type_code": {
+            "type": "string",
+            "pattern": "^[EI][SN][TF][JP]$"
+          },
+          "dimension_counts": {
+            "$ref": "#/components/schemas/F12_DimensionCounts"
+          },
+          "question_bank_version": {
+            "type": "string",
+            "description": "真实测评为所用题库版本。自选使用不与测评比较的独立标识。"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "life_stage": {
+            "type": "string"
+          },
+          "recent_status": {
+            "type": "string"
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Present when source=quiz"
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "enum": [
+                  "quiz"
+                ]
+              }
+            },
+            "required": [
+              "dimension_counts"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "enum": [
+                  "self_select"
+                ]
+              }
+            },
+            "not": {
+              "required": [
+                "dimension_counts"
+              ]
+            }
+          }
+        ]
+      },
+      "F12_ResultSnapshotSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "type_code",
+          "question_bank_version",
+          "submitted_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "quiz",
+              "self_select"
+            ]
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "question_bank_version": {
+            "type": "string"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "life_stage": {
+            "type": "string"
+          }
+        }
+      },
+      "F12_TypeMeta": {
+        "type": "object",
+        "required": [
+          "type_code",
+          "name_zh",
+          "tagline"
+        ],
+        "properties": {
+          "type_code": {
+            "type": "string"
+          },
+          "name_zh": {
+            "type": "string"
+          },
+          "tagline": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "F12_CompareResult": {
+        "type": "object",
+        "required": [
+          "baseline_id",
+          "target_id",
+          "question_bank_version",
+          "type_changed"
+        ],
+        "properties": {
+          "baseline_id": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string"
+          },
+          "question_bank_version": {
+            "type": "string"
+          },
+          "type_changed": {
+            "type": "boolean"
+          },
+          "baseline_type_code": {
+            "type": "string"
+          },
+          "target_type_code": {
+            "type": "string"
+          },
+          "dimension_deltas": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "stability_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "F12_GuestSession": {
+        "type": "object",
+        "required": [
+          "guest_token",
+          "expires_at"
+        ],
+        "properties": {
+          "guest_token": {
+            "type": "string",
+            "minLength": 1,
+            "description": "高熵不透明凭证。仅入本机存储，避免日志、URL 和截图。"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "凭证有效期，UTC ISO 8601。"
+          }
+        }
+      },
+      "F3_Product": {
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "description",
+          "amount",
+          "currency",
+          "saleable",
+          "pricing_mode",
+          "highlights",
+          "tier"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Minor units (fen)",
+            "minimum": 1
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CNY"
+            ]
+          },
+          "saleable": {
+            "type": "boolean"
+          },
+          "pricing_mode": {
+            "type": "string",
+            "enum": [
+              "controlled_test_fixture"
+            ]
+          },
+          "unavailable_reason": {
+            "type": "string"
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tier": {
+            "type": "integer",
+            "enum": [
+              1,
+              2
+            ]
+          }
+        }
+      },
+      "F3_Order": {
+        "type": "object",
+        "required": [
+          "id",
+          "result_id",
+          "product_code",
+          "amount",
+          "currency",
+          "status",
+          "unlocked",
+          "created_at",
+          "payment_availability",
+          "pricing_mode"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Persistent business order number shared by create/list/status/ops"
+          },
+          "result_id": {
+            "type": "string",
+            "description": "Immutable original reference retained after result deletion"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Frozen minor units (fen)"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "CNY"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "failed"
+            ]
+          },
+          "unlocked": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payment_availability": {
+            "type": "string",
+            "enum": [
+              "unconfigured",
+              "controlled_test"
+            ]
+          },
+          "pricing_mode": {
+            "type": "string",
+            "enum": [
+              "controlled_test_fixture"
+            ]
+          }
+        }
+      },
+      "F3_Entitlement": {
+        "type": "object",
+        "required": [
+          "id",
+          "order_id",
+          "result_id",
+          "product_code",
+          "kind",
+          "status",
+          "granted_at",
+          "scope"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string",
+            "description": "Order.id"
+          },
+          "result_id": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "studio_tier_1"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active"
+            ]
+          },
+          "granted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "controlled_test"
+            ]
+          }
+        }
+      },
+      "F4_CardVisibility": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "boolean"
+          },
+          "interests": {
+            "type": "boolean"
+          },
+          "declaration": {
+            "type": "boolean"
+          },
+          "manual": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "interests",
+          "declaration",
+          "manual"
+        ]
+      },
+      "F4_CardManual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "recharge": {
+            "type": "string"
+          },
+          "communication": {
+            "type": "string"
+          },
+          "care": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "recharge",
+          "communication",
+          "care"
+        ]
+      },
+      "F4_MyCard": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "declaration": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "illustration",
+              "editorial",
+              "game"
+            ]
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/F4_CardVisibility"
+          },
+          "discoverable": {
+            "type": "boolean"
+          },
+          "has_visual_set": {
+            "type": "boolean"
+          },
+          "latest_result_id": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "declaration",
+          "interests",
+          "style",
+          "visibility",
+          "discoverable",
+          "has_visual_set",
+          "updated_at"
+        ]
+      },
+      "F4_PublicCard": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "declaration": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "illustration",
+              "editorial",
+              "game"
+            ]
+          },
+          "manual": {
+            "$ref": "#/components/schemas/F4_CardManual"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "declaration",
+          "interests",
+          "style"
+        ]
+      },
+      "F4_BuddySummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "avatar_text": {
+            "type": "string"
+          },
+          "avatar_color": {
+            "type": "string"
+          },
+          "tagline": {
+            "type": "string"
+          },
+          "same_type": {
+            "type": "boolean"
+          },
+          "shared_interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exchange_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "is_demo": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "interests",
+          "avatar_text",
+          "avatar_color",
+          "tagline",
+          "same_type",
+          "shared_interests",
+          "exchange_status",
+          "is_demo"
+        ]
+      },
+      "F4_BuddyDetail": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Independent 192-bit opaque public card ID; also buddy.id/buddy_id. Never guest.id."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "type_code": {
+            "type": "string"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "avatar_text": {
+            "type": "string"
+          },
+          "avatar_color": {
+            "type": "string"
+          },
+          "tagline": {
+            "type": "string"
+          },
+          "same_type": {
+            "type": "boolean"
+          },
+          "shared_interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exchange_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "is_demo": {
+            "type": "boolean"
+          },
+          "compatibility_hint": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "type_code",
+          "type_name",
+          "interests",
+          "avatar_text",
+          "avatar_color",
+          "tagline",
+          "same_type",
+          "shared_interests",
+          "exchange_status",
+          "is_demo",
+          "compatibility_hint"
+        ]
+      },
+      "F4_CardExchange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buddy_id": {
+            "type": "string"
+          },
+          "buddy": {
+            "$ref": "#/components/schemas/F4_BuddySummary"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "incoming",
+              "outgoing"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "responded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "simulated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "buddy_id",
+          "buddy",
+          "direction",
+          "status",
+          "created_at",
+          "simulated"
+        ]
+      },
+      "F4_UpdateCardBody": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "type_code": {
+            "type": "string",
+            "enum": [
+              "INTJ",
+              "INTP",
+              "ENTJ",
+              "ENTP",
+              "INFJ",
+              "INFP",
+              "ENFJ",
+              "ENFP",
+              "ISTJ",
+              "ISFJ",
+              "ESTJ",
+              "ESFJ",
+              "ISTP",
+              "ISFP",
+              "ESTP",
+              "ESFP"
+            ]
+          },
+          "declaration": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "interests": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "maxLength": 24
+            }
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "illustration",
+              "editorial",
+              "game"
+            ]
+          },
+          "visibility": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "boolean"
+              },
+              "interests": {
+                "type": "boolean"
+              },
+              "declaration": {
+                "type": "boolean"
+              },
+              "manual": {
+                "type": "boolean"
+              }
+            },
+            "required": []
+          },
+          "discoverable": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      },
+      "F4_Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "F5_MyContacts": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "wechat": {
+            "type": "string",
+            "description": "Trim; omitted or empty removes. Candidate validation range."
+          },
+          "qq": {
+            "type": "string",
+            "description": "Trim; omitted or empty removes. Candidate validation range."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Trim; omitted or empty removes. Candidate validation range."
+          }
+        }
+      },
+      "F5_ContactRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "buddy_id",
+          "direction",
+          "status",
+          "channels",
+          "created_at",
+          "simulated"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "buddy_id": {
+            "type": "string",
+            "description": "Other public card ID"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "incoming",
+              "outgoing"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "declined",
+              "revoked"
+            ]
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "wechat",
+                "qq",
+                "phone"
+              ]
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "responded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": false
+          }
+        }
+      },
+      "F5_ContactRequestList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/F5_ContactRequest"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "F5_GrantedContacts": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "channels"
+        ],
+        "properties": {
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "channel",
+                "value"
+              ],
+              "properties": {
+                "channel": {
+                  "type": "string",
+                  "enum": [
+                    "wechat",
+                    "qq",
+                    "phone"
+                  ]
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "F5_Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "F6_Participation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "enrolled"
+        ],
+        "properties": {
+          "enrolled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "F6_Unavailable": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "count",
+          "status",
+          "reason"
+        ],
+        "properties": {
+          "count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "enum": [
+              null
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "unavailable"
+            ],
+            "x-needs-human-review": true
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "not_enrolled",
+              "location_source_not_configured"
+            ],
+            "x-needs-human-review": true
+          }
+        }
+      },
+      "F6_Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

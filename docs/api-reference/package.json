@@ -1,0 +1,12 @@
+{
+  "name": "@mbti/api-reference",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs --check",
+    "test": "node --test reference.test.mjs"
+  },
+  "devDependencies": { "yaml": "2.9.1" }
+}

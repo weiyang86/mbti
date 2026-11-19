@@ -1,0 +1,525 @@
+# AF-186 · 复核个人智能体与编排目标覆盖
+
+只读产品对照点：`48e8d26ea1dcd67df65d316a0edfdec4bcb2d502`；候选基线：`94b0236f775fa40a07944c5e0545ac6ce0e123f3`。负责人验收 **PENDING**；本次九项目标验收均 **NOT_RUN_BY_THIS_AUDIT**。
+
+结论：7项 PARTIAL、2项 MISSING（受控切换、多Agent协作），0项可由现有证据宣布完整目标就绪。个人 prompt Agent/显式记忆已形成真实运行切片；流程只有草稿与线性编辑，脚本只有独立容器适配器。
+
+本审计以源代码定位当前实现，以已批准且完整哈希相符的报告限定真实成功范围。页面状态/PG和构建报告内仍要求浏览器操作，故浏览器结论保持 UNPROVEN；独立容器隔离不等于用户可上传并运行脚本。
+
+## 冻结依据与证据规则
+
+基线：`AIJ-REQ-20261105-R1`，freeze `1f6549fd192b9ababe8c9d911ae19df3abd510ff`。traceability完整blob SHA256 `5b833d53e02396cc2f53f13554b53510c02226fcfb6c57368f54c3ae9a57bb59`；历史设计授权措辞不回写，当前连续授权以派工及 sourceHead program.json 为准。
+
+以下 sourceEvidence 路径/行号一律属于指定不可变提交，SHA256 为完整 blob；不是 origin94 工作树。runtimeEvidence 仅为 approvedReports 原路径/完整报告摘要，未借用 raw log、外部执行或供应商回执。
+
+## 逐需求有限审计
+
+### REQ-007 动作授权 · PARTIAL
+
+冻结目标：产品管理员规定工具/动作权限上限，组织和个人可在上限内收紧；审批、授权及运行态检查一致。
+
+AC-007 成功（原文）：已授权工具执行；需人工确认的写操作停在审批点，审计可关联。
+
+AC-007 拒绝（原文）：批准后撤权、换组织或变更工具版本不能沿用旧审批执行。
+
+当前真实入口/持久层：WorkspaceContextGuard/aiExecute、资产授权与运行前/credential IO 后复检已接入个人 Agent。没有工具/动作目录上限、组织/个人收紧、审批单或执行器；图中的 human-approval 只是一种草稿节点。API/UI/SDK 可执行的为 prompt Agent，不是动作审批。持久层有 Run/Job/Trace 和 workspace 权限，未见审批真值。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:55-55` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:80-80` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-runs.controller.ts:18-31` — 提交使用服务端 workspace 与 aiExecute/aiAssetsRead 权限。 完整blob SHA256 `cd80d3649a9740c77bdf8db788c5b225dad7fdde4075b655d5a793bf548d2151`。
+- `apps/api/src/plugins/aij-ai/ai-center-run.service.ts:234-249` — 凭据 IO 后、进入上游前复检权限/快照/租约。 完整blob SHA256 `b95651504ce5251196703f0e28b216a4f0ef623939ebd6f7c422195bf29bccd6`。
+- `apps/api/src/plugins/aij-ai/ai-personal-workflows-graph.ts:4-11` — 只有草稿 human-approval 类型，不能视作审批实现。 完整blob SHA256 `ab8b92b5fcdb7fde1e6397c3e654f1f63da9d0ace68410c73c5d93ea8a62d1ee`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-161/run-sAMufh/report.json`，SHA256 `d337188d01349532b36ada02dc6167695cd0faa0cdc92e7dd2fca939974e0457`。AF-161 / real-personal-agent-runtime-pg-upstream：12 tests PASS；实际 API/JobService/PG/Run/Trace/budget 与自有合成 HTTP 上游；TEXT/JSON、幂等、撤权、旧 nonce、未知结果不重发。 限制：单 Agent prompt 路径；合成上游不是 DeepSeek/阿里云付费回执或对客计费；无工具或切换。
+- `.artifacts/verification/AF-165/run-Gh05eu/report.json`，SHA256 `9e7a86735e3f42e2d1614d0e42db4f8f96651ff755c84c5752f3e8c61f283940`。AF-165 / real-preview-readonly-http-pg-packed：9 tests PASS；真实 readonly 预检、14 字段安全投影、域表哈希不变、无密钥 resolve/上游、PG 撤权围栏、packed ESM/CJS HTTP。 限制：费用上限是现有成本预算估算；没有付款方/BYOK/对客价格承诺，预检不是准入票据。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 需实际工具副作用、产品上限→组织/个人收紧→人工批准→撤权/切空间/工具版本变化的端到端拒绝；当前没有可运行目标入口。
+
+外部输入与工程阻塞：
+
+- 无必须先取得的外部输入；缺实现可在现有隔离/合成边界内继续。
+
+整项关闭路径：
+
+1. 在现有权限/Job/Trace owner 内完成一个低风险可审计工具的上限、收紧与审批产品纵向闭环，再复用到 Agent/流程；当前缺口是工程实现，不等待厂商。
+2. 扩展到工具版本固定/批准后撤权和取消副作用围栏；在最终制品同时跑 AC-007 与 AC-017/019，不以启用 Agent 代替动作授权。
+
+### REQ-012 多级厂商配置 · PARTIAL
+
+冻结目标：产品统一密钥与用户/组织自带配置并存，凭据归属/付款方与当前空间分别绑定。
+
+AC-012 成功（原文）：两个组织和个人分别使用授权配置，产品允许的模型可被客户端选择。
+
+AC-012 拒绝（原文）：其他组织密钥不可读/不可借用，脚本/日志/导出只含引用不含值。
+
+当前真实入口/持久层：管理员 /admin/ai/center/configuration 为 ProjectProfile 所在产品目录与 secretRef；个人 Agent 从该目录选文本模型，GET preview 只投影配置是否就绪。UI 有模型选择与成本上限，SDK 有 model-options/preview；没有用户/组织自带凭据写入/选择或付款主体。目录存 ScopedConfig，Run snapshot 存产品 provider 引用；Project 不是客户组织。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:70-70` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:85-85` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-center-configuration.service.ts:26-34` — 配置唯一来源为 project scoped ai.center.catalog。 完整blob SHA256 `1d429d644a6efdf7084265f13ff7730431f3e34167a1ab1ef3b264cb2dd6dc7a`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-snapshots.service.ts:55-64` — 个人 Agent 使用当前产品目录 provider/model；无个人凭据归属。 完整blob SHA256 `fb1dd0588d4c7ebae4f00d8af1b21d8b98763b928070b68ae7e7bc8d518c9406`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-run-previews.service.ts:64-78` — 只查询 credentialRef 是否存在，输出模型和成本上限。 完整blob SHA256 `f85d9da6cfd33aa784a5c4151ea2518ca41f145b0e9d31ec5c37ccfefe7f3102`。
+- `packages/sdk/src/personal-agents.ts:80-95` — 真实 SDK 私有 Agent/model-options 消费入口。 完整blob SHA256 `2554f86f4e074955d1d754a287662de1d2e812fd06899905719f11546b7f1ed1`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-159/run-zNjJOa/report.json`，SHA256 `25b2f20afd711cd45be19914e60355aa009962152c1b2c29cf6eeeb66a708751`。AF-159 / real-personal-agent-cookie-concurrency-history-pins：12 tests PASS；真实私有 Agent、固定 Skill 版本、角色/租户/删除/模型拒绝、PG 锁与回滚；产品目录保存包含两家厂商配置。 限制：配置保存不是厂商调用；执行账本不变且 upstream=0；未证明组织共享、BYOK 或工具。
+- `.artifacts/verification/AF-165/run-Gh05eu/report.json`，SHA256 `9e7a86735e3f42e2d1614d0e42db4f8f96651ff755c84c5752f3e8c61f283940`。AF-165 / real-preview-readonly-http-pg-packed：9 tests PASS；真实 readonly 预检、14 字段安全投影、域表哈希不变、无密钥 resolve/上游、PG 撤权围栏、packed ESM/CJS HTTP。 限制：费用上限是现有成本预算估算；没有付款方/BYOK/对客价格承诺，预检不是准入票据。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 个人和两个组织分别保存、轮换、停用 BYOK 并选用；付款主体/凭据 owner/任务空间分别冻结；产品范围内模型可选。
+- 脚本、日志、导出只有引用；跨成员/组织不可借用密钥；切空间后在途任务归属不漂移。
+
+外部输入与工程阻塞：
+
+- 真实供应商小额验证需获准测试账号/secret 引用、模型/地域和额度；实现同 owner 的合成测试不依赖真实密钥。
+
+整项关闭路径：
+
+1. 先交一个产品统一配置与个人/组织 BYOK 共存的实际配置→选用→运行纵向结果，复用 SecretRef/Trace，不扩散密钥值。
+2. 将付款账户与空间分离并冻结到准入/每次调用，补两组织+个人的 UI/API/SDK 及拒绝矩阵，最后获准真实上游样例关闭 AC-012。
+
+### REQ-013 受控切换 · MISSING
+
+冻结目标：跨自带密钥与产品付费额度默认关闭，需付款方显式授权；同意后受候选范围和预算约束；每步骤最多3次尝试、1次切换。
+
+AC-013 成功（原文）：限流/已确认失败按策略切换，并展示实际模型、付款来源和消耗。
+
+AC-013 拒绝（原文）：结果未知不得盲目重发；切空间不转移付款方；超预算不启动新调用。
+
+当前真实入口/持久层：已有单次调用的预算预占/结算、maxAttempts:1 和 unknown 保持预占不盲目重发；这属于安全基础。没有跨凭据/付款源候选、显式付款授权、三次/一次切换策略、切换 UI 或 SDK。预算是成本控制，不是对客钱包/售价。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:71-71` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:86-86` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-center-run.service.ts:109-115` — 当前单 Run 只入一个 maxAttempts:1 的 Job 并冻结单一快照。 完整blob SHA256 `b95651504ce5251196703f0e28b216a4f0ef623939ebd6f7c422195bf29bccd6`。
+- `apps/api/src/plugins/aij-ai/ai-center-run.service.ts:167-174` — 已尝试失败视为不确定并保留预算。 完整blob SHA256 `b95651504ce5251196703f0e28b216a4f0ef623939ebd6f7c422195bf29bccd6`。
+- `apps/api/src/plugins/aij-ai/ai-center-provider.ts:54-62` — 一次 invoke 对一个固定 provider 发请求。 完整blob SHA256 `b2ee1a7532717ab2916c737e82b6c5dcffedf6f4844d2822e3dfa5774049a4e0`。
+- `apps/api/src/plugins/aij-ai/ai-center-budget.service.ts:17-28` — 产品/月/空间成本预占，非付款账户切换授权。 完整blob SHA256 `b5b91157e12ecc88fe82f06e4568e8b2d6df455c885bdf761d9d8640b6d78746`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-161/run-sAMufh/report.json`，SHA256 `d337188d01349532b36ada02dc6167695cd0faa0cdc92e7dd2fca939974e0457`。AF-161 / real-personal-agent-runtime-pg-upstream：12 tests PASS；实际 API/JobService/PG/Run/Trace/budget 与自有合成 HTTP 上游；TEXT/JSON、幂等、撤权、旧 nonce、未知结果不重发。 限制：单 Agent prompt 路径；合成上游不是 DeepSeek/阿里云付费回执或对客计费；无工具或切换。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 已确认限流/失败后，在候选白名单与共享单任务/每日预算内切换；显式授权缺失必须暂停。
+- 验证最多3次总尝试、1次跨模型切换；timeout/迟到回执/取消/重复请求不重发或重复计费；空间切换不改原付款方。
+
+外部输入与工程阻塞：
+
+- 真实供应商失败/账单核对需获准小额账号及可核对回执；先以拥有的合成端点验证策略与 unknown。
+
+整项关闭路径：
+
+1. 依赖 REQ-012 的真实凭据/付款主体，再实现付款授权与候选预算的运行路径，保留未知结果先核对的默认。
+2. 将所有尝试关联现有 Trace/Run 与单一成本真值，UI 显示实际模型/来源/消耗；完成成功、拒绝、超限、未知/迟到与真实小额样例后关闭 AC-013。
+
+### REQ-015 多级Agent资产 · PARTIAL
+
+冻结目标：管理员、企业、个人可配置Agent，绑定模型、指令、知识、Skill、工具和运行权限，支持调试及可追溯版本。
+
+AC-015 成功（原文）：三个归属层能创建私有Agent并在授权范围共享/运行，运行保留版本快照。
+
+AC-015 拒绝（原文）：未发布/被禁用/依赖失效Agent不能执行；旧快照不能绕过当前撤权。
+
+当前真实入口/持久层：管理员目录 Agent 与 workspace+member 私有 Agent API/SDK、Skill 历史 pins、配置/运行/恢复页面存在；实际执行只支持 TEXT/JSON 产品模型+指令+prompt Skill+显式个人记忆。私有 Agent 要求当前 revision，snapshot resolver 将 enabled 私有版本映射为 published:true，没有独立发布流程；组织空间内个人私有资产不等于组织共享 Agent。知识、工具/权限绑定、共享与完整调试未接。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:78-78` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:88-88` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agents.dto.ts:3-12` — 字段只有模型、指令、I/O、Skill pins、enabled，无知识/工具/发布字段。 完整blob SHA256 `7dd8f38e4a1a32a0c49a4b4d6cd2b6cb19f599bb04e87b5c3a5f6c32c9ecd781`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-snapshots.service.ts:27-39` — 私有执行要求同成员/空间且当前版本相等；不是任意历史版本执行。 完整blob SHA256 `fb1dd0588d4c7ebae4f00d8af1b21d8b98763b928070b68ae7e7bc8d518c9406`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-snapshots.service.ts:55-64` — enabled 私有资产映射 published:true；未见独立发布状态。 完整blob SHA256 `fb1dd0588d4c7ebae4f00d8af1b21d8b98763b928070b68ae7e7bc8d518c9406`。
+- `apps/api/prisma/schema.prisma:1337-1358` — Run 冻结 snapshot 并关联唯一 Job/成本预算。 完整blob SHA256 `d93792ee299fa8dbf02af3104ada3a3fd01b24acd2683c914d6f62c4c01d1ca7`。
+- `apps/web/app/components/client-personal-agent-run.tsx:22-28` — 现有运行页面使用真实 SDK 的 preview/submit/read/recovery。 完整blob SHA256 `9ce54777f56d0a82534b43eef7218e5d4d236d531cc3d8cd81563eb790c7ed53`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-159/run-zNjJOa/report.json`，SHA256 `25b2f20afd711cd45be19914e60355aa009962152c1b2c29cf6eeeb66a708751`。AF-159 / real-personal-agent-cookie-concurrency-history-pins：12 tests PASS；真实私有 Agent、固定 Skill 版本、角色/租户/删除/模型拒绝、PG 锁与回滚；产品目录保存包含两家厂商配置。 限制：配置保存不是厂商调用；执行账本不变且 upstream=0；未证明组织共享、BYOK 或工具。
+- `.artifacts/verification/AF-161/run-sAMufh/report.json`，SHA256 `d337188d01349532b36ada02dc6167695cd0faa0cdc92e7dd2fca939974e0457`。AF-161 / real-personal-agent-runtime-pg-upstream：12 tests PASS；实际 API/JobService/PG/Run/Trace/budget 与自有合成 HTTP 上游；TEXT/JSON、幂等、撤权、旧 nonce、未知结果不重发。 限制：单 Agent prompt 路径；合成上游不是 DeepSeek/阿里云付费回执或对客计费；无工具或切换。
+- `.artifacts/verification/AF-165/run-Gh05eu/report.json`，SHA256 `9e7a86735e3f42e2d1614d0e42db4f8f96651ff755c84c5752f3e8c61f283940`。AF-165 / real-preview-readonly-http-pg-packed：9 tests PASS；真实 readonly 预检、14 字段安全投影、域表哈希不变、无密钥 resolve/上游、PG 撤权围栏、packed ESM/CJS HTTP。 限制：费用上限是现有成本预算估算；没有付款方/BYOK/对客价格承诺，预检不是准入票据。
+- `.artifacts/verification/AF-169/run-MMOLnu/report.json`，SHA256 `aac5feedf0c5982db7477bb638407d7d24d23627082e6a41e4c4246b9eb73f73`。AF-169 / real-personal-run-page-http-pg-job-memory-recovery：1 tests PASS；页面状态经真实 HTTP/PG/Job/Trace/budget 与编译 SDK；提交响应丢失后以原 key GET、一次调用、换空间旧响应隔离。 限制：报告 manual=[]；isolated production build 和 diff-check 均仍要求 actual browser，故不据此认定桌面/390 原生浏览器通过。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 三个归属层私有配置与授权共享、知识/工具/运行权限绑定、发布/停用/依赖失效拒绝与调试结果。
+- 独立发布授权需明确；旧版本/快照不得绕过当前撤权；历史版本用于流程 pins 时不能被静默替换为最新版。
+
+外部输入与工程阻塞：
+
+- 模型真实样例需获准厂商配置；发布/共享/绑定的实现与合成测试不受此阻塞。
+
+整项关闭路径：
+
+1. 优先 P186-AGENT-PUBLISH，补当前私有 Agent 的显式发布与版本调试闭环；该卡不是三层共享验收。
+2. 随后在同资产 owner 完成组织共享/管理员层与知识/Skill/工具绑定、权限收紧和独立调试；复验三个层级及撤权/禁用/失效，补浏览器和真实上游后关闭 AC-015。
+
+### REQ-016 可执行Skill包 · PARTIAL
+
+冻结目标：Skill含说明、模板、文件、输入输出、工具接口及脚本；普通用户可上传自用脚本，公开/收费发布需审核。
+
+AC-016 成功（原文）：上传能力包通过校验，在隔离执行器处理已授权文件，输出可下载且可审计。
+
+AC-016 拒绝（原文）：脚本越权网络/文件/凭据、超时/内存/并发超限被拦截，不在API进程运行用户代码。
+
+当前真实入口/持久层：现有 Skill 仅说明 prompt CRUD/历史，Agent 会把其指令拼入提示词。独立 PythonSandboxRunner 默认关闭，真实 Docker 隔离报告存在；在全树静态检查中仅该文件定义该类，没有运行模块接线。没有上传可执行包 API/UI/SDK、模板/文件/I/O/工具契约、脚本 Job、附件输出和公开/收费审核。不能将 prompt Skill 或独立 runner 当产品脚本能力。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:79-79` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:89-89` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-personal-skills.dto.ts:3-7` — 私有 Skill 数据只有 name/instructions/code/revision。 完整blob SHA256 `45064f58343453ac1586aa02f23558195373041dedca9057cd5feefc9ce2c59d`。
+- `apps/api/src/plugins/aij-ai/ai-center-provider.ts:18-31` — Skill 指令参与 prompt 编译，非脚本执行。 完整blob SHA256 `b2ee1a7532717ab2916c737e82b6c5dcffedf6f4844d2822e3dfa5774049a4e0`。
+- `apps/api/src/plugins/aij-ai/python-sandbox-runner.ts:199-210` — 独立执行适配器默认关闭/参数校验/并发拒绝。 完整blob SHA256 `ede851ca4a793ace9b00d3f36c41707eeac993eab067111d64b71cdf25fe1edc`。
+- `apps/api/src/plugins/aij-ai/python-sandbox-runner.ts:229-239` — 实际容器资源/权限限制由 runner 构造。 完整blob SHA256 `ede851ca4a793ace9b00d3f36c41707eeac993eab067111d64b71cdf25fe1edc`。
+- `apps/api/src/plugins/aij-ai/ai-runtime.module.ts:51-58` — 实际模块接入个人资产/Run 服务，未注册脚本 runner。 完整blob SHA256 `3b55864ebe024e46a39cf0da105f0df095a34858d9943bff4db2f23d8744fe52`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-154/run-QAFujH/report.json`，SHA256 `e81ea6331a68e6747a75881ca69063750b156186bc716e851f9e6dce34bbec6f`。AF-154 / real-personal-skill-cookie-concurrency-history：10 tests PASS；真实 Cookie/HTTP/PG 私有 prompt Skill CRUD、不可变历史、CAS、并发配额、撤权围栏与审计故障回滚。 限制：仅说明文本 Skill；未运行用户脚本或能力包。
+- `.artifacts/verification/AF-175/run-mTMIXe/report.json`，SHA256 `148740f001efa6771cdbd69ef1e6d9943a40b698d9238802d06f987037a2df6d`。AF-175 / actual-owned-python-docker-isolation-cleanup：8 tests PASS；真实 pinned official Python native Docker：JSON/Unicode、非 root/caps/seccomp/no-new-privileges、无网/只读/无 bind/无 env、timeout/OOM/PIDs/abort 与仅清理自有完整容器 ID。 限制：仅独立适配器、当时本机平台；默认关闭，没有 Skill 上传/API/Job/Trace/附件输出接线；不是敌对代码 VM 认证或 Linux 首批部署证明。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 用户上传说明+模板+文件+I/O/工具接口+脚本包，获授权附件输入经隔离执行、下载输出和审计关联。
+- 真实产品入口拒绝任意宿主/其他租户文件、凭据/网络探测、超时/内存/并发；公共/收费包须审核，审核不能被自用路径绕过。
+
+外部输入与工程阻塞：
+
+- 后续总控需要已批准 pinned image 与可用 Docker/隔离测试库；本次不启动、拉取或使用它们。
+
+整项关闭路径：
+
+1. P186-SCRIPT-RUN 先交单 Python 脚本+JSON 输入输出的私有上传/运行/下载产品切片；限制功能清楚标示，不能声称完整能力包。
+2. 在同包 owner 补模板/授权文件输入/工具代理与资源限制、公开收费审核和版本不可变；在真实 API→Job→容器→FileAsset 下载中覆盖 AC-016 全部成功/恶意拒绝，并与 Agent/流程组合。
+
+### REQ-017 多Agent协作 · MISSING
+
+冻结目标：支持分工、受控上下文传递、并行、评审、交接和汇总，并可作为流程节点组合。
+
+AC-017 成功（原文）：规划/执行/评审Agent在任务图中分工，前后结果与成本可追踪。
+
+AC-017 拒绝（原文）：交接不能扩大数据权限；被取消分支不继续产生工具副作用。
+
+当前真实入口/持久层：可保存多个固定 Agent 引用及 parallel/join 的草稿图；没有多 Agent 执行器、上下文传递、并行/评审/交接/汇总产品 API、UI、SDK 或运行持久层。现有单 Agent Job/Trace 可复用，但不能证明规划/执行/评审分工。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:80-80` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:90-90` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-personal-workflows-graph.ts:4-11` — parallel/join/agent 只是结构类型。 完整blob SHA256 `ab8b92b5fcdb7fde1e6397c3e654f1f63da9d0ace68410c73c5d93ea8a62d1ee`。
+- `apps/api/src/plugins/aij-ai/ai-personal-workflows.service.ts:17-24` — 服务明确只持久化私有 DRAFT，无 runtime 依赖。 完整blob SHA256 `b4160c1366623183a732abb82fe809de7005933afe8ad732bdf0b136ccc05698`。
+- `apps/api/src/plugins/aij-ai/ai-center-run.service.ts:34-38` — 实际运行注册只有单 Agent Job 与清理调度。 完整blob SHA256 `b95651504ce5251196703f0e28b216a4f0ef623939ebd6f7c422195bf29bccd6`。
+
+已核验的实际 PASS 范围：
+
+- 无批准报告能证明该目标运行；图定义和单Agent报告不冒充多Agent证据。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 规划/执行/评审 Agent 的前后结果与成本可追踪；受控数据交接、并行分工、评审/交接/汇总和流程节点真实执行。
+- 取消分支必须阻止后续工具副作用；下游重验当前身份、来源权限与批准，不能扩大上下文可见范围。
+
+外部输入与工程阻塞：
+
+- 无必须先取得的外部输入；缺实现可在现有隔离/合成边界内继续。
+
+整项关闭路径：
+
+1. 先通过 P186-LINEAR-RUN 建立最小可观察的流程运行切片，不能以单节点运行算多 Agent。
+2. 随后交真正两/三 Agent 上下文映射与规划/执行/评审汇总，再加入受控并行和取消副作用围栏；沿用每节点 Run/Trace，不复制成本账本；最终完整运行 AC-017。
+
+### REQ-018 长期记忆 · PARTIAL
+
+冻结目标：记住用户偏好、已确认事实和历史摘要，用户可查看/修改/删除，并控制可使用的Agent；个人与组织分别管理。
+
+AC-018 成功（原文）：跨会话读取获授权记忆，修改/删除和撤销Agent授权即时生效。
+
+AC-018 拒绝（原文）：被删除或其他组织的记忆不得通过缓存、检索和恢复重新注入。
+
+当前真实入口/持久层：/client/ai/personal-memories API/SDK 与 /client/memories 页面管理 preference/confirmed_fact/task_summary，默认关闭且明确列 Agent grants。runtime 注入同 member+workspace 的当前授权记忆，正文不落 Run/Trace/Job，只存引用；删除清空正文/摘要/授权，无记忆历史。组织空间内仍是个人私有记录，没有组织共享管理；未证明备份恢复后删除标记或缓存/语义检索全链。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:81-81` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:91-91` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-personal-memories.dto.ts:3-5` — 支持偏好/事实/摘要三类显式管理。 完整blob SHA256 `491797828fde8fdab47a51d2910a6b0b1652ec812cb8c8972439b71662661970`。
+- `apps/api/src/plugins/aij-ai/ai-personal-memories.dto.ts:24-30` — 默认关闭，Agent grants 明确。 完整blob SHA256 `491797828fde8fdab47a51d2910a6b0b1652ec812cb8c8972439b71662661970`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-memory-context.service.ts:67-80` — 运行按成员/空间/版本/grant 复检。 完整blob SHA256 `7c098d4677c956c9b0933cc006abf4c421aff451ec231db5c1160440e3b50508`。
+- `apps/api/src/plugins/aij-ai/ai-personal-memories.service.ts:135-146` — 删除擦除内容及 initial_digest 并保留 tombstone。 完整blob SHA256 `da31c7a6dc2bb58cb7041a2d2a5a487114799b11a3cabb87486bc57f1f299406`。
+- `apps/web/app/components/client-memory-library.tsx:68-75` — 页面可编辑内容/类别并显式选择使用许可与 Agent。 完整blob SHA256 `d856e45a3738b59446078ff703d11c8267e810f7ed567ad16f68e57ebed07e0b`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-163/run-ERIfmB/report.json`，SHA256 `7acc65c1e5cb6d13872fe4b25dd7e30380ea0128d17f392457b448a9aa6e752c`。AF-163 / real-memory-erasure-permissions-pg-packed-http：12 tests PASS；真实私有记忆 CRUD/Agent 授权、SQL/PG 并发与擦除、安装 tarball 后 ESM/CJS HTTP；删除内容/授权/摘要跨表检查。 限制：无组织共享记忆；无恢复后 tombstone 演练；单个报告不证明当前最终制品全部 AC。
+- `.artifacts/verification/AF-167/run-WMScB5/report.json`，SHA256 `adc30e414b22b8c0c8ad7c77d3f470a7e7d9882a7a9edaaceda5dd182b717fe2`。AF-167 / real-memory-runtime-pg-upstream-erasure：10 tests PASS；显式获授权私有记忆注入 TEXT/JSON；正文只在 RAM、持久层 opaque refs、删改/停用/撤权与 credential IO 后复检、PG 竞争/过期/旧 nonce。 限制：自有合成上游；无自动学习、组织共享、缓存/检索/备份恢复全矩阵。
+- `.artifacts/verification/AF-169/run-MMOLnu/report.json`，SHA256 `aac5feedf0c5982db7477bb638407d7d24d23627082e6a41e4c4246b9eb73f73`。AF-169 / real-personal-run-page-http-pg-job-memory-recovery：1 tests PASS；页面状态经真实 HTTP/PG/Job/Trace/budget 与编译 SDK；提交响应丢失后以原 key GET、一次调用、换空间旧响应隔离。 限制：报告 manual=[]；isolated production build 和 diff-check 均仍要求 actual browser，故不据此认定桌面/390 原生浏览器通过。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 个人跨会话 CRUD/运行已具真实切片证据；组织共享角色管理/跨会话使用仍需实际入口与拒绝。
+- 删除/撤权在缓存、检索、排队/进行中任务与恢复后均不重新注入；恢复只保留当前删除与撤权状态。
+
+外部输入与工程阻塞：
+
+- 完整恢复拒绝演练依赖 REQ-035/036/037 的真实隔离恢复能力，不以数据库行擦除替代。
+
+整项关闭路径：
+
+1. 沿用现有 private owner 完成独立组织共享记忆管理与当前成员/Agent grants，保留个人路径；补 API/SDK/UI/运行和两组织矩阵。
+2. 在同任务的检索/缓存/恢复入口应用当前删除及撤权标记；串行真实隔离恢复并跑 AC-018 负场景。自动学习不是强行新增前置，偏好/事实/摘要可由用户确认保存。
+
+### REQ-019 可视化与自主执行 · PARTIAL
+
+冻结目标：支持节点/连接/参数/条件/并行/循环/人工审核、子流程与Agent自主拆解；工作流定义与运行实例分离。
+
+AC-019 成功（原文）：编辑、验证、发布含脚本/Agent/审批的流程，查看各步骤结果并继续执行。
+
+AC-019 拒绝（原文）：循环与分支有边界；无权限、错误连线、缺依赖、过期审批拒绝发布或执行。
+
+当前真实入口/持久层：API/SDK 支持 DRAFT 图、条件/parallel/join/有限 loop/human-approval 结构校验、不可变版本和 Agent pins；UI 仅线性 start→Agent序列→end 的指针/键盘排序编辑，复杂图只读/改名。未有 publish/run/resume API 或执行器/步骤中心；无脚本节点、子流程、自主拆解。定义持久层存在，运行实例未建立。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:87-87` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:92-92` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-personal-workflows-graph.ts:4-11` — 图语法中含条件、并行、循环和审批，不代表运行。 完整blob SHA256 `ab8b92b5fcdb7fde1e6397c3e654f1f63da9d0ace68410c73c5d93ea8a62d1ee`。
+- `apps/api/src/plugins/aij-ai/ai-personal-workflows.service.ts:17-24` — 仅 DRAFT 持久化。 完整blob SHA256 `b4160c1366623183a732abb82fe809de7005933afe8ad732bdf0b136ccc05698`。
+- `apps/api/src/plugins/aij-ai/ai-personal-workflows.controller.ts:57-87` — 历史/PATCH/delete 路由；无发布/执行/继续。 完整blob SHA256 `6ac4c08a1687cbc33acb8987488523eb349b59d988c9aa680a057ba3aedaa85c`。
+- `packages/sdk/src/personal-workflows.ts:174-190` — SDK 状态仅 DRAFT 并明确 draft storage only。 完整blob SHA256 `a7a2023a3a4acff2a4b40c2fc5120d53fe485304f337991cffbc34c49e804ab8`。
+- `apps/web/app/components/client-workflow-library.tsx:73-83` — 页面明确只保存线性结构为 DRAFT。 完整blob SHA256 `0818a8185b6e3516bd8aa374dcda5b43b30bdf3d3035de4e4ea05f20678f0cc4`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-170/run-6K9jBh/report.json`，SHA256 `acd3b344597408256873ea472eedef3af39d2417262c4909a2df0629b33e3d5a`。AF-170 / real-workflow-cookie-pg-immutable-graphs-packed：10 tests PASS；真实流程 DRAFT CRUD、历史 Agent pins、图校验、SQL/FK/配额/权限并发围栏、安装 tarball ESM/CJS HTTP。 限制：runtime/Memory/payment/notification 域不变，upstream=0；不是发布/流程执行/审批/多 Agent。
+- `.artifacts/verification/AF-173/run-f389HZ/report.json`，SHA256 `2a137b402aa60faa5252d3db732af2764c8803e6e1571e7301e65763bc74f8b2`。AF-173 / real-workflow-page-http-pg-sdk-state：8 tests PASS；流程草稿页面状态经实际 API/PG/已构建 SDK 校验创建/历史/CAS/pins/拒绝/旧空间 HTTP 围栏。 限制：状态与 SSR/构建不证明浏览器；无真实流程执行。
+- `.artifacts/verification/AF-178/run-YSPZBs/report.json`，SHA256 `75ea37fa708e4ae8cec7af41c7566908cc75c8ad09bb5b1da36bed019a982c9f`。AF-178 / real-linear-editor-http-pg-sdk：12 tests PASS；真实 API/PG/已构建 SDK 的图 PATCH 顺序、历史/pins/CAS/noop、外部/只读/删除拒绝、丢失提交锁定后主动读取。 限制：报告明确 true native mouse browser stillrequired；manual=[]。线性编辑保存 DRAFT，不支持任意画布/发布/执行。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 可编辑/验证/发布/运行/继续含脚本、Agent、人工审批流程；节点结果可见且定义与实例分离。
+- 运行而非仅 parser 验循环/分支上限、错误连线、权限/依赖/过期审批；还需复杂图编辑、子流程与 Agent 自主拆解。
+
+外部输入与工程阻塞：
+
+- 脚本节点真容器依赖 REQ-016 的产品接线；审批依赖 REQ-007；已存在单 Agent 合成上游足够起最小流程切片。
+
+整项关闭路径：
+
+1. P186-LINEAR-RUN 先交 start→一个已发布 Agent→end 的发布/手动运行/结果产品切片，复杂图仍拒绝执行。
+2. 其后在同定义/实例 owner 加参数映射/多 Agent→条件并行有限循环→审批/继续/脚本/子流程与自主拆解，每次冻结当前权限与预算；完整浏览器和 PG/容器场景通过后才可跑 AC-019 目标出口。
+
+### REQ-020 五种触发入口 · PARTIAL
+
+冻结目标：工作台、API、定时、插件事件和Webhook触发同一任务契约，统一权限、幂等、预算及来源追踪。
+
+AC-020 成功（原文）：五入口对同一发布流程生成可关联任务，参数与调用主体明确。
+
+AC-020 拒绝（原文）：重复Webhook/事件/调度不重复收费或产生外部动作，验签失败不入执行队列。
+
+当前真实入口/持久层：现有工作台和 SDK/API 可提交同一个私有 Agent Run；RuntimeRegistry/Scheduler/Outbox 有通用基础，已注册 AI 定时仅清理任务。没有对发布流程统一的五入口契约、触发配置/鉴权/来源追踪或 Webhook 签名入队。没有发布流程可供触发；后台清理 schedule 和通知事件不能计作流程入口。
+
+源码证据：
+
+- `docs/planning/ai-platform-baseline-20261105/REQUIREMENTS_BASELINE.md:88-88` — 冻结需求原文；不改写目标。 完整blob SHA256 `3b26744c0c4dab476c8e10ac66f6cf57b14a42aa5b069d05d86791508b08296a`。
+- `docs/planning/ai-platform-baseline-20261105/DELIVERY_AND_ACCEPTANCE.md:93-93` — 冻结成功/拒绝场景；本次未运行。 完整blob SHA256 `b3c1f93d168d5b66a72abf9ec4b5488ab73fecf3d3190e83db7257ab513b7c3f`。
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-runs.controller.ts:18-31` — 实际手动/API 私有 Agent 入口。 完整blob SHA256 `cd80d3649a9740c77bdf8db788c5b225dad7fdde4075b655d5a793bf548d2151`。
+- `packages/sdk/src/personal-agent-runs.ts:4-22` — SDK 只能提交私有 Agent，不是流程 trigger。 完整blob SHA256 `e4993f878b2d9a620797dcb9b29c6abf466ea8d230aabc7060807da13097c5a0`。
+- `apps/api/src/async-runtime/registry.ts:27-48` — 底层支持事件与 Schedule 注册，非用户流程接线。 完整blob SHA256 `4f7e1b4bb76e895de528e71ddd39e253c953bac476c460143e21f5ba0e108142`。
+- `apps/api/src/plugins/aij-ai/ai-center-run.service.ts:34-38` — AI 已注册 schedule 是清理用途。 完整blob SHA256 `b95651504ce5251196703f0e28b216a4f0ef623939ebd6f7c422195bf29bccd6`。
+
+已核验的实际 PASS 范围：
+
+- `.artifacts/verification/AF-161/run-sAMufh/report.json`，SHA256 `d337188d01349532b36ada02dc6167695cd0faa0cdc92e7dd2fca939974e0457`。AF-161 / real-personal-agent-runtime-pg-upstream：12 tests PASS；实际 API/JobService/PG/Run/Trace/budget 与自有合成 HTTP 上游；TEXT/JSON、幂等、撤权、旧 nonce、未知结果不重发。 限制：单 Agent prompt 路径；合成上游不是 DeepSeek/阿里云付费回执或对客计费；无工具或切换。
+- `.artifacts/verification/AF-170/run-6K9jBh/report.json`，SHA256 `acd3b344597408256873ea472eedef3af39d2417262c4909a2df0629b33e3d5a`。AF-170 / real-workflow-cookie-pg-immutable-graphs-packed：10 tests PASS；真实流程 DRAFT CRUD、历史 Agent pins、图校验、SQL/FK/配额/权限并发围栏、安装 tarball ESM/CJS HTTP。 限制：runtime/Memory/payment/notification 域不变，upstream=0；不是发布/流程执行/审批/多 Agent。
+
+精确剩余场景（冻结成功/拒绝均仍待目标验收）：
+
+- 同一发布版本在工作台、API、定时、插件事件、Webhook 发起，记录明确主体、参数、source 与相同权限/预算/幂等契约。
+- 重复事件/Webhook/调度不重复费用或副作用；签名错误在入队前拒绝；成员/授权/发布版本失效后不得沿用旧 trigger。
+
+外部输入与工程阻塞：
+
+- 真外部 Webhook 不是首个测试前置；owned loopback 可验签名/重放。真正外部事件商户等各自另需明确测试输入。
+
+整项关闭路径：
+
+1. 先依赖 P186-LINEAR-RUN 的发布/运行单一准入；统一来源+主体+payload+idempotency 归一化，不复制执行账本。
+2. 在相同发布流程依次接 API/工作台及 schedule/event/Webhook，并对并发重放和错签执行 PG/HTTP/副作用计数断言；全五入口成功/拒绝才关闭 AC-020。
+
+## 至多三张后续卡建议
+
+均为未登记本地提案，候选文件彼此不重叠；rootWiring 是总控独占范围并不授权 Worker 修改。总11.5有效工程小时，其中root4.25小时；按真实依赖串行集成。三卡都不声称关闭整条需求，不能在 formal queue 将本建议写成 CODE_VERIFIED。
+
+### P186-AGENT-PUBLISH · 提供私有Agent发布与版本调试入口 · 含总控3.5h
+
+优先1；worker2.25h+root1.25h。在已有个人配置/运行页明确发布一个当前不可变版本并运行/调试，禁用/撤销发布后排队执行拒绝；正常编辑不静默重新发布。只允许同 owner 当前版本，不在此卡承诺旧历史版本任意执行。消除 enabled 即 published 的语义缺口，为流程复用建立可执行前置。
+
+真实已存在集成依赖：`task_8225f38866ac`, `task_5731129d1d35`, `task_716ae25e1295`, `task_c488ac264036`；本地提案依赖：无。
+
+Worker allowPaths：
+
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-publications.controller.ts`
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-publications.service.ts`
+- `packages/sdk/src/personal-agent-publications.ts`
+- `apps/web/app/components/client-agent-publication.tsx`
+- `scripts/verification/personal-agent-publications.test.mjs`
+- `scripts/verification/personal-agent-publications-acceptance.test.mjs`
+- `scripts/verification/personal-agent-publications-live.test.mjs`
+- `scripts/verification/personal-agent-publications-browser-manual.mjs`
+
+Root共享接线（开正式卡时冻结路径/迁移编号/记录路径）：
+
+- `apps/api/prisma/schema.prisma`
+- `apps/api/prisma/migrations/20261106010000_ai_personal_agent_publication/migration.sql`
+- `apps/api/src/plugins/aij-ai/ai-runtime.module.ts`
+- `apps/api/src/plugins/aij-ai/ai-personal-agent-snapshots.service.ts`
+- `apps/api/src/plugins/aij-ai/ai-center-run.service.ts`
+- `packages/sdk/src/index.ts`
+- `apps/web/app/components/client-agent-library.tsx`
+- `apps/web/app/components/client-personal-agent-run.tsx`
+- `scripts/verification/registry.mjs`
+- `scripts/runtime-environment.cjs`
+- `scripts/database/migration.mjs`
+- `scripts/database/seed.mjs`
+- `docs/planning/CODING_QUEUE.json`
+- `docs/planning/auto-ai-program-20261105/program.json`
+
+须注册并真正运行的验收：
+
+1. 新注册：node --test scripts/verification/personal-agent-publications.test.mjs scripts/verification/personal-agent-publications-acceptance.test.mjs；acceptance 在 protected PG/真实 Nest API/Job/Trace+owned HTTP 中验发布/运行、CAS/重复发布/停用/撤权/目录失效/排队后撤销/旧 nonce 与未发布拒绝，统计 Run/Trace/上游恰一次。
+2. pnpm -r --filter @aij/contracts --filter @aij/core --filter @aij/runtime-contracts --filter @aij/sdk --filter @aij/ui build；node --test scripts/verification/package-consumer-matrix.test.mjs（实际 workspace/packed ESM/CJS 与声明消费）
+3. 拟新增并注册命令：node scripts/verification/personal-agent-publications-browser-manual.mjs（由实际原生浏览器操作生成证据后校验，缺证据必须非零退出，不允许自动填写PASS）。新实际浏览器门禁注册到 acceptance 的独立 manual 步骤：production build 后桌面+390 使用配置页发布→运行→结果→撤销→拒绝；用原生鼠标/键盘，记录请求/状态/PG 行与来源版本；无浏览器证据保持 NOT_PROVEN。
+4. 分配正式 AF 号后总控注册 pnpm verify:task AF-<正式号>，含目标库身份保护、pnpm run typecheck、pnpm --filter @aij/api build、pnpm run lint 与 git diff --check；未注册不得用上述命令名宣称通过。
+
+本卡后仍未完成：
+
+- 仅推进 REQ-015；三归属层共享/知识工具绑定、完整调试、浏览器与真实厂商目标矩阵仍待关闭。
+- 流程历史 pins 的任意旧版本执行仍禁止；流程卡只允 pins 等于当前已发布版本。
+- 没有动作审批、BYOK、脚本或流程执行。
+
+### P186-SCRIPT-RUN · 提供私有Python脚本上传运行与JSON下载 · 含总控4h
+
+优先2；worker2.5h+root1.5h。单个有界 UTF-8 .py 上传+JSON 输入，由现有 Job owner 调现有 pinned Python runner，生成同归属 FileAsset JSON 下载并记录 Job/审计；使用唯一脚本运行记录引用 Job/FileAsset，不伪造 AI Trace 或厂商成本。无工具/网络/任意包安装，无多文件/授权附件输入；产品明确标为私有脚本切片。这是首个可操作脚本纵向结果，可与发布卡候选文件并行、root串行共享接线。
+
+真实已存在集成依赖：`task_9435b82f4964`, `task_623c04531bae`, `task_5731129d1d35`；本地提案依赖：无。
+
+Worker allowPaths：
+
+- `apps/api/src/plugins/aij-ai/ai-personal-script-runs.controller.ts`
+- `apps/api/src/plugins/aij-ai/ai-personal-script-runs.service.ts`
+- `packages/sdk/src/personal-script-runs.ts`
+- `apps/web/app/client/scripts/page.tsx`
+- `apps/web/app/components/client-script-run.tsx`
+- `scripts/verification/personal-script-runs.test.mjs`
+- `scripts/verification/personal-script-runs-acceptance.test.mjs`
+- `scripts/verification/personal-script-runs-live.test.mjs`
+- `scripts/verification/personal-script-runs-browser-manual.mjs`
+
+Root共享接线（开正式卡时冻结路径/迁移编号/记录路径）：
+
+- `apps/api/prisma/schema.prisma`
+- `apps/api/prisma/migrations/20261106020000_ai_personal_script_runs/migration.sql`
+- `apps/api/src/plugins/aij-ai/ai-runtime.module.ts`
+- `apps/api/src/client-workspaces/client-workspace-permissions.ts`
+- `apps/api/src/files/client-files.service.ts`
+- `packages/sdk/src/index.ts`
+- `scripts/verification/registry.mjs`
+- `scripts/runtime-environment.cjs`
+- `scripts/database/migration.mjs`
+- `scripts/database/seed.mjs`
+- `docs/planning/CODING_QUEUE.json`
+- `docs/planning/auto-ai-program-20261105/program.json`
+
+须注册并真正运行的验收：
+
+1. 新注册：node --test scripts/verification/personal-script-runs.test.mjs scripts/verification/personal-script-runs-acceptance.test.mjs；保护 PG+真实 HTTP 上传/摘要/同 key 一 Job，执行前撤权拒绝、输出归属/FileAsset 下载摘要一致、跨租户不可读、取消/旧 nonce 不写结果、审计失败回滚；用户脚本从未在 API 进程 eval/spawn Python。
+2. 已有真实容器回归：node --test scripts/verification/python-sandbox-runner-acceptance.test.mjs；在原获准 image 上验证 native Docker 无网/宿主文件/凭据、timeout/OOM/PIDs/并发/abort 及自有 ID 清理；新脚本 acceptance 必须通过实际 API→Job→container→FileAsset，而非仅再跑独立 runner。
+3. pnpm -r --filter @aij/contracts --filter @aij/core --filter @aij/runtime-contracts --filter @aij/sdk --filter @aij/ui build；node --test scripts/verification/package-consumer-matrix.test.mjs（实际 workspace/packed ESM/CJS 与声明消费）
+4. 拟新增并注册命令：node scripts/verification/personal-script-runs-browser-manual.mjs（由实际原生浏览器操作生成证据后校验，缺证据必须非零退出，不允许自动填写PASS）。新实际浏览器门禁注册到 acceptance manual：production 脚本页选择合成 .py→输入 JSON→一次运行→下载→无权限拒绝；桌面/390 原生文件选择器必须实际验，程序设置 file input 不算 OS picker。
+5. 分配正式 AF 号后总控注册 pnpm verify:task AF-<正式号>，含目标库身份保护、pnpm run typecheck、pnpm --filter @aij/api build、pnpm run lint 与 git diff --check；未注册不得用上述命令名宣称通过。
+
+本卡后仍未完成：
+
+- REQ-016 完整能力包的说明/模板/多文件/输入输出/工具接口、授权附件输入、Agent/流程组合与公开/收费审核仍未完成。
+- 此切片不收模型费；若允许受控工具使用模型，需接已有 Trace/预算并完成 REQ-007/012。
+- 若4h预测无法容纳输出/拒绝矩阵，保留未通过候选、拆下一卡；不得降格为 runner 协议测试后报产品已交付。
+
+### P186-LINEAR-RUN · 发布并运行单Agent线性工作流 · 含总控4h
+
+优先3；worker2.5h+root1.5h。仅 start→一个已发布且 pins 等于当前 revision 的 Agent→end，固定发布图与身份，参数字段一一相同，复用原 Agent Run/Job/Trace/预算和结果查询；流程实例只关联这些 owner，不创建第二套执行/成本账。生产草稿页增加发布、一次手动运行及单节点结果；复杂图、旧 pins、审批、脚本直接拒绝。可审核的最小流程纵向结果，比再加图协议有更高价值。
+
+真实已存在集成依赖：`task_5943982f67fa`, `task_f43c05b7e146`, `task_5731129d1d35`；本地提案依赖：P186-AGENT-PUBLISH。
+
+Worker allowPaths：
+
+- `apps/api/src/plugins/aij-ai/ai-personal-workflow-runs.controller.ts`
+- `apps/api/src/plugins/aij-ai/ai-personal-workflow-runs.service.ts`
+- `packages/sdk/src/personal-workflow-runs.ts`
+- `apps/web/app/components/client-workflow-run.tsx`
+- `scripts/verification/personal-workflow-runs.test.mjs`
+- `scripts/verification/personal-workflow-runs-acceptance.test.mjs`
+- `scripts/verification/personal-workflow-runs-live.test.mjs`
+- `scripts/verification/personal-workflow-runs-browser-manual.mjs`
+
+Root共享接线（开正式卡时冻结路径/迁移编号/记录路径）：
+
+- `apps/api/prisma/schema.prisma`
+- `apps/api/prisma/migrations/20261106030000_ai_personal_workflow_runs/migration.sql`
+- `apps/api/src/plugins/aij-ai/ai-runtime.module.ts`
+- `apps/api/src/plugins/aij-ai/ai-personal-workflows.service.ts`
+- `apps/api/src/plugins/aij-ai/ai-center-run.service.ts`
+- `packages/sdk/src/index.ts`
+- `apps/web/app/components/client-workflow-library.tsx`
+- `scripts/verification/registry.mjs`
+- `scripts/runtime-environment.cjs`
+- `scripts/database/migration.mjs`
+- `scripts/database/seed.mjs`
+- `docs/planning/CODING_QUEUE.json`
+- `docs/planning/auto-ai-program-20261105/program.json`
+
+须注册并真正运行的验收：
+
+1. 新注册：node --test scripts/verification/personal-workflow-runs.test.mjs scripts/verification/personal-workflow-runs-acceptance.test.mjs；protected PG+真实 HTTP/Job/owned upstream 验图发布与实例分离、提交并发/响应丢失原 key 一 Run、一 Trace、一步结果可查；DRAFT/foreign/readonly/目录失效/已禁用/发布后改图或旧 pins/非单 Agent图拒绝、排队撤权与旧 nonce 不产生调用。
+2. 已有回归：node --test scripts/verification/personal-workflows-acceptance.test.mjs scripts/verification/personal-agent-runs-acceptance.test.mjs；复验 immutable历史、旧 nonce 和 unknown 不重发。
+3. pnpm -r --filter @aij/contracts --filter @aij/core --filter @aij/runtime-contracts --filter @aij/sdk --filter @aij/ui build；node --test scripts/verification/package-consumer-matrix.test.mjs（实际 workspace/packed ESM/CJS 与声明消费）
+4. 拟新增并注册命令：node scripts/verification/personal-workflow-runs-browser-manual.mjs（由实际原生浏览器操作生成证据后校验，缺证据必须非零退出，不允许自动填写PASS）。新实际浏览器门禁注册到 acceptance manual：production workflows 页面选择明确版本→发布→运行→单节点结果→撤销后拒绝，桌面/390 鼠标/键盘与网络/PG 关联；构建/SSR 不代替浏览器。
+5. 分配正式 AF 号后总控注册 pnpm verify:task AF-<正式号>，含目标库身份保护、pnpm run typecheck、pnpm --filter @aij/api build、pnpm run lint 与 git diff --check；未注册不得用上述命令名宣称通过。
+
+本卡后仍未完成：
+
+- REQ-019 剩多节点参数映射、复杂图编辑、条件/并行/循环执行、人工审批/继续、脚本、子流程和自主拆解。
+- REQ-017 仍缺真正规划/执行/评审多 Agent 上下文与并行/取消；REQ-020 仍缺五入口统一契约及重放/验签。
+- 本卡只是手动/API最小流程运行，不关闭任何完整需求；超过4h先保留未验收候选并按产品闭环拆分。
+
+## 限制及交接
+
+- 本次是 AF-186 有限只读审计；所有九项 owner acceptance=PENDING，targetAcceptance=NOT_RUN_BY_THIS_AUDIT。没有 READY_FOR_TARGET_ACCEPTANCE、CODE_VERIFIED 或完整 AC PASS 结论。
+- 基线 AIJ-REQ-20261105-R1 / freeze 1f6549fd192b9ababe8c9d911ae19df3abd510ff 的需求和 AC 原文保持。历史 PROPOSED_NOT_AUTHORIZED 是当时记录，当前连续 ALL40 实施授权来自派工及指定 sourceHead 的 program.json；本次不回写旧文档。
+- 工作区基线是 origin94，不是当前产品；产品/版本文档只经 git ls-tree/git show 读取 immutable sourceHead。没有 checkout/fetch/恢复产品源码或读取 root 工作源码。
+- root 例外仅读取 audit-inputs.json 与其中准确 approvedReports/report.json；未读 raw 日志/fixtures/凭据/数据库。input SHA256=852aa122dcb5eebb527081ccfc5182c41d658c5444f39b025273ce4163baa49b。
+- 使用的11个批准报告均逐个核对完整 SHA256、JSON结构、taskId/mode/PASS/exit0，每个 prerequisite/step effectiveExitCode0、未超时/溢出，测试 failed/skipped/cancelled0。只认列出的真实 PG/HTTP/packed/container 切片；报告不是本次重新运行，也无统一最终制品 SHA 证明。
+- 获准 AF-169/173/178（亦抽查158/162/166）报告没有实际浏览器结果，manual=[]，build/diff-check 或 real step 明示 browser still required；历史 versioned execution 中浏览器完成描述不提升成获准 runtimeEvidence。此差量是证据缺失，不是宣称页面必定坏。
+- 静态负向搜索在 sourceHead 的 apps/api/src、apps/web/app、packages 文本范围：PythonSandboxRunner 只有类定义，human-approval 仅图语法/预览/SDK，AI registerSchedule 仅清理；无 BYOK/cross-payer/fallback 对应产品链。缺失结论限本次版本与允许范围，不为缺失能力虚构源码。
+- W12：生产审计 all severities0 仍受窄 Prisma6 config exception；网页来源导入已有实际 UI 修正验证，但 OS picker/true hidden focus NOT_PROVEN；阿里云 embedding/rerank configured=false，没有 host/secret/admission/ledger/catalog/semanticRAG paidvendor 接线。协议测试不算语义检索，也不能补本次 M3/M4 缺口。
+- 个人资产可位于组织 workspace 但仍以 member_id 私有；ProjectProfile 产品配置不是租户 Membership；secretRef 不等于 BYOK，成本预算不等于对客售价或现金，prompt Skill 不等于脚本包，图 descriptor 不等于运行。
+- 推荐仅3张本地提案、总11.5h含root4.25h，非派工/AF号/Task ID。closesRequirements 为空表示均为切片；其后完整关闭步骤列在每项 closurePlan 和 remainingAfterCard。shared schema/module/SDK exports/正式队列/registry/DB/重型构建由root串行。
+- 建议中的三条带日期 migration 路径是尚不存在的明确提案路径，已检查 sourceHead 无同名文件，须开卡时由root最终冻结；新 acceptance 命令亦须注册后运行。依赖 Task ID 均从 immutable program.json 的真实 integrationTaskId 取值，绝不借候选 Task 冒充集成。
+- 无临界安全/跨租户泄漏/数据丢失漏洞被本次静态检查证实；未运行漏洞测试不表示无漏洞。发现已确认严重问题须立即 Orca escalation 并停止冲突写入。
+- Worker 仅写3份新文档；产品、Schema、manifest/lock、AGENTS、registry、正式队列/current state均未改。安装/构建/运行测试、PG/Docker/服务器/浏览器、厂商/网络/付费与远端 Git 操作全部 NOT_RUN。自查不是独立复核；总控仍须精确 source/report 校验、正式 verify:task、记录和原名提交/readback，才能结束集成 Task。
+
+本次人工验收复核：在总控当前产品制品上按以上每项冻结 AC 操作，逐次记录版本、主体/空间、参数、API状态、Job/Run/Trace及拒绝后数据不变；涉及页面须实际浏览器，脚本须实际容器，真实厂商须获准回执。这里没有已运行访问地址。
+
+Worker有效工程工时估算0.65h；为本卡3h总预算预留root约2.35h，未用工时不转给未批准任务。候选仅文档，可读后精确集成；Worker提交后STOP ALL WRITING，无push。

@@ -1,0 +1,100 @@
+{
+  "card": "AF-205",
+  "candidate": "62970c1ce21ea35ce559b75ed908384226ddb2ee",
+  "sourceCommit": "2ee9172a30be7694dc2cb097a43fbce1f0a14e65",
+  "contractSha256": "b2340b8926523bfaf435ef0d21938ba25adbbfa9d8ecc22496709d4d38b532da",
+  "files": [
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-publication.dto.ts",
+      "sha256": "e50157eb2c7354c1b4eb4a7c0040ca9c6b8073adbeae3ede877103a63580a949"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-publication.service.ts",
+      "sha256": "6db04d02a3d4ca99ec9f18768b9d9b89b9b6ad10b2d26b76ff85d92ae8932cf9"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-linear-contract.ts",
+      "sha256": "f1afeab0542f9ea6233ab9d3235c2672d58921f2b2f723b411825f596cb2c2e8"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-publication.test.mjs",
+      "sha256": "542878ab2f72bf944df249d463cf9ad553ecd225741c73c5e05ace4904662414"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W18/AF-205-ROOT_WIRING.md",
+      "sha256": "edc3bc1dd1bc2d6551ee3a51de602f70d58f1acaff9608b1d147191e0ae6238b"
+    },
+    {
+      "path": "docs/execution/AF-205-candidate.md",
+      "sha256": "bd07f5405c5e66abd5e0f3842a0fcaa6b86420316726901188cb757fb27440a1"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflows.service.ts",
+      "sha256": "12c4f825643ac18011dce97c2e28ad0d627093a32dd9d3a313e7614fd3b90fff"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-personal-workflow-publication-access.service.ts",
+      "sha256": "6c1e6e86e80d3d6874f7344e4a1538addcb45d9605e7645d398a3d1ef38a53c2"
+    },
+    {
+      "path": "apps/api/src/plugins/aij-ai/ai-runtime.module.ts",
+      "sha256": "38f28db6e8f6b37d914665d7c465ada79efc3fb8667723f9222345def2fe61dc"
+    },
+    {
+      "path": "apps/api/src/client-workspaces/client-workspace-permissions.ts",
+      "sha256": "525b10f5d66b66060ff92e7cbbd2914e9224ffb05c7c7f04cabdf5ad6d031db7"
+    },
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "bc7f25cce21aec413bcd5dc2116561957a937545fa15e28db908feb36a804620"
+    },
+    {
+      "path": "apps/api/prisma/migrations/20261107020000_personal_workflow_publication/migration.sql",
+      "sha256": "2f409b6bb820f8445c1ee8ddfcc00cca92a93bebcb3a839ea972cc851f395ce4"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "a5245753fb2a12085969680e95682e0be63e7f043f761e6e19fd3af17150627b"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "846338f9cf03de3a30bee175e3383cb370845ea7e2137822b1d613f7d870a262"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "9b61ac3be5b8bb25144a9814b795f1880d10f30d86e0767ce99c026bb2a77285"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "07914e473654a3134428ba7266e69f39c7229e4ae22416f6d665f95f3d630f1f"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "48a7ffb7817dba46499ff54dc9b402c27637af0cff5435d28ef968d058eb72fa"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "5beaae5434f743a4485b9ebaeaaeed889b39d48b9662a609d45c6282762d9693"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "a6c37354c4e2054ec0dbcb606012dab98413d4eac45680aed55b6ccdba4b7069"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-publication-prerequisite.mjs",
+      "sha256": "64910bf61fd61e97cbe6ff36e1851ed897ebdd36e4d990de5fe82a4927d40f0c"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-publication-live.test.mjs",
+      "sha256": "cd516c043108c5b45f8d12bd4992aece357c0a3c1ca4d41f0970bb898ccf9e0f"
+    },
+    {
+      "path": "scripts/verification/personal-workflow-publication-acceptance.mjs",
+      "sha256": "05c592bc74847260b135292e19068e82447f46dbd5cb0c7bde1d2e1804806351"
+    },
+    {
+      "path": "scripts/verification/registry.mjs",
+      "sha256": "e4d0f96a954a66441ecaeada6959b16f1a5ce99fedbeadc48c72e08dc8aa783c"
+    }
+  ]
+}

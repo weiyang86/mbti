@@ -1,0 +1,106 @@
+{
+  "task": "AF-203",
+  "sourceBaseline": "f0e12d76b0c2c5dccf4d1c56369019e979e52902",
+  "stoppedCandidate": "5a8bbf320acc282b8f21be02071f309da24b64aa",
+  "phase": "W21 resumed root corrections; W17 snapshot retained as historical unverified inputs",
+  "rootCorrections": [
+    "opaque original owner/document/revision unknown lock across400409/null and another context",
+    "fresh authorized original-version read at separate explicit ACK",
+    "no DOM/method/event injection in native harness",
+    "actual OS bytes/hash and real hidden/restoration"
+  ],
+  "files": [
+    {
+      "path": "apps/web/app/components/client-document-access.ts",
+      "sha256": "fbd265319dd9374c63cf3bf12fb5e7b33de6bae660a5151d4a13e01de19745d7"
+    },
+    {
+      "path": "apps/web/app/components/client-document-export-panel.tsx",
+      "sha256": "cc9563a8b575234fd99f74051dad94df3353499b5b0f4479aecc2d9d154fbdfc"
+    },
+    {
+      "path": "apps/web/app/components/client-document-export-state.d.mts",
+      "sha256": "d84644f50703d38c2a66830f0ae67db7f42ecc5aa0c5fdb0ca91e7150f8fda84"
+    },
+    {
+      "path": "apps/web/app/components/client-document-export-state.mjs",
+      "sha256": "6f45d21788b918cce78d8a907ed5583a83184cbc2764318a1d63897f55378853"
+    },
+    {
+      "path": "apps/web/app/components/client-document-library.tsx",
+      "sha256": "2bd0b9493f6f8900b7109240b3fc0cdf4cebc1eff55ce8a5b6150b582375aed9"
+    },
+    {
+      "path": "apps/web/app/components/client-document-manager.tsx",
+      "sha256": "5a4ee0d71edbfa5acf3e880d1f60364a71fca31106fb860a66f62b34b7ee23f5"
+    },
+    {
+      "path": "docs/execution/AF-203-candidate.md",
+      "sha256": "2ea8078387b86d94464c9818559d7e66235c9c5eec83bb30ee25aacb3a0249b6"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W17/AF-203-ROOT_WIRING.md",
+      "sha256": "aff394961133fd3c9ed89e5ba343e8c20e1ab395ab01a7def1b472c39ad3b0e9"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha256": "e2d4622a485057844358f24c4b46ed80cbd7349cfae096fd8399e1f09cdf1b1c"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "8e8ecf422ee322811a75ac3b2120d537b291f7a4246778206e8e52ad698b88b7"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "0bdb0ad180e2068f3fb457f92954bd73ee1831e605e80ead22a9d0f673929318"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "9f2dd4af99464948961e5069731a876e53493f48bfebad6f0e9d7fc8eacd67e9"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "2fafc591069962876a9b75623ec1f323aadd3879cadc80203ff5231ef1c6d057"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "6085845a6e1f9b194a800798414e5041f4c820b542d4877e6f99d2db4175a5fe"
+    },
+    {
+      "path": "scripts/verification/client-document-export-browser-acceptance.mjs",
+      "sha256": "47e31ae9cbd8b263ad9742acb5ffde1dea939f9ac0ded89e2b9fdc188f76f2e6"
+    },
+    {
+      "path": "scripts/verification/client-document-export-browser-live.test.mjs",
+      "sha256": "ada192357f0751a03f1b67d7e3502462f35c5c4666cd120f8d04f0d30a360f90"
+    },
+    {
+      "path": "scripts/verification/client-document-export-browser.mjs",
+      "sha256": "982470cff728a4e1eb818b79b54f75eca0a791e51910a4471c441877539175aa"
+    },
+    {
+      "path": "scripts/verification/client-document-export-integration.test.mjs",
+      "sha256": "81fab349d2fa0d6ac8895bb587e3af0d04fe8192120c5f6c998c9f5273797b98"
+    },
+    {
+      "path": "scripts/verification/client-document-export-prerequisite.mjs",
+      "sha256": "5463e57c89b228936c7d80fad98824813492984b75746033a8a9475b8786c778"
+    },
+    {
+      "path": "scripts/verification/client-document-export-state.test.mjs",
+      "sha256": "5a55e2d76969d319835a560befd5504fc7faf8437cbb76218f9b13253630b2bc"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "a36b8d6d032f6c52a0f0a1f0f28e071abc91ded971c5809804ac851bb315b1fe"
+    },
+    {
+      "path": "scripts/verification/web-build-isolated.mjs",
+      "sha256": "0e42714cf21c0aaeae56e187629eb73f5be8e63c702ac1d7c475d582149d2857"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "336698e887406a62fcea97d03f13306f9575b019460224a66ab02ef85bc8479d"
+    }
+  ]
+}

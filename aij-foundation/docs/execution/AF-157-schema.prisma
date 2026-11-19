@@ -1,0 +1,3 @@
+// Root-only proposal: add exactly this field inside model RuntimeJob.
+// Production schema.prisma is intentionally untouched by the worker.
+leaseNonce String? @map("lease_nonce") @db.Uuid

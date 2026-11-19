@@ -1,0 +1,68 @@
+{
+  "task": "AF-215",
+  "candidateCommit": "01686171e38c221737a17dce6181cab7b46aee1b",
+  "candidateStop": "msg_85a77496e11a",
+  "purpose": "Frozen actual root composition inputs, not target/native proof; source-only AppleDouble fence and measured runtime environment restoration are explicit root corrections.",
+  "files": [
+    {
+      "path": "scripts/verification/workbench-sdk-target-adapter.mjs",
+      "sha256": "288a8686b53bda53037cae4a4eb0f73996f6a017f5dc0869a56116130fbee511"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-adapter-evidence.mjs",
+      "sha256": "f6a549a10ec9cbc28c15fe0867bfdb78483a05400d1d9e4cb226ecc7fb249b1c"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-adapter.test.mjs",
+      "sha256": "8cb66ecae2db9e6efba3c45ca1076855513c3fcd5da7c5bbd0b8c0e650aff946"
+    },
+    {
+      "path": "docs/planning/auto-ai-program-20261105/W20/AF-215-ROOT_WIRING.md",
+      "sha256": "ece61a650b08b7cfcb8b850ff736b95e4e9c6898f28d5a9f888fcd775f5c4282"
+    },
+    {
+      "path": "docs/execution/AF-215-candidate.md",
+      "sha256": "b876da505b794301cbad433618ef63f60600e879fde2e21de73001b130ebdc02"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-runtime.mjs",
+      "sha256": "1c82313afcdd982c24767659511fb9494b5693720eac115b8fedaec04dd4aec6"
+    },
+    {
+      "path": "scripts/verification/workbench-sdk-target-adapter-acceptance.mjs",
+      "sha256": "848a427e3088cb704e1a273b12bf217739a300ffbb4738272fe46bf65546c425"
+    },
+    {
+      "path": "scripts/verification/w20-candidate-prerequisite.mjs",
+      "sha256": "a38fab5fdb86e204e1f97eea2dd4694d08ed7c7262ce14427f8f12dcd825f603"
+    },
+    {
+      "path": "scripts/database/migration.mjs",
+      "sha256": "43bb6e9e04c1cd5415e60b51c9c0043ec3175e5112274648cff5de564b6f2490"
+    },
+    {
+      "path": "scripts/database/seed.mjs",
+      "sha256": "0e8659d8e3852ad6803ad675ccf4acd04a770ab39c9d568dec4734d6ec9ec5b1"
+    },
+    {
+      "path": "scripts/runtime-environment.cjs",
+      "sha256": "3117799832cc08131481980fdbb93b64db5deb4ad6e356b24be56a5aedac89ff"
+    },
+    {
+      "path": "scripts/verification/auth-support.mjs",
+      "sha256": "be0dc68e91ff7fa9deedea08248d61d5d7fc8c31475c4af54d1ae97c5183a915"
+    },
+    {
+      "path": "scripts/verification/client-auth-fixture.mjs",
+      "sha256": "64792fff645c02764273b52392cf238791717cab9ac91478611247e97ab79762"
+    },
+    {
+      "path": "scripts/verification/remaining-client-fixture.mjs",
+      "sha256": "65495bc48e661c6f1663bc37416b7c5a7adc1cdaf1790ce0f7fdf622d2156aa1"
+    },
+    {
+      "path": "scripts/verification/workbench-runtime-safe-fixture.mjs",
+      "sha256": "53fb879ddb0af0f8775c6257d5082ca09dc0521548965f5e7046d384eaf43a60"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import{readFileSync}from'node:fs';import{execFileSync}from'node:child_process';
+const read=p=>readFileSync(p,'utf8');
+execFileSync('git',['merge-base','--is-ancestor','f0479cdf5934de5b2bfacf5d97a497107449b640','HEAD']);
+const q=JSON.parse(read('docs/planning/CODING_QUEUE.json')),c=q.taskExecutions.find(c=>c.formalTaskId==='AF-170');assert.equal(c.candidateStopped,true);assert.equal(c.candidateCommit,'e2a281b30f33990ef86e5812f66e897d16a7ffc0');assert.equal(c.bootstrapCommit,'3140596eb1f8f887dc40fc23bc3fcdd12a4facf9');
+for(const id of ['AF-159','AF-163','AF-167','AF-171']){const p=q.taskExecutions.find(c=>c.formalTaskId===id);assert.equal(p.status,'CODE_VERIFIED');assert.equal(JSON.parse(read(p.report)).status,'PASS');}
+const schema=read('apps/api/prisma/schema.prisma'),start=schema.indexOf('model AiPersonalWorkflow {'),proposal=read('docs/execution/AF-170-schema.prisma');assert.ok(start>0);assert.equal(schema.slice(start).trim(),proposal.slice(proposal.indexOf('model AiPersonalWorkflow {')).trim());
+const before=schema.slice(0,start).split('\n').filter(l=>!['personalWorkflows AiPersonalWorkflow[]','personalWorkflowBindings AiPersonalWorkflowAgentBinding[]'].includes(l.trim())).join('\n');assert.equal(before.trim(),execFileSync('git',['show','179751f0922104fc7eee454c87ca4f4d07796fc0:apps/api/prisma/schema.prisma'],{encoding:'utf8'}).trim());
+for(const [name,line]of [['MemberUser','personalWorkflows AiPersonalWorkflow[]'],['ClientWorkspace','personalWorkflows AiPersonalWorkflow[]'],['AiPersonalAgentVersion','personalWorkflowBindings AiPersonalWorkflowAgentBinding[]']])assert.ok(schema.match(new RegExp('model '+name+' \\{([\\s\\S]*?)\\n\\}'))?.[1].includes(line));
+assert.equal(read('apps/api/prisma/migrations/20261105050000_ai_personal_workflows/migration.sql'),read('docs/execution/AF-170-migration.sql'));
+for(const p of ['scripts/runtime-environment.cjs','scripts/database/migration.mjs','scripts/database/seed.mjs','scripts/verification/auth-support.mjs','scripts/verification/client-auth-fixture.mjs'])assert.equal(read(p).split('"AF-170"').length-1,p.endsWith('auth-support.mjs')?3:1);
+const module=read('apps/api/src/plugins/aij-ai/ai-runtime.module.ts');for(const n of ['AiPersonalWorkflowsController','AiPersonalWorkflowsService','PersonalWorkflowNoStoreGuard'])assert.ok(module.includes(n));
+const host=read('apps/api/src/bootstrap.ts');assert.ok(host.includes('app.use(personalWorkflowPrivateMiddleware)'));assert.ok(host.includes('request.rawBody = buffer'));assert.ok(host.indexOf('correlateRequest(request, response)')<host.indexOf('useBodyParser("json", false, workflowParserOptions)'));assert.ok(host.includes('personalWorkflowJsonVerify(request, response, buffer)'));assert.ok(read('packages/sdk/src/index.ts').includes('export * from "./personal-workflows.js";'));
+await import('./personal-memory-integration-prerequisite.mjs');
+console.log(JSON.stringify({task:'AF-170',status:'PASS',kind:'exact-integration-only',models:3,backrelations:3,originalOwnersUnchanged:true}));

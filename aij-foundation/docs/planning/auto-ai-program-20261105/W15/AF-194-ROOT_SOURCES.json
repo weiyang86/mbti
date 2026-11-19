@@ -1,0 +1,27 @@
+{
+  "task": "AF-194",
+  "candidate": "433e0c7f057a710b70915a928ad29a6a86b78df8",
+  "reason": "Root after explicit STOP: current-authorization recovery cleanup, ninth state case, actual stable public-SDK/CSRF parent composition, Chinese provider categories. This is a source freeze, not a passed test. Formal run-F3oQKy passed actual GUI/PG but lint rejected TS method-signature AST. Root declaration now reuses actual public SDK aliases and repository-standard declare-function/typeof syntax; no rule/dependency bypass.",
+  "files": [
+    {
+      "path": "apps/web/app/components/admin-external-services.tsx",
+      "sha256": "e689de8ff9b9bdabe4a8ba4738b61d64bf1c41960e8503b3bae673a7b4da7ac9"
+    },
+    {
+      "path": "apps/web/app/components/admin-external-services-state.mjs",
+      "sha256": "fc99818aa8e94c915af39dd699b02668f1e67d04b44d66f565b5c20b3343ebc4"
+    },
+    {
+      "path": "scripts/verification/admin-external-services.test.mjs",
+      "sha256": "b01d79beba3783179a1a3a306cb5e03adbccf8357428c57e28592e9201654ddd"
+    },
+    {
+      "path": "apps/web/app/components/admin-configuration.tsx",
+      "sha256": "deb0b5fd09a18996dd198481b86ed796ee7cc205aba01dd10295e20f6bacf861"
+    },
+    {
+      "path": "apps/web/app/components/admin-external-services-state.d.mts",
+      "sha256": "1e00cb06a69fb43c4fa2532d989dda60fe0dee38d8bfd0377fb63fa9754e7915"
+    }
+  ]
+}
