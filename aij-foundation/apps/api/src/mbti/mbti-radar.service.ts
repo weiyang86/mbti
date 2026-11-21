@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Optional } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
+import { MbtiConfigService } from "../plugins/mbti-config/mbti-config.service";
 import { reject } from "./mbti.http";
 import { MbtiSocialService } from "./mbti-social.service";
 import { TYPE_METAS } from "./mbti.types";
@@ -18,7 +19,12 @@ function requireType(code: string | undefined) {
  */
 @Injectable()
 export class MbtiRadarService {
-  constructor(private readonly prisma: PrismaService, private readonly social: MbtiSocialService) {}
+  constructor(private readonly prisma: PrismaService, private readonly social: MbtiSocialService,
+    @Optional() private readonly configs?: MbtiConfigService) {}
+
+  private async discoverySettings() {
+    try { return await this.configs?.publishedDiscovery(); } catch { return null; }
+  }
 
   private query(url: string, allowed: readonly string[]) {
     // Inspect the wire query: Express parsers can discard special keys or coerce duplicates.
@@ -43,6 +49,8 @@ export class MbtiRadarService {
     const body = input as Record<string, unknown>;
     if (Object.keys(body).length !== 1 || !Object.hasOwn(body, "enrolled") || typeof body.enrolled !== "boolean") invalid();
     const enrolled = body.enrolled;
+    const settings = await this.discoverySettings();
+    if (enrolled && settings?.radar === false) reject(403, "RADAR_DISABLED", "同型雷达当前未开放");
     return this.prisma.$transaction(async tx => {
       // Same lock as F4 card updates/F5; type cannot change during an enrollment decision.
       await this.social.lockOwners(tx, ownerId);
@@ -58,7 +66,8 @@ export class MbtiRadarService {
   async sameType(ownerId: string, url: string) {
     const query = this.query(url, ["type_code", "radius_m"]);
     if (query.type_code !== undefined && !TYPE_METAS.some(item => item.type_code === query.type_code)) invalid();
-    const radius = query.radius_m ?? "500";
+    const settings = await this.discoverySettings();
+    const radius = query.radius_m ?? String(settings?.radius ?? 500);
     if (!["500", "1000", "3000"].includes(radius)) invalid();
     return this.prisma.$transaction(async tx => {
       const type = requireType((await tx.mbtiCard.findUnique({ where: { ownerId }, select: { typeCode: true } }))?.typeCode);

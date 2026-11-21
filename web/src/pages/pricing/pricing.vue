@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="showDemoStatus">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view class="scene-offer">
       <view class="offer-heading">
@@ -171,6 +168,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { createOrder, getMyEntitlements, listProducts, type Entitlement, type PaymentProduct } from '@/api/payment'
@@ -222,7 +220,12 @@ const openFaq = ref('')
 const profile = loadProfile()
 
 const previewAsset = computed(() => styleAsset(style.value))
-const sceneTitle = computed(() => SCENE_TITLES[scene.value])
+const sceneTitle = computed(() => {
+  const configured = scene.value === 'moments' ? published.value?.content?.moments
+    : scene.value === 'avatar' ? published.value?.content?.avatar : published.value?.content?.meet
+  const lines = configured?.split(/[，,]/).map((item) => item.trim()).filter(Boolean)
+  return lines?.length ? lines.slice(0, 2) : SCENE_TITLES[scene.value]
+})
 const nickname = computed(() => account.profile.nickname.trim() || studio.nickname.trim() || '小禾')
 const previewInterests = computed(() => (profile.interests.length ? profile.interests : ['摄影', '音乐']))
 

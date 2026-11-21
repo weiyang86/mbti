@@ -30,12 +30,14 @@ import { RbacModule } from "../rbac/rbac.module";
 import { AuthModule } from "../auth/auth.module";
 import { loadRuntimeEnvironment, readApplicationEnvironment } from "../../../../scripts/runtime-environment.cjs";
 import { MbtiTestCallbackController, MbtiTestPayableSource, MbtiTestPaymentAdminController, MbtiTestPaymentService } from "./mbti-test-payment";
+import { MbtiDevPaymentController } from "./mbti-dev-payment.controller";
 import { PAYMENT_CREDENTIAL_RESOLVER, PAYMENT_PAYABLE_SOURCE } from "../plugins/aij-payment/payment-payable-source";
 import { PaymentProviderRegistry, PaymentProviderQuery, PaymentProviderRequest } from "../plugins/aij-payment/payment-provider";
 import { SyntheticTestPaymentProvider } from "../plugins/aij-payment/synthetic-test-payment.provider";
 import { PaymentService } from "../plugins/aij-payment/payment.service";
 import { PaymentCallbackService } from "../plugins/aij-payment/payment-callback.service";
 import { PluginRuntimeAccessModule } from "../plugin-runtime/plugin-runtime-access.module";
+import { MbtiConfigModule } from "../plugins/mbti-config/mbti-config.module";
 
 class MbtiControlledTestProvider extends SyntheticTestPaymentProvider {
   override createPayment(request: PaymentProviderRequest, _credential: string) { return super.createPayment(request, "synthetic-only-no-provider-secret"); }
@@ -50,8 +52,8 @@ export class MbtiModule {
       throw new Error("MBTI controlled payments require explicit isolated test runtime, administrator auth and a local random secret");
     }
     return { module: MbtiModule,
-      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.capabilities.auth ? [
+      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule] : [])],
+      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.nodeEnv === "development" && runtime.environment === "development" ? [MbtiDevPaymentController] : []), ...(runtime.capabilities.auth ? [
         MbtiOrdersAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
         MbtiOpsModerationController, MbtiOpsGrowthController, MbtiOpsRetentionController,
       ] : []),

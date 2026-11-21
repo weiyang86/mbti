@@ -113,6 +113,14 @@ export function getOrderStatus(orderId: string): Promise<OrderStatus> {
   return request<OrderStatus>(`/orders/${encodeURIComponent(orderId)}`)
 }
 
+/** Local-development only: the backend route exists only when NODE_ENV and APP_ENV are development. */
+export const devPaymentAvailable = import.meta.env.DEV
+
+export function devMarkOrderPaid(orderId: string): Promise<Order> {
+  requireOnline()
+  return request<Order>(`/orders/${encodeURIComponent(orderId)}/dev-pay`, { method: 'POST' })
+}
+
 export function listProducts(): Promise<{ items: PaymentProduct[] }> {
   requireOnline()
   return request('/products')

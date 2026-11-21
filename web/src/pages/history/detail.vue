@@ -23,10 +23,7 @@
     </template>
 
     <template v-else>
-      <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
-        <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
-      </view>
+      <DemoStrip />
 
       <view class="page-intro">
         <view class="eyebrow">A MOMENT OF ME / 阶段记录</view>
@@ -85,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot, ResultSnapshotSummary, TypeMeta } from '@/api/types'

@@ -1,10 +1,7 @@
 <template>
   <view class="page quiz-page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <button class="textbtn" @click="demoState">演示状态 ↗</button>
-    </view>
+    <DemoStrip />
 
     <view v-if="loading" class="state"><text class="state-text">正在加载题目…</text></view>
 
@@ -49,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { Question } from '@/api/types'

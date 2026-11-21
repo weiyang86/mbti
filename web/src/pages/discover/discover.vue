@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view class="page-intro">
       <view class="eyebrow">MEET YOUR TYPE / MBTI 搭子</view>
@@ -67,11 +64,14 @@
   </view>
 </template>
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'
 import { listResults } from '@/api/results'
 import { listBuddies } from '@/api/buddies'
+import { ensurePublishedConfig, published } from '@/store/published'
+import { LIMITS } from '@/constants/copy'
 import { listCardExchanges } from '@/api/card-exchanges'
 import type { BuddySummary, CardExchange, MyCard } from '@/api/types-social'
 import { avatarTint, displayBuddyName, socialErrorMessage } from '@/utils/social-display'
@@ -84,11 +84,14 @@ const loading = ref(false)
 const loaded = ref(false)
 const error = ref('')
 const pendingCount = computed(() => exchanges.value.filter((item) => item.status === 'pending').length)
+let modeInitialized = false
 onShow(load)
 async function load() {
   if (loading.value) return
   loading.value = true; loaded.value = false; items.value = []; exchanges.value = []; myCard.value = null; error.value = ''
   try {
+    await ensurePublishedConfig()
+    if (!modeInitialized) { mode.value = published.discovery?.order ?? 'recommend'; modeInitialized = true }
     const [card, exchangeList] = await Promise.all([
       getMyCard(),
       listCardExchanges().catch(() => ({ items: [] as CardExchange[] })),
@@ -99,9 +102,10 @@ async function load() {
     try { latestType = (await listResults({ limit: 1 })).items[0]?.type_code || '' } catch { latestType = '' }
     // 同型筛选以最近一次测试结果为准，名片里保存的类型只作兜底
     myType.value = latestType || card.type_code || 'INFP'
+    const limit = published.discovery?.daily ?? LIMITS.discovery
     const list = mode.value === 'same' && myType.value
-      ? await listBuddies({ mode: 'recommend', type_code: myType.value, limit: 20 })
-      : await listBuddies({ mode: 'recommend', limit: 20 })
+      ? await listBuddies({ mode: 'recommend', type_code: myType.value, limit })
+      : await listBuddies({ mode: 'recommend', limit })
     items.value = list.items; loaded.value = true
   } catch (e) { error.value = socialErrorMessage(e, '搭子列表读取失败，请重试') }
   finally { loading.value = false }

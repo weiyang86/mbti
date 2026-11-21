@@ -1,4 +1,6 @@
 /** 按四个字母生成相处小抄，与产品原型 getManual 保持一致 */
+import { published } from '@/store/published'
+
 export interface TypeManualFields {
   recharge: string
   communication: string
@@ -13,6 +15,8 @@ export interface TypeManualItem {
 
 export function manualFields(typeCode = 'INFP'): TypeManualFields {
   const t = typeCode || 'INFP'
+  const configured = published.personas?.[t]
+  if (configured) return { recharge: configured.recharge, communication: configured.communication, care: configured.care }
   return {
     recharge:
       t[0] === 'I'

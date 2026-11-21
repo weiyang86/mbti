@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view class="panel">
       <view class="h3">我的订单</view>
@@ -59,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { getMyEntitlements, listOrders, type Entitlement, type Order } from '@/api/payment'

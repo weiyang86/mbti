@@ -2,10 +2,7 @@
   <view>
     <proto-nav />
   <view class="page">
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <button class="textbtn" @click="demoState">演示状态 ↗</button>
-    </view>
+    <DemoStrip />
 
     <view class="page-intro">
       <view class="eyebrow">MY TYPE / 直接做名片</view>
@@ -79,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, onMounted, ref } from 'vue'
 import type { TypeMeta } from '@/api/types'
 import { listTypes } from '@/api/types-api'

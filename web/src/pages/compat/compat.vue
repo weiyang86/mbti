@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="demoState">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view class="page-intro">
       <view class="eyebrow">TYPE × TYPE / 相处小抄</view>
@@ -108,6 +105,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'

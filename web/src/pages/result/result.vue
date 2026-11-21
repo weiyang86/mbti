@@ -14,10 +14,7 @@
       </template>
 
       <template v-else>
-        <view class="demo-strip">
-          <text>V0.4 · Mock 演示 · 不产生费用</text>
-          <button class="textbtn" @click="demoState">演示状态 ↗</button>
-        </view>
+        <DemoStrip />
 
         <view class="result-banner">
           <text class="span">{{ sourceLabel }} · 免费查看</text>
@@ -189,6 +186,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'

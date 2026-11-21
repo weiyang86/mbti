@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="demoState">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view class="page-intro">
       <view class="eyebrow">MY CONTACTS / 交换设置</view>
@@ -72,6 +69,7 @@
   </view>
 </template>
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { reactive, ref } from 'vue'
 import { onHide, onShow, onUnload } from '@dcloudio/uni-app'
 import { clearContacts, getContacts, updateContacts } from '@/api/contacts'

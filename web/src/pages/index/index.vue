@@ -98,6 +98,7 @@ import { listResults } from '@/api/results'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
 import { DEFAULT_COMPARE_TYPE } from '@/constants/compat'
 import { readPublishedPreview, type PublishedPreview } from '@/api/published-config'
+import { LIMITS } from '@/constants/copy'
 import { account } from '@/store/account'
 
 const latest = ref<ResultSnapshotSummary | null>(null)
@@ -134,7 +135,7 @@ const compatLine = computed(() =>
 onShow(async () => {
   void loadPublished()
   try {
-    const res = await listResults({ limit: 50 })
+    const res = await listResults({ limit: LIMITS.recentResults })
     resultCount.value = res.items.length
     latest.value = res.items[0] || null
   } catch {

@@ -9,7 +9,7 @@ import { ManagementAccessService } from "../../rbac/management-access.service";
 import { PermissionsService } from "../../rbac/permissions.service";
 import { PluginRuntimeAccessService } from "../../plugin-runtime/plugin-runtime-access.service";
 import { assertOwnedRef } from "../../secret-center/secret-ref";
-import { MBTI_CATEGORIES, MBTI_UNKNOWN, MbtiCategory, MbtiSnapshot, canonical, category, emptySnapshot, exactBody, projectSnapshot, revision, validateCategory, validateSnapshot } from "./mbti-config.schema";
+import { MBTI_CATEGORIES, MBTI_UNKNOWN, MbtiCategory, MbtiSnapshot, MbtiValues, canonical, category, emptySnapshot, exactBody, projectSnapshot, revision, validateCategory, validateSnapshot } from "./mbti-config.schema";
 
 import { MbtiChannel, projectPublicPublished } from "./mbti-config.public";
 
@@ -78,6 +78,20 @@ export class MbtiConfigService {
       return projectPublicPublished(live.snapshot, projectId, channel, live.pointer?.version ?? 0);
     }, { maxWait: 3000, timeout: 5000 }));
   }
+  /** Published category for business consumers; null when unconfigured or the plugin is unavailable. */
+  private publishedCategory<K extends MbtiCategory>(key: K) {
+    return this.access.database(() => this.prisma.$transaction(async tx => {
+      if (this.runtime.getOrThrow<string>("projectId") !== "mbti-foundation") throw new ForbiddenException("MBTI project required");
+      const projectId = await this.plugins.projectId(tx);
+      await this.plugins.assertEnabledInTransaction(tx, projectId, MBTI_PLUGIN);
+      const live = await this.live(tx, { projectId, system: false });
+      return live.snapshot[key];
+    }, { maxWait: 3000, timeout: 5000 }));
+  }
+  publishedAssessment() { return this.publishedCategory("assessment"); }
+  publishedCatalog() { return this.publishedCategory("catalog"); }
+  publishedDiscovery() { return this.publishedCategory("discovery"); }
+  publishedCopy() { return this.publishedCategory("copy"); }
   saveDraft(operator: string, keyInput: string, input: unknown, correlationId?: string) {
     const key = category(keyInput), body = exactBody(input, ["value", "expectedDraftVersion"]), expected = revision(body.expectedDraftVersion), value = validateCategory(key, body.value);
     return this.access.write(operator, [CONFIGURATION_PERMISSION], async (tx, actor) => {
@@ -122,7 +136,24 @@ export class MbtiConfigService {
     const audit = await this.access.audit(tx, operator, pointer.id, `mbti_${action}`, "configuration", "scoped_config", correlationId, diff);
     await tx.configurationChange.create({ data: { configId: pointer.id, configVersion: nextVersion, auditLogId: audit.id, operatorId: operator, scope: "project", scopeId: c.projectId,
       pluginCode: MBTI_PLUGIN, configKey: ACTIVE, eventType: `mbti.${action}`, changeMetadata: { snapshotKey: configKey, previousVersion: expected, rollbackOf, categories: diff } } });
+    await this.syncAssessment(tx, next.assessment);
     return { version: nextVersion, auditLogId: audit.id, diff };
+  }
+  /** Keeps the quiz consumer table in step with the published assessment snapshot.
+   * Existing versions are immutable snapshots: a published different shape needs a new question bank version. */
+  private async syncAssessment(tx: Prisma.TransactionClient, assessment: MbtiValues["assessment"] | null) {
+    if (!assessment) return;
+    const questions = assessment.questions.map(question => ({ id: question.id, index: question.index, dimension: question.dimension,
+      prompt: question.prompt, options: question.options.map(option => ({ id: option.id, label: option.label })) }));
+    const scoring: Record<string, Record<string, string>> = {};
+    for (const question of assessment.questions) {
+      scoring[question.id] = Object.fromEntries(question.options.map((option, index) =>
+        [option.id, question.reverse ? question.dimension[1 - index]! : question.dimension[index]!]));
+    }
+    const payload = { question_bank_version: assessment.question_bank_version, questions };
+    const existing = await tx.mbtiQuestionBank.findUnique({ where: { version: assessment.question_bank_version }, select: { version: true } });
+    if (existing) return;
+    await tx.mbtiQuestionBank.create({ data: { version: assessment.question_bank_version, payload, scoring } });
   }
   publish(operator: string, input: unknown, correlationId?: string) {
     const body = exactBody(input, ["expectedVersion", "expectedDraftVersion"]), expected = revision(body.expectedVersion), expectedDraft = revision(body.expectedDraftVersion);

@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Optional } from "@nestjs/common";
 import { MbtiCard, MbtiCardExchange, Prisma } from "@prisma/client";
 import { randomBytes } from "node:crypto";
 import { PrismaService } from "../prisma/prisma.service";
+import { MbtiConfigService } from "../plugins/mbti-config/mbti-config.service";
 import { reject } from "./mbti.http";
 import { TYPE_METAS } from "./mbti.types";
 
@@ -30,7 +31,11 @@ function text(input: unknown, max: number) {
  */
 @Injectable()
 export class MbtiSocialService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, @Optional() private readonly configs?: MbtiConfigService) {}
+
+  private async discoverySettings() {
+    try { return await this.configs?.publishedDiscovery(); } catch { return null; }
+  }
 
   noInput(query: unknown, body?: unknown) {
     object(query ?? {}, []);
@@ -161,11 +166,12 @@ export class MbtiSocialService {
   }
   async buddies(ownerId: string, input: unknown) {
     const query = object(input ?? {}, ["mode", "type_code", "limit"]);
-    const mode = query.mode ?? "recommend";
+    const settings = await this.discoverySettings();
+    const mode = query.mode ?? settings?.order ?? "recommend";
     if (mode !== "recommend" && mode !== "same") invalid();
     if (query.type_code !== undefined && (typeof query.type_code !== "string" || !meta(query.type_code))) invalid();
     if (query.limit !== undefined && (typeof query.limit !== "string" || !/^\d+$/.test(query.limit))) invalid();
-    const limit = query.limit === undefined ? 20 : Number(query.limit);
+    const limit = query.limit === undefined ? settings?.daily ?? 20 : Number(query.limit);
     if (!Number.isInteger(limit) || limit < 1 || limit > 100) invalid();
     return this.snapshot(async tx => {
       const own = await tx.mbtiCard.findUnique({ where: { ownerId } });

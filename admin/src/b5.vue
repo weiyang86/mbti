@@ -75,7 +75,7 @@ defineExpose({ openPreview: () => open('配置投影预览') })
 <template>
   <div class="b5-page">
     <div class="b5-context" role="status"><div><b>UI_CONTRACT</b><span>{{ canEdit ? '系统参数 · 本机预览可编辑' : '受限只读视图' }}</span></div><span>{{ dirty ? '有未保存输入 · 仅当前页内存' : '原型参考 · 非线上配置' }}</span></div>
-    <p class="b5-boundary">C2 配置服务未接通。读取、保存、发布及回滚均不可用；离开页面会丢弃本机输入。服务端授权与持久化验收：NOT_RUN。</p>
+    <p class="b5-boundary">本页为只读原型演练，不保存也不写入服务端；真实配置请使用上方「服务端配置」面板。</p>
     <div class="b5-toolbar"><button class="outline-button" @click="open('本机输入差异')">本机输入差异</button><button class="outline-button" @click="open('配置投影预览')">草稿 / 线上预览</button><button class="outline-button" @click="open('权限与接入边界')">权限与接入边界</button></div>
 
     <template v-if="page === 'ai-settings'">

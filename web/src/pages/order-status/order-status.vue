@@ -21,6 +21,10 @@
         </view>
       </view>
       <view v-if="order.status === 'pending'" class="notice warn">订单仍待支付；创建订单不会自动获得权益。</view>
+      <view v-if="order.status === 'pending' && devPaymentAvailable" class="notice">
+        <text class="small">以下为本地开发模拟支付，不会产生真实扣款。</text>
+        <button class="btn secondary full mt" :disabled="devPaying" @click="simulatePay">{{ devPaying ? '正在模拟支付…' : '模拟支付成功（仅开发环境）' }}</button>
+      </view>
       <view class="fine">订单与权益以服务端记录为准，关闭页面不会改变订单状态。</view>
     </view>
 
@@ -36,13 +40,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { getOrderStatus, type OrderStatus } from '@/api/payment'
+import { getOrderStatus, devMarkOrderPaid, devPaymentAvailable, type OrderStatus } from '@/api/payment'
 import { requestErrorMessage } from '@/api/client'
 import { orderStatusLabel, paymentAvailabilityLabel } from '@/utils/payment-display'
 
 const orderId = ref('')
 const order = ref<OrderStatus | null>(null)
 const loading = ref(false)
+const devPaying = ref(false)
 const error = ref('')
 onLoad((q) => { orderId.value = (q?.order_id as string) || '' })
 onShow(load)
@@ -56,6 +61,16 @@ async function load() {
   try { order.value = await getOrderStatus(orderId.value) }
   catch (e) { error.value = requestErrorMessage(e, '订单状态暂未查询成功，请稍后重试') }
   finally { loading.value = false }
+}
+async function simulatePay() {
+  if (!orderId.value || devPaying.value) return
+  devPaying.value = true
+  error.value = ''
+  try {
+    await devMarkOrderPaid(orderId.value)
+    order.value = await getOrderStatus(orderId.value)
+  } catch (e) { error.value = requestErrorMessage(e, '模拟支付失败，请稍后重试') }
+  finally { devPaying.value = false }
 }
 function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
 function goCatalog() { uni.reLaunch({ url: '/pages/pricing/pricing' }) }

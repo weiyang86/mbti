@@ -2,25 +2,22 @@
   <view>
     <proto-nav />
   <view class="page">
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <button class="textbtn" @click="demoState">演示状态 ↗</button>
-    </view>
+    <DemoStrip />
 
     <view class="page-intro">
-      <view class="eyebrow">12 QUESTIONS / MBTI 趣味测试</view>
-      <view class="h1">12 个选择，<text class="line">找到你更像的那一面。</text></view>
+      <view class="eyebrow">{{ LIMITS.questionCount }} QUESTIONS / MBTI 趣味测试</view>
+      <view class="h1">{{ LIMITS.questionCount }} 个选择，<text class="line">找到你更像的那一面。</text></view>
       <view class="p">只做选择题，无自由聊天。基础类型结果免费查看。</view>
     </view>
 
     <view class="field">
       <text class="label">名片昵称</text>
-      <input class="input" v-model="profile.name" maxlength="12" placeholder="例如：小禾" />
+      <input class="input" v-model="profile.name" :maxlength="LIMITS.nickname" placeholder="例如：小禾" />
     </view>
 
     <view class="field">
       <text class="label">
-        最近喜欢什么？ <text class="muted">选填 · 最多 3 项</text>
+        最近喜欢什么？ <text class="muted">选填 · 最多 {{ LIMITS.interests }} 项</text>
       </text>
       <view class="choice-row">
         <button
@@ -91,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { createQuizSession } from '@/api/quiz'
@@ -107,6 +105,7 @@ import {
   saveQuizDraft,
   type QuizDraft,
 } from '@/store/quiz-draft'
+import { DEMO_COPY, LIMITS } from '@/constants/copy'
 
 const profile = ref(loadProfile())
 const submitting = ref(false)
@@ -123,7 +122,7 @@ onShow(() => {
 })
 
 function demoState() {
-  uni.showToast({ title: 'Mock 演示状态，不产生费用', icon: 'none' })
+  uni.showToast({ title: DEMO_COPY.stateToast, icon: 'none' })
 }
 
 function toggleInterest(value: string) {
@@ -133,8 +132,8 @@ function toggleInterest(value: string) {
     list.splice(idx, 1)
     return
   }
-  if (list.length >= 3) {
-    uni.showToast({ title: '最多选 3 项', icon: 'none' })
+  if (list.length >= LIMITS.interests) {
+    uni.showToast({ title: `最多选 ${LIMITS.interests} 项`, icon: 'none' })
     return
   }
   list.push(value)

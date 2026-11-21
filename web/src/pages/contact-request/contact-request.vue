@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view v-if="!emptyState" class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="demoState">演示状态 ↗</text>
-    </view>
+    <DemoStrip v-if="!emptyState" />
 
     <view v-if="!emptyState" class="page-intro">
       <view class="eyebrow">MUTUAL CONSENT / 双向确认</view>
@@ -139,6 +136,7 @@
   </view>
 </template>
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
 import { onHide, onLoad, onShow, onUnload } from '@dcloudio/uni-app'
 import { getBuddy } from '@/api/buddies'

@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Optional } from "@nestjs/common";
 import { createHash, randomBytes } from "node:crypto";
 import { MbtiAnswer, MbtiQuizSession, MbtiResult, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { reject } from "./mbti.http";
 import { TYPE_METAS } from "./mbti.types";
+import { MbtiConfigService } from "../plugins/mbti-config/mbti-config.service";
 
 export const CURRENT_BANK = "qb-v0.4-prototype-1";
 type Answer = { question_id: string; option_id: string };
@@ -21,7 +22,7 @@ function label(value: unknown): string | undefined {
 
 @Injectable()
 export class MbtiService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, @Optional() private readonly configs?: MbtiConfigService) {}
 
   async guest() {
     const token = randomBytes(48).toString("base64url");
@@ -30,6 +31,15 @@ export class MbtiService {
     return { guest_token: token, expires_at: expiresAt.toISOString() };
   }
   async currentBank() {
+    // Published configuration wins; the built-in bank is the fallback when configuration is absent.
+    try {
+      const published = await this.configs?.publishedAssessment();
+      if (published) return {
+        question_bank_version: published.question_bank_version,
+        questions: published.questions.map(question => ({ id: question.id, index: question.index, dimension: question.dimension,
+          prompt: question.prompt, options: question.options.map(option => ({ id: option.id, label: option.label })) })),
+      };
+    } catch { /* Configuration unavailable: keep the quiz usable with the built-in bank. */ }
     const bank = await this.prisma.mbtiQuestionBank.findUnique({ where: { version: CURRENT_BANK } });
     if (!bank) reject(503, "QUESTION_BANK_UNAVAILABLE", "题库尚未就绪");
     return bank.payload;
