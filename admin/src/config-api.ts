@@ -1,6 +1,6 @@
 /** C1 internal candidate adapter; never the formal MBTI API contract. No cached drafts or persistence fallback. */
 import { request } from './ops-api'
-export const categoryKeys = ['content', 'channels', 'catalog', 'assessment', 'personas', 'imageRecipes', 'retention', 'discovery', 'aiRuntime', 'payments', 'trade'] as const
+export const categoryKeys = ['content', 'channels', 'catalog', 'assessment', 'personas', 'imageRecipes', 'retention', 'discovery', 'copy', 'aiRuntime', 'payments', 'trade'] as const
 export type Category = typeof categoryKeys[number]
 export interface Projection {
   schema: 'mbti-config-candidate/v1'
@@ -15,10 +15,32 @@ export interface Projection {
   categories: Partial<Record<Category, unknown>>
   diff: Category[]
 }
-export interface VersionRecord { version: number; event: string; auditLogId: string; createdAt: string; categories: Category[]; id?: string }
+export type VersionRecord = { version: number; event: string; auditLogId: string; createdAt: string; categories: Category[]; id?: string }
 export type Commit = { version: number; auditLogId: string; diff: Category[] }
+export type PublicChannel = 'wechat' | 'mp' | 'douyin' | 'xhs'
+export interface PublicProjection {
+  schema: 'mbti-config-candidate/v1'
+  status: 'needs_human_review'
+  view: 'published'
+  channel: PublicChannel
+  projectId: string
+  publishedVersion: number
+  categories: {
+    content?: { headline?: string; sub?: string } | null
+    channels?: Record<string, { name?: string; badge?: string }> | null
+    catalog?: { shop?: unknown[] } | null
+  }
+}
+export function validatePublicProjection(value: unknown): PublicProjection {
+  const projection = value as PublicProjection
+  const channels: PublicChannel[] = ['wechat', 'mp', 'douyin', 'xhs']
+  if (!projection || projection.schema !== 'mbti-config-candidate/v1' || projection.view !== 'published' || !channels.includes(projection.channel) ||
+      typeof projection.projectId !== 'string' || !projection.projectId || !Number.isSafeInteger(projection.publishedVersion) || projection.publishedVersion < 0 ||
+      !projection.categories || typeof projection.categories !== 'object' || Array.isArray(projection.categories)) throw new Error('前台投影格式不正确，请稍后重试。')
+  return projection
+}
 export const pageCategories: Record<string, Category[]> = {
-  content: ['content', 'channels'], catalog: ['catalog'], assessment: ['assessment', 'personas'], ai: ['imageRecipes'],
+  content: ['content', 'channels'], catalog: ['catalog'], assessment: ['assessment', 'personas', 'copy'], ai: ['imageRecipes'],
   retention: ['retention'], social: ['discovery'], 'ai-settings': ['aiRuntime'], 'payment-settings': ['payments'], 'trade-settings': ['trade'], release: [...categoryKeys],
 }
 function revision(value: number) { if (!Number.isSafeInteger(value) || value < 0 || value > 2147483645) throw new Error('请重新读取服务端修订号。'); return value }
@@ -41,5 +63,8 @@ export const configApi = {
   versions() { return request<VersionRecord[]>(`${root}/versions`) },
   audit() { return request<VersionRecord[]>(`${root}/audit`) },
   version(target: number) { if (revision(target) < 1) throw new Error('请选择已发布版本。'); return request<{ version: number; categories: Partial<Record<Category, unknown>> }>(`${root}/versions/${target}`) },
+  async publicProjection(channel: PublicChannel = 'wechat') {
+    return validatePublicProjection(await request<unknown>(`/v1/config/published?channel=${channel}`, {}, true, true))
+  },
 }
 export type ConfigApi = typeof configApi
