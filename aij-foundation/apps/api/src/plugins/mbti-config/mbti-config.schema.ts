@@ -26,6 +26,10 @@ export type MbtiValues = {
   imageRecipes: { recipe: "portrait" | "balanced" | "style" };
   retention: { tags: string[]; days: number[] };
   discovery: { order: "same" | "recommend"; daily: number; radar: boolean; radius: number; minimum: number };
+  copy: {
+    stages: string[]; recentStatuses: string[]; interests: string[]; maxInterests: number;
+    compare: { title: string; accent: string; description: string; emptyTitle: string; emptyAccent: string; emptyDescription: string };
+  };
   aiRuntime: { mode: "UNCONFIGURED"; size: "960*1280" | "1024*1024" | "720*1280"; timeout: number; credentialRef?: string };
   payments: Record<Channel, { enabled: false; mode: "UNCONFIGURED"; merchantLabel: string }>;
   trade: { ttl: number; redeem: boolean; selfRefund: "self" | "support"; refundDays: number };
@@ -57,6 +61,10 @@ const checks: Record<MbtiCategory, Check> = {
   imageRecipes: shape({ recipe: oneOf(["portrait", "balanced", "style"]) }),
   retention: shape({ tags: array(text(12), 1, 10), days: array(integer(1, 365), 1, 3) }),
   discovery: shape({ order: oneOf(["same", "recommend"]), daily: integer(1, 30), radar: boolean, radius: oneOf([500, 1000, 3000]), minimum: integer(10, 200) }),
+  copy: shape({
+    stages: array(text(24), 1, 20), recentStatuses: array(text(24), 1, 20), interests: array(text(16), 1, 30), maxInterests: integer(1, 10),
+    compare: shape({ title: text(40), accent: text(40), description: text(160), emptyTitle: text(40), emptyAccent: text(40), emptyDescription: text(160) }),
+  }),
   aiRuntime: shape({ mode: oneOf(["UNCONFIGURED"]), size: oneOf(["960*1280", "1024*1024", "720*1280"]), timeout: integer(20, 180) }, { credentialRef: v => { if (typeof v !== "string") invalid(); parseSecretRef(v); } }),
   payments: shape(Object.fromEntries(channels.map(c => [c, shape({ enabled: oneOf([false]), mode: oneOf(["UNCONFIGURED"]), merchantLabel: oneOf(["MBTI搭子体验店", "品牌展示样例"]) })]))),
   trade: shape({ ttl: integer(1, 120), redeem: boolean, selfRefund: oneOf(["self", "support"]), refundDays: integer(1, 30) })
@@ -78,9 +86,14 @@ export function validateCategory<K extends MbtiCategory>(key: K, input: unknown)
   return structuredClone(v);
 }
 export function validateSnapshot(input: unknown): MbtiSnapshot {
-  if (!record(input) || Object.keys(input).length !== MBTI_CATEGORIES.length || MBTI_CATEGORIES.some(k => !Object.hasOwn(input, k))) invalid();
-  for (const k of MBTI_CATEGORIES) if (input[k] !== null) validateCategory(k, input[k]);
-  return structuredClone(input) as MbtiSnapshot;
+  // Legacy snapshots predate newly added categories; a missing key is treated as null.
+  if (!record(input) || Object.keys(input).some(k => !MBTI_CATEGORIES.includes(k as MbtiCategory))) invalid();
+  const out: Record<string, unknown> = emptySnapshot();
+  for (const k of MBTI_CATEGORIES) {
+    const value = (input as Record<string, unknown>)[k];
+    out[k] = Object.hasOwn(input, k) && value !== null && value !== undefined ? validateCategory(k, value) : null;
+  }
+  return out as MbtiSnapshot;
 }
 export function canonical(value: unknown): string {
   return JSON.stringify(value, (_key, v) => record(v) ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.localeCompare(b))) : v);
@@ -94,7 +107,7 @@ export function projectSnapshot(snapshot: MbtiSnapshot, system: boolean) {
   const out: Record<string, unknown> = {};
   for (const key of MBTI_CATEGORIES) {
     if (!system && ["aiRuntime", "payments", "trade"].includes(key)) continue;
-    const value = structuredClone(snapshot[key]);
+    const value = structuredClone(snapshot[key] ?? null);
     if (key === "aiRuntime" && value) { const ai = value as MbtiValues["aiRuntime"]; delete ai.credentialRef; }
     out[key] = value;
   }

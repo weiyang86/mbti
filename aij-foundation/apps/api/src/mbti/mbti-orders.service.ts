@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Optional } from "@nestjs/common";
 import { MbtiOrder, Prisma } from "@prisma/client";
 import { createHash, randomUUID } from "node:crypto";
 import { PrismaService } from "../prisma/prisma.service";
+import { MbtiConfigService } from "../plugins/mbti-config/mbti-config.service";
 import { reject } from "./mbti.http";
 import { object } from "./mbti.service";
 import { MBTI_PRODUCTS } from "./mbti-products";
@@ -11,8 +12,17 @@ const digest = (value: string) => createHash("sha256").update(value).digest("hex
 
 @Injectable()
 export class MbtiOrdersService {
-  constructor(private readonly prisma: PrismaService) {}
-  products() { return { items: MBTI_PRODUCTS }; }
+  constructor(private readonly prisma: PrismaService, @Optional() private readonly configs?: MbtiConfigService) {}
+  async products() {
+    const catalog = await this.configuredCatalog();
+    if (!catalog?.shop.length) return { items: MBTI_PRODUCTS };
+    return { items: catalog.shop.map((item, index) => ({ code: item.id, name: item.title, description: item.desc,
+      amount: item.cents, currency: "CNY", saleable: item.on, pricing_mode: "controlled_test_fixture", highlights: [],
+      tier: (index + 1) as 1 | 2, ...(item.on ? {} : { unavailable_reason: "FULFILLMENT_UNCONFIGURED" }) })) };
+  }
+  private async configuredCatalog() {
+    try { return await this.configs?.publishedCatalog(); } catch { return null; }
+  }
   payload(row: Row) {
     return { id: row.id, result_id: row.resultId, product_code: row.productCode, amount: row.amount, currency: row.currency.trim(),
       status: row.status, unlocked: row.status === "paid" && !!row.entitlement, created_at: row.createdAt.toISOString(),
@@ -27,6 +37,13 @@ export class MbtiOrdersService {
     if (typeof key !== "string" || !/^[A-Za-z0-9_-]{16,128}$/.test(key)) reject(422, "INVALID_IDEMPOTENCY_KEY", "请提供16至128位购买意图重试标识");
     const resultId = body.result_id, productCode = body.product_code;
     const keyHash = digest(key), fingerprint = digest(JSON.stringify([resultId, productCode]));
+    // Published catalog wins; the built-in fixtures stay the fallback when configuration is absent.
+    const catalog = await this.configuredCatalog();
+    const configured = catalog?.shop.find(item => item.id === productCode);
+    const product = configured
+      ? { amount: configured.cents, currency: "CNY", saleable: configured.on }
+      : MBTI_PRODUCTS.find(item => item.code === productCode);
+    if (!product?.saleable) reject(409, "PRODUCT_NOT_SALEABLE", "此商品暂不可下单");
     const id = await this.prisma.$transaction(async tx => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"mbti-order:" + ownerId + ":" + keyHash},0))`;
       const existing = await tx.mbtiOrder.findUnique({ where: { ownerId_idempotencyKeyHash: { ownerId, idempotencyKeyHash: keyHash } } });
@@ -36,8 +53,6 @@ export class MbtiOrdersService {
       }
       const owned = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "MbtiResult" WHERE id=${resultId} AND "ownerId"=${ownerId} FOR SHARE`;
       if (!owned.length) reject(404, "NOT_FOUND", "资源不存在");
-      const product = MBTI_PRODUCTS.find(p => p.code === productCode);
-      if (!product?.saleable) reject(409, "PRODUCT_NOT_SALEABLE", "此商品暂不可下单");
       const row = await tx.mbtiOrder.create({ data: { id: "MBTI-" + randomUUID(), ownerId, resultId, productCode,
         amount: product.amount, currency: product.currency, idempotencyKeyHash: keyHash, requestFingerprint: fingerprint } });
       return row.id;
@@ -61,6 +76,54 @@ export class MbtiOrdersService {
       const existing = await tx.mbtiEntitlement.findUnique({ where: { orderId: id } });
       if (!existing) await tx.mbtiEntitlement.create({ data: { orderId: id, kind: order.productCode } });
     }, { maxWait: 5000, timeout: 10000 });
+  }
+  // Local development only: settle a pending order with a synthetic Foundation charge.
+  async devMarkPaid(ownerId: string, id: string) {
+    const row = await this.prisma.$transaction(async tx => {
+      const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
+      const order = rows[0];
+      if (!order || order.ownerId !== ownerId) reject(404, "NOT_FOUND", "资源不存在");
+      if (order.status === "failed") reject(409, "ORDER_TERMINAL", "订单已失败，无法模拟支付");
+      if (order.status !== "paid") {
+        await this.settle(tx, order);
+        await tx.mbtiOrder.update({ where: { id }, data: { status: "paid", paidAt: new Date() } });
+      }
+      if (!await tx.mbtiEntitlement.findUnique({ where: { orderId: id } })) {
+        await tx.mbtiEntitlement.create({ data: { orderId: id, kind: order.productCode } });
+      }
+      return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
+    }, { maxWait: 5000, timeout: 10000 });
+    return this.payload(row);
+  }
+  // Builds a synthetic succeeded charge so the database payment guards stay authoritative.
+  private async settle(tx: Prisma.TransactionClient, order: MbtiOrder) {
+    const project = await tx.projectProfile.findFirst({ where: { environment: "development" } }) ?? await tx.projectProfile.findFirstOrThrow();
+    const workspace = await tx.clientWorkspace.findUnique({ where: { code: "mbti-dev-payment" } })
+      ?? await tx.clientWorkspace.create({ data: { id: "mbti-dev-payment-workspace", code: "mbti-dev-payment", name: "MBTI 开发模拟支付",
+        createdByMemberId: (await tx.memberUser.upsert({ where: { id: "mbti-dev-payment-owner" },
+          create: { id: "mbti-dev-payment-owner", nickname: "MBTI 开发模拟支付" }, update: {} })).id,
+        creationIdempotencyKey: "mbti-dev-payment-workspace" } });
+    const role = await tx.clientWorkspaceRole.upsert({ where: { workspaceId_code: { workspaceId: workspace.id, code: "member" } },
+      create: { id: "mbti-dev-payment-role", workspaceId: workspace.id, code: "member", name: "成员" }, update: {} });
+    const memberId = "mbti-dev-pay-" + order.ownerId;
+    await tx.memberUser.upsert({ where: { id: memberId }, create: { id: memberId, nickname: "MBTI 开发模拟支付用户" }, update: {} });
+    await tx.clientWorkspaceMembership.upsert({ where: { workspaceId_memberId: { workspaceId: workspace.id, memberId } },
+      create: { workspaceId: workspace.id, memberId, roleId: role.id }, update: {} });
+    const ledger = await tx.paymentOrder.create({ data: { projectId: project.id, workspaceId: workspace.id, memberId,
+      orderNo: "DEVPAY-" + randomUUID(), payableOwner: "mbti-controlled-test", payableReference: order.id,
+      amountMinor: BigInt(order.amount), currency: order.currency.trim(), currencyExponent: 2,
+      idempotencyKeyHash: digest("devpay:" + order.id), requestFingerprint: digest(JSON.stringify([order.id, order.amount])),
+      status: "succeeded" } });
+    const providerReference = "devpay-" + randomUUID();
+    const attempt = await tx.paymentAttempt.create({ data: { orderId: ledger.id, attemptNumber: 1, providerCode: "synthetic-test",
+      providerReference, status: "succeeded", submittedAt: new Date(), observedAt: new Date() } });
+    const event = await tx.paymentCallbackEvent.create({ data: { projectId: project.id, orderId: ledger.id, attemptId: attempt.id,
+      providerCode: "synthetic-test", eventId: "devpay-" + randomUUID(), payloadSha256: digest("devpay:" + order.id),
+      status: "accepted", processedAt: new Date() } });
+    await tx.paymentTransaction.create({ data: { orderId: ledger.id, attemptId: attempt.id, callbackEventId: event.id,
+      providerCode: "synthetic-test", providerReference, kind: "charge",
+      amountMinor: BigInt(order.amount), currency: order.currency.trim(), occurredAt: new Date() } });
+    await tx.mbtiOrder.update({ where: { id: order.id }, data: { paymentOrderId: ledger.id } });
   }
   private async owned(ownerId: string, id: string): Promise<Row> {
     const found = await this.prisma.mbtiOrder.findFirst({ where: { id, ownerId }, select: { id: true } });
