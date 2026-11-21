@@ -19,10 +19,7 @@
 
     <!-- 已有类型：名片主页 -->
     <template v-else-if="card">
-      <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
-        <text class="textbtn" @click="demoInfo">演示状态 ↗</text>
-      </view>
+      <DemoStrip />
       <view class="page-intro">
         <view class="eyebrow">MY CARD / 我的名片</view>
         <view class="h1">先认识我，再交换联系。</view>
@@ -197,6 +194,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, reactive, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'

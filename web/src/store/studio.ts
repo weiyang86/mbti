@@ -29,16 +29,16 @@ export interface StudioState {
 
 const KEY = 'mbti_studio_v1'
 
-export const STUDIO_STYLES: { key: StyleKey; label: string; asset: string }[] = [
+export const STUDIO_STYLES: { key: StyleKey; label: string; asset: string }[] = reactive([
   { key: 'editorial', label: '日常杂志', asset: '/static/share-style-editorial.webp' },
   { key: 'illustration', label: '梦境插画', asset: '/static/share-style-illustration.webp' },
   { key: 'game', label: '未来角色', asset: '/static/share-style-game.webp' },
-]
+])
 
-export const PLAN_NAMES: Record<PlanTier, string> = {
+export const PLAN_NAMES: Record<PlanTier, string> = reactive({
   1: 'MBTI 晒图套装',
   2: '本人形象套装',
-}
+})
 
 const STYLE_KEYS: StyleKey[] = ['illustration', 'editorial', 'game']
 

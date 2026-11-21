@@ -1,17 +1,14 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view v-if="loading" class="notice mt">正在生成阶段图…</view>
 
     <template v-else-if="error || !a || !b">
       <view class="page-intro">
         <view class="eyebrow">MY NEXT CHAPTER / 阶段分享</view>
-        <view class="h1">还没有两份可比较的记录</view>
+        <view class="h1">{{ JOURNEY_COPY.emptyTitle }}</view>
         <view class="p">{{ error || '先完成两次同版本测试，再回来做成一张图。' }}</view>
       </view>
       <view class="btn full" @click="backToJourney">回到我的轨迹</view>
@@ -21,8 +18,8 @@
       <view class="page-intro">
         <view class="eyebrow">MY NEXT CHAPTER / 阶段分享</view>
         <view class="h1">
-          <text class="title-line">每一面的我，</text>
-          <text class="title-line">都值得留一张。</text>
+          <text class="title-line">{{ JOURNEY_COPY.titleLines[0] }}</text>
+          <text class="title-line">{{ JOURNEY_COPY.titleLines[1] }}</text>
         </view>
         <view class="p">只分享你选择的两个结果，完整历史与作答不会被公开。</view>
       </view>
@@ -43,7 +40,7 @@
         <text class="b">{{ posterSummary }}</text>
         <view v-if="showName" class="p">{{ nickname }}</view>
         <view v-if="showStage" class="p">{{ stageOf(a) }} → {{ stageOf(b) }}</view>
-        <text class="small">趣味复测记录，不代表人格已改变</text>
+        <text class="small">{{ JOURNEY_COPY.posterDisclaimer }}</text>
         <text class="i">✦</text>
       </view>
 
@@ -88,6 +85,8 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
+import { JOURNEY_COPY } from '@/constants/copy'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot, ResultSnapshotSummary } from '@/api/types'
@@ -193,9 +192,9 @@ function caption(): string {
   return [
     `${dateLabel(a.value.submitted_at)} → ${dateLabel(b.value.submitted_at)}`,
     summaryText(a.value, b.value),
-    '每一面的我，都值得记录。',
+    JOURNEY_COPY.captionLead,
     '#MBTI搭子 #我的阶段记录',
-    '趣味复测结果，不代表人格已改变。',
+    JOURNEY_COPY.captionDisclaimer,
   ].join('\n')
 }
 

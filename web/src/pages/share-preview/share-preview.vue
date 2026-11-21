@@ -14,10 +14,7 @@
       </template>
 
       <template v-else>
-        <view class="demo-strip">
-          <text>V0.4 · Mock 演示 · 不产生费用</text>
-          <text class="textbtn" @click="demoState">演示状态 ↗</text>
-        </view>
+        <DemoStrip />
 
         <view class="page-intro">
           <view class="eyebrow">READY TO SHARE / 晒出我的 MBTI</view>
@@ -129,6 +126,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'
@@ -137,6 +135,7 @@ import { getResult } from '@/api/results'
 import { createSharePreview } from '@/api/share'
 import { requestErrorMessage } from '@/api/client'
 import { TYPE_NAMES } from '@/constants/types'
+import { published } from '@/store/published'
 import { currentQuote, saveStudio, studio } from '@/store/studio'
 
 type PlatformKey = 'wechat' | 'xhs' | 'douyin' | 'mp'
@@ -248,11 +247,12 @@ function defaultCaption(k: PlatformKey) {
   const t = result.value?.type_code || 'INFP'
   const names = TYPE_NAMES[t] || 'MBTI'
   const quote = currentQuote(t)
+  const lead = published.content?.caption || `同样是 ${t}，我也有自己的主角感。`
   if (k === 'douyin') {
     return `四个字母说不完我。\n${t} · ${names}\n${quote}\n晒出我的 MBTI 主角卡。#MBTI搭子 #MBTI\n画面为 AI 示例人物。`
   }
   const likes = interests.value.length ? interests.value.join('、') : '探索生活里的新鲜事'
-  return `同样是 ${t}，我也有自己的主角感。\n${quote}\n最近喜欢：${likes}。\n换了张 MBTI 名片，也换个方式认识我。\n#MBTI搭子 #MBTI #人格名片\n图片为 AI 示例，类型仅作趣味参考。`
+  return `${lead}\n${quote}\n最近喜欢：${likes}。\n换了张 MBTI 名片，也换个方式认识我。\n#MBTI搭子 #MBTI #人格名片\n图片为 AI 示例，类型仅作趣味参考。`
 }
 
 function switchPlatform(key: PlatformKey) {

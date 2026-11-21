@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view class="panel">
       <view class="profile-head">
@@ -63,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import type { MyCard } from '@/api/types-social'
@@ -80,8 +78,8 @@ import {
 } from '@/store/account'
 
 const PRODUCT_NAMES: Record<string, string> = {
-  studio_tier_1: 'MBTI 晒图套装',
-  studio_tier_2: '本人形象套装',
+  get studio_tier_1() { return PLAN_NAMES[1] },
+  get studio_tier_2() { return PLAN_NAMES[2] },
 }
 
 const card = ref<MyCard | null>(null)

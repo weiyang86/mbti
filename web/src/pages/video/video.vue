@@ -11,10 +11,7 @@
     </template>
 
     <template v-else>
-      <view class="demo-strip">
-        <text>V0.4 · Mock 演示 · 不产生费用</text>
-        <text class="textbtn" @click="demoInfo">演示状态 ↗</text>
-      </view>
+      <DemoStrip />
 
       <view class="page-intro">
         <view class="eyebrow">STORYBOARD / 分镜预览</view>
@@ -47,11 +44,13 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 // TODO: 待 Remy 确认接口路径和字段（视频分镜生成接口未定义，当前为本地静态分镜演示）
 import { computed, ref } from 'vue'
 import { onShow, onUnload } from '@dcloudio/uni-app'
 import { listResults } from '@/api/results'
 import { TYPE_NAMES } from '@/constants/types'
+import { VIDEO_COPY } from '@/constants/copy'
 import { currentQuote, studio, styleAsset } from '@/store/studio'
 
 const typeCode = ref('INFP')
@@ -78,19 +77,19 @@ const frames = computed(() => [
   {
     label: '形象',
     time: '00–05 秒',
-    title: '我的 MBTI 有了新形象',
+    title: VIDEO_COPY.titles[0] || '我的 MBTI 有了新形象',
     line: `${typeCode.value} · ${TYPE_NAMES[typeCode.value] || 'MBTI'}`,
   },
   {
     label: '宣言',
     time: '05–10 秒',
-    title: '同一种类型，不同的我',
+    title: VIDEO_COPY.titles[1] || '同一种类型，不同的我',
     line: currentQuote(typeCode.value),
   },
   {
     label: '名片',
     time: '10–15 秒',
-    title: '先交换名片，再认识彼此',
+    title: VIDEO_COPY.titles[2] || '先交换名片，再认识彼此',
     line: 'MBTI搭子 / 晒出我的主角卡',
   },
 ])

@@ -1,10 +1,7 @@
 <template>
   <view class="page" :class="{ 'comparison-page': ready }">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="toastDemo">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view v-if="loading" class="notice mt">正在准备对比…</view>
 
@@ -22,10 +19,10 @@
       <view class="page-intro">
         <view class="eyebrow">THEN & NOW / 前后对比</view>
         <view class="h1">
-          <text class="title-line">变了多少，</text>
-          <text class="title-line">让答案自己说。</text>
+          <text class="title-line">{{ compareCopy.title }}</text>
+          <text class="title-line">{{ compareCopy.accent }}</text>
         </view>
-        <view class="p">比较你选择的两个阶段；没有高低阶，也没有“更好的人格”。</view>
+        <view class="p">{{ compareCopy.description }}</view>
       </view>
 
       <view class="compare-selects">
@@ -144,10 +141,10 @@
       <view class="page-intro">
         <view class="eyebrow">THEN & NOW / 前后对比</view>
         <view class="h1">
-          <text class="title-line">再留一份记录，</text>
-          <text class="title-line">就能看见前后差别。</text>
+          <text class="title-line">{{ compareCopy.emptyTitle }}</text>
+          <text class="title-line">{{ compareCopy.emptyAccent }}</text>
         </view>
-        <view class="p">只比较同一题目、计分规则和回顾时间窗下的两次结果。</view>
+        <view class="p">{{ compareCopy.emptyDescription }}</view>
       </view>
       <view class="btn full" @click="goQuiz">免费记录现在的我</view>
       <view class="btn secondary full mt" @click="backToJourney">查看已有记录</view>
@@ -158,6 +155,7 @@
 </template>
 
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import type {
@@ -176,8 +174,15 @@ import {
   dimCompareRows,
   summaryText,
 } from '@/constants/journey'
+import { ensurePublishedConfig, published } from '@/store/published'
 
 type PickRow = ResultSnapshotSummary & { recent_status?: string }
+
+const COMPARE_FALLBACK = {
+  title: '变了多少，', accent: '让答案自己说。', description: '比较你选择的两个阶段；没有高低阶，也没有“更好的人格”。',
+  emptyTitle: '再留一份记录，', emptyAccent: '就能看见前后差别。', emptyDescription: '只比较同一题目、计分规则和回顾时间窗下的两次结果。',
+}
+const compareCopy = computed(() => published.copy?.compare ?? COMPARE_FALLBACK)
 
 const baselineId = ref('')
 const targetId = ref('')
@@ -197,6 +202,7 @@ onLoad((q) => {
 })
 
 onShow(() => {
+  void ensurePublishedConfig()
   load()
 })
 

@@ -1,10 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view class="demo-strip">
-      <text>V0.4 · Mock 演示 · 不产生费用</text>
-      <text class="textbtn" @click="demoState">演示状态 ↗</text>
-    </view>
+    <DemoStrip />
 
     <view class="page-intro">
       <view class="eyebrow">SAME TYPE RADAR / 同型雷达</view>
@@ -63,24 +60,31 @@
   </view>
 </template>
 <script setup lang="ts">
+import DemoStrip from '@/components/demo-strip.vue'
 import { computed, reactive } from 'vue'
 import { onHide, onShow, onUnload } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'
 import { getRadarParticipation, getSameTypeCount, updateRadarParticipation } from '@/api/radar'
 import { createRadarController, createRadarViewState } from '@/utils/radar-state'
+import { ensurePublishedConfig, published } from '@/store/published'
+import { DEMO_COPY } from '@/constants/copy'
 const RADII = [500, 1000, 3000] as const
 /** 原型示例人数：仅用于演示，未接真实位置统计 */
 const DEMO_COUNTS: Record<number, number> = { 500: 18, 1000: 43, 3000: 96 }
 const state = reactive(createRadarViewState())
 const controller = createRadarController({ getMyCard, getRadarParticipation, updateRadarParticipation, getSameTypeCount }, state)
-onShow(controller.enter)
+onShow(async () => {
+  await ensurePublishedConfig()
+  if (published.discovery?.radius) state.radius = published.discovery.radius as typeof state.radius
+  controller.enter()
+})
 onHide(controller.leave)
 onUnload(controller.leave)
 
 const radiusLabel = computed(() => (state.radius === 500 ? '500 米' : `${state.radius / 1000} 公里`))
 const ctaDisabled = computed(() => state.loading || state.saving || state.needsReload)
 const demoCount = computed(() => (state.enrolled === true ? DEMO_COUNTS[state.radius] : '—'))
-const countLabel = computed(() => (state.enrolled === true ? '位同型参与者 · 模拟人数' : '先选择体验状态'))
+const countLabel = computed(() => (state.enrolled === true ? DEMO_COPY.radarDemoCount : '先选择体验状态'))
 
 function join() {
   if (ctaDisabled.value) return
@@ -91,7 +95,7 @@ function leave() {
   controller.save(false)
 }
 function deny() { uni.showToast({ title: '已模拟拒绝授权，不展示人数', icon: 'none' }) }
-function demoState() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
+function demoState() { uni.showToast({ title: DEMO_COPY.stateToast, icon: 'none' }) }
 function goDiscover() { uni.switchTab({ url: '/pages/discover/discover', fail: () => uni.reLaunch({ url: '/pages/discover/discover' }) }) }
 </script>
 <style scoped lang="scss">

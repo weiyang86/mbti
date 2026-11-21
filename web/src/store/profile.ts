@@ -1,3 +1,5 @@
+import { reactive } from 'vue'
+
 // TODO: 待 Remy 确认接口路径和字段（用户资料接口未定义，当前仅保存在本机 storage）
 export interface TestProfile {
   name: string
@@ -8,9 +10,9 @@ export interface TestProfile {
 
 const KEY = 'mbti_test_profile_v1'
 
-export const INTERESTS = ['摄影', '阅读', '音乐', '散步', '电影', '咖啡', '运动', '游戏']
-export const STAGES = ['日常生活', '新学期', '新工作', '新城市', '生活转折', '项目冲刺', '假期休息']
-export const RECENT_STATES = ['不记录', '轻松', '平稳', '忙碌', '疲惫']
+export const INTERESTS: string[] = reactive(['摄影', '阅读', '音乐', '散步', '电影', '咖啡', '运动', '游戏'])
+export const STAGES: string[] = reactive(['日常生活', '新学期', '新工作', '新城市', '生活转折', '项目冲刺', '假期休息'])
+export const RECENT_STATES: string[] = reactive(['不记录', '轻松', '平稳', '忙碌', '疲惫'])
 
 const DEFAULTS: TestProfile = {
   name: '',
