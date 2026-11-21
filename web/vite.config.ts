@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/v1": {
-        target: "https://mbti-dev.bestshizhongyu.com",
+        // MBTI_WEB_API_ORIGIN lets a local dev server target the local API without editing this file.
+        target: process.env.MBTI_WEB_API_ORIGIN || "https://mbti-dev.bestshizhongyu.com",
         changeOrigin: true,
         secure: true,
       },
