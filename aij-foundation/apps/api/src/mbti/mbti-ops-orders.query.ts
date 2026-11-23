@@ -22,7 +22,7 @@ export function parseOrderQuery(value: unknown, summary = false, now = new Date(
   const filters: OrderFilters = {};
   for (const key of ["q", "status", "product_code", "from", "to"] as const) if (query[key] !== undefined) filters[key] = query[key] as string;
   if (filters.q !== undefined && !identifier.test(filters.q)) invalid();
-  if (filters.status !== undefined && !["pending", "paid", "failed"].includes(filters.status)) invalid();
+  if (filters.status !== undefined && !["pending", "paid", "failed", "refunded"].includes(filters.status)) invalid();
   if (filters.product_code !== undefined && !/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(filters.product_code)) invalid();
   if (!!filters.from !== !!filters.to || summary && !filters.from) invalid();
   if (filters.from && filters.to) {

@@ -23,13 +23,14 @@
         </view>
       </view>
 
-      <view class="notice" :class="{ warn: tone === 'pending' || tone === 'failed', ok: tone === 'paid' }">
+      <view class="notice" :class="{ warn: tone === 'pending' || tone === 'failed' || tone === 'refunded', ok: tone === 'paid' }">
         {{ orderStatusHint(order.status) }}
       </view>
 
       <view v-if="order.status === 'pending' && devPaymentAvailable" class="notice">
         <text class="small">以下为本地开发模拟支付，不会产生真实扣款。</text>
-        <button class="btn secondary full mt" :disabled="devPaying" @click="simulatePay">{{ devPaying ? '正在模拟支付…' : '模拟支付成功（仅开发环境）' }}</button>
+        <button class="btn secondary full mt" :disabled="devPaying || devFailing" @click="simulatePay">{{ devPaying ? '正在模拟支付…' : '模拟支付成功（仅开发环境）' }}</button>
+        <button class="btn ghost full mt" :disabled="devPaying || devFailing" @click="simulateFail">{{ devFailing ? '正在模拟失败…' : '模拟支付失败（仅开发环境）' }}</button>
       </view>
 
       <view v-if="order.status === 'pending'" class="mini-list">
@@ -40,6 +41,10 @@
       </view>
       <view v-else-if="order.status === 'paid'" class="mini-list">
         <button class="btn full" @click="goOrders">查看已解锁权益</button>
+        <button v-if="devPaymentAvailable" class="btn ghost full mt" :disabled="devRefunding" @click="confirmRefund">{{ devRefunding ? '正在模拟退款…' : '模拟退款（仅开发环境）' }}</button>
+      </view>
+      <view v-else-if="order.status === 'refunded'" class="mini-list">
+        <button class="btn full" @click="goCatalog">重新选择商品</button>
       </view>
 
       <view class="fine">订单与权益以服务端记录为准，关闭页面不会改变订单状态。</view>
@@ -58,14 +63,16 @@
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import StateView from '@/components/state-view.vue'
-import { getOrderStatus, devMarkOrderPaid, devPaymentAvailable, type OrderStatus } from '@/api/payment'
+import { getOrderStatus, devMarkOrderPaid, devMarkOrderFailed, devRefundOrder, devPaymentAvailable, type OrderStatus } from '@/api/payment'
 import { requestErrorMessage } from '@/api/client'
-import { isTerminalOrder, orderStatusHint, orderStatusLabel, orderTone, paymentAvailabilityLabel } from '@/utils/payment-display'
+import { orderStatusHint, orderStatusLabel, orderTone, paymentAvailabilityLabel } from '@/utils/payment-display'
 
 const orderId = ref('')
 const order = ref<OrderStatus | null>(null)
 const loading = ref(false)
 const devPaying = ref(false)
+const devFailing = ref(false)
+const devRefunding = ref(false)
 const error = ref('')
 onLoad((q) => { orderId.value = (q?.order_id as string) || '' })
 onShow(load)
@@ -75,6 +82,7 @@ const symbol = computed(() => {
   if (!order.value) return '✦'
   if (order.value.status === 'paid') return '✓'
   if (order.value.status === 'failed') return '!'
+  if (order.value.status === 'refunded') return '↺'
   return '✦'
 })
 
@@ -89,7 +97,7 @@ async function load() {
 }
 
 async function simulatePay() {
-  if (!orderId.value || devPaying.value || isTerminalOrder(order.value?.status || '')) return
+  if (!orderId.value || devPaying.value || order.value?.status !== 'pending') return
   devPaying.value = true
   error.value = ''
   try {
@@ -97,6 +105,38 @@ async function simulatePay() {
     order.value = await getOrderStatus(orderId.value)
   } catch (e) { error.value = requestErrorMessage(e, '模拟支付失败，请稍后重试') }
   finally { devPaying.value = false }
+}
+
+async function simulateFail() {
+  if (!orderId.value || devFailing.value || order.value?.status !== 'pending') return
+  devFailing.value = true
+  error.value = ''
+  try {
+    await devMarkOrderFailed(orderId.value)
+    order.value = await getOrderStatus(orderId.value)
+  } catch (e) { error.value = requestErrorMessage(e, '模拟支付失败，请稍后重试') }
+  finally { devFailing.value = false }
+}
+
+function confirmRefund() {
+  if (!orderId.value || devRefunding.value || order.value?.status !== 'paid') return
+  uni.showModal({
+    title: '模拟退款？',
+    content: '仅开发环境演示：订单将变为已退款，并收回已解锁权益。',
+    confirmText: '模拟退款',
+    success: (res) => { if (res.confirm) void simulateRefund() },
+  })
+}
+
+async function simulateRefund() {
+  if (!orderId.value || devRefunding.value || order.value?.status !== 'paid') return
+  devRefunding.value = true
+  error.value = ''
+  try {
+    await devRefundOrder(orderId.value)
+    order.value = await getOrderStatus(orderId.value)
+  } catch (e) { error.value = requestErrorMessage(e, '模拟退款失败，请稍后重试') }
+  finally { devRefunding.value = false }
 }
 
 function goOrders() { uni.navigateTo({ url: '/pages/orders/orders' }) }
@@ -123,5 +163,9 @@ function goCatalog() { uni.reLaunch({ url: '/pages/pricing/pricing' }) }
 
 .tone-failed .order-symbol {
   color: #b24a3f;
+}
+
+.tone-refunded .order-symbol {
+  color: #a43b3b;
 }
 </style>

@@ -51,13 +51,24 @@ export class MbtiOpsOrdersService {
     return this.prisma.$transaction(async tx => {
       const groups = await tx.mbtiOrder.groupBy({ by: ["status", "currency"], where: orderWhere(query), _count: { _all: true }, _sum: { amount: true } });
       const count = (status: string) => groups.filter(g => g.status === status).reduce((sum, g) => sum + g._count._all, 0);
-      const paid = groups.filter(g => g.status === "paid");
-      const grossPaidByCurrency = paid.map(g => ({ currency: g.currency.trim(), amountFen: g._sum.amount ?? 0, paidOrderCount: g._count._all })).sort((a, b) => a.currency.localeCompare(b.currency));
-      const metrics = { pending: count("pending"), paid: count("paid"), failed: count("failed"), paidOrderCount: count("paid"),
-        grossPaidAmountFen: paid.length > 1 ? null : paid[0]?._sum.amount ?? 0, currency: paid.length === 1 ? paid[0].currency.trim() : null, grossPaidByCurrency };
+      // 退款单在业务上仍是“成功支付过的订单”，保留在已支付数量与毛额内；退款事实另计。
+      const paidLike = groups.filter(g => g.status === "paid" || g.status === "refunded");
+      const paidOrderCount = count("paid") + count("refunded");
+      const byCurrency = new Map<string, { currency: string; amountFen: number; paidOrderCount: number }>();
+      for (const group of paidLike) {
+        const currency = group.currency.trim();
+        const current = byCurrency.get(currency) ?? { currency, amountFen: 0, paidOrderCount: 0 };
+        current.amountFen += group._sum.amount ?? 0;
+        current.paidOrderCount += group._count._all;
+        byCurrency.set(currency, current);
+      }
+      const grossPaidByCurrency = [...byCurrency.values()].sort((a, b) => a.currency.localeCompare(b.currency));
+      const metrics = { pending: count("pending"), paid: paidOrderCount, failed: count("failed"), paidOrderCount,
+        grossPaidAmountFen: grossPaidByCurrency.length > 1 ? null : grossPaidByCurrency[0]?.amountFen ?? 0,
+        currency: grossPaidByCurrency.length === 1 ? grossPaidByCurrency[0].currency : null, grossPaidByCurrency };
       // Net only when refund PaymentTransaction facts exist for paid orders in-window; empty refund ledger ≠ zero refunds.
       const paidLinks = await tx.mbtiOrder.findMany({
-        where: { AND: [orderWhere(query), { status: "paid", paymentOrderId: { not: null } }] },
+        where: { AND: [orderWhere(query), { status: { in: ["paid", "refunded"] }, paymentOrderId: { not: null } }] },
         select: { amount: true, currency: true, paymentOrderId: true },
       });
       const paymentIds = [...new Set(paidLinks.map(row => row.paymentOrderId!).filter(Boolean))];

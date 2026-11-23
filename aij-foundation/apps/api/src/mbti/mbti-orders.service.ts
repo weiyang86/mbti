@@ -65,7 +65,7 @@ export class MbtiOrdersService {
     await this.prisma.$transaction(async tx => {
       const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
       const order = rows[0];
-      if (!order?.paymentOrderId) return;
+      if (!order?.paymentOrderId || order.status === "refunded") return;
       const ledger = await tx.paymentOrder.findUnique({ where: { id: order.paymentOrderId }, include: { transactions: { where: { kind: "charge" } } } });
       if (!ledger || ledger.payableOwner !== "mbti-controlled-test" || ledger.payableReference !== order.id ||
         ledger.amountMinor !== BigInt(order.amount) || ledger.currency.trim() !== order.currency.trim()) return;
@@ -83,7 +83,7 @@ export class MbtiOrdersService {
       const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
       const order = rows[0];
       if (!order || order.ownerId !== ownerId) reject(404, "NOT_FOUND", "资源不存在");
-      if (order.status === "failed") reject(409, "ORDER_TERMINAL", "订单已失败，无法模拟支付");
+      if (order.status === "failed" || order.status === "refunded") reject(409, "ORDER_TERMINAL", "订单已结束，无法模拟支付");
       if (order.status !== "paid") {
         await this.settle(tx, order);
         await tx.mbtiOrder.update({ where: { id }, data: { status: "paid", paidAt: new Date() } });
@@ -91,6 +91,33 @@ export class MbtiOrdersService {
       if (!await tx.mbtiEntitlement.findUnique({ where: { orderId: id } })) {
         await tx.mbtiEntitlement.create({ data: { orderId: id, kind: order.productCode } });
       }
+      return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
+    }, { maxWait: 5000, timeout: 10000 });
+    return this.payload(row);
+  }
+  // Local development only: close a pending order as failed without a provider fact.
+  async devMarkFailed(ownerId: string, id: string) {
+    const row = await this.prisma.$transaction(async tx => {
+      const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
+      const order = rows[0];
+      if (!order || order.ownerId !== ownerId) reject(404, "NOT_FOUND", "资源不存在");
+      if (order.status === "paid" || order.status === "refunded") reject(409, "ORDER_STATE", "仅待支付订单可模拟失败");
+      if (order.status !== "failed") await tx.mbtiOrder.update({ where: { id }, data: { status: "failed" } });
+      return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
+    }, { maxWait: 5000, timeout: 10000 });
+    return this.payload(row);
+  }
+  // Local development only: refund a paid order and revoke its business entitlement.
+  // No provider refund fact is fabricated; the status change is a controlled-test projection.
+  async devRefund(ownerId: string, id: string) {
+    const row = await this.prisma.$transaction(async tx => {
+      const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
+      const order = rows[0];
+      if (!order || order.ownerId !== ownerId) reject(404, "NOT_FOUND", "资源不存在");
+      if (order.status === "refunded") return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
+      if (order.status !== "paid") reject(409, "ORDER_STATE", "仅已支付订单可模拟退款");
+      await tx.mbtiOrder.update({ where: { id }, data: { status: "refunded" } });
+      await tx.mbtiEntitlement.deleteMany({ where: { orderId: id } });
       return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
     }, { maxWait: 5000, timeout: 10000 });
     return this.payload(row);

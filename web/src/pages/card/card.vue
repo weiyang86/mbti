@@ -224,6 +224,7 @@ const latestType = ref('')
 const latestResultId = ref('')
 const latestAt = ref('')
 const entitlements = ref<Entitlement[]>([])
+const entitlementsLoaded = ref(false)
 const form = reactive({ nickname: '', type_code: '', declaration: '', interests: '', style: 'illustration' as CardStyle })
 const styles: { value: CardStyle; label: string }[] = [{ value: 'illustration', label: '插画' }, { value: 'editorial', label: '杂志' }, { value: 'game', label: '游戏' }]
 const visibilityRows: { key: keyof CardVisibility; label: string }[] = [
@@ -290,10 +291,10 @@ async function load() {
       if (!form.type_code && latestType.value) form.type_code = latestType.value
     }).catch(() => { latestType.value = ''; latestResultId.value = ''; latestAt.value = '' }),
     listTypes().then((data) => { types.value = data.items }).catch((e) => { types.value = []; typesError.value = socialErrorMessage(e, '类型列表读取失败，请重新读取') }),
-    getMyEntitlements().then((data) => { entitlements.value = data.items }).catch(() => { entitlements.value = [] }),
+    getMyEntitlements().then((data) => { entitlements.value = data.items; entitlementsLoaded.value = true }).catch(() => { entitlements.value = []; entitlementsLoaded.value = false }),
   ])
-  // 服务端权益是付费态的唯一来源，同步给本地套餐缓存，供「去制作」页判断是否已解锁
-  if (unlockTier.value > studio.tier) {
+  // 服务端权益是付费态的唯一来源，双向同步本地套餐缓存（退款后也要收回）。
+  if (entitlementsLoaded.value && unlockTier.value !== studio.tier) {
     studio.tier = unlockTier.value
     saveStudio()
   }

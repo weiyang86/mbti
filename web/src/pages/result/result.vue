@@ -260,12 +260,12 @@ async function load() {
   loading.value = false
 }
 
-/** 已购/未购分支以服务端权益为准，并同步本机 studio.tier 供后续页面复用。 */
+/** 已购/未购分支以服务端权益为准，并双向同步本机 studio.tier（退款后也要收回）。 */
 async function loadEntitlements() {
   try {
     entitlements.value = (await getMyEntitlements()).items
     const tier = entitledTier(entitlements.value)
-    if (tier > studio.tier) {
+    if (tier !== studio.tier) {
       studio.tier = tier
       saveStudio()
     }

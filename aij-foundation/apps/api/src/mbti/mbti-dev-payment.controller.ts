@@ -14,4 +14,12 @@ export class MbtiDevPaymentController {
   @HttpCode(200)
   @Header("Cache-Control", "no-store")
   devPay(@Req() req: GuestRequest, @Param("id") id: string) { return this.orders.devMarkPaid(req.mbtiOwnerId, id); }
+  @Post(":id/dev-fail")
+  @HttpCode(200)
+  @Header("Cache-Control", "no-store")
+  devFail(@Req() req: GuestRequest, @Param("id") id: string) { return this.orders.devMarkFailed(req.mbtiOwnerId, id); }
+  @Post(":id/dev-refund")
+  @HttpCode(200)
+  @Header("Cache-Control", "no-store")
+  devRefund(@Req() req: GuestRequest, @Param("id") id: string) { return this.orders.devRefund(req.mbtiOwnerId, id); }
 }
