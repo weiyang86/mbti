@@ -9,6 +9,8 @@ import { MBTI_PRODUCTS } from "./mbti-products";
 
 type Row = MbtiOrder & { entitlement: { id: string } | null };
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
+// Admin read model only ever exposes a masked identifier, never the full openId.
+const maskIdentity = (value: string) => value.length <= 10 ? `${value.slice(0, 2)}***` : `${value.slice(0, 6)}***${value.slice(-4)}`;
 
 @Injectable()
 export class MbtiOrdersService {
@@ -197,5 +199,21 @@ export class MbtiOrdersService {
     if (!await this.prisma.mbtiOrder.findUnique({ where: { id }, select: { id: true } })) reject(404, "NOT_FOUND", "资源不存在");
     await this.sync(id);
     return this.payload(await this.prisma.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } }));
+  }
+  // Support view of who owns an order: masked login identity plus card profile.
+  async adminUser(id: string) {
+    const order = await this.prisma.mbtiOrder.findUnique({ where: { id }, select: { id: true, ownerId: true } });
+    if (!order) reject(404, "NOT_FOUND", "资源不存在");
+    const identity = await this.prisma.mbtiWechatIdentity.findUnique({ where: { guestId: order.ownerId } });
+    if (!identity) return { order_id: order.id, logged_in: false, provider: null, open_id_masked: null,
+      union_id_masked: null, nickname: null, type_code: null };
+    const card = await this.prisma.mbtiCard.findUnique({ where: { ownerId: order.ownerId }, select: { nickname: true, typeCode: true } });
+    const typeCode = card?.typeCode && /^[A-Za-z]{4}$/.test(card.typeCode) ? card.typeCode : null;
+    return { order_id: order.id, logged_in: true,
+      provider: identity.openId.startsWith("mock_") ? "mock" : "wechat",
+      open_id_masked: maskIdentity(identity.openId),
+      union_id_masked: identity.unionId ? maskIdentity(identity.unionId) : null,
+      nickname: card?.nickname || null, type_code: typeCode,
+      identity_created_at: identity.createdAt.toISOString(), last_login_at: identity.lastLoginAt.toISOString() };
   }
 }

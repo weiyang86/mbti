@@ -38,6 +38,8 @@ export class MbtiOrdersAdminController {
   ) {}
   @Get() @Permissions("mbti:orders:read") @Header("Cache-Control", "no-store")
   list(@Query() query: unknown) { return this.collection.list(query); }
+  @Get(":id/user") @Permissions("mbti:orders:read") @Header("Cache-Control", "no-store")
+  user(@Param("id") id: string) { return this.orders.adminUser(id); }
   @Get("export.csv") @Permissions("mbti:ops:access", "mbti:ops:export") @Header("Cache-Control", "no-store")
   @Header("Content-Type", "text/csv; charset=utf-8") @Header("Content-Disposition", 'attachment; filename="mbti-orders.csv"') @Header("X-Content-Type-Options", "nosniff")
   exportCsv(@Req() req: AdminRequest, @Query() query: unknown) { return this.collection.exportCsv(req.user!.id, query); }
