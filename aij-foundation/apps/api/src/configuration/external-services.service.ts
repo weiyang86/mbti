@@ -64,6 +64,25 @@ export class ExternalServicesService {
         return { providerCode: code, version: row?.version ?? 0, fields: stored.fields, credentialStates: states, missingFields: missing, configurationStatus: !row ? 'not_configured' : missing.length ? 'draft' : 'credentials_ready', runtimeEnabled: false, externalVerification: 'not_run' };
     }
     catalog(operator: string) { return this.access.write(operator, [permission], async (tx) => { await this.context(tx); return EXTERNAL_SERVICE_CATALOG; }); }
+  /** Server-internal runtime view: resolved credentials never leave the owning service. */
+  async runtimeCredentials(code: string) {
+    const provider = externalProvider(code);
+    const projectId = this.runtime.getOrThrow<string>('projectId'), environment = this.runtime.getOrThrow<string>('environment');
+    const profile = await this.prisma.projectProfile.findFirst({ where: { code: projectId + '-' + environment, environment, deletedAt: null, organization: { deletedAt: null } }, include: { organization: true } });
+    if (!profile || profile.status !== 'active' || profile.organization.status !== 'active') throw new ServiceUnavailableException('External service context unavailable');
+    const row = await this.prisma.scopedConfig.findUnique({ where: this.where(code, profile.id) });
+    if (!row) throw new ServiceUnavailableException('External service is not configured');
+    const stored = this.stored(code, row);
+    const missing = [...provider.fields.filter(f => f.required && !stored.fields[f.key]).map(f => f.key),
+      ...provider.credentials.filter(c => c.required && !stored.credentialRefs[c.key]).map(c => c.key)];
+    if (missing.length) throw new ServiceUnavailableException('External service is not configured');
+    const credentials: Record<string, string> = {};
+    for (const c of provider.credentials) {
+      const ref = stored.credentialRefs[c.key];
+      if (ref) credentials[c.key] = await this.secrets.resolveTrusted(ref);
+    }
+    return { fields: { ...stored.fields }, credentials };
+  }
     get(code: string, operator: string) { externalProvider(code); return this.access.write(operator, [permission], async (tx) => { const p = await this.context(tx); return this.view(tx, code, await tx.scopedConfig.findUnique({ where: this.where(code, p.id) })); }); }
     list(operator: string) { return this.access.write(operator, [permission], async (tx) => { const p = await this.context(tx); return { projectId: p.id, items: await Promise.all(EXTERNAL_SERVICE_CATALOG.providers.map(async (provider) => this.view(tx, provider.code, await tx.scopedConfig.findUnique({ where: this.where(provider.code, p.id) })))) }; }); }
     save(code: string, raw: SaveExternalServiceDto, operator: string, correlationId?: string) {

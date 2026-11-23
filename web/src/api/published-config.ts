@@ -85,7 +85,7 @@ export function publishedPreview(value: unknown, channel: PublicChannel): Publis
     discovery = { order: rawDiscovery.order as 'same' | 'recommend', daily: Number(rawDiscovery.daily), radar: rawDiscovery.radar,
       radius: Number(rawDiscovery.radius), minimum: Number(rawDiscovery.minimum) }
   }
-  const rawCopy = c.copy
+  const rawCopy = c.copy ?? null
   let copy: PublishedPreview['copy'] = null
   if (rawCopy !== null) {
     const list = (value: unknown): value is string[] => Array.isArray(value) && value.length > 0 && value.every(text)

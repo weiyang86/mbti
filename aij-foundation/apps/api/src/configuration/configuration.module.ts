@@ -5,5 +5,5 @@ import { ConfigurationService } from "./configuration.service";
 import { SecretCenterModule } from "../secret-center/secret-center.module";
 import { ExternalServicesController } from "./external-services.controller";
 import { ExternalServicesService } from "./external-services.service";
-@Module({ imports: [RbacModule, SecretCenterModule], controllers: [ConfigurationAdminController, ProjectContextController, ExternalServicesController], providers: [ConfigurationService, ExternalServicesService], exports: [ConfigurationService] })
+@Module({ imports: [RbacModule, SecretCenterModule], controllers: [ConfigurationAdminController, ProjectContextController, ExternalServicesController], providers: [ConfigurationService, ExternalServicesService], exports: [ConfigurationService, ExternalServicesService] })
 export class ConfigurationModule {}

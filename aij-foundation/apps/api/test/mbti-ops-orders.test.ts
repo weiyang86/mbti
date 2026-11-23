@@ -23,11 +23,12 @@ const row = (id: string, status: string, amount: number, createdAt: string, curr
 test("order query rejects unsafe filters, empty keys, and unbound cursor reuse", () => {
   assert.equal(parseOrderQuery({}).limit, 20);
   assert.equal(parseOrderQuery({ limit: "100" }).limit, 100);
-  for (const query of [{ q: "bad id" }, { status: "refunded" }, { product_code: "x/y" }, { from: "2026-01-01" }, { to: "2026-01-01" },
+  for (const query of [{ q: "bad id" }, { status: "closed" }, { product_code: "x/y" }, { from: "2026-01-01" }, { to: "2026-01-01" },
     { from: "2026-01-01", to: "2024-01-01" }, { from: "2026-01-01", to: "2027-01-02" }, { limit: "0" }, { limit: "101" }, { cursor: "%%%" },
     { channel: "tiktok" }, { ownerId: "x" }, { q: "" }, null, []]) {
     assert.throws(() => parseOrderQuery(query as never), code("INVALID_ORDER_QUERY"));
   }
+  assert.equal(parseOrderQuery({ status: "refunded" }).filters.status, "refunded");
   const ok = parseOrderQuery({ from: "2026-01-01", to: "2026-01-02", status: "paid", limit: "10" });
   const cursor = orderCursor(ok, { createdAt: new Date("2026-01-02T00:00:00.000Z"), id: "MBTI-1" });
   assert.equal(parseOrderQuery({ from: "2026-01-01", to: "2026-01-02", status: "paid", limit: "10", cursor }).cursor?.id, "MBTI-1");
