@@ -17,6 +17,18 @@ const landings = { home: '首页', pricing: '购买页', 'test-intro': '测试�
 const styleNames = { editorial: '杂志', illustration: '插画', game: '游戏' }
 const dimensions = ['EI', 'SN', 'TF', 'JP'] as const
 const personaCodes = ['E', 'I'].flatMap(a => ['S', 'N'].flatMap(b => ['T', 'F'].flatMap(c => ['J', 'P'].map(d => a + b + c + d))))
+const pageTitles: [string, string][] = [
+  ['pages/index/index', '首页'], ['pages/test-intro/test-intro', '测试入口'], ['pages/quiz/quiz', '答题页'],
+  ['pages/self-select/self-select', '自选类型'], ['pages/result/result', '测试结果'], ['pages/pricing/pricing', '购买页'],
+  ['pages/create/create', '形象工作台'], ['pages/generating/generating', '生成中'], ['pages/card/card', '我的名片'],
+  ['pages/share-preview/share-preview', '分享预览'], ['pages/card/public', '公开名片'], ['pages/discover/discover', '发现搭子'],
+  ['pages/buddies/detail', '搭子名片'], ['pages/contacts/contacts', '交换资料'], ['pages/contact-request/contact-request', '双向确认'],
+  ['pages/contact-request/granted', '确认结果'], ['pages/exchanges/exchanges', '名片夹'], ['pages/radar/radar', '同型雷达'],
+  ['pages/compat/compat', '相处小抄'], ['pages/account/account', '我的'], ['pages/video/video', '视频分镜'],
+  ['pages/history/list', '我的轨迹'], ['pages/history/detail', '阶段记录'], ['pages/compare/compare', '结果对比'],
+  ['pages/journey-share/journey-share', '阶段分享图'], ['pages/orders/orders', '我的订单'],
+  ['pages/order-status/order-status', '订单状态'], ['pages/buddies/blocked', '屏蔽管理'],
+]
 const text = (path: string, label: string, max: number, long = false, group?: string): FieldDef => ({ path, label, type: long ? 'textarea' : 'text', max, group })
 const number = (path: string, label: string, min: number, maxValue: number, group?: string): FieldDef => ({ path, label, type: 'number', min, maxValue, group })
 const check = (path: string, label: string, group?: string): FieldDef => ({ path, label, type: 'checkbox', group })
@@ -88,6 +100,7 @@ export function fieldsFor(category: string): FieldDef[] {
     text('compare.emptyTitle', '空态标题第一行', 40, false, '对比页'),
     text('compare.emptyAccent', '空态标题第二行', 40, false, '对比页'),
     text('compare.emptyDescription', '空态说明', 160, true, '对比页'),
+    ...pageTitles.map(([route, label]) => text(`pages.${route}`, label, 30, false, '页面标题')),
   ]
   if (category === 'assessment') return [
     { path: 'question_bank_version', label: '题库版本', type: 'text', max: 96, group: '题库',
@@ -187,6 +200,7 @@ export function skeletonFor(category: string): Record<string, unknown> | null {
     maxInterests: 3,
     compare: { title: '变了多少，', accent: '让答案自己说。', description: '比较你选择的两个阶段；没有高低阶，也没有“更好的人格”。',
       emptyTitle: '再留一份记录，', emptyAccent: '就能看见前后差别。', emptyDescription: '只比较同一题目、计分规则和回顾时间窗下的两次结果。' },
+    pages: Object.fromEntries(pageTitles.map(([route, label]) => [route, label])),
   }
   return null
 }

@@ -2,10 +2,10 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import {
   createOrderRefundRequest, createRedeemCodes, disableRedeemCode, listGenerationJobs, listRedeemCodes,
-  OpsApiError, readOrder, retryGenerationJob,
+  OpsApiError, readOrder, readOrderUser, retryGenerationJob,
   type GenerationJobRow, type RedeemCodeRow, type RefundRequestResult,
 } from './ops-api'
-import { normalizeOrderId, orderStatus, orderTime, type OpsOrder } from './ops-order'
+import { normalizeOrderId, orderStatus, orderTime, type OpsOrder, type OpsOrderUser } from './ops-order'
 import './orders.css'
 import OrdersList from './orders-list.vue'
 const props = withDefaults(defineProps<{ permissions?: string[] }>(), { permissions: () => [] })
@@ -23,6 +23,9 @@ const state = ref<LookupState>('idle')
 const orderId = ref('')
 const queriedId = ref('')
 const order = ref<OpsOrder | null>(null)
+const orderUser = ref<OpsOrderUser | null>(null)
+const userState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+const userError = ref('')
 const errorMessage = ref('')
 const refundReason = ref('')
 const refundState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -66,6 +69,7 @@ function clearLookup() {
   requestVersion++
   refundVersion++
   state.value = 'idle'; order.value = null; queriedId.value = ''; errorMessage.value = ''
+  orderUser.value = null; userState.value = 'idle'; userError.value = ''
   refundReason.value = ''; refundState.value = 'idle'; refundError.value = ''; refundResult.value = null
 }
 // Clear earlier data immediately when the identifier changes, including during a request.
@@ -88,6 +92,7 @@ async function queryOrder() {
     const value = await readOrder(id)
     if (version !== requestVersion) return
     order.value = value; state.value = 'success'
+    void loadOrderUser(id)
   } catch (error) {
     if (version !== requestVersion) return
     const status = error instanceof OpsApiError ? error.status : 0
@@ -98,6 +103,20 @@ async function queryOrder() {
         : status === 401 ? '请重新核验管理员会话后查询。'
           : error instanceof OpsApiError && error.code === 'INVALID_ORDER_RESPONSE' ? '订单响应格式不正确，请重试或联系维护人员。'
             : error instanceof OpsApiError && status === 0 ? error.message : '订单服务暂不可用，请稍后重试。'
+  }
+}
+
+async function loadOrderUser(id: string) {
+  const version = requestVersion
+  userState.value = 'loading'; userError.value = ''; orderUser.value = null
+  try {
+    const value = await readOrderUser(id)
+    if (version !== requestVersion) return
+    orderUser.value = value; userState.value = 'success'
+  } catch (error) {
+    if (version !== requestVersion) return
+    userState.value = 'error'
+    userError.value = error instanceof OpsApiError && error.status === 404 ? '该订单没有可展示的用户身份。' : '用户身份暂不可读取。'
   }
 }
 
@@ -252,6 +271,23 @@ watch(tab, value => {
             <div><dt>定价模式</dt><dd>{{ order.pricing_mode === 'controlled_test_fixture' ? '受控测试定价' : '未识别定价模式' }} <span class="order-mono">· {{ order.pricing_mode }}</span></dd></div>
             <div><dt>素材交付 / 累计退款</dt><dd>素材交付仍未接通；退款仅人工申请入审，不表示到账</dd></div>
           </dl>
+          <section class="order-user" aria-labelledby="order-user-title">
+            <div class="order-section-heading">
+              <div><p class="eyebrow">USER IDENTITY</p><h4 id="order-user-title">用户身份</h4></div>
+              <span class="muted">脱敏只读 · 不含完整 OpenID</span>
+            </div>
+            <p v-if="userState === 'loading'" class="muted">正在读取用户身份…</p>
+            <p v-else-if="userState === 'error'" class="muted">{{ userError }}</p>
+            <dl v-else-if="orderUser" class="order-fields">
+              <div><dt>登录状态</dt><dd>{{ orderUser.logged_in ? '已微信登录' : '未登录（游客订单）' }}</dd></div>
+              <div><dt>身份来源</dt><dd>{{ orderUser.provider === 'wechat' ? '微信' : orderUser.provider === 'mock' ? '开发 Mock' : '—' }}</dd></div>
+              <div><dt>OpenID</dt><dd class="order-mono">{{ orderUser.open_id_masked || '—' }}</dd></div>
+              <div v-if="orderUser.union_id_masked"><dt>UnionID</dt><dd class="order-mono">{{ orderUser.union_id_masked }}</dd></div>
+              <div><dt>昵称</dt><dd>{{ orderUser.nickname || '未填写' }}</dd></div>
+              <div><dt>MBTI 类型</dt><dd>{{ orderUser.type_code || '—' }}</dd></div>
+              <div v-if="orderUser.last_login_at"><dt>最近登录（北京时间）</dt><dd>{{ orderTime(orderUser.last_login_at) }}</dd></div>
+            </dl>
+          </section>
           <div class="order-dependency">
             <div>
               <b>人工退款申请（AF-106 候选）</b>

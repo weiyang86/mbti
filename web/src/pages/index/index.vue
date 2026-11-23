@@ -10,6 +10,12 @@
       <button class="channel-chip" @click="switchChannel">微信预览⌄</button>
     </view>
     <text class="m-kicker">MBTI TEST × PERSONALITY CARD</text>
+    <view v-if="sessionExpired" class="notice session-renew">
+      <text>{{ account.session ? '登录状态已失效，请重新登录后继续。' : '本机游客会话已失效，重新建立后才能继续测试、下单与查看记录。' }}</text>
+      <button class="btn secondary full mt" :disabled="renewing" @click="renewSession">
+        {{ renewing ? '正在建立…' : account.session ? '重新登录' : '重新建立游客会话' }}
+      </button>
+    </view>
     <view class="h1">{{ heroLead }}<text class="line"><text class="em">{{ heroAccent }}</text></text></view>
     <view class="p home-sub">{{ heroSub }}</view>
 
@@ -100,10 +106,13 @@ import { DEFAULT_COMPARE_TYPE } from '@/constants/compat'
 import { readPublishedPreview, type PublishedPreview } from '@/api/published-config'
 import { LIMITS } from '@/constants/copy'
 import { account } from '@/store/account'
+import { isGuestSessionExpired, startNewGuestSession } from '@/api/client'
 
 const latest = ref<ResultSnapshotSummary | null>(null)
 const resultCount = ref(0)
 const published = ref<PublishedPreview | null>(null)
+const sessionExpired = ref(false)
+const renewing = ref(false)
 
 const heroLead = computed(() => published.value?.content?.headline || '你的 MBTI，')
 const heroAccent = computed(() => published.value?.content?.accent || '值得一张主角卡。')
@@ -132,17 +141,45 @@ const compatLine = computed(() =>
   latest.value ? `${latest.value.type_code} × ${DEFAULT_COMPARE_TYPE}` : '和不同 MBTI',
 )
 
-onShow(async () => {
+onShow(() => {
   void loadPublished()
+  void loadHome()
+})
+
+async function loadHome() {
+  sessionExpired.value = isGuestSessionExpired()
   try {
     const res = await listResults({ limit: LIMITS.recentResults })
     resultCount.value = res.items.length
     latest.value = res.items[0] || null
+    sessionExpired.value = false
   } catch {
     latest.value = null
     resultCount.value = 0
+    sessionExpired.value = isGuestSessionExpired()
   }
-})
+}
+
+async function renewSession() {
+  if (renewing.value) return
+  if (account.session) {
+    uni.navigateTo({ url: '/pages/login/login' })
+    return
+  }
+  renewing.value = true
+  try {
+    await startNewGuestSession()
+    sessionExpired.value = isGuestSessionExpired()
+    if (!sessionExpired.value) {
+      uni.showToast({ title: '游客会话已重建', icon: 'none' })
+      await loadHome()
+    }
+  } catch {
+    uni.showToast({ title: '建立失败，请稍后重试', icon: 'none' })
+  } finally {
+    renewing.value = false
+  }
+}
 
 async function loadPublished() {
   published.value = await readPublishedPreview('微信小程序')
@@ -188,6 +225,9 @@ function switchChannel() {
 </script>
 
 <style scoped>
+.session-renew {
+  margin: 0 0 16px;
+}
 .h2,
 .h3 {
   font-weight: 700;

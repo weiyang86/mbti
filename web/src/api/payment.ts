@@ -1,7 +1,7 @@
 // Internal F3 integration candidate; see F3-INTEGRATION.md, not a published contract.
 import { baseURL, ensureGuestSession, request, useMock } from './client'
 
-export type OrderStatusValue = 'pending' | 'paid' | 'failed'
+export type OrderStatusValue = 'pending' | 'paid' | 'failed' | 'refunded'
 export type PaymentAvailability = 'unconfigured' | 'controlled_test'
 
 export interface PaymentProduct {
@@ -116,9 +116,38 @@ export function getOrderStatus(orderId: string): Promise<OrderStatus> {
 /** Local-development only: the backend route exists only when NODE_ENV and APP_ENV are development. */
 export const devPaymentAvailable = import.meta.env.DEV
 
+export interface WechatPayParams {
+  timeStamp: string
+  nonceStr: string
+  package: string
+  signType: 'RSA'
+  paySign: string
+}
+
+/** Real WeChat JSAPI payment. Returns 503 until merchant credentials are configured. */
+export function requestWechatPay(orderId: string) {
+  requireOnline()
+  return request<{ payment_availability: 'wechat_jsapi'; pay_params: WechatPayParams }>(
+    `/orders/${encodeURIComponent(orderId)}/pay`,
+    { method: 'POST' },
+  )
+}
+
 export function devMarkOrderPaid(orderId: string): Promise<Order> {
   requireOnline()
   return request<Order>(`/orders/${encodeURIComponent(orderId)}/dev-pay`, { method: 'POST' })
+}
+
+/** Local-development only: close a pending order as failed. */
+export function devMarkOrderFailed(orderId: string): Promise<Order> {
+  requireOnline()
+  return request<Order>(`/orders/${encodeURIComponent(orderId)}/dev-fail`, { method: 'POST' })
+}
+
+/** Local-development only: refund a paid order and revoke its entitlement. */
+export function devRefundOrder(orderId: string): Promise<Order> {
+  requireOnline()
+  return request<Order>(`/orders/${encodeURIComponent(orderId)}/dev-refund`, { method: 'POST' })
 }
 
 export function listProducts(): Promise<{ items: PaymentProduct[] }> {

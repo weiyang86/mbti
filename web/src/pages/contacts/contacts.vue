@@ -14,9 +14,8 @@
     </view>
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <text v-if="loading" class="notice" role="status">正在读取本人渠道…</text>
-
-    <view v-if="loaded" class="contact-form">
+    <StateView v-if="loading" state="loading" title="正在读取本人渠道…" />
+    <view v-else-if="loaded" class="contact-form">
       <view class="field">
         <text class="label">微信 <text class="muted">选填</text></text>
         <input
@@ -70,6 +69,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { reactive, ref } from 'vue'
 import { onHide, onShow, onUnload } from '@dcloudio/uni-app'
 import { clearContacts, getContacts, updateContacts } from '@/api/contacts'

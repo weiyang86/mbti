@@ -2,7 +2,16 @@
   <view>
     <proto-nav />
     <view class="page">
-      <view v-if="loading" class="state"><text class="state-text">正在读取结果…</text></view>
+      <StateView v-if="loading" state="loading" title="正在读取结果…" />
+
+      <StateView v-else-if="loadError" state="error" title="结果读取失败" :description="loadError">
+        <button class="btn secondary full" @click="load">重新加载</button>
+      </StateView>
+
+      <StateView v-else-if="missing" state="empty" title="这份结果已删除或不可用" description="可能是记录已被删除，或链接不属于当前身份。">
+        <button class="btn full" @click="goHistory">查看我的轨迹</button>
+        <button class="btn ghost full" @click="goTestIntro">重新测一次</button>
+      </StateView>
 
       <template v-else-if="!result">
         <view class="page-intro">
@@ -187,11 +196,15 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'
 import type { ResultSnapshot, ResultSnapshotSummary } from '@/api/types'
 import { getResult, listResults } from '@/api/results'
+import { getMyEntitlements, type Entitlement } from '@/api/payment'
+import { HttpError, requestErrorMessage } from '@/api/client'
+import { entitledTier } from '@/utils/payment-display'
 import { TYPE_NAMES, DECLARATIONS } from '@/constants/types'
 import { buildManual } from '@/constants/manual'
 import { dateLabel, summaryText } from '@/constants/journey'
@@ -213,6 +226,9 @@ const historyRows = ref<ResultSnapshotSummary[]>([])
 const profileName = ref('')
 const profileInterests = ref<string[]>([])
 const loading = ref(true)
+const loadError = ref('')
+const missing = ref(false)
+const entitlements = ref<Entitlement[]>([])
 
 onLoad((q) => {
   resultId.value = (q?.id as string) || ''
@@ -220,19 +236,43 @@ onLoad((q) => {
 
 onMounted(async () => {
   readProfile()
+  await load()
+})
+
+async function load() {
+  loading.value = true
+  loadError.value = ''
+  missing.value = false
+  result.value = null
+  previous.value = null
+  historyRows.value = []
   if (!resultId.value) {
     loading.value = false
     return
   }
   try {
     result.value = await getResult(resultId.value)
-  } catch {
-    result.value = null
-  } finally {
-    loading.value = false
+  } catch (e) {
+    if (e instanceof HttpError && e.status === 404) missing.value = true
+    else loadError.value = requestErrorMessage(e, '结果读取失败，请稍后重试')
   }
-  if (result.value) await loadHistory()
-})
+  if (result.value) await Promise.all([loadEntitlements(), loadHistory()])
+  loading.value = false
+}
+
+/** 已购/未购分支以服务端权益为准，并双向同步本机 studio.tier（退款后也要收回）。 */
+async function loadEntitlements() {
+  try {
+    entitlements.value = (await getMyEntitlements()).items
+    const tier = entitledTier(entitlements.value)
+    if (tier !== studio.tier) {
+      studio.tier = tier
+      saveStudio()
+    }
+  } catch {
+    // 读取失败时保留本机已有套餐状态，避免把已购用户误判为未购。
+  }
+}
 
 /** 读取测试入口保存的昵称与兴趣，用于晒图预览 */
 function readProfile() {
@@ -422,16 +462,6 @@ function goTestIntro() {
 .h2,
 .h3 {
   font-weight: 700;
-}
-
-.state {
-  padding-top: 220px;
-  text-align: center;
-}
-.state-text {
-  display: block;
-  font-size: 13px;
-  color: #77727e;
 }
 
 .line {

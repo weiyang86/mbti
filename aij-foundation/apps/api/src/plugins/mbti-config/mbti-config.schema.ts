@@ -17,6 +17,18 @@ type Style = "editorial" | "illustration" | "game";
 type PersonaCode = `${"E" | "I"}${"S" | "N"}${"T" | "F"}${"J" | "P"}`;
 type Persona = { title: string; quote: string; recharge: string; communication: string; care: string };
 type Question = { id: string; index: number; dimension: "EI" | "SN" | "TF" | "JP"; prompt: string; options: { id: string; label: string }[]; reverse: boolean };
+/** Public page titles editable from the console; keys mirror web/src/constants/copy.ts. */
+export const PAGE_TITLE_KEYS = [
+  "pages/index/index", "pages/test-intro/test-intro", "pages/quiz/quiz", "pages/self-select/self-select",
+  "pages/result/result", "pages/pricing/pricing", "pages/create/create", "pages/generating/generating",
+  "pages/card/card", "pages/share-preview/share-preview", "pages/card/public", "pages/discover/discover",
+  "pages/buddies/detail", "pages/contacts/contacts", "pages/contact-request/contact-request",
+  "pages/contact-request/granted", "pages/exchanges/exchanges", "pages/radar/radar", "pages/compat/compat",
+  "pages/account/account", "pages/video/video", "pages/history/list", "pages/history/detail",
+  "pages/compare/compare", "pages/journey-share/journey-share", "pages/orders/orders",
+  "pages/order-status/order-status", "pages/buddies/blocked"
+] as const;
+export type PageTitleKey = typeof PAGE_TITLE_KEYS[number];
 export type MbtiValues = {
   content: { headline: string; accent: string; sub: string; cta: string; moments: string; avatar: string; meet: string; caption: string };
   channels: Record<Channel, { name: string; landing: "home" | "pricing" | "test-intro" | "discover" | "history"; badge: string }>;
@@ -29,6 +41,7 @@ export type MbtiValues = {
   copy: {
     stages: string[]; recentStatuses: string[]; interests: string[]; maxInterests: number;
     compare: { title: string; accent: string; description: string; emptyTitle: string; emptyAccent: string; emptyDescription: string };
+    pages?: Partial<Record<PageTitleKey, string>>;
   };
   aiRuntime: { mode: "UNCONFIGURED"; size: "960*1280" | "1024*1024" | "720*1280"; timeout: number; credentialRef?: string };
   payments: Record<Channel, { enabled: false; mode: "UNCONFIGURED"; merchantLabel: string }>;
@@ -64,6 +77,15 @@ const checks: Record<MbtiCategory, Check> = {
   copy: shape({
     stages: array(text(24), 1, 20), recentStatuses: array(text(24), 1, 20), interests: array(text(16), 1, 30), maxInterests: integer(1, 10),
     compare: shape({ title: text(40), accent: text(40), description: text(160), emptyTitle: text(40), emptyAccent: text(40), emptyDescription: text(160) }),
+  }, {
+    // Optional so legacy snapshots without page titles remain readable.
+    pages: v => {
+      if (!record(v)) invalid();
+      for (const [key, value] of Object.entries(v)) {
+        if (!PAGE_TITLE_KEYS.includes(key as PageTitleKey)) invalid();
+        text(30)(value);
+      }
+    },
   }),
   aiRuntime: shape({ mode: oneOf(["UNCONFIGURED"]), size: oneOf(["960*1280", "1024*1024", "720*1280"]), timeout: integer(20, 180) }, { credentialRef: v => { if (typeof v !== "string") invalid(); parseSecretRef(v); } }),
   payments: shape(Object.fromEntries(channels.map(c => [c, shape({ enabled: oneOf([false]), mode: oneOf(["UNCONFIGURED"]), merchantLabel: oneOf(["MBTI搭子体验店", "品牌展示样例"]) })]))),

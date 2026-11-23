@@ -5,7 +5,7 @@
 
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
-    <view v-if="loading" class="notice">正在读取名片与交换状态…</view>
+    <StateView v-if="loading" state="loading" title="正在读取名片与交换状态…" />
 
     <template v-if="buddy">
       <view class="buddy-profile">
@@ -90,6 +90,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getBuddy, blockBuddy } from '@/api/buddies'

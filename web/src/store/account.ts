@@ -47,8 +47,8 @@ function persist() {
   uni.setStorageSync(PROFILE_KEY, account.profile)
 }
 
-export async function login() {
-  if (account.session) return account.session
+export async function login(force = false) {
+  if (account.session && !force) return account.session
   account.busy = true
   try {
     account.session = await loginWithWeChat()
@@ -63,6 +63,12 @@ export function logout() {
   account.session = null
   account.profile = emptyProfile()
   persist()
+}
+
+/** 仅退出登录：保留本机测试记录、订单与名片数据。 */
+export function logoutSession() {
+  clearSession()
+  account.session = null
 }
 
 export function isLoggedIn(): boolean {

@@ -1,5 +1,5 @@
 import { orderQuery, projectOrderPage, projectOrderSummary, type OrderFilters } from './ops-orders-collection'
-import { normalizeOrderId, orderPath, projectOrder } from './ops-order'
+import { normalizeOrderId, orderPath, projectOrder, projectOrderUser, type OpsOrderUser } from './ops-order'
 
 export type Capability = 'access' | 'orders' | 'draft' | 'systemRead' | 'systemWrite' | 'release' | 'fulfillment' | 'generationRetry' | 'moderationRead' | 'moderation' | 'export' | 'redemption'
 export interface OpsSession {
@@ -67,6 +67,14 @@ export async function readOrder(id: string) {
   const payload = await request<unknown>(orderPath(normalized), {}, true, true)
   try { return projectOrder(payload, normalized) }
   catch { throw new OpsApiError(502, '订单响应格式不正确，请重试或联系维护人员。', 'INVALID_ORDER_RESPONSE') }
+}
+
+/** Masked identity of the order owner; never exposes a full openid. */
+export async function readOrderUser(id: string): Promise<OpsOrderUser> {
+  const normalized = normalizeOrderId(id)
+  const payload = await request<unknown>(`${orderPath(normalized)}/user`, {}, true, true)
+  try { return projectOrderUser(payload, normalized) }
+  catch { throw new OpsApiError(502, '用户身份响应格式不正确。', 'INVALID_ORDER_RESPONSE') }
 }
 
 export async function listOrders(filters: OrderFilters) {

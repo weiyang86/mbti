@@ -53,7 +53,7 @@ onBeforeUnmount(() => { version++; exportVersion++ })
     <div class="order-section-heading"><div><h2>订单列表</h2><p class="muted">持久化订单快照 · 创建时间、订单号降序。详情读取可修复支付状态；刷新列表查看更新。</p></div><button class="outline-button" :disabled="!canExport || !data || exportState === 'loading'" :title="canExport ? '最多5000笔，同一已应用筛选的全部订单' : '当前会话缺少 mbti:ops:access 或 mbti:ops:export'" @click="download">{{ exportState === 'loading' ? '导出中…' : '导出当前筛选 CSV' }}</button></div>
     <form class="order-list-filters" @submit.prevent="search">
       <label>订单号 / 结果编号<input v-model="q" type="search" maxlength="128" autocomplete="off" placeholder="精确编号；不搜索游客资料"></label>
-      <label>状态<select v-model="status" aria-label="订单状态筛选"><option value="">全部状态</option><option value="pending">待支付 pending</option><option value="paid">已支付 paid</option><option value="failed">支付失败 failed</option></select></label>
+      <label>状态<select v-model="status" aria-label="订单状态筛选"><option value="">全部状态</option><option value="pending">待支付 pending</option><option value="paid">已支付 paid</option><option value="failed">支付失败 failed</option><option value="refunded">已退款 refunded</option></select></label>
       <label>商品编码<input v-model="product" maxlength="64" placeholder="精确商品编码"></label>
       <label>从（UTC）<input v-model="from" type="date" :max="new Date().toISOString().slice(0, 10)"></label><label>至（UTC，含）<input v-model="to" type="date" :max="new Date().toISOString().slice(0, 10)"></label>
       <label>每页<select v-model="limit" aria-label="订单每页条数"><option value="10">10 条</option><option value="20">20 条</option><option value="50">50 条</option><option value="100">100 条</option></select></label>

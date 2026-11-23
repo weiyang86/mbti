@@ -1794,6 +1794,19 @@ model MbtiGuest {
   socialBlocksReceived MbtiSocialBlock[] @relation("MbtiBlockTarget")
   cardExchangesSent MbtiCardExchange[] @relation("MbtiExchangeSender")
   cardExchangesReceived MbtiCardExchange[] @relation("MbtiExchangeRecipient")
+  wechatIdentity MbtiWechatIdentity?
+}
+
+// Mini-program login identity. The guest row stays the single data owner so an
+// anonymous visitor can bind the same history by presenting its guest token.
+model MbtiWechatIdentity {
+  id          String   @id @default(uuid())
+  openId      String   @unique
+  unionId     String?
+  guestId     String   @unique
+  createdAt   DateTime @default(now())
+  lastLoginAt DateTime @default(now())
+  guest       MbtiGuest @relation(fields: [guestId], references: [id], onDelete: Restrict, onUpdate: Restrict)
 }
 
 model MbtiQuestionBank {

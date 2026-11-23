@@ -3,13 +3,12 @@
     <proto-nav />
     <DemoStrip />
 
-    <view v-if="loading" class="state"><text class="state-text">正在加载题目…</text></view>
+    <StateView v-if="loading" state="loading" title="正在加载题目…" />
 
-    <view v-else-if="!questions.length" class="state">
-      <text class="state-text">题库加载失败</text>
-      <button class="btn secondary mt" @click="load">重试</button>
-      <text class="textbtn mt" @click="goHome">返回首页</text>
-    </view>
+    <StateView v-else-if="!questions.length" state="error" title="题库加载失败" description="请检查网络后再试一次。">
+      <button class="btn secondary full" @click="load">重试</button>
+      <text class="textbtn" @click="goHome">返回首页</text>
+    </StateView>
 
     <template v-else>
       <view class="question-progress">
@@ -47,6 +46,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { Question } from '@/api/types'
@@ -241,16 +241,6 @@ function readProfile(): { stage?: string; recent?: string } {
 </script>
 
 <style scoped lang="scss">
-.state {
-  padding-top: 200px;
-  text-align: center;
-}
-.state-text {
-  display: block;
-  color: #77727e;
-  font-size: 13px;
-}
-
 .question-progress {
   margin-bottom: 0;
   font-size: 14px;

@@ -12,7 +12,7 @@
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <text v-if="loading" class="notice" role="status">正在读取当前身份的请求…</text>
+    <StateView v-if="loading" state="loading" title="正在读取当前身份的请求…" />
 
     <template v-if="emptyState">
       <view class="page-intro">
@@ -137,6 +137,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onHide, onLoad, onShow, onUnload } from '@dcloudio/uni-app'
 import { getBuddy } from '@/api/buddies'

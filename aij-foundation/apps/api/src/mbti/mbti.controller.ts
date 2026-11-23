@@ -3,12 +3,13 @@ import type { ServerResponse } from "node:http";
 import { GuestRequest, MBTI_RAW, MbtiErrorFilter, MbtiGuestGuard } from "./mbti.http";
 import { MbtiService } from "./mbti.service";
 import { MbtiShareService } from "./mbti-share.service";
+import { MbtiWechatAuthService } from "./mbti-wechat-auth.service";
 
 @Controller("v1")
 @SetMetadata(MBTI_RAW, true)
 @UseFilters(MbtiErrorFilter)
 export class MbtiController {
-  constructor(private readonly service: MbtiService, private readonly shares: MbtiShareService) {}
+  constructor(private readonly service: MbtiService, private readonly shares: MbtiShareService, private readonly auth: MbtiWechatAuthService) {}
   @Get("health")
   health() { return { status: "ok", version: "0.4.0-fastlane-candidate.1" }; }
 
@@ -16,6 +17,11 @@ export class MbtiController {
   @HttpCode(201)
   @Header("Cache-Control", "no-store")
   guest() { return this.service.guest(); }
+
+  @Post("auth/wechat/login")
+  @HttpCode(200)
+  @Header("Cache-Control", "no-store")
+  wechatLogin(@Body() body: unknown) { return this.auth.login(body); }
 
   @Get("quiz/versions/current")
   @UseGuards(MbtiGuestGuard)

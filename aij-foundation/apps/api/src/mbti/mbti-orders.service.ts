@@ -9,6 +9,8 @@ import { MBTI_PRODUCTS } from "./mbti-products";
 
 type Row = MbtiOrder & { entitlement: { id: string } | null };
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
+// Admin read model only ever exposes a masked identifier, never the full openId.
+const maskIdentity = (value: string) => value.length <= 10 ? `${value.slice(0, 2)}***` : `${value.slice(0, 6)}***${value.slice(-4)}`;
 
 @Injectable()
 export class MbtiOrdersService {
@@ -65,7 +67,7 @@ export class MbtiOrdersService {
     await this.prisma.$transaction(async tx => {
       const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
       const order = rows[0];
-      if (!order?.paymentOrderId) return;
+      if (!order?.paymentOrderId || order.status === "refunded") return;
       const ledger = await tx.paymentOrder.findUnique({ where: { id: order.paymentOrderId }, include: { transactions: { where: { kind: "charge" } } } });
       if (!ledger || ledger.payableOwner !== "mbti-controlled-test" || ledger.payableReference !== order.id ||
         ledger.amountMinor !== BigInt(order.amount) || ledger.currency.trim() !== order.currency.trim()) return;
@@ -83,7 +85,7 @@ export class MbtiOrdersService {
       const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
       const order = rows[0];
       if (!order || order.ownerId !== ownerId) reject(404, "NOT_FOUND", "资源不存在");
-      if (order.status === "failed") reject(409, "ORDER_TERMINAL", "订单已失败，无法模拟支付");
+      if (order.status === "failed" || order.status === "refunded") reject(409, "ORDER_TERMINAL", "订单已结束，无法模拟支付");
       if (order.status !== "paid") {
         await this.settle(tx, order);
         await tx.mbtiOrder.update({ where: { id }, data: { status: "paid", paidAt: new Date() } });
@@ -91,6 +93,33 @@ export class MbtiOrdersService {
       if (!await tx.mbtiEntitlement.findUnique({ where: { orderId: id } })) {
         await tx.mbtiEntitlement.create({ data: { orderId: id, kind: order.productCode } });
       }
+      return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
+    }, { maxWait: 5000, timeout: 10000 });
+    return this.payload(row);
+  }
+  // Local development only: close a pending order as failed without a provider fact.
+  async devMarkFailed(ownerId: string, id: string) {
+    const row = await this.prisma.$transaction(async tx => {
+      const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
+      const order = rows[0];
+      if (!order || order.ownerId !== ownerId) reject(404, "NOT_FOUND", "资源不存在");
+      if (order.status === "paid" || order.status === "refunded") reject(409, "ORDER_STATE", "仅待支付订单可模拟失败");
+      if (order.status !== "failed") await tx.mbtiOrder.update({ where: { id }, data: { status: "failed" } });
+      return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
+    }, { maxWait: 5000, timeout: 10000 });
+    return this.payload(row);
+  }
+  // Local development only: refund a paid order and revoke its business entitlement.
+  // No provider refund fact is fabricated; the status change is a controlled-test projection.
+  async devRefund(ownerId: string, id: string) {
+    const row = await this.prisma.$transaction(async tx => {
+      const rows = await tx.$queryRaw<MbtiOrder[]>`SELECT * FROM "MbtiOrder" WHERE id=${id} FOR UPDATE`;
+      const order = rows[0];
+      if (!order || order.ownerId !== ownerId) reject(404, "NOT_FOUND", "资源不存在");
+      if (order.status === "refunded") return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
+      if (order.status !== "paid") reject(409, "ORDER_STATE", "仅已支付订单可模拟退款");
+      await tx.mbtiOrder.update({ where: { id }, data: { status: "refunded" } });
+      await tx.mbtiEntitlement.deleteMany({ where: { orderId: id } });
       return tx.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } });
     }, { maxWait: 5000, timeout: 10000 });
     return this.payload(row);
@@ -170,5 +199,21 @@ export class MbtiOrdersService {
     if (!await this.prisma.mbtiOrder.findUnique({ where: { id }, select: { id: true } })) reject(404, "NOT_FOUND", "资源不存在");
     await this.sync(id);
     return this.payload(await this.prisma.mbtiOrder.findUniqueOrThrow({ where: { id }, include: { entitlement: true } }));
+  }
+  // Support view of who owns an order: masked login identity plus card profile.
+  async adminUser(id: string) {
+    const order = await this.prisma.mbtiOrder.findUnique({ where: { id }, select: { id: true, ownerId: true } });
+    if (!order) reject(404, "NOT_FOUND", "资源不存在");
+    const identity = await this.prisma.mbtiWechatIdentity.findUnique({ where: { guestId: order.ownerId } });
+    if (!identity) return { order_id: order.id, logged_in: false, provider: null, open_id_masked: null,
+      union_id_masked: null, nickname: null, type_code: null };
+    const card = await this.prisma.mbtiCard.findUnique({ where: { ownerId: order.ownerId }, select: { nickname: true, typeCode: true } });
+    const typeCode = card?.typeCode && /^[A-Za-z]{4}$/.test(card.typeCode) ? card.typeCode : null;
+    return { order_id: order.id, logged_in: true,
+      provider: identity.openId.startsWith("mock_") ? "mock" : "wechat",
+      open_id_masked: maskIdentity(identity.openId),
+      union_id_masked: identity.unionId ? maskIdentity(identity.unionId) : null,
+      nickname: card?.nickname || null, type_code: typeCode,
+      identity_created_at: identity.createdAt.toISOString(), last_login_at: identity.lastLoginAt.toISOString() };
   }
 }

@@ -6,8 +6,10 @@
       <view class="h1">认识我，从这张卡开始。</view>
     </view>
 
-    <text v-if="loading" class="notice">正在读取公开名片…</text>
-    <view v-if="error" class="notice warn">{{ error }}</view>
+    <StateView v-if="loading" state="loading" title="正在读取公开名片…" />
+    <StateView v-else-if="error && !shown" state="error" title="公开名片读取失败" :description="error">
+      <button class="btn secondary full" @click="load">重新加载</button>
+    </StateView>
 
     <template v-if="shown">
       <view v-if="shown.style" class="portrait">
@@ -58,6 +60,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
+import StateView from '@/components/state-view.vue'
 import { getPublicCard } from '@/api/cards'
 import type { PublicCard } from '@/api/types-social'
 import { DECLARATIONS } from '@/constants/types'

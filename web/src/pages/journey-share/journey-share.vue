@@ -3,7 +3,7 @@
     <proto-nav />
     <DemoStrip />
 
-    <view v-if="loading" class="notice mt">正在生成阶段图…</view>
+    <StateView v-if="loading" state="loading" title="正在生成阶段图…" />
 
     <template v-else-if="error || !a || !b">
       <view class="page-intro">
@@ -86,6 +86,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { JOURNEY_COPY } from '@/constants/copy'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'

@@ -77,3 +77,21 @@ uni-button.textbtn { display: inline-block; width: auto; height: auto; min-heigh
 @media (min-width: 851px) {
   .action-dock { max-width: 480px; }
 }
+/* P1 移动端适配：弹层高于 tabBar，并允许小屏/横屏滚动与安全区留白 */
+.modal-backdrop { z-index: 1000; overflow-y: auto; }
+.modal { max-height: 86vh; overflow-y: auto; padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
+/* 超长昵称/文本不撑破容器；列表行单行省略 */
+.wallet-head .b,
+.buddy-main > .b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wallet-head,
+.buddy-main > .b { min-width: 0; }
+.cover-name,
+.portrait-info .name,
+.profile-head .h2,
+.buddy-profile .h1,
+.mini-pass .b,
+.feed-head .b { overflow-wrap: anywhere; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .action-dock { position: static; }
+  .modal { max-height: 92vh; }
+}
