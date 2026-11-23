@@ -5,6 +5,8 @@ import OrdersPage from './orders.vue'
 import WorkspacePage from './workspace.vue'
 import ConfigPage from './config.vue'
 import ServerConfig from './config-server.vue'
+import AiProvider from './ai-provider.vue'
+import AiImageTrial from './ai-image-trial.vue'
 import B4Page from './b4.vue'
 import B5Page from './b5.vue'
 import type { B5Scope } from './b5-contract'
@@ -116,6 +118,8 @@ watch(visiblePage, valid => { if (!valid && sessionState.value) go(visiblePages.
     <section class="workspace"><header class="topbar"><div class="breadcrumb"><button class="mobile-menu icon-button" aria-label="打开导航" @click="navOpen = true">☰</button><span>运营工作台</span><i>/</i><b>{{ page.name }}</b></div><div class="top-actions"><span class="environment"><i></i>服务端会话</span><button class="icon-button search-shortcut" aria-label="查找功能" @click="searchOpen = true">⌕</button><button class="outline-button" @click="configScope ? configPage?.openPreview() : b4Scope ? b4Page?.openPreview() : b5Scope ? b5Page?.openPreview() : openDrawer('前台预览')">前台预览</button><button v-if="sessionState.capabilities.release" class="primary" @click="go('release')">发布中心</button><button class="icon-button logout-top" aria-label="退出登录" @click="signOut">↪</button></div></header>
       <main class="content"><div v-if="apiError" class="alert error-banner" role="alert">{{ apiError }} <button class="text-button" @click="loadSession">重新连接</button></div><div class="page-heading"><div><p class="eyebrow">OPERATIONS / {{ page.code }}</p><h1>{{ page.name }}</h1><p class="description">{{ page.description }}</p></div><div class="heading-actions"><button class="outline-button" @click="goBack">返回</button><button v-if="page.id === 'ai' || page.id === 'ai-settings'" class="outline-button" disabled>图像服务未接通</button></div></div>
         <WorkspacePage v-if="(page.id === 'overview' || page.id === 'growth' || page.id === 'moderation') && visiblePage" :page="page.id" :can-export="sessionState.capabilities.export" :can-moderate="sessionState.capabilities.moderation" :can-moderate-read="sessionState.capabilities.moderationRead" @navigate="go" @reauthenticate="loadSession" />
+        <AiProvider v-if="page.id === 'ai-settings' && visiblePage" :can-write="sessionState.capabilities.systemWrite" />
+        <AiImageTrial v-if="page.id === 'ai-settings' && visiblePage" :can-write="sessionState.capabilities.systemWrite" />
         <ServerConfig v-if="(configScope || b4Scope || b5Scope) && visiblePage" :key="pageId" :page="pageId" @dirty="configUnsaved = $event" />
         <details v-if="configScope || b4Scope || b5Scope"><summary>本机原型演练（只读演示，不写入服务器）</summary>
           <ConfigPage v-if="configScope && visiblePage" ref="configPage" :page="configScope" @dirty="unsaved = $event" />

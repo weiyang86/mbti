@@ -24,6 +24,9 @@ import { MbtiOpsGrowthController } from "./mbti-ops-growth.controller";
 import { MbtiOpsRetentionService } from "./mbti-ops-retention.service";
 import { MbtiOpsRetentionController } from "./mbti-ops-retention.controller";
 import { MbtiOrdersAdminController, MbtiOrdersController } from "./mbti-orders.controller";
+import { MbtiAiAdminController } from "./mbti-ai-image.controller";
+import { MbtiAiImageService } from "./mbti-ai-image.service";
+import { ConfigurationModule } from "../configuration/configuration.module";
 
 import { MbtiSocialController } from "./mbti-social.controller";
 import { MbtiSocialService } from "./mbti-social.service";
@@ -55,14 +58,14 @@ export class MbtiModule {
       throw new Error("MBTI controlled payments require explicit isolated test runtime, administrator auth and a local random secret");
     }
     return { module: MbtiModule,
-      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule] : [])],
+      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule, ConfigurationModule] : [])],
       controllers: [MbtiController, MbtiOrdersController, MbtiWechatPayController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.nodeEnv === "development" && runtime.environment === "development" ? [MbtiDevPaymentController] : []), ...(runtime.capabilities.auth ? [
-        MbtiOrdersAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
+        MbtiOrdersAdminController, MbtiAiAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
         MbtiOpsModerationController, MbtiOpsGrowthController, MbtiOpsRetentionController,
       ] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
       providers: [MbtiService, MbtiShareService, MbtiWechatAuthService, MbtiWechatPayService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
-        MbtiOpsRefundService, MbtiOpsRedeemService, MbtiOpsGenerationService, MbtiOpsModerationService,
+        MbtiAiImageService, MbtiOpsRefundService, MbtiOpsRedeemService, MbtiOpsGenerationService, MbtiOpsModerationService,
         MbtiOpsGrowthService, MbtiOpsRetentionService,
       ] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },

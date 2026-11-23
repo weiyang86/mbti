@@ -3,7 +3,7 @@ import type { AdminRequest } from "../auth/auth.types";
 import { AdminIdDto, AdminListDto } from "../admin/dto";
 import { Permissions } from "../common/decorators/permissions.decorator";
 import { SECRET_PERMISSION } from "../../../../scripts/secret-policy.cjs";
-import { CreateSecretReferenceDto, RotateSecretReferenceDto, SecretVersionDto } from "./dto";
+import { CreateSecretReferenceDto, RotateSecretReferenceDto, SaveSecretValueDto, SecretVersionDto } from "./dto";
 import { SecretCenterService } from "./secret-center.service";
 const strict = (expectedType: Type<object>) => new ValidationPipe({ expectedType, whitelist: true, forbidNonWhitelisted: true, transform: true });
 @Controller("admin/secret-references")
@@ -16,6 +16,8 @@ export class SecretCenterController {
   detail(@Param() p: AdminIdDto) { return this.secrets.detail(p.id); }
   @Post() @Header("Cache-Control", "no-store")
   create(@Body(strict(CreateSecretReferenceDto)) d: object, @Req() r: AdminRequest) { return this.secrets.create(d as CreateSecretReferenceDto, r.user!.id, r.correlationId); }
+  @Post("values") @Header("Cache-Control", "no-store")
+  saveValue(@Body(strict(SaveSecretValueDto)) d: object, @Req() r: AdminRequest) { return this.secrets.saveValue(d as SaveSecretValueDto, r.user!.id, r.correlationId); }
   @Post(":id/rotate") @HttpCode(200) @Header("Cache-Control", "no-store")
   rotate(@Param() p: AdminIdDto, @Body(strict(RotateSecretReferenceDto)) d: object, @Req() r: AdminRequest) { return this.secrets.rotate(p.id, d as RotateSecretReferenceDto, r.user!.id, r.correlationId); }
   @Post(":id/clear") @HttpCode(200) @Header("Cache-Control", "no-store")
