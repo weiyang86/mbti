@@ -37,7 +37,7 @@
       <text class="a" @click="go('/pages/exchanges/exchanges')">名片夹{{ pendingCount ? ` ${pendingCount}` : '' }}</text>
     </view>
 
-    <view v-if="loading" class="notice">正在读取搭子…</view>
+    <StateView v-if="loading" state="loading" title="正在读取搭子…" />
 
     <view v-for="buddy in items" :key="buddy.id" class="buddy-tile" @click="openBuddy(buddy.id)">
       <view class="buddy-avatar" :style="{ background: avatarTint(buddy.id).bg }">
@@ -54,9 +54,7 @@
       <text class="span">↗</text>
     </view>
 
-    <view v-if="loaded && !loading && !items.length" class="notice">
-      这一组示例搭子当前不可查看，可以在“我的”中管理屏蔽列表。
-    </view>
+    <StateView v-if="loaded && !loading && !items.length" state="empty" title="这一组暂时没有可查看的搭子" description="可以在「我的」中管理屏蔽列表，或切换到另一组推荐。" />
 
     <view class="fine mt">全部为虚构成年人资料。没有聊天、评论或自由发布动态的入口。</view>
   <proto-tabbar />
@@ -65,6 +63,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'

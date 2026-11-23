@@ -1,7 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <text v-if="loading" class="notice">正在读取本人名片…</text>
+    <StateView v-if="loading" state="loading" title="正在读取本人名片…" />
     <view v-if="error" class="notice warn">{{ error }}</view>
     <view v-if="success" class="notice green">{{ success }}</view>
 
@@ -195,6 +195,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, reactive, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'

@@ -9,7 +9,7 @@
       <view class="p">按类型标签生成的趣味建议，不提供“天生绝配”或匹配概率。</view>
     </view>
 
-    <text v-if="loading" class="notice" role="status">正在读取你的类型…</text>
+    <StateView v-if="loading" state="loading" title="正在读取你的类型…" />
     <text v-if="error" class="error" role="alert">{{ error }}</text>
 
     <view v-if="!loading && !myType" class="panel">
@@ -106,6 +106,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'

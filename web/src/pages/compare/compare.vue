@@ -3,7 +3,7 @@
     <proto-nav />
     <DemoStrip />
 
-    <view v-if="loading" class="notice mt">正在准备对比…</view>
+    <StateView v-if="loading" state="loading" title="正在准备对比…" />
 
     <template v-else-if="error">
       <view class="page-intro">
@@ -156,6 +156,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import type {

@@ -17,12 +17,11 @@
       <text>默认仅自己可见 · 本机保存</text>
     </view>
 
-    <view v-if="loading" class="notice mt">正在读取记录…</view>
+    <StateView v-if="loading" state="loading" title="正在读取记录…" />
 
-    <view v-else-if="loadError" class="notice warn mt">
-      <view>轨迹读取失败</view>
-      <view class="btn secondary small mt" @click="load">重试</view>
-    </view>
+    <StateView v-else-if="loadError" state="error" title="轨迹读取失败" description="请检查网络后重试，已有记录不会被删除。">
+      <button class="btn secondary small" @click="load">重试</button>
+    </StateView>
 
     <template v-else>
       <template v-if="rows.length">
@@ -221,6 +220,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import type {

@@ -31,7 +31,7 @@
       >{{ radius === 500 ? '500 米' : `${radius / 1000} 公里` }}</button>
     </view>
 
-    <text v-if="state.loading" class="notice" role="status">正在读取本人类型和参与状态…</text>
+    <StateView v-if="state.loading" state="loading" title="正在读取本人类型和参与状态…" />
     <text v-if="state.error" class="error" role="alert">{{ state.error }}</text>
     <text v-if="state.notice" class="success" role="status">{{ state.notice }}</text>
     <text v-if="state.statistics.kind === 'error'" class="error" role="alert">{{ state.statistics.message }}</text>
@@ -61,6 +61,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, reactive } from 'vue'
 import { onHide, onShow, onUnload } from '@dcloudio/uni-app'
 import { getMyCard } from '@/api/cards'

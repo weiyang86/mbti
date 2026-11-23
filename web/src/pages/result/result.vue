@@ -2,7 +2,7 @@
   <view>
     <proto-nav />
     <view class="page">
-      <view v-if="loading" class="state"><text class="state-text">正在读取结果…</text></view>
+      <StateView v-if="loading" state="loading" title="正在读取结果…" />
 
       <template v-else-if="!result">
         <view class="page-intro">
@@ -187,6 +187,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'
@@ -422,16 +423,6 @@ function goTestIntro() {
 .h2,
 .h3 {
   font-weight: 700;
-}
-
-.state {
-  padding-top: 220px;
-  text-align: center;
-}
-.state-text {
-  display: block;
-  font-size: 13px;
-  color: #77727e;
 }
 
 .line {

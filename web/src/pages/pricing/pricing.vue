@@ -88,9 +88,11 @@
 
     <view class="h3 offer-choice-title">选一份想晒的自己</view>
 
-    <view v-if="loading" class="notice">正在读取商品…</view>
-    <view v-else-if="error" class="notice warn">{{ error }}</view>
-    <view v-else-if="!products.length" class="notice">当前没有商品。</view>
+    <StateView v-if="loading" state="loading" title="正在读取商品…" />
+    <StateView v-else-if="error" state="error" title="商品读取失败" :description="error">
+      <button class="btn secondary full" @click="loadProducts">重新加载</button>
+    </StateView>
+    <StateView v-else-if="!products.length" state="empty" title="当前没有可购买的商品" description="稍后再来看看，或先回到首页继续探索。" />
     <view v-else class="plan-picker">
       <view
         v-for="(product, index) in products"
@@ -169,6 +171,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { createOrder, getMyEntitlements, listProducts, type Entitlement, type PaymentProduct } from '@/api/payment'

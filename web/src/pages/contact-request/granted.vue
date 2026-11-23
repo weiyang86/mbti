@@ -11,7 +11,7 @@
 
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <text v-if="loading" class="notice" role="status">正在验证当前授权…</text>
+    <StateView v-if="loading" state="loading" title="正在验证当前授权…" />
 
     <template v-if="loaded">
       <view class="notice green">双方已确认（模拟） · 仅授权本次所选渠道</view>
@@ -36,6 +36,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { ref } from 'vue'
 import { onHide, onLoad, onShow, onUnload } from '@dcloudio/uni-app'
 import { getGrantedContacts, revokeContactRequest } from '@/api/contacts'

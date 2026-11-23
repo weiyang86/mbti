@@ -11,12 +11,9 @@
 
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
-    <text v-if="loading" class="notice">正在读取屏蔽列表…</text>
+    <StateView v-if="loading" state="loading" title="正在读取屏蔽列表…" />
 
-    <view v-if="loaded && !items.length" class="panel">
-      <view class="h3">还没有屏蔽任何搭子</view>
-      <view class="p">解除屏蔽后，旧的名片交换与授权不会恢复。</view>
-    </view>
+    <StateView v-if="loaded && !items.length" state="empty" title="还没有屏蔽任何搭子" description="解除屏蔽后，旧的名片交换与授权不会恢复。" />
 
     <view v-else-if="items.length" class="panel">
       <view class="h3">已屏蔽的搭子</view>
@@ -40,6 +37,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { listBlockedBuddies, unblockBuddy } from '@/api/buddies'

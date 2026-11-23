@@ -1,7 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view v-if="loading" class="notice mt">正在读取这份记录…</view>
+    <StateView v-if="loading" state="loading" title="正在读取这份记录…" />
 
     <template v-else-if="loadError">
       <view class="page-intro">
@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { ResultSnapshot, ResultSnapshotSummary, TypeMeta } from '@/api/types'
