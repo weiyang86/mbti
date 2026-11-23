@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Header, Headers, Param, Post, Query, Req, SetMetadata, UseFilters, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Header, Headers, HttpCode, Param, Post, Query, Req, SetMetadata, UseFilters, UseGuards } from "@nestjs/common";
 import { GuestRequest, MBTI_RAW, MbtiErrorFilter, MbtiGuestGuard } from "./mbti.http";
 import { MbtiOrdersService } from "./mbti-orders.service";
+import { MbtiWechatPayService } from "./mbti-wechat-pay.service";
 import { Permissions } from "../common/decorators/permissions.decorator";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { PermissionsGuard } from "../common/guards/permissions.guard";
@@ -14,9 +15,11 @@ import type { AdminRequest } from "../auth/auth.types";
 @UseFilters(MbtiErrorFilter)
 @UseGuards(MbtiGuestGuard)
 export class MbtiOrdersController {
-  constructor(private readonly orders: MbtiOrdersService) {}
+  constructor(private readonly orders: MbtiOrdersService, private readonly wechatPay: MbtiWechatPayService) {}
   @Get("products") @Header("Cache-Control", "no-store") products() { return this.orders.products(); }
   @Post("orders") @Header("Cache-Control", "no-store") create(@Req() req: GuestRequest, @Body() body: unknown, @Headers("idempotency-key") key: unknown) { return this.orders.create(req.mbtiOwnerId, body, key); }
+  @Post("orders/:id/pay") @HttpCode(200) @Header("Cache-Control", "no-store")
+  pay(@Req() req: GuestRequest, @Param("id") id: string) { return this.wechatPay.pay(req.mbtiOwnerId, id); }
   @Get("orders") @Header("Cache-Control", "no-store") list(@Req() req: GuestRequest, @Query("limit") limit: unknown, @Query("cursor") cursor: unknown) { return this.orders.list(req.mbtiOwnerId, limit, cursor); }
   @Get("orders/:id") @Header("Cache-Control", "no-store") status(@Req() req: GuestRequest, @Param("id") id: string) { return this.orders.status(req.mbtiOwnerId, id); }
   @Get("entitlements/me") @Header("Cache-Control", "no-store") entitlements(@Req() req: GuestRequest) { return this.orders.entitlements(req.mbtiOwnerId); }

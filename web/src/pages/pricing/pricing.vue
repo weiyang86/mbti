@@ -174,7 +174,7 @@ import DemoStrip from '@/components/demo-strip.vue'
 import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { createOrder, getMyEntitlements, listProducts, type Entitlement, type PaymentProduct } from '@/api/payment'
+import { createOrder, getMyEntitlements, listProducts, requestWechatPay, devPaymentAvailable, type Entitlement, type PaymentProduct, type WechatPayParams } from '@/api/payment'
 import { getResult, listResults } from '@/api/results'
 import { requestErrorMessage } from '@/api/client'
 import { entitledTier, formatMoney } from '@/utils/payment-display'
@@ -369,12 +369,45 @@ async function confirmOrder() {
     }
     const order = await createOrder({ result_id: resultId, product_code: payProduct.value.code })
     payOpen.value = false
+    if (!devPaymentAvailable) {
+      try {
+        const payment = await requestWechatPay(order.id)
+        await requestPayment(payment.pay_params)
+        uni.redirectTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(order.id)}&paid=1` })
+      } catch (e) {
+        const cancelled = /cancel/i.test(String((e as { errMsg?: string })?.errMsg || ''))
+        uni.showToast({ title: cancelled ? '已取消支付' : e instanceof Error ? e.message : '支付未完成，请稍后重试', icon: 'none' })
+        uni.redirectTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(order.id)}` })
+      }
+      return
+    }
     uni.navigateTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(order.id)}` })
   } catch (e) {
     payError.value = requestErrorMessage(e, '创建订单失败，请稍后重试')
   } finally {
     creating.value = false
   }
+}
+
+/** 小程序端唤起微信支付；H5 仅用于预览，会给出明确提示。 */
+function requestPayment(params: WechatPayParams): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // #ifdef MP-WEIXIN
+    uni.requestPayment({
+      provider: 'wxpay',
+      timeStamp: params.timeStamp,
+      nonceStr: params.nonceStr,
+      package: params.package,
+      signType: params.signType,
+      paySign: params.paySign,
+      success: () => resolve(),
+      fail: (err) => reject(err),
+    })
+    // #endif
+    // #ifndef MP-WEIXIN
+    reject(new Error('请在微信小程序内完成支付'))
+    // #endif
+  })
 }
 
 function toggleFaq(q: string) {

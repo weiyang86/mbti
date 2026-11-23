@@ -8,6 +8,8 @@ import { MbtiGuestGuard } from "./mbti.http";
 import { MbtiService } from "./mbti.service";
 import { MbtiShareService } from "./mbti-share.service";
 import { MbtiWechatAuthService } from "./mbti-wechat-auth.service";
+import { MbtiWechatPayService } from "./mbti-wechat-pay.service";
+import { MbtiWechatPayController } from "./mbti-wechat-pay.controller";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { MbtiOpsOrdersService } from "./mbti-ops-orders.service";
 import { MbtiOpsRefundService } from "./mbti-ops-refund.service";
@@ -54,12 +56,12 @@ export class MbtiModule {
     }
     return { module: MbtiModule,
       imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.nodeEnv === "development" && runtime.environment === "development" ? [MbtiDevPaymentController] : []), ...(runtime.capabilities.auth ? [
+      controllers: [MbtiController, MbtiOrdersController, MbtiWechatPayController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.nodeEnv === "development" && runtime.environment === "development" ? [MbtiDevPaymentController] : []), ...(runtime.capabilities.auth ? [
         MbtiOrdersAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
         MbtiOpsModerationController, MbtiOpsGrowthController, MbtiOpsRetentionController,
       ] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiWechatAuthService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
+      providers: [MbtiService, MbtiShareService, MbtiWechatAuthService, MbtiWechatPayService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
         MbtiOpsRefundService, MbtiOpsRedeemService, MbtiOpsGenerationService, MbtiOpsModerationService,
         MbtiOpsGrowthService, MbtiOpsRetentionService,
       ] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [

@@ -35,6 +35,7 @@
 
       <view v-if="order.status === 'pending'" class="mini-list">
         <button class="btn secondary full" :disabled="loading" @click="load">刷新支付状态</button>
+        <text v-if="pollPaid" class="small">支付完成后会自动刷新…</text>
       </view>
       <view v-else-if="order.status === 'failed'" class="mini-list">
         <button class="btn full" @click="goCatalog">重新选择商品</button>
@@ -61,7 +62,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { onLoad, onShow } from '@dcloudio/uni-app'
+import { onLoad, onShow, onUnload } from '@dcloudio/uni-app'
 import StateView from '@/components/state-view.vue'
 import { getOrderStatus, devMarkOrderPaid, devMarkOrderFailed, devRefundOrder, devPaymentAvailable, type OrderStatus } from '@/api/payment'
 import { requestErrorMessage } from '@/api/client'
@@ -74,8 +75,19 @@ const devPaying = ref(false)
 const devFailing = ref(false)
 const devRefunding = ref(false)
 const error = ref('')
-onLoad((q) => { orderId.value = (q?.order_id as string) || '' })
+const pollPaid = ref(false)
+let pollTimer: ReturnType<typeof setTimeout> | undefined
+let pollRemaining = 0
+onLoad((q) => {
+  orderId.value = (q?.order_id as string) || ''
+  pollPaid.value = q?.paid === '1'
+  pollRemaining = pollPaid.value ? 10 : 0
+})
 onShow(load)
+onUnload(() => {
+  if (pollTimer) clearTimeout(pollTimer)
+  pollTimer = undefined
+})
 
 const tone = computed(() => order.value ? orderTone(order.value.status) : 'unknown')
 const symbol = computed(() => {
@@ -91,9 +103,20 @@ async function load() {
   error.value = ''
   if (!orderId.value) { order.value = null; error.value = '缺少订单号，请从本人订单列表打开'; return }
   loading.value = true
-  try { order.value = await getOrderStatus(orderId.value) }
+  try { order.value = await getOrderStatus(orderId.value); schedulePoll() }
   catch (e) { order.value = null; error.value = requestErrorMessage(e, '订单状态暂未查询成功，请稍后重试') }
   finally { loading.value = false }
+}
+
+/** 微信支付返回后，回调可能略晚于页面跳转；短轮询等待最终状态。 */
+function schedulePoll() {
+  if (!pollPaid.value || order.value?.status !== 'pending' || pollRemaining <= 0) return
+  pollRemaining -= 1
+  if (pollTimer) clearTimeout(pollTimer)
+  pollTimer = setTimeout(() => {
+    pollTimer = undefined
+    if (order.value?.status === 'pending') void load()
+  }, 2000)
 }
 
 async function simulatePay() {
