@@ -11,9 +11,9 @@
     </view>
     <text class="m-kicker">MBTI TEST × PERSONALITY CARD</text>
     <view v-if="sessionExpired" class="notice session-renew">
-      <text>本机游客会话已失效，重新建立后才能继续测试、下单与查看记录。</text>
+      <text>{{ account.session ? '登录状态已失效，请重新登录后继续。' : '本机游客会话已失效，重新建立后才能继续测试、下单与查看记录。' }}</text>
       <button class="btn secondary full mt" :disabled="renewing" @click="renewSession">
-        {{ renewing ? '正在建立…' : '重新建立游客会话' }}
+        {{ renewing ? '正在建立…' : account.session ? '重新登录' : '重新建立游客会话' }}
       </button>
     </view>
     <view class="h1">{{ heroLead }}<text class="line"><text class="em">{{ heroAccent }}</text></text></view>
@@ -162,6 +162,10 @@ async function loadHome() {
 
 async function renewSession() {
   if (renewing.value) return
+  if (account.session) {
+    uni.navigateTo({ url: '/pages/login/login' })
+    return
+  }
   renewing.value = true
   try {
     await startNewGuestSession()

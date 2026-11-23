@@ -32,6 +32,23 @@ export function isGuestSessionExpired(): boolean {
   }
 }
 
+/** Current data-owner token, or null when this device has no guest identity yet. */
+export function currentGuestToken(): string | null {
+  try {
+    return storedGuest()?.guest_token ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Adopt a server-issued guest token (e.g. after WeChat login) for all later requests. */
+export function adoptGuestSession(guest: { guest_token: string; expires_at: string }) {
+  if (!guest.guest_token || !guest.expires_at || !Number.isFinite(Date.parse(guest.expires_at))) {
+    throw new Error('登录响应缺少有效会话')
+  }
+  uni.setStorageSync(guestKey, { guest_token: guest.guest_token, expires_at: guest.expires_at })
+}
+
 export class HttpError extends Error {
   status: number
   body: ApiError | null

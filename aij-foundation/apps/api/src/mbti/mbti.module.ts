@@ -7,6 +7,7 @@ import { MbtiController } from "./mbti.controller";
 import { MbtiGuestGuard } from "./mbti.http";
 import { MbtiService } from "./mbti.service";
 import { MbtiShareService } from "./mbti-share.service";
+import { MbtiWechatAuthService } from "./mbti-wechat-auth.service";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { MbtiOpsOrdersService } from "./mbti-ops-orders.service";
 import { MbtiOpsRefundService } from "./mbti-ops-refund.service";
@@ -58,7 +59,7 @@ export class MbtiModule {
         MbtiOpsModerationController, MbtiOpsGrowthController, MbtiOpsRetentionController,
       ] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
+      providers: [MbtiService, MbtiShareService, MbtiWechatAuthService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
         MbtiOpsRefundService, MbtiOpsRedeemService, MbtiOpsGenerationService, MbtiOpsModerationService,
         MbtiOpsGrowthService, MbtiOpsRetentionService,
       ] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
