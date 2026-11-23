@@ -11,7 +11,7 @@
         <view class="h1">对比加载失败</view>
         <view class="p">{{ error }}</view>
       </view>
-      <view class="btn secondary full" @click="load">重新加载</view>
+      <view v-if="!incomparable" class="btn secondary full" @click="load">重新加载</view>
       <view class="btn ghost full mt" @click="backToJourney">回到我的轨迹</view>
     </template>
 
@@ -165,6 +165,7 @@ import type {
   ResultSnapshotSummary,
 } from '@/api/types'
 import { compareResults, getResult, listResults } from '@/api/results'
+import { HttpError, requestErrorMessage } from '@/api/client'
 import { getLocalAnswers, type LocalAnswerRecord } from '@/store/local-answers'
 import {
   DIM_LIST,
@@ -189,6 +190,7 @@ const baselineId = ref('')
 const targetId = ref('')
 const loading = ref(true)
 const error = ref('')
+const incomparable = ref(false)
 const a = ref<ResultSnapshot | null>(null)
 const b = ref<ResultSnapshot | null>(null)
 const compare = ref<CompareResult | null>(null)
@@ -293,6 +295,7 @@ const toIndex = computed(() => {
 async function load() {
   loading.value = true
   error.value = ''
+  incomparable.value = false
   try {
     const res = await listResults({ limit: 100 })
     const quiz = res.items.filter((i) => i.source === 'quiz')
@@ -318,10 +321,16 @@ async function load() {
       targetId.value = to.id
       compare.value = await compareResults(from.id, to.id)
     }
-  } catch {
-    error.value = '对比加载失败，请稍后再试。'
+  } catch (e) {
     a.value = null
     b.value = null
+    compare.value = null
+    if (e instanceof HttpError && e.status === 422) {
+      incomparable.value = true
+      error.value = '这两份结果来自不同题库版本，或不是完整的测评记录，无法直接对比。'
+    } else {
+      error.value = requestErrorMessage(e, '对比加载失败，请稍后再试。')
+    }
   } finally {
     loading.value = false
   }

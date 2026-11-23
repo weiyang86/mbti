@@ -516,11 +516,12 @@ function showDemoStatus() {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  z-index: 1000;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding: 0;
+  overflow-y: auto;
 }
 .modal {
   width: 100%;

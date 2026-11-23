@@ -54,7 +54,23 @@
       <text class="span">↗</text>
     </view>
 
-    <StateView v-if="loaded && !loading && !items.length" state="empty" title="这一组暂时没有可查看的搭子" description="可以在「我的」中管理屏蔽列表，或切换到另一组推荐。" />
+    <StateView
+      v-if="loaded && !loading && !items.length"
+      state="empty"
+      :title="mode === 'same' ? `暂时没有同型 ${myType} 的搭子` : '这一组暂时没有可查看的搭子'"
+      :description="mode === 'same' ? '可以切换到推荐分组，看看不同类型的人。' : '可以在「我的」中管理屏蔽列表，或切换到同型分组。'"
+    >
+      <button v-if="mode === 'same'" class="btn secondary full" @click="switchMode('recommend')">看看推荐搭子</button>
+    </StateView>
+
+    <button
+      v-if="canLoadMore"
+      class="btn secondary full mt"
+      :disabled="loadingMore"
+      @click="loadMore"
+    >
+      {{ loadingMore ? '正在加载…' : '加载更多搭子' }}
+    </button>
 
     <view class="fine mt">全部为虚构成年人资料。没有聊天、评论或自由发布动态的入口。</view>
   <proto-tabbar />
@@ -82,7 +98,12 @@ const mode = ref<'recommend' | 'same'>('recommend')
 const loading = ref(false)
 const loaded = ref(false)
 const error = ref('')
+const displayLimit = ref(0)
+const loadingMore = ref(false)
 const pendingCount = computed(() => exchanges.value.filter((item) => item.status === 'pending').length)
+const canLoadMore = computed(
+  () => loaded.value && !loading.value && items.value.length >= displayLimit.value && displayLimit.value < 100,
+)
 let modeInitialized = false
 onShow(load)
 async function load() {
@@ -101,7 +122,8 @@ async function load() {
     try { latestType = (await listResults({ limit: 1 })).items[0]?.type_code || '' } catch { latestType = '' }
     // 同型筛选以最近一次测试结果为准，名片里保存的类型只作兜底
     myType.value = latestType || card.type_code || 'INFP'
-    const limit = published.discovery?.daily ?? LIMITS.discovery
+    const limit = displayLimit.value || (published.discovery?.daily ?? LIMITS.discovery)
+    displayLimit.value = limit
     const list = mode.value === 'same' && myType.value
       ? await listBuddies({ mode: 'recommend', type_code: myType.value, limit })
       : await listBuddies({ mode: 'recommend', limit })
@@ -109,9 +131,25 @@ async function load() {
   } catch (e) { error.value = socialErrorMessage(e, '搭子列表读取失败，请重试') }
   finally { loading.value = false }
 }
+async function loadMore() {
+  if (loadingMore.value || !canLoadMore.value) return
+  loadingMore.value = true
+  error.value = ''
+  const next = Math.min(displayLimit.value + 10, 100)
+  try {
+    const list = mode.value === 'same' && myType.value
+      ? await listBuddies({ mode: 'recommend', type_code: myType.value, limit: next })
+      : await listBuddies({ mode: 'recommend', limit: next })
+    items.value = list.items
+    displayLimit.value = next
+  } catch (e) { error.value = socialErrorMessage(e, '加载更多失败，请重试') }
+  finally { loadingMore.value = false }
+}
 function switchMode(next: 'recommend' | 'same') {
   if (loading.value || (next === 'same' && !myType.value)) return
-  mode.value = next; load()
+  mode.value = next
+  displayLimit.value = 0
+  load()
 }
 function avatarText(buddy: BuddySummary) {
   return Array.from(displayBuddyName(buddy.nickname, buddy.id))[0] || '搭'
