@@ -6,6 +6,7 @@ import WorkspacePage from './workspace.vue'
 import ConfigPage from './config.vue'
 import ServerConfig from './config-server.vue'
 import AiProvider from './ai-provider.vue'
+import PaymentConfig from './payment-config.vue'
 import AiImageTrial from './ai-image-trial.vue'
 import B4Page from './b4.vue'
 import B5Page from './b5.vue'
@@ -119,8 +120,9 @@ watch(visiblePage, valid => { if (!valid && sessionState.value) go(visiblePages.
       <main class="content"><div v-if="apiError" class="alert error-banner" role="alert">{{ apiError }} <button class="text-button" @click="loadSession">重新连接</button></div><div class="page-heading"><div><p class="eyebrow">OPERATIONS / {{ page.code }}</p><h1>{{ page.name }}</h1><p class="description">{{ page.description }}</p></div><div class="heading-actions"><button class="outline-button" @click="goBack">返回</button><button v-if="page.id === 'ai' || page.id === 'ai-settings'" class="outline-button" disabled>图像服务未接通</button></div></div>
         <WorkspacePage v-if="(page.id === 'overview' || page.id === 'growth' || page.id === 'moderation') && visiblePage" :page="page.id" :can-export="sessionState.capabilities.export" :can-moderate="sessionState.capabilities.moderation" :can-moderate-read="sessionState.capabilities.moderationRead" @navigate="go" @reauthenticate="loadSession" />
         <AiProvider v-if="page.id === 'ai-settings' && visiblePage" :can-write="sessionState.capabilities.systemWrite" />
+        <PaymentConfig v-if="page.id === 'payment-settings' && visiblePage" :can-write="sessionState.capabilities.systemWrite" @dirty="configUnsaved = $event" />
         <AiImageTrial v-if="page.id === 'ai-settings' && visiblePage" :can-write="sessionState.capabilities.systemWrite" />
-        <ServerConfig v-if="(configScope || b4Scope || b5Scope) && visiblePage" :key="pageId" :page="pageId" @dirty="configUnsaved = $event" />
+        <ServerConfig v-if="(configScope || b4Scope || b5Scope) && visiblePage && page.id !== 'payment-settings'" :key="pageId" :page="pageId" @dirty="configUnsaved = $event" />
         <details v-if="configScope || b4Scope || b5Scope"><summary>本机原型演练（只读演示，不写入服务器）</summary>
           <ConfigPage v-if="configScope && visiblePage" ref="configPage" :page="configScope" @dirty="unsaved = $event" />
           <B4Page v-if="b4Scope && visiblePage" :key="b4Scope" ref="b4Page" :page="b4Scope" :can-edit="sessionState.capabilities.draft" @dirty="unsaved = $event" />

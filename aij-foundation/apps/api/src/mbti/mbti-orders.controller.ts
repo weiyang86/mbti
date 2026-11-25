@@ -19,7 +19,9 @@ export class MbtiOrdersController {
   @Get("products") @Header("Cache-Control", "no-store") products() { return this.orders.products(); }
   @Post("orders") @Header("Cache-Control", "no-store") create(@Req() req: GuestRequest, @Body() body: unknown, @Headers("idempotency-key") key: unknown) { return this.orders.create(req.mbtiOwnerId, body, key); }
   @Post("orders/:id/pay") @HttpCode(200) @Header("Cache-Control", "no-store")
-  pay(@Req() req: GuestRequest, @Param("id") id: string) { return this.wechatPay.pay(req.mbtiOwnerId, id); }
+  pay(@Req() req: GuestRequest, @Param("id") id: string, @Headers("x-mbti-pay-channel") channel: unknown) {
+    return this.wechatPay.pay(req.mbtiOwnerId, id, channel);
+  }
   @Get("orders") @Header("Cache-Control", "no-store") list(@Req() req: GuestRequest, @Query("limit") limit: unknown, @Query("cursor") cursor: unknown) { return this.orders.list(req.mbtiOwnerId, limit, cursor); }
   @Get("orders/:id") @Header("Cache-Control", "no-store") status(@Req() req: GuestRequest, @Param("id") id: string) { return this.orders.status(req.mbtiOwnerId, id); }
   @Get("entitlements/me") @Header("Cache-Control", "no-store") entitlements(@Req() req: GuestRequest) { return this.orders.entitlements(req.mbtiOwnerId); }

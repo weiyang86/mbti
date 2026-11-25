@@ -1795,11 +1795,25 @@ model MbtiGuest {
   cardExchangesSent MbtiCardExchange[] @relation("MbtiExchangeSender")
   cardExchangesReceived MbtiCardExchange[] @relation("MbtiExchangeRecipient")
   wechatIdentity MbtiWechatIdentity?
+  wechatMpIdentity MbtiWechatMpIdentity?
 }
 
 // Mini-program login identity. The guest row stays the single data owner so an
 // anonymous visitor can bind the same history by presenting its guest token.
 model MbtiWechatIdentity {
+  id          String   @id @default(uuid())
+  openId      String   @unique
+  unionId     String?
+  guestId     String   @unique
+  createdAt   DateTime @default(now())
+  lastLoginAt DateTime @default(now())
+  guest       MbtiGuest @relation(fields: [guestId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+}
+
+// Official-account (公众号) OAuth identity. Kept separate from the mini-program
+// identity because openid is scoped to each WeChat AppID, while the guest row
+// remains the shared data owner.
+model MbtiWechatMpIdentity {
   id          String   @id @default(uuid())
   openId      String   @unique
   unionId     String?

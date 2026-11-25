@@ -23,6 +23,16 @@ export class MbtiController {
   @Header("Cache-Control", "no-store")
   wechatLogin(@Body() body: unknown) { return this.auth.login(body); }
 
+  // Official-account OAuth: the H5 page exchanges its snsapi_base code here.
+  @Post("auth/wechat/mp/login")
+  @HttpCode(200)
+  @Header("Cache-Control", "no-store")
+  wechatMpLogin(@Body() body: unknown) { return this.auth.mpLogin(body); }
+
+  @Get("auth/wechat/mp/config")
+  @Header("Cache-Control", "no-store")
+  wechatMpConfig() { return this.auth.mpPublicConfig(); }
+
   @Get("quiz/versions/current")
   @UseGuards(MbtiGuestGuard)
   bank() { return this.service.currentBank(); }

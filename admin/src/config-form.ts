@@ -87,8 +87,21 @@ export function fieldsFor(category: string): FieldDef[] {
     select('size', '生成尺寸', { '960*1280': '960×1280', '1024*1024': '1024×1024', '720*1280': '720×1280' }, '图像服务'),
     number('timeout', '超时（秒）', 20, 180, '图像服务'),
   ]
-  if (category === 'payments') return channelNames.map(([key, name]) =>
-    select(`${key}.merchantLabel`, '收款主体', { 'MBTI搭子体验店': 'MBTI搭子体验店', '品牌展示样例': '品牌展示样例' }, name))
+  if (category === 'payments') return channelNames.slice(0, 2).flatMap(([key, name]) => [
+    check(`${key}.enabled`, '允许本渠道新下单', name),
+    select(`${key}.mode`, '交易环境', { mock: '模拟 · 不扣款', live: '正式收款' }, name),
+    text(`${key}.merchantLabel`, '收款方展示名（1–40 字）', 40, false, name),
+    text(`${key}.appId`, 'AppID（wx 开头 18 位）', 64, false, name),
+    text(`${key}.appSecretRef`, 'AppSecret 凭据引用', 256, false, name),
+    text(`${key}.mchId`, '微信支付商户号 MchID', 64, false, name),
+    text(`${key}.serialNo`, '商户证书序列号', 64, false, name),
+    text(`${key}.publicKeyId`, '微信支付公钥 ID（PUB_KEY_ID_…）', 80, false, name),
+    text(`${key}.notifyUrl`, '支付通知地址（HTTPS）', 240, false, name),
+    text(`${key}.refundNotifyUrl`, '退款通知地址（HTTPS）', 240, false, name),
+    text(`${key}.privateKeyRef`, '商户签名私钥引用', 256, false, name),
+    text(`${key}.apiV3KeyRef`, 'APIv3 密钥引用', 256, false, name),
+    text(`${key}.platformPublicKeyRef`, '微信支付验签公钥引用', 256, false, name),
+  ])
   if (category === 'copy') return [
     { path: 'stages', label: '阶段选项', type: 'tags', hint: '用逗号分隔，1–20 项，每项最多 24 字', group: '测试选项' },
     { path: 'recentStatuses', label: '最近状态选项', type: 'tags', hint: '用逗号分隔，1–20 项，每项最多 24 字', group: '测试选项' },
@@ -181,7 +194,8 @@ export function skeletonFor(category: string): Record<string, unknown> | null {
     ],
   }
   if (category === 'payments') return Object.fromEntries(channelNames.map(([key]) =>
-    [key, { enabled: false, mode: 'UNCONFIGURED', merchantLabel: 'MBTI搭子体验店' }]))
+    [key, { enabled: false, mode: 'mock', merchantLabel: '', appId: '', appSecretRef: '', mchId: '', serialNo: '',
+      publicKeyId: '', notifyUrl: '', refundNotifyUrl: '', privateKeyRef: '', apiV3KeyRef: '', platformPublicKeyRef: '' }]))
   if (category === 'aiRuntime') return { mode: 'UNCONFIGURED', size: '1024*1024', timeout: 60 }
   if (category === 'assessment') return {
     question_bank_version: '',

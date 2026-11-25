@@ -34,6 +34,8 @@ import { LAUNCH_PLUGIN_CODES, assertLaunchPlugins, assertLaunchRegistryAlignment
 const CONFIG = "admin.config.manage", SECRET = "admin.secret.manage", PLUGIN = "admin.plugin.manage";
 const runtime = { getOrThrow(key: string) { const values: Record<string, string> = { projectId: "mbti-foundation", environment: "test", namespace: "mbti-test" }; return values[key]; } } as ConfigService;
 const content = (headline: string) => ({ headline, accent: "当前阶段", sub: "了解自己", cta: "开始", moments: "生活", avatar: "形象", meet: "相遇", caption: "记录" });
+const paymentEntry = () => ({ enabled: false, mode: "mock" as const, merchantLabel: "", appId: "", appSecretRef: "", mchId: "", serialNo: "", publicKeyId: "", notifyUrl: "", refundNotifyUrl: "", privateKeyRef: "", apiV3KeyRef: "", platformPublicKeyRef: "" });
+const paymentChannels = () => Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, paymentEntry()]));
 type Query = { where?: Record<string, unknown>; data?: Record<string, unknown>; take?: number };
 function matches(row: object, query: Record<string, unknown> = {}): boolean {
   const values = row as Record<string, unknown>;
@@ -133,7 +135,7 @@ test("exactly 12 unique categories, prototype candidates validate and unknown/se
   const values = { ...emptySnapshot(), content: b3.content, channels: b3.channels, catalog: { shop: b3.shop, styles: b3.styles },
     assessment: { ...b3.quiz, questions: b3.quiz.questions.map((q: object) => ({ ...q, reverse: false })) }, personas: b3.personas,
     imageRecipes: { recipe: "balanced" }, retention: { tags: ["日常生活"], days: [30, 90] }, discovery: { order: "recommend", daily: 8, radar: true, radius: 500, minimum: 10 },
-    aiRuntime: { mode: "UNCONFIGURED", size: "960*1280", timeout: 90 }, payments: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(c => [c, { enabled: false, mode: "UNCONFIGURED", merchantLabel: "MBTI搭子体验店" }])), trade: { ttl: 30, redeem: true, selfRefund: "self", refundDays: 7 } };
+    aiRuntime: { mode: "UNCONFIGURED", size: "960*1280", timeout: 90 }, payments: paymentChannels(), trade: { ttl: 30, redeem: true, selfRefund: "self", refundDays: 7 } };
   assert.deepEqual(validateSnapshot(values), values);
   assert.throws(() => validateSnapshot({ ...values, release: {} }));
   assert.throws(() => validateCategory("content", { ...content("内容"), credential: "invalid-reference" }));
@@ -222,9 +224,9 @@ test("permission matrix covers every category family for denied/editor/publisher
   const NORMAL = MBTI_CATEGORIES.filter(key => !(SYSTEM as readonly string[]).includes(key));
   const systemValues = {
     aiRuntime: { mode: "UNCONFIGURED", size: "960*1280", timeout: 90 },
-    payments: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, { enabled: false, mode: "UNCONFIGURED", merchantLabel: "MBTI搭子体验店" }])),
+    payments: paymentChannels(),
     trade: { ttl: 30, redeem: false, selfRefund: "support", refundDays: 7 },
-  } as const;
+  };
   const normalValues = {
     content: content("矩阵"),
     channels: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, { name: "入口", landing: "home", badge: "标签" }])),

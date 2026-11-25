@@ -1,8 +1,12 @@
 import { X509Certificate, createPublicKey, type KeyObject } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { readApplicationEnvironment } from "../../../../scripts/runtime-environment.cjs";
+import type { MbtiPaymentSettings } from "../plugins/mbti-config/mbti-config.schema";
+import { merchantPrivateKey, normalizePem } from "../plugins/mbti-config/mbti-payment-settings";
 
+export type WechatPayChannel = "wechat" | "mp";
 export type WechatPayConfig = Readonly<{
+  channel: WechatPayChannel;
   appid: string;
   mchid: string;
   serialNo: string;
@@ -25,6 +29,47 @@ function secret(value: string | undefined): string {
   }
 }
 
+function platformKey(pem: string): KeyObject | null {
+  const normalized = normalizePem(pem);
+  try {
+    return normalized.includes("BEGIN CERTIFICATE") ? new X509Certificate(normalized).publicKey : createPublicKey(normalized);
+  } catch {
+    return null;
+  }
+}
+
+function apiBase(env: Record<string, string | undefined> = readApplicationEnvironment()) {
+  return (env.MBTI_WECHAT_PAY_API_BASE || "https://api.mch.weixin.qq.com").replace(/\/$/, "");
+}
+
+/**
+ * Builds a runtime config from published admin settings plus resolved SecretCenter values.
+ * Returns a problem label instead of throwing so the caller can answer with a 503 message.
+ */
+export function buildWechatPayConfig(channel: WechatPayChannel, settings: MbtiPaymentSettings,
+  values: { privateKey?: string; apiV3Key?: string; platformPublicKey?: string }): { config: WechatPayConfig } | { problem: string } {
+  const appid = (settings.appId || "").trim();
+  const mchid = (settings.mchId || "").trim();
+  const serialNo = (settings.serialNo || "").trim();
+  const notifyUrl = (settings.notifyUrl || "").trim();
+  const privateKeyPem = normalizePem(values.privateKey || "");
+  const apiV3Key = (values.apiV3Key || "").trim();
+  const platformPem = normalizePem(values.platformPublicKey || "");
+  if (!appid || !mchid || !serialNo || !notifyUrl) return { problem: "商户参数未填完整" };
+  if (!privateKeyPem || !merchantPrivateKey(privateKeyPem)) return { problem: "商户签名私钥不可用" };
+  if (apiV3Key.length !== 32) return { problem: "APIv3 密钥必须为 32 位" };
+  const platformPublicKey = platformKey(platformPem);
+  if (!platformPublicKey) return { problem: "微信支付验签公钥不可用" };
+  let notify: URL;
+  try { notify = new URL(notifyUrl); } catch { return { problem: "支付通知地址无效" }; }
+  if (notify.protocol !== "https:") return { problem: "支付通知地址必须是 HTTPS" };
+  return { config: {
+    channel, appid, mchid, serialNo, privateKeyPem, apiV3Key, platformPublicKey,
+    notifyUrl, apiBase: apiBase(),
+  } };
+}
+
+/** Legacy environment configuration, kept so deployments that predate admin settings still work. */
 export function loadWechatPayConfig(env: Record<string, string | undefined> = readApplicationEnvironment()): WechatPayConfig | null {
   const appid = (env.MBTI_WECHAT_APPID || "").trim();
   const mchid = (env.MBTI_WECHAT_PAY_MCHID || "").trim();
@@ -35,29 +80,13 @@ export function loadWechatPayConfig(env: Record<string, string | undefined> = re
   const notifyUrl = (env.MBTI_WECHAT_PAY_NOTIFY_URL || "").trim();
   if (!appid || !mchid || !serialNo || !privateKeyPem || apiV3Key.length !== 32 || !platformPem || !notifyUrl) return null;
   if (!privateKeyPem.includes("BEGIN PRIVATE KEY") && !privateKeyPem.includes("BEGIN RSA PRIVATE KEY")) return null;
-  let platformPublicKey: KeyObject;
-  try {
-    platformPublicKey = platformPem.includes("BEGIN CERTIFICATE")
-      ? new X509Certificate(platformPem).publicKey
-      : createPublicKey(platformPem);
-  } catch {
-    return null;
-  }
+  const platformPublicKey = platformKey(platformPem);
+  if (!platformPublicKey) return null;
   let notify: URL;
-  try {
-    notify = new URL(notifyUrl);
-  } catch {
-    return null;
-  }
+  try { notify = new URL(notifyUrl); } catch { return null; }
   if (notify.protocol !== "https:") return null;
   return {
-    appid,
-    mchid,
-    serialNo,
-    privateKeyPem,
-    apiV3Key,
-    platformPublicKey,
-    notifyUrl,
-    apiBase: (env.MBTI_WECHAT_PAY_API_BASE || "https://api.mch.weixin.qq.com").replace(/\/$/, ""),
+    channel: "wechat", appid, mchid, serialNo, privateKeyPem, apiV3Key, platformPublicKey,
+    notifyUrl, apiBase: apiBase(env),
   };
 }

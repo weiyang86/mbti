@@ -13,6 +13,22 @@ export const MBTI_UNKNOWN = Object.freeze({ status: "needs_human_review", unknow
 ] });
 
 type Channel = "wechat" | "mp" | "douyin" | "xhs";
+/** Channel payment settings. WeChat Pay consumes `wechat` (mini program) and `mp` (official account). */
+export type MbtiPaymentSettings = {
+  enabled: boolean;
+  mode: "mock" | "live";
+  merchantLabel: string;
+  appId: string;
+  appSecretRef: string;
+  mchId: string;
+  serialNo: string;
+  publicKeyId: string;
+  notifyUrl: string;
+  refundNotifyUrl: string;
+  privateKeyRef: string;
+  apiV3KeyRef: string;
+  platformPublicKeyRef: string;
+};
 type Style = "editorial" | "illustration" | "game";
 type PersonaCode = `${"E" | "I"}${"S" | "N"}${"T" | "F"}${"J" | "P"}`;
 type Persona = { title: string; quote: string; recharge: string; communication: string; care: string };
@@ -44,7 +60,7 @@ export type MbtiValues = {
     pages?: Partial<Record<PageTitleKey, string>>;
   };
   aiRuntime: { mode: "UNCONFIGURED"; size: "960*1280" | "1024*1024" | "720*1280"; timeout: number; credentialRef?: string };
-  payments: Record<Channel, { enabled: false; mode: "UNCONFIGURED"; merchantLabel: string }>;
+  payments: Record<Channel, MbtiPaymentSettings>;
   trade: { ttl: number; redeem: boolean; selfRefund: "self" | "support"; refundDays: number };
 };
 export type MbtiSnapshot = { [K in MbtiCategory]: MbtiValues[K] | null };
@@ -56,6 +72,32 @@ const text = (max: number): Check => v => { if (typeof v !== "string" || !v.trim
 const integer = (min: number, max: number): Check => v => { if (!Number.isSafeInteger(v) || Number(v) < min || Number(v) > max) invalid(); };
 const oneOf = (values: readonly unknown[]): Check => v => { if (!values.includes(v)) invalid(); };
 const boolean: Check = v => { if (typeof v !== "boolean") invalid(); };
+/** Free text that may be empty while a channel is still being filled in. */
+const plain = (max: number): Check => v => { if (typeof v !== "string" || v.length > max || redactText(v) !== v || [...v].some(c => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127) || /[<>"'&]|-----BEGIN|(?:password|api[_-]?key|secret)\s*[:=]/i.test(v)) invalid(); };
+const secretRef = (v: unknown) => { if (typeof v !== "string" || v.length > 256) invalid(); if (v !== "") parseSecretRef(v); };
+const paymentUrl = (v: unknown) => {
+  if (v === "") return;
+  if (typeof v !== "string" || v.length > 240) invalid();
+  let url: URL;
+  try { url = new URL(v); } catch { invalid(); }
+  if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash || url.pathname === "/" || !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(url.hostname)) invalid();
+};
+const pattern = (expression: RegExp, max: number): Check => v => { if (typeof v !== "string" || v.length > max || (v !== "" && !expression.test(v))) invalid(); };
+const paymentSettings = (channel: Channel): Check => shape({
+  enabled: boolean,
+  mode: oneOf(["mock", "live"]),
+  merchantLabel: plain(40),
+  appId: pattern(channel === "wechat" || channel === "mp" ? /^wx[0-9a-zA-Z]{16}$/ : /^[0-9a-zA-Z_-]{6,64}$/, 64),
+  appSecretRef: secretRef,
+  mchId: pattern(channel === "wechat" || channel === "mp" ? /^\d{6,20}$/ : /^[0-9a-zA-Z_-]{3,64}$/, 64),
+  serialNo: pattern(/^[0-9a-fA-F]{8,64}$/, 64),
+  publicKeyId: pattern(/^PUB_KEY_ID_[0-9a-zA-Z]{5,70}$/, 80),
+  notifyUrl: paymentUrl,
+  refundNotifyUrl: paymentUrl,
+  privateKeyRef: secretRef,
+  apiV3KeyRef: secretRef,
+  platformPublicKeyRef: secretRef,
+});
 const shape = (fields: Record<string, Check>, optional: Record<string, Check> = {}): Check => v => {
   if (!record(v) || Object.keys(v).some(k => !Object.hasOwn(fields, k) && !Object.hasOwn(optional, k)) || Object.keys(fields).some(k => !Object.hasOwn(v, k))) invalid();
   for (const [key, check] of Object.entries({ ...fields, ...optional })) if (Object.hasOwn(v, key)) check(v[key]);
@@ -88,7 +130,7 @@ const checks: Record<MbtiCategory, Check> = {
     },
   }),
   aiRuntime: shape({ mode: oneOf(["UNCONFIGURED"]), size: oneOf(["960*1280", "1024*1024", "720*1280"]), timeout: integer(20, 180) }, { credentialRef: v => { if (typeof v !== "string") invalid(); parseSecretRef(v); } }),
-  payments: shape(Object.fromEntries(channels.map(c => [c, shape({ enabled: oneOf([false]), mode: oneOf(["UNCONFIGURED"]), merchantLabel: oneOf(["MBTI搭子体验店", "品牌展示样例"]) })]))),
+  payments: shape(Object.fromEntries(channels.map(c => [c, paymentSettings(c)]))),
   trade: shape({ ttl: integer(1, 120), redeem: boolean, selfRefund: oneOf(["self", "support"]), refundDays: integer(1, 30) })
 };
 export function category(input: string): MbtiCategory { if (!MBTI_CATEGORIES.includes(input as MbtiCategory)) invalid(); return input as MbtiCategory; }

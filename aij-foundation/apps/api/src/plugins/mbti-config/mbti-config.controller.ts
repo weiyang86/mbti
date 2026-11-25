@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, HttpCode, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Header, HttpCode, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import type { AdminRequest } from "../../auth/auth.types";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { PermissionsGuard } from "../../common/guards/permissions.guard";
@@ -16,6 +16,20 @@ export class MbtiConfigController {
   @Header("Cache-Control", "no-store") @Get("draft") draft(@Req() r: AdminRequest) { return this.config.readView(r.user!.id, "draft"); }
   @Header("Cache-Control", "no-store") @Get("published") published(@Req() r: AdminRequest) { return this.config.readView(r.user!.id, "published"); }
   @Header("Cache-Control", "no-store") @Patch("draft/:category") save(@Req() r: AdminRequest, @Param("category") key: string, @Body() body: unknown) { return this.config.saveDraft(r.user!.id, key, body, r.correlationId); }
+  @Header("Cache-Control", "no-store") @Post("payments/check") @HttpCode(200)
+  checkPayments(@Req() r: AdminRequest, @Body() body: unknown) {
+    const channel = body && typeof body === "object" && !Array.isArray(body) && Object.keys(body).length === 1
+      ? (body as { channel?: unknown }).channel : undefined;
+    if (typeof channel !== "string") throw new BadRequestException("Invalid payment check request");
+    return this.config.checkPayments(r.user!.id, channel);
+  }
+  @Header("Cache-Control", "no-store") @Post("payments/probe") @HttpCode(200)
+  probePayments(@Req() r: AdminRequest, @Body() body: unknown) {
+    const channel = body && typeof body === "object" && !Array.isArray(body) && Object.keys(body).length === 1
+      ? (body as { channel?: unknown }).channel : undefined;
+    if (typeof channel !== "string") throw new BadRequestException("Invalid payment probe request");
+    return this.config.probePayments(r.user!.id, channel);
+  }
   @Header("Cache-Control", "no-store") @Post("publish") @HttpCode(200) publish(@Req() r: AdminRequest, @Body() body: unknown) { return this.config.publish(r.user!.id, body, r.correlationId); }
   @Header("Cache-Control", "no-store") @Post("versions/:version/rollback") @HttpCode(200) rollback(@Req() r: AdminRequest, @Param("version") version: string, @Body() body: unknown) { return this.config.rollback(r.user!.id, version, body, r.correlationId); }
   @Header("Cache-Control", "no-store") @Get("versions/:version") version(@Req() r: AdminRequest, @Param("version") version: string) { return this.config.version(r.user!.id, version); }
