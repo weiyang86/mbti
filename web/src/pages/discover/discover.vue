@@ -12,14 +12,14 @@
     <text v-if="error" class="error" role="alert">{{ error }}</text>
 
     <view class="notice mb">
-      当前以 {{ myType }} 示例类型体验。
+      当前以 {{ myType }} 类型体验。
       <text class="textbtn" @click="goTab('/pages/card/card')">选择我的 MBTI →</text>
     </view>
 
     <view class="exchange-shortcuts">
       <view class="a" @click="go('/pages/radar/radar')">
         <text class="b">◎ 同型雷达</text>
-        <text class="small">周边人数 · 模拟</text>
+        <text class="small">同型人数</text>
       </view>
       <view class="a" @click="go('/pages/compat/compat')">
         <text class="b">✧ 相处小抄</text>
@@ -159,7 +159,6 @@ function sharedText(buddy: BuddySummary) {
   return buddy.type_code === myType.value ? '同型搭子' : '不同类型，也可以认识'
 }
 function openBuddy(id: string) { go(`/pages/buddies/detail?id=${encodeURIComponent(id)}`) }
-function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 function go(url: string) { uni.navigateTo({ url }) }
 function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>

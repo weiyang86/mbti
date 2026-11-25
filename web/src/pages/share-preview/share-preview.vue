@@ -104,9 +104,9 @@
             <text class="textbtn" @click="openDrafts">查看草稿</text>
           </template>
           <button v-if="platform === 'douyin'" class="btn ghost" @click="goVideo">
-            预览 15 秒分镜（模拟）
+            预览 15 秒分镜
           </button>
-          <text class="textbtn" @click="nativeShare">预览平台分享卡片（模拟）</text>
+          <text class="textbtn" @click="nativeShare">预览平台分享卡片</text>
         </view>
 
         <view class="notice mt">
@@ -224,10 +224,6 @@ async function loadResult() {
   } finally {
     loading.value = false
   }
-}
-
-function demoState() {
-  uni.showToast({ title: 'Mock 演示状态，不产生费用', icon: 'none' })
 }
 
 const typeName = computed(() => TYPE_NAMES[result.value?.type_code || ''] || 'MBTI')

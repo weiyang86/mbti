@@ -100,10 +100,6 @@ async function load() {
   }
 }
 
-function demoState() {
-  uni.showToast({ title: 'Mock 演示状态，不产生费用', icon: 'none' })
-}
-
 /** 同一 session 的本地草稿：恢复已答题目与当前题号 */
 function restoreDraft() {
   const draft = loadQuizDraft()

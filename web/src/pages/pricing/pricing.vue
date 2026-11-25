@@ -138,7 +138,7 @@
       >
         {{ dockLabel }}
       </button>
-      <text class="dock-hint">一次购买 · 受控测试订单，不发起真实支付</text>
+      <text class="dock-hint">一次购买 · 无自动续费</text>
     </view>
 
     <view v-if="payOpen" class="modal-backdrop" @click.self="payOpen = false">
@@ -154,12 +154,12 @@
             <text class="b">{{ payPriceLabel }}</text>
           </view>
         </view>
-        <view class="p">{{ payProduct?.tier === 2 ? '包含晒图套装；照片功能目前仅本机预览，使用预置人物演示。' : '海报 + 同款头像 + 相处卡 + 配文。' }}</view>
-        <view class="notice">{{ channelName }} · 受控测试订单，不会扣款。一次购买，没有自动续费。</view>
+        <view class="p">{{ payProduct?.tier === 2 ? '包含晒图套装；照片功能即将开放，当前使用示例人物素材。' : '海报 + 同款头像 + 相处卡 + 配文。' }}</view>
+        <view class="notice">{{ channelName }} · 一次购买，没有自动续费。</view>
         <view v-if="payError" class="notice warn">{{ payError }}</view>
         <view class="btnrow mt">
           <button class="btn full" :disabled="creating" @click="confirmOrder">
-            {{ creating ? '正在创建订单…' : '创建测试订单' }}
+            {{ creating ? '正在创建订单…' : '创建订单' }}
           </button>
           <button class="btn secondary full" :disabled="creating" @click="payOpen = false">先不下单</button>
         </view>
@@ -174,7 +174,8 @@ import DemoStrip from '@/components/demo-strip.vue'
 import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { createOrder, getMyEntitlements, listProducts, requestWechatPay, devPaymentAvailable, type Entitlement, type PaymentProduct, type WechatPayParams } from '@/api/payment'
+import { createOrder, getMyEntitlements, listProducts, requestWechatPay, requestWechatH5Pay, payChannel, devPaymentAvailable, type Entitlement, type PaymentProduct, type WechatPayParams } from '@/api/payment'
+import { ensureWechatMpSession } from '@/api/auth'
 import { getResult, listResults } from '@/api/results'
 import { requestErrorMessage } from '@/api/client'
 import { entitledTier, formatMoney } from '@/utils/payment-display'
@@ -209,11 +210,11 @@ const VALUE_PACKS = [
 const FAQS = [
   {
     q: '不付费也可以做什么？',
-    a: '看基础类型结果、使用基础文字名片、申请换名片、体验相处小抄与模拟同型雷达。付费购买的是视觉套装，不购买他人的联系方式。',
+    a: '看基础类型结果、使用基础文字名片、申请换名片、体验相处小抄与同型雷达。付费购买的是视觉套装，不购买他人的联系方式。',
   },
   {
     q: '图片不喜欢，怎么办？',
-    a: '原型可切换三种风格、重新选择宣言后再生成。正式版生成额度与退款条件在上线前明确，本页不承诺无限 AI 生图。',
+    a: '可切换三种风格、重新选择宣言后再生成。',
   },
 ]
 
@@ -247,7 +248,7 @@ const typeName = computed(() => TYPE_NAMES[typeCode.value] || 'MBTI')
 const declaration = computed(() => DECLARATIONS[typeCode.value] || '四个字母之外，还有不一样的我。')
 const planNotice = computed(() =>
   activeProduct.value?.tier === 2
-    ? '本人形象套装的正式目标是基于授权照片生成。目前上传仅本机预览，生成仍用示例人物，不会变成你的真实样貌。'
+    ? '照片功能即将开放，当前套装使用示例人物素材。'
     : '晒图套装使用原创示例人物，按昵称、MBTI、兴趣和宣言组合个性化排版；正式版人物素材需确保可商用。',
 )
 const unavailableText = computed(() =>
@@ -267,10 +268,10 @@ onLoad((q) => {
       .catch(() => { resultType.value = '' })
   }
 })
-onShow(() => {
-  void loadProducts()
-  void loadEntitlements()
+onShow(async () => {
   void loadPublished()
+  await Promise.all([loadProducts(), loadEntitlements()])
+  resumePendingPay()
 })
 
 async function loadPublished() {
@@ -309,6 +310,30 @@ const payOpen = ref(false)
 const payProduct = ref<PaymentProduct | null>(null)
 const creating = ref(false)
 const payError = ref('')
+/** 登录拦截后待续付的商品；登录返回时自动重新打开支付弹窗 */
+const pendingPayCode = ref('')
+const PENDING_PAY_KEY = 'mbti_pending_purchase_v1'
+
+function savePendingPay(code: string) {
+  pendingPayCode.value = code
+  try { uni.setStorageSync(PENDING_PAY_KEY, { code, at: Date.now() }) } catch { /* ignore */ }
+}
+
+function loadPendingPay(): string {
+  if (pendingPayCode.value) return pendingPayCode.value
+  try {
+    const value = uni.getStorageSync(PENDING_PAY_KEY) as { code?: unknown; at?: unknown } | undefined
+    if (!value || typeof value.code !== 'string' || typeof value.at !== 'number' || Date.now() - value.at > 30 * 60_000) return ''
+    return value.code
+  } catch {
+    return ''
+  }
+}
+
+function clearPendingPay() {
+  pendingPayCode.value = ''
+  try { uni.removeStorageSync(PENDING_PAY_KEY) } catch { /* ignore */ }
+}
 const payArt = computed(() => styleAsset(style.value))
 const dockPrice = computed(() => (activeProduct.value ? priceLabel(activeProduct.value) : '¥9.9'))
 const ownedTier = computed(() => entitledTier(entitlements.value))
@@ -331,7 +356,34 @@ function onDockTap() {
     startCreate()
     return
   }
+  if (!account.session) {
+    promptLogin(activeProduct.value.code)
+    return
+  }
   openPay(activeProduct.value)
+}
+
+function promptLogin(productCode: string) {
+  uni.showModal({
+    title: '下单前请先登录',
+    content: '登录后订单会与你的微信身份绑定，方便后续查看与发放。',
+    confirmText: '去登录',
+    success: (res) => {
+      if (!res.confirm) return
+      savePendingPay(productCode)
+      uni.navigateTo({ url: '/pages/login/login?from=checkout' })
+    },
+  })
+}
+
+/** 登录页返回后自动续上被拦截的购买流程 */
+function resumePendingPay() {
+  const code = loadPendingPay()
+  if (!code) return
+  clearPendingPay()
+  if (!account.session) return
+  const product = products.value.find((item) => item.code === code)
+  if (product?.saleable) openPay(product)
 }
 
 function openPay(product: PaymentProduct | null | undefined) {
@@ -350,7 +402,7 @@ function startCreate() {
   }
 }
 
-/** F3：创建受控测试订单，金额/状态/权益全部以服务端响应为准 */
+/** F3：创建订单，金额/状态/权益全部以服务端响应为准 */
 async function confirmOrder() {
   if (!payProduct.value || creating.value) return
   creating.value = true
@@ -371,13 +423,33 @@ async function confirmOrder() {
     payOpen.value = false
     if (!devPaymentAvailable) {
       try {
-        const payment = await requestWechatPay(order.id)
-        await requestPayment(payment.pay_params)
+        const channel = payChannel()
+        if (channel === 'mp') await ensureWechatMpSession()
+        const payment = await requestWechatPay(order.id, channel)
+        if (channel === 'mp') await requestWechatH5Pay(payment.pay_params)
+        else await requestPayment(payment.pay_params)
         uni.redirectTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(order.id)}&paid=1` })
       } catch (e) {
+        const message = e instanceof Error ? e.message : '支付未完成，请稍后重试'
         const cancelled = /cancel/i.test(String((e as { errMsg?: string })?.errMsg || ''))
-        uni.showToast({ title: cancelled ? '已取消支付' : e instanceof Error ? e.message : '支付未完成，请稍后重试', icon: 'none' })
-        uni.redirectTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(order.id)}` })
+        // Server enforces "login before pay"; guide the person to login and resume here.
+        if (!cancelled && /登录/.test(message)) {
+          savePendingPay(payProduct.value?.code || '')
+          uni.showModal({
+            title: '需要先登录',
+            content: '登录后继续支付这笔订单。',
+            confirmText: '去登录',
+            success: (res) => {
+              if (res.confirm) uni.navigateTo({ url: '/pages/login/login?from=checkout' })
+            },
+          })
+          return
+        }
+        uni.showToast({ title: cancelled ? '已取消支付' : message, icon: 'none' })
+        // A WeChat OAuth redirect is already navigating; do not race it with a route change.
+        if (!/正在跳转微信授权/.test(message)) {
+          uni.redirectTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(order.id)}` })
+        }
       }
       return
     }
@@ -417,16 +489,7 @@ function toggleFaq(q: string) {
 function showRedeem() {
   uni.showModal({
     title: '体验兑换码',
-    content: '兑换码由活动渠道发放；当前受控测试暂未开放兑换，可先免费查看基础结果。',
-    showCancel: false,
-    confirmText: '知道了',
-  })
-}
-
-function showDemoStatus() {
-  uni.showModal({
-    title: '演示状态',
-    content: '当前为受控测试环境：基础结果免费，商品下单为受控测试订单，不产生真实扣款。',
+    content: '兑换码由活动渠道发放；兑换功能暂未开放，可先免费查看基础结果。',
     showCancel: false,
     confirmText: '知道了',
   })

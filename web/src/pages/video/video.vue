@@ -5,7 +5,7 @@
       <view class="page-intro">
         <view class="eyebrow">MBTI BUDDY</view>
         <view class="h1">先制作你的形象套装</view>
-        <view class="p">再预览 15 秒静态分镜演示。</view>
+        <view class="p">再预览 15 秒分镜。</view>
       </view>
       <view class="btn full" @click="goCreate">开始制作</view>
     </template>
@@ -16,7 +16,7 @@
       <view class="page-intro">
         <view class="eyebrow">STORYBOARD / 分镜预览</view>
         <view class="h1">15 秒，晒出我的 MBTI。</view>
-        <view class="p">静态素材切换演示，不是实际视频生成或导出。</view>
+        <view class="p">静态分镜预览，逐帧切换素材。</view>
       </view>
 
       <view class="video-story">
@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
-// TODO: 待 Remy 确认接口路径和字段（视频分镜生成接口未定义，当前为本地静态分镜演示）
+// TODO: 待 Remy 确认接口路径和字段（视频分镜生成接口未定义，当前为本地静态分镜预览）
 import { computed, ref } from 'vue'
 import { onShow, onUnload } from '@dcloudio/uni-app'
 import { listResults } from '@/api/results'
@@ -131,9 +131,6 @@ function goCreate() {
   })
 }
 
-function demoInfo() {
-  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
-}
 </script>
 
 <style scoped lang="scss">

@@ -1,6 +1,7 @@
 import { createDecipheriv, randomBytes, sign, verify, type KeyObject } from "node:crypto";
 
 export type WechatPayParams = Readonly<{
+  appId: string;
   timeStamp: string;
   nonceStr: string;
   package: string;
@@ -42,7 +43,7 @@ export function buildWechatPayParams(input: {
   const nonceStr = input.nonce ?? randomBytes(16).toString("hex");
   const pkg = `prepay_id=${input.prepayId}`;
   const message = `${input.appid}\n${timeStamp}\n${nonceStr}\n${pkg}\n`;
-  return { timeStamp, nonceStr, package: pkg, signType: "RSA", paySign: signWechatMessage(input.privateKeyPem, message) };
+  return { appId: input.appid, timeStamp, nonceStr, package: pkg, signType: "RSA", paySign: signWechatMessage(input.privateKeyPem, message) };
 }
 
 export function verifyWechatNotifySignature(input: {

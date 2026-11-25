@@ -10,7 +10,7 @@
     </view>
 
     <view class="notice">
-      为便于演示，建议填写虚构内容。保存为整份替换：留空即删除该渠道。
+      建议填写你愿意公开的内容。保存为整份替换：留空即删除该渠道。
     </view>
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
@@ -23,7 +23,7 @@
           v-model="form.wechat"
           :disabled="busy"
           maxlength="20"
-          placeholder="例如 demo_mbti_01"
+          placeholder="例如 xiaohe_01"
           autocomplete="off"
         />
       </view>
@@ -47,7 +47,7 @@
           type="number"
           :disabled="busy"
           maxlength="11"
-          placeholder="11 位手机号（仅本机演示）"
+          placeholder="11 位手机号"
           autocomplete="off"
         />
       </view>
@@ -129,7 +129,6 @@ function clearAll() {
     finally { if (scope.current(ticket)) busy.value = false }
   } })
 }
-function demoState() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 </script>
 <style scoped lang="scss">
 .error {

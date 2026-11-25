@@ -8,7 +8,13 @@ import { readRepositoryEnvironment } from "../../../../scripts/runtime-environme
 export interface SecretAdapter { resolve(parsed: ParsedSecretRef): Promise<string>; exists(parsed: ParsedSecretRef): Promise<boolean>; }
 const unavailable = () => new ServiceUnavailableException("Configured secret unavailable");
 const posix = process.platform !== "win32";
-export function isUsableSecretValue(value: unknown): value is string { return typeof value === "string" && value.length >= 16 && value.length <= 8192 && !/\s/.test(value) && !/change.?me|replace.?me|your[_-]|example|placeholder|template/i.test(value); }
+// Merchant key material is pasted as a PEM block; ordinary tokens must stay single-line.
+const PEM_VALUE = /^-----BEGIN (?:RSA )?(?:PRIVATE KEY|PUBLIC KEY|CERTIFICATE)-----[\s\S]{20,16000}-----END (?:RSA )?(?:PRIVATE KEY|PUBLIC KEY|CERTIFICATE)-----\s*$/;
+export function isUsableSecretValue(value: unknown): value is string {
+  if (typeof value !== "string" || value.length < 16 || value.length > 16384) return false;
+  if (/change.?me|replace.?me|your[_-]|example|placeholder|template/i.test(value)) return false;
+  return PEM_VALUE.test(value) || !/\s/.test(value);
+}
 export class EnvSecretAdapter implements SecretAdapter {
   async resolve(parsed: ParsedSecretRef) { try { const value = readRepositoryEnvironment()[parsed.name]; if (!isUsableSecretValue(value)) throw unavailable(); return value; } catch { throw unavailable(); } }
   async exists(parsed: ParsedSecretRef) { try { await this.resolve(parsed); return true; } catch { return false; } }

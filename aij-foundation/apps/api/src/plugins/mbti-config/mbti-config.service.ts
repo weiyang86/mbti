@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException, Optional } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Prisma, ScopedConfig } from "@prisma/client";
 import { randomUUID } from "node:crypto";
@@ -8,10 +8,14 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { ManagementAccessService } from "../../rbac/management-access.service";
 import { PermissionsService } from "../../rbac/permissions.service";
 import { PluginRuntimeAccessService } from "../../plugin-runtime/plugin-runtime-access.service";
+import { SecretRefPort } from "../../secret-center/secret-ref";
 import { assertOwnedRef } from "../../secret-center/secret-ref";
 import { MBTI_CATEGORIES, MBTI_UNKNOWN, MbtiCategory, MbtiSnapshot, MbtiValues, canonical, category, emptySnapshot, exactBody, projectSnapshot, revision, validateCategory, validateSnapshot } from "./mbti-config.schema";
 
 import { MbtiChannel, projectPublicPublished } from "./mbti-config.public";
+import { PAYMENT_CHANNEL_LABELS, WECHAT_PAY_CHANNELS, WechatPayChannel, paymentMissingFields, paymentSecretProblems } from "./mbti-payment-settings";
+import { probeMerchant } from "./mbti-payment-probe";
+import { buildWechatPayConfig } from "../../mbti/mbti-wechat-pay.config";
 
 export const MBTI_PLUGIN = "mbti-config";
 const ACTIVE = "release.active", DRAFT = "release.draft", SNAPSHOT = "release.version.";
@@ -21,7 +25,8 @@ type Context = { projectId: string; system: boolean };
 @Injectable()
 export class MbtiConfigService {
   constructor(private readonly prisma: PrismaService, private readonly access: ManagementAccessService,
-    private readonly permissions: PermissionsService, private readonly runtime: ConfigService, private readonly plugins: PluginRuntimeAccessService) {}
+    private readonly permissions: PermissionsService, private readonly runtime: ConfigService, private readonly plugins: PluginRuntimeAccessService,
+    @Optional() @Inject(SecretRefPort) private readonly secrets?: SecretRefPort) {}
 
   private async context(tx: Prisma.TransactionClient, operator: string): Promise<Context> {
     if (this.runtime.getOrThrow<string>("projectId") !== "mbti-foundation") throw new ForbiddenException("MBTI project required");
@@ -92,6 +97,20 @@ export class MbtiConfigService {
   publishedCatalog() { return this.publishedCategory("catalog"); }
   publishedDiscovery() { return this.publishedCategory("discovery"); }
   publishedCopy() { return this.publishedCategory("copy"); }
+  /** Published channel payment settings consumed by the WeChat Pay runtime. */
+  publishedPayments() { return this.publishedCategory("payments"); }
+  private async paymentReferences(settings: MbtiValues["payments"][keyof MbtiValues["payments"]]) {
+    return [settings.appSecretRef, settings.privateKeyRef, settings.apiV3KeyRef, settings.platformPublicKeyRef].filter(Boolean);
+  }
+  private async assertPaymentReferences(tx: Prisma.TransactionClient, settings: MbtiValues["payments"][keyof MbtiValues["payments"]]) {
+    const identity = { projectId: "mbti-foundation", environment: this.runtime.getOrThrow<string>("environment"), namespace: this.runtime.getOrThrow<string>("namespace"), repositoryRoot: "" };
+    for (const ref of await this.paymentReferences(settings)) {
+      assertOwnedRef(ref, identity);
+      if (!await tx.secretReference.findFirst({ where: { ref, status: "active", deletedAt: null }, select: { id: true } })) {
+        throw new BadRequestException("支付凭据引用不存在或未启用，请先在密钥中心保存对应凭据");
+      }
+    }
+  }
   saveDraft(operator: string, keyInput: string, input: unknown, correlationId?: string) {
     const key = category(keyInput), body = exactBody(input, ["value", "expectedDraftVersion"]), expected = revision(body.expectedDraftVersion), value = validateCategory(key, body.value);
     return this.access.write(operator, [CONFIGURATION_PERMISSION], async (tx, actor) => {
@@ -100,6 +119,9 @@ export class MbtiConfigService {
       const s = await this.state(tx, c);
       if ((s.draft?.version ?? 0) !== expected) throw new ConflictException("Draft version conflict");
       let candidateValue: unknown = value;
+      if (key === "payments") {
+        for (const channel of Object.values(value as MbtiValues["payments"])) await this.assertPaymentReferences(tx, channel);
+      }
       if (key === "aiRuntime") {
         // Safe projections omit references. Saving those visible fields must retain an existing binding.
         const ref = (value as { credentialRef?: string }).credentialRef ?? s.candidate.aiRuntime?.credentialRef;
@@ -179,6 +201,68 @@ export class MbtiConfigService {
       // Deliberately never updates DRAFT: even a newer unpublished draft survives rollback.
       return this.commit(tx, c, actor.id, expected, this.parse(snapshot), "rollback", target, correlationId);
     });
+  }
+  /** Non-secret readiness check for one WeChat Pay channel; values are never returned. */
+  async checkPayments(operator: string, channelInput: string) {
+    if (!WECHAT_PAY_CHANNELS.includes(channelInput as WechatPayChannel)) throw new BadRequestException("Unknown payment channel");
+    const channel = channelInput as WechatPayChannel;
+    const settings = await this.read(operator, async (tx, c) => {
+      if (!c.system) throw new ForbiddenException("System configuration requires platform administrator and secret permission");
+      const s = await this.state(tx, c);
+      return s.candidate.payments?.[channel] ?? null;
+    });
+    if (!settings) return { channel, label: PAYMENT_CHANNEL_LABELS[channel], ready: false, problems: ["支付配置尚未创建"], checkedAt: new Date().toISOString() };
+    const problems: string[] = [];
+    if (!settings.enabled) problems.push("渠道尚未允许新下单");
+    if (settings.mode !== "live") problems.push("交易环境不是正式收款");
+    const missing = paymentMissingFields(settings);
+    if (missing.length) problems.push(`缺少：${missing.join("、")}`);
+    if (!problems.length && this.secrets) {
+      try {
+        const [privateKey, apiV3Key, platform] = await Promise.all([
+          this.secrets.resolveTrusted(settings.privateKeyRef),
+          this.secrets.resolveTrusted(settings.apiV3KeyRef),
+          this.secrets.resolveTrusted(settings.platformPublicKeyRef),
+        ]);
+        problems.push(...paymentSecretProblems(settings, { privateKey, apiV3Key, platformPublicKey: platform }));
+      } catch {
+        problems.push("服务端凭据不可用，请重新保存对应密钥");
+      }
+    }
+    return { channel, label: PAYMENT_CHANNEL_LABELS[channel], ready: problems.length === 0, problems, checkedAt: new Date().toISOString() };
+  }
+  /** Signed, read-only probe against the real WeChat Pay API for one channel. */
+  async probePayments(operator: string, channelInput: string) {
+    if (!WECHAT_PAY_CHANNELS.includes(channelInput as WechatPayChannel)) throw new BadRequestException("Unknown payment channel");
+    const channel = channelInput as WechatPayChannel;
+    const settings = await this.read(operator, async (tx, c) => {
+      if (!c.system) throw new ForbiddenException("System configuration requires platform administrator and secret permission");
+      const s = await this.state(tx, c);
+      return s.candidate.payments?.[channel] ?? null;
+    });
+    const unavailable = (message: string, hint: string) => ({
+      channel, label: PAYMENT_CHANNEL_LABELS[channel], reachable: false, signatureValid: false, ok: false,
+      status: 0, message, hint, probedAt: new Date().toISOString(),
+    });
+    if (!settings) return unavailable("支付配置尚未创建", "请先填写并保存支付参数");
+    const missing = paymentMissingFields(settings);
+    if (missing.length) return unavailable(`缺少：${missing.join("、")}`, "补齐字段后再验证商户连通性");
+    if (!this.secrets) return unavailable("服务端凭据组件不可用", "请检查密钥中心配置");
+    let values: { privateKey: string; apiV3Key: string; platformPublicKey: string };
+    try {
+      const [privateKey, apiV3Key, platformPublicKey] = await Promise.all([
+        this.secrets.resolveTrusted(settings.privateKeyRef),
+        this.secrets.resolveTrusted(settings.apiV3KeyRef),
+        this.secrets.resolveTrusted(settings.platformPublicKeyRef),
+      ]);
+      values = { privateKey, apiV3Key, platformPublicKey };
+    } catch {
+      return unavailable("服务端凭据不可用", "请重新保存商户私钥、APIv3 密钥与验签公钥");
+    }
+    const built = buildWechatPayConfig(channel, settings, values);
+    if ("problem" in built) return unavailable(built.problem, "请核对商户私钥、APIv3 密钥与验签公钥内容");
+    const result = await probeMerchant(built.config);
+    return { channel, label: PAYMENT_CHANNEL_LABELS[channel], ...result, probedAt: new Date().toISOString() };
   }
   version(operator: string, targetInput: string) {
     const target = Number(targetInput); if (!/^[1-9][0-9]{0,9}$/.test(targetInput)) throw new BadRequestException("Invalid version"); revision(target);

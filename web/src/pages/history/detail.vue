@@ -186,10 +186,6 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
-function toastDemo() {
-  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
-}
-
 function openCompare() {
   if (!older.value) return
   uni.navigateTo({

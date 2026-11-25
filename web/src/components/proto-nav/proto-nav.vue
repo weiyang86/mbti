@@ -2,11 +2,7 @@
   <view class="host-nav">
     <button class="host-back" aria-label="返回上一页" @click="goBack">‹</button>
     <text class="host-title">{{ title }}</text>
-    <button class="host-capsule" aria-label="切换平台预览" @click="switchChannel">
-      <text>•••</text>
-      <text class="host-divider"></text>
-      <text>◎</text>
-    </button>
+    <view class="host-spacer" />
   </view>
 </template>
 
@@ -33,15 +29,6 @@ function goBack() {
   }
 }
 
-function switchChannel() {
-  uni.showActionSheet({
-    itemList: ['微信预览', '小红书预览', '抖音预览', '公众号预览'],
-    success: (res) => {
-      const names = ['微信', '小红书', '抖音', '公众号']
-      uni.showToast({ title: `已切换为${names[res.tapIndex] || '微信'}预览（模拟）`, icon: 'none' })
-    },
-  })
-}
 </script>
 
 <style scoped>
@@ -64,9 +51,7 @@ function switchChannel() {
   font-weight: 600;
   color: var(--ink);
 }
-.host-divider {
-  width: 1px;
-  height: 12px;
-  background: #e2dbea;
+.host-spacer {
+  width: 36px;
 }
 </style>

@@ -10,11 +10,8 @@
     </view>
 
     <view class="panel">
-      <view class="h3">{{ isRealAuth() ? '微信登录' : 'Mock 登录（开发模式）' }}</view>
-      <view v-if="!isRealAuth()" class="p">
-        当前未配置 <text class="em">VITE_AUTH_MODE=real</text>，登录会使用稳定的本地 Mock 身份。
-      </view>
-      <view v-else class="p">将调用微信登录获取 code，再由服务端换取身份。</view>
+      <view class="h3">微信登录</view>
+      <view class="p">{{ loginHint }}</view>
 
       <view v-if="account.session" class="notice green">已登录：{{ providerLabel }}</view>
       <text v-if="error" class="error" role="alert">{{ error }}</text>
@@ -26,7 +23,7 @@
     </view>
 
     <view class="fine mt">
-      登录身份与当前游客数据绑定；退出登录不会删除本机记录。真实微信登录需要小程序 appid 与服务端 secret。
+      登录身份与当前记录绑定；退出登录不会删除本机记录。
     </view>
   <proto-footer />
   </view>
@@ -35,15 +32,27 @@
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
 import { computed, ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { account, login } from '@/store/account'
-import { isRealAuth } from '@/api/auth'
+import { hasWechatMpCallback } from '@/api/auth'
 
 const busy = ref(false)
 const error = ref('')
+/** 从支付页跳来时，登录成功后返回原页面继续下单 */
+const fromCheckout = ref(false)
+let loginHint = '将调用微信登录授权，再由服务端换取身份。'
+// #ifdef H5
+loginHint = '网页版会在微信内跳转授权，请在微信中打开本页面。'
+// #endif
 const providerLabel = computed(() =>
-  account.session?.provider === 'wechat' ? '微信身份' : '开发 Mock 身份',
+  account.session?.provider === 'wechat' ? '微信身份' : '本机身份',
 )
+
+onLoad((query) => {
+  fromCheckout.value = query?.from === 'checkout'
+  // 公众号 OAuth 回到本页后自动完成登录
+  if (hasWechatMpCallback()) void submit()
+})
 
 onShow(() => {
   error.value = ''
@@ -56,6 +65,12 @@ async function submit() {
   try {
     await login(true)
     uni.showToast({ title: '登录成功', icon: 'none' })
+    if (fromCheckout.value) {
+      setTimeout(() => {
+        uni.navigateBack({ fail: () => uni.redirectTo({ url: '/pages/pricing/pricing' }) })
+      }, 300)
+      return
+    }
     setTimeout(() => uni.switchTab({ url: '/pages/account/account' }), 500)
   } catch (e) {
     error.value = e instanceof Error ? e.message : '登录失败，请稍后重试'

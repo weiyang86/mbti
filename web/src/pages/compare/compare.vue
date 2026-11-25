@@ -148,7 +148,6 @@
       </view>
       <view class="btn full" @click="goQuiz">免费记录现在的我</view>
       <view class="btn secondary full mt" @click="backToJourney">查看已有记录</view>
-      <text class="textbtn mt" @click="toastDemo">先看变化示例</text>
     </template>
   <proto-footer />
   </view>
@@ -360,10 +359,6 @@ function deltaText(delta: number): string {
 
 function stageOf(record: ResultSnapshot): string {
   return record.life_stage || '日常生活'
-}
-
-function toastDemo() {
-  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
 }
 
 function openRecord(id: string) {

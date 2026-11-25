@@ -9,8 +9,6 @@
       <view class="p">查看自愿参与者的类型人数，不展示任何人的具体位置。</view>
     </view>
 
-    <view class="radar-demo-label">DEMO · 虚构示例区域 · 未读取 GPS</view>
-
     <view class="radar-visual">
       <view class="radar-ring r1" />
       <view class="radar-ring r2" />
@@ -37,21 +35,20 @@
     <text v-if="state.statistics.kind === 'error'" class="error" role="alert">{{ state.statistics.message }}</text>
 
     <template v-if="state.enrolled === true">
-      <view class="notice green">当前仅演示匿名人数统计，不生成附近人员列表，也不展示位置标记。</view>
+      <view class="notice green">仅展示匿名人数统计，不生成附近人员列表，也不展示位置标记。</view>
       <button class="btn ghost full mt" :class="{ dim: ctaDisabled }" @click="leave">
         {{ state.saving ? '正在保存…' : '关闭本次雷达体验' }}
       </button>
     </template>
     <template v-else>
       <button class="btn full mt" :class="{ dim: ctaDisabled }" @click="join">
-        {{ state.saving ? '正在保存…' : '体验同型雷达（模拟授权）' }}
+        {{ state.saving ? '正在保存…' : '体验同型雷达' }}
       </button>
-      <button class="textbtn full mt" @click="deny">模拟拒绝授权</button>
     </template>
 
     <view class="radar-rules">
       <view class="h3">看见同类，不暴露行踪。</view>
-      <view class="p">正式方案：主动加入、可随时关闭；少于 10 人时仅显示“人数较少”，不展示精确人数或个人轨迹。</view>
+      <view class="p">主动加入、可随时关闭；少于 10 人时仅显示“人数较少”，不展示精确人数或个人轨迹。</view>
       <view class="p">参与不等于位置授权，也不会更改名片公开范围或联系方式授权；私密名片也可以参与。</view>
     </view>
 
@@ -68,9 +65,8 @@ import { getMyCard } from '@/api/cards'
 import { getRadarParticipation, getSameTypeCount, updateRadarParticipation } from '@/api/radar'
 import { createRadarController, createRadarViewState } from '@/utils/radar-state'
 import { ensurePublishedConfig, published } from '@/store/published'
-import { DEMO_COPY } from '@/constants/copy'
 const RADII = [500, 1000, 3000] as const
-/** 原型示例人数：仅用于演示，未接真实位置统计 */
+/** 示例人数：未接真实位置统计 */
 const DEMO_COUNTS: Record<number, number> = { 500: 18, 1000: 43, 3000: 96 }
 const state = reactive(createRadarViewState())
 const controller = createRadarController({ getMyCard, getRadarParticipation, updateRadarParticipation, getSameTypeCount }, state)
@@ -85,7 +81,7 @@ onUnload(controller.leave)
 const radiusLabel = computed(() => (state.radius === 500 ? '500 米' : `${state.radius / 1000} 公里`))
 const ctaDisabled = computed(() => state.loading || state.saving || state.needsReload)
 const demoCount = computed(() => (state.enrolled === true ? DEMO_COUNTS[state.radius] : '—'))
-const countLabel = computed(() => (state.enrolled === true ? DEMO_COPY.radarDemoCount : '先选择体验状态'))
+const countLabel = computed(() => (state.enrolled === true ? '位同型参与者' : '先选择体验状态'))
 
 function join() {
   if (ctaDisabled.value) return
@@ -95,8 +91,6 @@ function leave() {
   if (ctaDisabled.value) return
   controller.save(false)
 }
-function deny() { uni.showToast({ title: '已模拟拒绝授权，不展示人数', icon: 'none' }) }
-function demoState() { uni.showToast({ title: DEMO_COPY.stateToast, icon: 'none' }) }
 function goDiscover() { uni.switchTab({ url: '/pages/discover/discover', fail: () => uni.reLaunch({ url: '/pages/discover/discover' }) }) }
 </script>
 <style scoped lang="scss">

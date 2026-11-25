@@ -44,6 +44,7 @@ import { PaymentService } from "../plugins/aij-payment/payment.service";
 import { PaymentCallbackService } from "../plugins/aij-payment/payment-callback.service";
 import { PluginRuntimeAccessModule } from "../plugin-runtime/plugin-runtime-access.module";
 import { MbtiConfigModule } from "../plugins/mbti-config/mbti-config.module";
+import { SecretCenterModule } from "../secret-center/secret-center.module";
 
 class MbtiControlledTestProvider extends SyntheticTestPaymentProvider {
   override createPayment(request: PaymentProviderRequest, _credential: string) { return super.createPayment(request, "synthetic-only-no-provider-secret"); }
@@ -58,7 +59,7 @@ export class MbtiModule {
       throw new Error("MBTI controlled payments require explicit isolated test runtime, administrator auth and a local random secret");
     }
     return { module: MbtiModule,
-      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule, ConfigurationModule] : [])],
+      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule, ConfigurationModule, SecretCenterModule] : [])],
       controllers: [MbtiController, MbtiOrdersController, MbtiWechatPayController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.nodeEnv === "development" && runtime.environment === "development" ? [MbtiDevPaymentController] : []), ...(runtime.capabilities.auth ? [
         MbtiOrdersAdminController, MbtiAiAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
         MbtiOpsModerationController, MbtiOpsGrowthController, MbtiOpsRetentionController,
