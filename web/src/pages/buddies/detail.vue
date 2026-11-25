@@ -31,7 +31,7 @@
 
       <view class="panel">
         <template v-if="status === 'accepted'">
-          <view class="notice green">✓ 已互换基础名片（模拟）</view>
+          <view class="notice green">✓ 已互换基础名片</view>
           <button class="btn full mt" @click="openContactRequest">申请交换联系方式</button>
           <button
             v-if="canRevokeCurrent"
@@ -44,10 +44,9 @@
         <template v-else-if="status === 'pending'">
           <view class="notice">名片申请待回应，当前看不到任何联系方式。</view>
           <view v-if="canRespondCurrent" class="demo-reply">
-            <text class="span">仅供演示：模拟对方操作</text>
             <view>
-              <button class="btn secondary small" :disabled="busy || !relationsLoaded" @click="respond('accept')">模拟对方同意</button>
-              <button class="btn ghost small" :disabled="busy || !relationsLoaded" @click="respond('decline')">模拟对方拒绝</button>
+              <button class="btn secondary small" :disabled="busy || !relationsLoaded" @click="respond('accept')">对方同意</button>
+              <button class="btn ghost small" :disabled="busy || !relationsLoaded" @click="respond('decline')">对方拒绝</button>
             </view>
           </view>
           <view v-else class="notice mt">请等待对方本人回应。</view>
@@ -60,7 +59,7 @@
         </template>
 
         <template v-else>
-          <view v-if="status === 'declined'" class="fine">对方已拒绝这次模拟申请，暂不重复发送。</view>
+          <view v-if="status === 'declined'" class="fine">对方已拒绝这次申请，暂不重复发送。</view>
           <view v-if="myCard && !myCard.discoverable" class="notice">请先公开自己的名片，再发起交换。</view>
           <button
             v-if="relationsLoaded && (!exchange || ['declined', 'revoked'].includes(exchange.status))"
@@ -73,7 +72,6 @@
       </view>
 
       <view class="btnrow mt">
-        <button class="textbtn" @click="reportDemo">举报示例资料</button>
         <button class="textbtn" :disabled="busy" @click="block">屏蔽这位搭子</button>
         <button class="textbtn" @click="openPublic">查看公开名片</button>
       </view>
@@ -82,7 +80,7 @@
     <view v-if="!buddy && !loading" class="page-intro">
       <view class="eyebrow">MBTI BUDDY</view>
       <view class="h1">这张名片当前不可查看</view>
-      <view class="p">返回推荐页看看其他示例搭子。</view>
+      <view class="p">返回推荐页看看其他搭子。</view>
     </view>
     <button v-if="!buddy && !loading" class="btn full mt" @click="goTab('/pages/discover/discover')">返回换名片</button>
   <proto-footer />
@@ -181,8 +179,6 @@ function goCompat() {
   const other = buddy.value?.type_code
   go(`/pages/compat/compat${other ? `?other=${encodeURIComponent(other)}` : ''}`)
 }
-function reportDemo() { uni.showToast({ title: '演示模式，举报入口仅作展示', icon: 'none' }) }
-function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 function block() {
   if (busy.value || !buddy.value) return
   uni.showModal({ title: '屏蔽这位搭子？', content: '双方将无法查看彼此的公开名片；待回应或已接受的交换会撤回，解除屏蔽不会恢复旧关系。', confirmText: '屏蔽', success: async (response) => {

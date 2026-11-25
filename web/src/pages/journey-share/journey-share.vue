@@ -184,10 +184,6 @@ function stageOf(record: ResultSnapshot): string {
   return record.life_stage || '日常生活'
 }
 
-function toastDemo() {
-  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
-}
-
 function caption(): string {
   if (!a.value || !b.value) return ''
   return [

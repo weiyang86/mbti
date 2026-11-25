@@ -41,12 +41,12 @@ export const LIMITS = reactive({
   questionCount: 12,
 })
 
-/** Demo-state copy; hide or replace when the product leaves the prototype stage. */
+/** 本地体验条文案；生产构建默认不展示。 */
 export const DEMO_COPY = reactive({
-  badge: 'V0.4 · Mock 演示 · 不产生费用',
-  link: '演示状态 ↗',
-  stateToast: 'Mock 演示状态，不产生费用',
-  radarDemoCount: '位同型参与者 · 模拟人数',
+  badge: 'V0.4 · 在线体验版',
+  link: '了解更多 ↗',
+  stateToast: '当前为在线体验版',
+  radarDemoCount: '位同型参与者',
 })
 
 /** Generation page copy, kept central until a backend copy category is approved. */

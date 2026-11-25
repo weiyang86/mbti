@@ -175,7 +175,7 @@
             <text>¥9.9 · 制作我的 MBTI 晒图套装</text>
             <AppIcon name="arrow" :size="18" color="#ffffff" />
           </button>
-          <view class="fine centered">一次购买 · 无订阅 · 当前仅模拟支付</view>
+          <view class="fine centered">一次购买 · 无订阅</view>
         </view>
 
         <view class="discovery-card" style="display: block; min-height: 95px" @click="goDiscover">
@@ -310,10 +310,6 @@ async function loadHistory() {
   } catch {
     previous.value = null
   }
-}
-
-function demoState() {
-  uni.showToast({ title: 'Mock 演示状态，不产生费用', icon: 'none' })
 }
 
 const savedTitle = computed(() =>

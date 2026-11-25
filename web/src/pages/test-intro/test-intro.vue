@@ -105,7 +105,7 @@ import {
   saveQuizDraft,
   type QuizDraft,
 } from '@/store/quiz-draft'
-import { DEMO_COPY, LIMITS } from '@/constants/copy'
+import { LIMITS } from '@/constants/copy'
 
 const profile = ref(loadProfile())
 const submitting = ref(false)
@@ -120,10 +120,6 @@ onShow(() => {
   profile.value = loadProfile()
   draft.value = loadQuizDraft()
 })
-
-function demoState() {
-  uni.showToast({ title: DEMO_COPY.stateToast, icon: 'none' })
-}
 
 function toggleInterest(value: string) {
   const list = profile.value.interests

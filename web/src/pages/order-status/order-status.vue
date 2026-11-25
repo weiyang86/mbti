@@ -28,9 +28,9 @@
       </view>
 
       <view v-if="order.status === 'pending' && devPaymentAvailable" class="notice">
-        <text class="small">以下为本地开发模拟支付，不会产生真实扣款。</text>
-        <button class="btn secondary full mt" :disabled="devPaying || devFailing" @click="simulatePay">{{ devPaying ? '正在模拟支付…' : '模拟支付成功（仅开发环境）' }}</button>
-        <button class="btn ghost full mt" :disabled="devPaying || devFailing" @click="simulateFail">{{ devFailing ? '正在模拟失败…' : '模拟支付失败（仅开发环境）' }}</button>
+        <text class="small">以下为本地支付联调入口，不会产生真实扣款。</text>
+        <button class="btn secondary full mt" :disabled="devPaying || devFailing" @click="simulatePay">{{ devPaying ? '正在标记支付…' : '标记支付成功（仅开发环境）' }}</button>
+        <button class="btn ghost full mt" :disabled="devPaying || devFailing" @click="simulateFail">{{ devFailing ? '正在标记失败…' : '标记支付失败（仅开发环境）' }}</button>
       </view>
 
       <view v-if="order.status === 'pending'" class="mini-list">
@@ -42,7 +42,7 @@
       </view>
       <view v-else-if="order.status === 'paid'" class="mini-list">
         <button class="btn full" @click="goOrders">查看已解锁权益</button>
-        <button v-if="devPaymentAvailable" class="btn ghost full mt" :disabled="devRefunding" @click="confirmRefund">{{ devRefunding ? '正在模拟退款…' : '模拟退款（仅开发环境）' }}</button>
+        <button v-if="devPaymentAvailable" class="btn ghost full mt" :disabled="devRefunding" @click="confirmRefund">{{ devRefunding ? '正在标记退款…' : '标记退款（仅开发环境）' }}</button>
       </view>
       <view v-else-if="order.status === 'refunded'" class="mini-list">
         <button class="btn full" @click="goCatalog">重新选择商品</button>
@@ -126,7 +126,7 @@ async function simulatePay() {
   try {
     await devMarkOrderPaid(orderId.value)
     order.value = await getOrderStatus(orderId.value)
-  } catch (e) { error.value = requestErrorMessage(e, '模拟支付失败，请稍后重试') }
+  } catch (e) { error.value = requestErrorMessage(e, '支付状态更新失败，请稍后重试') }
   finally { devPaying.value = false }
 }
 
@@ -137,16 +137,16 @@ async function simulateFail() {
   try {
     await devMarkOrderFailed(orderId.value)
     order.value = await getOrderStatus(orderId.value)
-  } catch (e) { error.value = requestErrorMessage(e, '模拟支付失败，请稍后重试') }
+  } catch (e) { error.value = requestErrorMessage(e, '支付状态更新失败，请稍后重试') }
   finally { devFailing.value = false }
 }
 
 function confirmRefund() {
   if (!orderId.value || devRefunding.value || order.value?.status !== 'paid') return
   uni.showModal({
-    title: '模拟退款？',
-    content: '仅开发环境演示：订单将变为已退款，并收回已解锁权益。',
-    confirmText: '模拟退款',
+    title: '标记退款？',
+    content: '仅开发环境可用：订单将变为已退款，并收回已解锁权益。',
+    confirmText: '标记退款',
     success: (res) => { if (res.confirm) void simulateRefund() },
   })
 }
@@ -158,7 +158,7 @@ async function simulateRefund() {
   try {
     await devRefundOrder(orderId.value)
     order.value = await getOrderStatus(orderId.value)
-  } catch (e) { error.value = requestErrorMessage(e, '模拟退款失败，请稍后重试') }
+  } catch (e) { error.value = requestErrorMessage(e, '退款状态更新失败，请稍后重试') }
   finally { devRefunding.value = false }
 }
 

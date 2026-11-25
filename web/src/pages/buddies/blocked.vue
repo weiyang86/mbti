@@ -64,7 +64,6 @@ async function unblock(id: string) {
   catch (e) { actionError.value = socialErrorMessage(e, '解除屏蔽失败，请重试'); await load() }
   finally { busy.value = false }
 }
-function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>
 <style scoped lang="scss">

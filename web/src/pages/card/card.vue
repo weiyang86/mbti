@@ -347,9 +347,6 @@ function previewAsset() {
   const url = styleAsset(card.value.style)
   uni.previewImage({ urls: [url], current: url })
 }
-function demoInfo() {
-  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
-}
 function goTest() { uni.navigateTo({ url: '/pages/test-intro/test-intro' }) }
 function goSelfSelect() { uni.navigateTo({ url: '/pages/self-select/self-select' }) }
 function goCreate() { uni.navigateTo({ url: '/pages/create/create' }) }

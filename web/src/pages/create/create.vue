@@ -207,10 +207,6 @@ function generate() {
   uni.navigateTo({ url: '/pages/generating/generating' })
 }
 
-function demoInfo() {
-  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
-}
-
 </script>
 
 <style scoped lang="scss">

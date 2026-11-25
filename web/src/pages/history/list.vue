@@ -152,7 +152,6 @@
           <text class="title-line">重测不覆盖过去，也不扣费。</text>
         </view>
         <view class="btn full" @click="goQuiz">建立我的第一份记录</view>
-        <button class="textbtn full mt" @click="showHistoryDemo">先看三个阶段的示例 →</button>
       </view>
 
       <view v-if="rows.length" class="btn full mt" @click="goQuiz">
@@ -414,10 +413,6 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
-function toastDemo() {
-  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
-}
-
 function openRecord(item: TimelineRow) {
   uni.navigateTo({ url: `/pages/history/detail?id=${item.id}` })
 }
@@ -431,10 +426,6 @@ function goCompare() {
 
 function goQuiz() {
   uni.reLaunch({ url: '/pages/index/index' })
-}
-
-function showHistoryDemo() {
-  uni.showToast({ title: '示例轨迹为演示数据', icon: 'none' })
 }
 
 function dateToStr(date: Date) {

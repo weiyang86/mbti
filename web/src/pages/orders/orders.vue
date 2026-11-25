@@ -5,7 +5,7 @@
 
     <view class="panel">
       <view class="h3">我的订单</view>
-      <view class="p fine">不会产生真实扣款；刷新后可看到最新状态。</view>
+      <view class="p fine">刷新后可看到最新状态。</view>
       <text class="textbtn order-refresh" @click="refresh">刷新记录 →</text>
 
       <StateView v-if="ordersLoading && !orders.length" state="loading" title="正在读取订单…" />
@@ -23,7 +23,7 @@
         <text class="textbtn" @click="openOrder(order.id)">查看 →</text>
       </view>
 
-      <StateView v-if="ordersLoaded && !orders.length && !ordersError" state="empty" title="暂无模拟订单" description="完成一次 MBTI 测试后，可以在这里查看可购买的商品。">
+      <StateView v-if="ordersLoaded && !orders.length && !ordersError" state="empty" title="暂无订单" description="完成一次 MBTI 测试后，可以在这里查看可购买的商品。">
         <button class="btn full" @click="goCatalog">看看我的 MBTI 晒图套装</button>
       </StateView>
 
@@ -122,7 +122,6 @@ async function loadEntitlements() {
 function openOrder(id: string) { uni.navigateTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(id)}` }) }
 function goCatalog() { uni.navigateTo({ url: '/pages/pricing/pricing' }) }
 function goHome() { uni.reLaunch({ url: '/pages/index/index' }) }
-function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 </script>
 
 <style scoped lang="scss">

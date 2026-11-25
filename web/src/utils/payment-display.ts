@@ -39,5 +39,5 @@ export function isTerminalOrder(status: string): boolean {
 }
 
 export function paymentAvailabilityLabel(value: PaymentAvailability): string {
-  return value === 'unconfigured' ? '支付通道未配置，暂不可发起支付' : '受控测试通道'
+  return value === 'unconfigured' ? '支付通道未配置，暂不可发起支付' : '微信支付'
 }
