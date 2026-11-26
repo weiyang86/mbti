@@ -44,10 +44,12 @@ function apiBase(env: Record<string, string | undefined> = readApplicationEnviro
 
 /**
  * Builds a runtime config from published admin settings plus resolved SecretCenter values.
- * Returns a problem label instead of throwing so the caller can answer with a 503 message.
+ * Callback verification does not need notify_url, so it can omit that requirement.
  */
 export function buildWechatPayConfig(channel: WechatPayChannel, settings: MbtiPaymentSettings,
-  values: { privateKey?: string; apiV3Key?: string; platformPublicKey?: string }): { config: WechatPayConfig } | { problem: string } {
+  values: { privateKey?: string; apiV3Key?: string; platformPublicKey?: string },
+  options: { requireNotifyUrl?: boolean } = {}): { config: WechatPayConfig } | { problem: string } {
+  const requireNotifyUrl = options.requireNotifyUrl !== false;
   const appid = (settings.appId || "").trim();
   const mchid = (settings.mchId || "").trim();
   const serialNo = (settings.serialNo || "").trim();
@@ -55,14 +57,16 @@ export function buildWechatPayConfig(channel: WechatPayChannel, settings: MbtiPa
   const privateKeyPem = normalizePem(values.privateKey || "");
   const apiV3Key = (values.apiV3Key || "").trim();
   const platformPem = normalizePem(values.platformPublicKey || "");
-  if (!appid || !mchid || !serialNo || !notifyUrl) return { problem: "商户参数未填完整" };
+  if (!appid || !mchid || !serialNo || (requireNotifyUrl && !notifyUrl)) return { problem: "商户参数未填完整" };
   if (!privateKeyPem || !merchantPrivateKey(privateKeyPem)) return { problem: "商户签名私钥不可用" };
   if (apiV3Key.length !== 32) return { problem: "APIv3 密钥必须为 32 位" };
   const platformPublicKey = platformKey(platformPem);
   if (!platformPublicKey) return { problem: "微信支付验签公钥不可用" };
-  let notify: URL;
-  try { notify = new URL(notifyUrl); } catch { return { problem: "支付通知地址无效" }; }
-  if (notify.protocol !== "https:") return { problem: "支付通知地址必须是 HTTPS" };
+  if (notifyUrl) {
+    let notify: URL;
+    try { notify = new URL(notifyUrl); } catch { return { problem: "支付通知地址无效" }; }
+    if (notify.protocol !== "https:") return { problem: "支付通知地址必须是 HTTPS" };
+  }
   return { config: {
     channel, appid, mchid, serialNo, privateKeyPem, apiV3Key, platformPublicKey,
     notifyUrl, apiBase: apiBase(),

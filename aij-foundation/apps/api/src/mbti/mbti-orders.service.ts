@@ -74,6 +74,8 @@ export class MbtiOrdersService {
       if (ledger.status === "failed" && order.status === "pending") await tx.mbtiOrder.update({ where: { id }, data: { status: "failed" } });
       const charge = ledger.transactions.find(t => t.amountMinor === BigInt(order.amount) && t.currency.trim() === order.currency.trim());
       if (ledger.status !== "succeeded" || !charge) return;
+      // Terminal failure is immutable in the database; a later charge is recorded but needs manual review.
+      if (order.status === "failed") return;
       if (order.status === "pending") await tx.mbtiOrder.update({ where: { id }, data: { status: "paid", paidAt: charge.occurredAt } });
       const existing = await tx.mbtiEntitlement.findUnique({ where: { orderId: id } });
       if (!existing) await tx.mbtiEntitlement.create({ data: { orderId: id, kind: order.productCode } });
