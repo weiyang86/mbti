@@ -54,9 +54,14 @@ function endpoint(baseUrl: string | undefined) {
   let parsed!: URL;
   try { parsed = new URL(baseUrl); } catch { reject(503, "AI_IMAGE_ENDPOINT", "图像模型 Base URL 无效"); }
   if (parsed.protocol !== "https:" || parsed.hostname !== "dashscope.aliyuncs.com") {
-    reject(503, "AI_IMAGE_ENDPOINT", "图像模型仅支持 dashscope.aliyuncs.com");
+    reject(503, "AI_IMAGE_ENDPOINT", "图像模型 Base URL 请填写 https://dashscope.aliyuncs.com");
   }
   return ENDPOINT;
+}
+/** wan2.x uses interleave flags; qwen-image takes plain generation parameters. */
+function imageParameters(model: string, size: string) {
+  if (/^wan2\./i.test(model)) return { n: 1, enable_interleave: false, size, watermark: true };
+  return { n: 1, size, watermark: true };
 }
 
 @Injectable()
@@ -71,7 +76,9 @@ export class MbtiAiImageService {
     const apiKey = runtime.credentials.apiKey;
     if (!apiKey) reject(503, "AI_IMAGE_UNCONFIGURED", "阿里云百炼 API Key 未配置");
     const model = runtime.fields.model?.trim() || "wan2.6-image";
-    if (!/^wan2\.[A-Za-z0-9._-]{1,48}$/i.test(model)) reject(503, "AI_IMAGE_MODEL", "阿里云百炼需配置万相图像模型，例如 wan2.6-image");
+    if (!/^(?:wan2\.[A-Za-z0-9._-]{1,48}|qwen-image[A-Za-z0-9._-]{0,32})$/i.test(model)) {
+      reject(503, "AI_IMAGE_MODEL", "请配置万相或 Qwen 图像模型，例如 wan2.6-image、qwen-image-3.0");
+    }
     const url = endpoint(runtime.fields.baseUrl);
     const call = this.fetcher ?? fetch;
 
@@ -81,7 +88,7 @@ export class MbtiAiImageService {
         headers: { Authorization: "Bearer " + apiKey, "Content-Type": "application/json" },
         body: JSON.stringify({ model, input: { messages: [{ role: "user", content: [
           { text: request.prompt }, { image: request.portrait }, { image: request.style },
-        ] }] }, parameters: { n: 1, enable_interleave: false, size: request.size, watermark: true } }),
+        ] }] }, parameters: imageParameters(model, request.size) }),
         signal: AbortSignal.timeout(175_000) });
     } catch (error) {
       if (error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError")) reject(504, "AI_IMAGE_TIMEOUT", "图像模型响应超时");

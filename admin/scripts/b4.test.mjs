@@ -31,7 +31,8 @@ const data = n => 'data:image/png;base64,' + Buffer.from([137,80,78,71,13,10,26,
 const pair = overrides => ({ portrait: data(20), style: data(80), consent: true, recipe: 'balanced', mode: 'offline', ...overrides })
 
 test('vendored image-kit core matches the supplied zip hash without requiring the untracked input package', () => {
-  const original = readFileSync(new URL('../vendor/mbti-image-kit/core.mjs', import.meta.url))
+  // The expected hash is the LF content in git; normalise CRLF checkouts on Windows.
+  const original = readFileSync(new URL('../vendor/mbti-image-kit/core.mjs', import.meta.url), 'utf8').replace(/\r\n/g, '\n')
   assert.equal(createHash('sha256').update(original).digest('hex'), '8b4e8d8f64ba5710a4d0121c29d13d6c5dc07187c10f2df747247f5052e50a82')
 })
 test('all absent-image/consent combinations and real mode stop before rendering, gateway or network', async () => {

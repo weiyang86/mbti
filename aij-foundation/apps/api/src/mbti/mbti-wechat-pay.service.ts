@@ -7,6 +7,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { reject } from "./mbti.http";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { buildWechatPayConfig, loadWechatPayConfig, type WechatPayChannel, type WechatPayConfig } from "./mbti-wechat-pay.config";
+import { WECHAT_PAY_CHANNELS } from "../plugins/mbti-config/mbti-payment-settings";
 import { buildWechatAuthorization, buildWechatPayParams, decryptWechatResource, verifyWechatNotifySignature } from "./mbti-wechat-pay.crypto";
 import { MbtiConfigService } from "../plugins/mbti-config/mbti-config.service";
 import { SecretRefPort } from "../secret-center/secret-ref";
@@ -254,11 +255,10 @@ export class MbtiWechatPayService {
     }
     if (envelope.event_type !== "TRANSACTION.SUCCESS") return { ignored: true };
 
-    // A notify carries no channel marker, so try every configured channel and keep
-    // the one whose merchant id matches the decrypted transaction.
-    let config: WechatPayConfig | null = null;
-    let transaction: WechatTransaction | null = null;
-    for (const channel of ["wechat", "mp"] as const) {
+    // A notify carries no channel marker and both channels may share one merchant id,
+    // so the ledger's payment attempt decides the channel instead of config order.
+    const candidates: { channel: WechatPayChannel; config: WechatPayConfig; transaction: WechatTransaction }[] = [];
+    for (const channel of WECHAT_PAY_CHANNELS) {
       const candidate = await this.resolveForNotify(channel);
       if (!candidate) continue;
       if (!verifyWechatNotifySignature({ publicKey: candidate.platformPublicKey, timestamp, nonce, body: rawBody, signature })) continue;
@@ -270,13 +270,13 @@ export class MbtiWechatPayService {
           ...(typeof resource.associated_data === "string" ? { associated_data: resource.associated_data } : {}),
         })) as WechatTransaction;
         if (typeof parsed.mchid === "string" && parsed.mchid !== candidate.mchid) continue;
-        config = candidate; transaction = parsed; break;
+        candidates.push({ channel, config: candidate, transaction: parsed });
       } catch {
         continue;
       }
     }
-    if (!config || !transaction) reject(401, "INVALID_CALLBACK_SIGNATURE", "支付回调签名无效");
-    const provider = providerFor(config.channel);
+    if (!candidates.length) reject(401, "INVALID_CALLBACK_SIGNATURE", "支付回调签名无效");
+    const transaction = candidates[0].transaction;
     if (transaction.trade_state !== "SUCCESS" || typeof transaction.out_trade_no !== "string" ||
         typeof transaction.transaction_id !== "string" || !transaction.amount ||
         typeof transaction.amount.total !== "number" || typeof transaction.amount.currency !== "string") {
@@ -284,16 +284,22 @@ export class MbtiWechatPayService {
     }
     const ledger = await this.prisma.paymentOrder.findUnique({ where: { orderNo: transaction.out_trade_no }, include: { attempts: { orderBy: { attemptNumber: "desc" } } } });
     if (!ledger || ledger.payableOwner !== OWNER) reject(404, "NOT_FOUND", "支付订单不存在");
+    const attempt = ledger.attempts.find(item => item.providerCode === WECHAT_PROVIDER || item.providerCode === MP_PROVIDER);
+    if (!attempt) reject(404, "NOT_FOUND", "支付尝试不存在");
+    const channel: WechatPayChannel = attempt.providerCode === MP_PROVIDER ? "mp" : "wechat";
+    const provider = attempt.providerCode;
+    const chosen = candidates.find(item => item.channel === channel &&
+      (typeof item.transaction.appid !== "string" || item.transaction.appid === item.config.appid));
+    const config = (chosen ?? candidates.find(item => item.channel === channel))?.config;
+    if (!config) reject(401, "INVALID_CALLBACK_SIGNATURE", "支付回调渠道不匹配");
     if (Number(ledger.amountMinor) !== transaction.amount.total || ledger.currency.trim() !== transaction.amount.currency) {
       reject(400, "INVALID_CALLBACK", "支付金额或币种不匹配");
     }
-    const attempt = ledger.attempts.find(item => item.providerCode === provider);
-    if (!attempt) reject(404, "NOT_FOUND", "支付尝试不存在");
     const mbtiOrderId = ledger.payableReference;
     const mbtiOrder = await this.prisma.mbtiOrder.findUnique({ where: { id: mbtiOrderId }, select: { ownerId: true, status: true } });
     if (!mbtiOrder) reject(404, "NOT_FOUND", "业务订单不存在");
     if (typeof transaction.payer?.openid === "string") {
-      const identity = await this.identityFor(config.channel, mbtiOrder.ownerId);
+      const identity = await this.identityFor(channel, mbtiOrder.ownerId);
       if (!identity || identity.openId !== transaction.payer.openid) reject(400, "INVALID_CALLBACK", "支付人与下单身份不一致");
     }
 
@@ -320,8 +326,12 @@ export class MbtiWechatPayService {
           providerCode: provider, providerReference: transaction.transaction_id as string,
           kind: PaymentTransactionKind.charge, amountMinor: ledger.amountMinor, currency: ledger.currency, occurredAt,
         } });
-        const linked = await tx.mbtiOrder.findUniqueOrThrow({ where: { id: mbtiOrderId }, select: { paymentOrderId: true } });
-        if (!linked.paymentOrderId) await tx.mbtiOrder.update({ where: { id: mbtiOrderId }, data: { paymentOrderId: ledger.id } });
+        // A failed business order is terminal by database invariant; the charge is still
+        // recorded for manual reconciliation, but must not be linked to that order.
+        if (mbtiOrder.status !== "failed") {
+          const linked = await tx.mbtiOrder.findUniqueOrThrow({ where: { id: mbtiOrderId }, select: { paymentOrderId: true } });
+          if (!linked.paymentOrderId) await tx.mbtiOrder.update({ where: { id: mbtiOrderId }, data: { paymentOrderId: ledger.id } });
+        }
         return false;
       }, { maxWait: 5000, timeout: 10000 });
     } catch (error) {
@@ -351,7 +361,8 @@ export class MbtiWechatPayService {
         this.secrets.resolveTrusted(settings.apiV3KeyRef),
         this.secrets.resolveTrusted(settings.platformPublicKeyRef),
       ]);
-      const built = buildWechatPayConfig(channel, settings, { privateKey, apiV3Key, platformPublicKey });
+      // notify_url is irrelevant for verification: a paused channel must still settle callbacks.
+      const built = buildWechatPayConfig(channel, settings, { privateKey, apiV3Key, platformPublicKey }, { requireNotifyUrl: false });
       return "config" in built ? built.config : null;
     } catch {
       return null;
