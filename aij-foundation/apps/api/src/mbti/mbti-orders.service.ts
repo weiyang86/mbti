@@ -74,9 +74,10 @@ export class MbtiOrdersService {
       if (ledger.status === "failed" && order.status === "pending") await tx.mbtiOrder.update({ where: { id }, data: { status: "failed" } });
       const charge = ledger.transactions.find(t => t.amountMinor === BigInt(order.amount) && t.currency.trim() === order.currency.trim());
       if (ledger.status !== "succeeded" || !charge) return;
-      // Terminal failure is immutable in the database; a later charge is recorded but needs manual review.
-      if (order.status === "failed") return;
-      if (order.status === "pending") await tx.mbtiOrder.update({ where: { id }, data: { status: "paid", paidAt: charge.occurredAt } });
+      // A verified charge wins over an earlier failure: the payer really was charged, so the
+      // order reopens (failed -> paid) and the entitlement is granted instead of only logging money.
+      if (order.status === "pending" || order.status === "failed")
+        await tx.mbtiOrder.update({ where: { id }, data: { status: "paid", paidAt: charge.occurredAt } });
       const existing = await tx.mbtiEntitlement.findUnique({ where: { orderId: id } });
       if (!existing) await tx.mbtiEntitlement.create({ data: { orderId: id, kind: order.productCode } });
     }, { maxWait: 5000, timeout: 10000 });
@@ -191,7 +192,8 @@ export class MbtiOrdersService {
     return { items, next_cursor: rows.length > limit && last ? Buffer.from(JSON.stringify([last.createdAt.toISOString(), last.id])).toString("base64url") : null };
   }
   async entitlements(ownerId: string) {
-    const unsettled = await this.prisma.mbtiOrder.findMany({ where: { ownerId, paymentOrderId: { not: null }, status: "pending" }, select: { id: true } });
+    // Failed orders are re-synced too: a late verified charge reopens them as paid.
+    const unsettled = await this.prisma.mbtiOrder.findMany({ where: { ownerId, paymentOrderId: { not: null }, status: { in: ["pending", "failed"] } }, select: { id: true } });
     for (const row of unsettled) await this.sync(row.id);
     const rows = await this.prisma.mbtiEntitlement.findMany({ where: { order: { ownerId } }, include: { order: true }, orderBy: [{ grantedAt: "desc" }, { id: "desc" }] });
     return { items: rows.map(row => ({ id: row.id, order_id: row.orderId, result_id: row.order.resultId, product_code: row.order.productCode,

@@ -296,7 +296,7 @@ export class MbtiWechatPayService {
       reject(400, "INVALID_CALLBACK", "支付金额或币种不匹配");
     }
     const mbtiOrderId = ledger.payableReference;
-    const mbtiOrder = await this.prisma.mbtiOrder.findUnique({ where: { id: mbtiOrderId }, select: { ownerId: true, status: true } });
+    const mbtiOrder = await this.prisma.mbtiOrder.findUnique({ where: { id: mbtiOrderId }, select: { ownerId: true } });
     if (!mbtiOrder) reject(404, "NOT_FOUND", "业务订单不存在");
     if (typeof transaction.payer?.openid === "string") {
       const identity = await this.identityFor(channel, mbtiOrder.ownerId);
@@ -326,12 +326,10 @@ export class MbtiWechatPayService {
           providerCode: provider, providerReference: transaction.transaction_id as string,
           kind: PaymentTransactionKind.charge, amountMinor: ledger.amountMinor, currency: ledger.currency, occurredAt,
         } });
-        // A failed business order is terminal by database invariant; the charge is still
-        // recorded for manual reconciliation, but must not be linked to that order.
-        if (mbtiOrder.status !== "failed") {
-          const linked = await tx.mbtiOrder.findUniqueOrThrow({ where: { id: mbtiOrderId }, select: { paymentOrderId: true } });
-          if (!linked.paymentOrderId) await tx.mbtiOrder.update({ where: { id: mbtiOrderId }, data: { paymentOrderId: ledger.id } });
-        }
+        // Link the verified charge even to an order already closed as failed; read repair then
+        // reopens it, because the payer was actually charged.
+        const linked = await tx.mbtiOrder.findUniqueOrThrow({ where: { id: mbtiOrderId }, select: { paymentOrderId: true } });
+        if (!linked.paymentOrderId) await tx.mbtiOrder.update({ where: { id: mbtiOrderId }, data: { paymentOrderId: ledger.id } });
         return false;
       }, { maxWait: 5000, timeout: 10000 });
     } catch (error) {

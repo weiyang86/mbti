@@ -55,7 +55,7 @@ export class MbtiTestPaymentService {
   async receive(request: IncomingMessage & { rawBody?: Buffer }) {
     // Foundation validates raw bytes, signature, replay event, frozen order, amount and currency.
     const receipt = await this.callbacks.receive("mbti-foundation-test", "synthetic-test", request);
-    const pending = await this.prisma.mbtiOrder.findMany({ where: { paymentOrderId: { not: null }, status: "pending" }, select: { id: true } });
+    const pending = await this.prisma.mbtiOrder.findMany({ where: { paymentOrderId: { not: null }, status: { in: ["pending", "failed"] } }, select: { id: true } });
     for (const row of pending) await this.orders.sync(row.id);
     return receipt;
   }
