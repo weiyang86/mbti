@@ -17,6 +17,18 @@ const landings = { home: '首页', pricing: '购买页', 'test-intro': '测试�
 const styleNames = { editorial: '杂志', illustration: '插画', game: '游戏' }
 const dimensions = ['EI', 'SN', 'TF', 'JP'] as const
 const personaCodes = ['E', 'I'].flatMap(a => ['S', 'N'].flatMap(b => ['T', 'F'].flatMap(c => ['J', 'P'].map(d => a + b + c + d))))
+const pageTitles: [string, string][] = [
+  ['pages/index/index', '首页'], ['pages/test-intro/test-intro', '测试入口'], ['pages/quiz/quiz', '答题页'],
+  ['pages/self-select/self-select', '自选类型'], ['pages/result/result', '测试结果'], ['pages/pricing/pricing', '购买页'],
+  ['pages/create/create', '形象工作台'], ['pages/generating/generating', '生成中'], ['pages/card/card', '我的名片'],
+  ['pages/share-preview/share-preview', '分享预览'], ['pages/card/public', '公开名片'], ['pages/discover/discover', '发现搭子'],
+  ['pages/buddies/detail', '搭子名片'], ['pages/contacts/contacts', '交换资料'], ['pages/contact-request/contact-request', '双向确认'],
+  ['pages/contact-request/granted', '确认结果'], ['pages/exchanges/exchanges', '名片夹'], ['pages/radar/radar', '同型雷达'],
+  ['pages/compat/compat', '相处小抄'], ['pages/account/account', '我的'], ['pages/video/video', '视频分镜'],
+  ['pages/history/list', '我的轨迹'], ['pages/history/detail', '阶段记录'], ['pages/compare/compare', '结果对比'],
+  ['pages/journey-share/journey-share', '阶段分享图'], ['pages/orders/orders', '我的订单'],
+  ['pages/order-status/order-status', '订单状态'], ['pages/buddies/blocked', '屏蔽管理'],
+]
 const text = (path: string, label: string, max: number, long = false, group?: string): FieldDef => ({ path, label, type: long ? 'textarea' : 'text', max, group })
 const number = (path: string, label: string, min: number, maxValue: number, group?: string): FieldDef => ({ path, label, type: 'number', min, maxValue, group })
 const check = (path: string, label: string, group?: string): FieldDef => ({ path, label, type: 'checkbox', group })
@@ -75,8 +87,21 @@ export function fieldsFor(category: string): FieldDef[] {
     select('size', '生成尺寸', { '960*1280': '960×1280', '1024*1024': '1024×1024', '720*1280': '720×1280' }, '图像服务'),
     number('timeout', '超时（秒）', 20, 180, '图像服务'),
   ]
-  if (category === 'payments') return channelNames.map(([key, name]) =>
-    select(`${key}.merchantLabel`, '收款主体', { 'MBTI搭子体验店': 'MBTI搭子体验店', '品牌展示样例': '品牌展示样例' }, name))
+  if (category === 'payments') return channelNames.slice(0, 2).flatMap(([key, name]) => [
+    check(`${key}.enabled`, '允许本渠道新下单', name),
+    select(`${key}.mode`, '交易环境', { mock: '模拟 · 不扣款', live: '正式收款' }, name),
+    text(`${key}.merchantLabel`, '收款方展示名（1–40 字）', 40, false, name),
+    text(`${key}.appId`, 'AppID（wx 开头 18 位）', 64, false, name),
+    text(`${key}.appSecretRef`, 'AppSecret 凭据引用', 256, false, name),
+    text(`${key}.mchId`, '微信支付商户号 MchID', 64, false, name),
+    text(`${key}.serialNo`, '商户证书序列号', 64, false, name),
+    text(`${key}.publicKeyId`, '微信支付公钥 ID（PUB_KEY_ID_…）', 80, false, name),
+    text(`${key}.notifyUrl`, '支付通知地址（HTTPS）', 240, false, name),
+    text(`${key}.refundNotifyUrl`, '退款通知地址（HTTPS）', 240, false, name),
+    text(`${key}.privateKeyRef`, '商户签名私钥引用', 256, false, name),
+    text(`${key}.apiV3KeyRef`, 'APIv3 密钥引用', 256, false, name),
+    text(`${key}.platformPublicKeyRef`, '微信支付验签公钥引用', 256, false, name),
+  ])
   if (category === 'copy') return [
     { path: 'stages', label: '阶段选项', type: 'tags', hint: '用逗号分隔，1–20 项，每项最多 24 字', group: '测试选项' },
     { path: 'recentStatuses', label: '最近状态选项', type: 'tags', hint: '用逗号分隔，1–20 项，每项最多 24 字', group: '测试选项' },
@@ -88,6 +113,7 @@ export function fieldsFor(category: string): FieldDef[] {
     text('compare.emptyTitle', '空态标题第一行', 40, false, '对比页'),
     text('compare.emptyAccent', '空态标题第二行', 40, false, '对比页'),
     text('compare.emptyDescription', '空态说明', 160, true, '对比页'),
+    ...pageTitles.map(([route, label]) => text(`pages.${route}`, label, 30, false, '页面标题')),
   ]
   if (category === 'assessment') return [
     { path: 'question_bank_version', label: '题库版本', type: 'text', max: 96, group: '题库',
@@ -168,7 +194,8 @@ export function skeletonFor(category: string): Record<string, unknown> | null {
     ],
   }
   if (category === 'payments') return Object.fromEntries(channelNames.map(([key]) =>
-    [key, { enabled: false, mode: 'UNCONFIGURED', merchantLabel: 'MBTI搭子体验店' }]))
+    [key, { enabled: false, mode: 'mock', merchantLabel: '', appId: '', appSecretRef: '', mchId: '', serialNo: '',
+      publicKeyId: '', notifyUrl: '', refundNotifyUrl: '', privateKeyRef: '', apiV3KeyRef: '', platformPublicKeyRef: '' }]))
   if (category === 'aiRuntime') return { mode: 'UNCONFIGURED', size: '1024*1024', timeout: 60 }
   if (category === 'assessment') return {
     question_bank_version: '',
@@ -187,6 +214,7 @@ export function skeletonFor(category: string): Record<string, unknown> | null {
     maxInterests: 3,
     compare: { title: '变了多少，', accent: '让答案自己说。', description: '比较你选择的两个阶段；没有高低阶，也没有“更好的人格”。',
       emptyTitle: '再留一份记录，', emptyAccent: '就能看见前后差别。', emptyDescription: '只比较同一题目、计分规则和回顾时间窗下的两次结果。' },
+    pages: Object.fromEntries(pageTitles.map(([route, label]) => [route, label])),
   }
   return null
 }

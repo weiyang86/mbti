@@ -1,5 +1,5 @@
 import { orderQuery, projectOrderPage, projectOrderSummary, type OrderFilters } from './ops-orders-collection'
-import { normalizeOrderId, orderPath, projectOrder } from './ops-order'
+import { normalizeOrderId, orderPath, projectOrder, projectOrderUser, type OpsOrderUser } from './ops-order'
 
 export type Capability = 'access' | 'orders' | 'draft' | 'systemRead' | 'systemWrite' | 'release' | 'fulfillment' | 'generationRetry' | 'moderationRead' | 'moderation' | 'export' | 'redemption'
 export interface OpsSession {
@@ -19,9 +19,9 @@ export class OpsApiError extends Error {
   constructor(readonly status: number, message: string, readonly code?: 'INVALID_ORDER_RESPONSE') { super(message) }
 }
 
-export async function request<T>(path: string, init: RequestInit = {}, retry = true, raw: boolean | 'csv' = false): Promise<T> {
+export async function request<T>(path: string, init: RequestInit = {}, retry = true, raw: boolean | 'csv' = false, limitMs = timeoutMs): Promise<T> {
   const controller = new AbortController()
-  const timeout = window.setTimeout(() => controller.abort(), timeoutMs)
+  const timeout = window.setTimeout(() => controller.abort(), limitMs)
   try {
     const headers = new Headers(init.headers)
     headers.set('Accept', 'application/json')
@@ -30,7 +30,7 @@ export async function request<T>(path: string, init: RequestInit = {}, retry = t
     const response = await fetch(`/api${path}`, { ...init, headers, credentials: 'same-origin', cache: 'no-store', signal: controller.signal })
     if (response.status === 401 && retry && path !== '/auth/browser-login' && path !== '/auth/session' && path !== '/auth/logout') {
       try { await session() } catch { throw new OpsApiError(401, '登录已失效，请重新登录。') }
-      return request<T>(path, init, false, raw)
+      return request<T>(path, init, false, raw, limitMs)
     }
     if (raw === 'csv' && response.ok) {
       if (!response.headers.get('Content-Type')?.startsWith('text/csv')) throw new OpsApiError(502, '导出响应格式不正确。')
@@ -67,6 +67,14 @@ export async function readOrder(id: string) {
   const payload = await request<unknown>(orderPath(normalized), {}, true, true)
   try { return projectOrder(payload, normalized) }
   catch { throw new OpsApiError(502, '订单响应格式不正确，请重试或联系维护人员。', 'INVALID_ORDER_RESPONSE') }
+}
+
+/** Masked identity of the order owner; never exposes a full openid. */
+export async function readOrderUser(id: string): Promise<OpsOrderUser> {
+  const normalized = normalizeOrderId(id)
+  const payload = await request<unknown>(`${orderPath(normalized)}/user`, {}, true, true)
+  try { return projectOrderUser(payload, normalized) }
+  catch { throw new OpsApiError(502, '用户身份响应格式不正确。', 'INVALID_ORDER_RESPONSE') }
 }
 
 export async function listOrders(filters: OrderFilters) {

@@ -41,6 +41,10 @@ API不写入/接收密钥值，不创建真实SecretStore。prepare工具仅为�
 
 `private.integrationRef`写入另需admin.config.manage+admin.secret.manage，global仍需DB超级。普通配置角色不能借“已登记？”结果探测引用；仅保存规范引用字符串，无真实值进入ScopedConfig。Seed --secrets只注册权限定义；--configuration也登记这个显式依赖，不修复已有状态/授权，不种配置值。当前读取配置API继续隐藏敏感引用；公开project/context仍只有品牌和实际能力白名单。
 
+### 受控模型密钥写入（MBTI 后台）
+
+`POST /api/admin/secret-references/values` 是唯一接收明文值的入口，仅用于 MBTI 后台的 AI 模型 API Key：body 为 `{ name, value }`，`name` 限 `[A-Z][A-Z0-9_]{2,63}`，`value` 16–8192 字符且无空白/模板词。服务端只写 `local://<projectId>/<environment>/<name>`，用现有 `AIJ_SECRET_STORE_KEY` 以 AES-256-GCM 加密后原子替换本机 SecretStore，再登记/激活同一引用；响应只返回 id/ref/provider/status/configured/updatedAt，从不返回值。未配置 `AIJ_SECRET_STORE_KEY` 时 503，权限、命名空间、版本与审计复用本节现有规则。该入口不改变 env 引用和外部 Provider 的只读边界，也不提供任意配置 key 写入能力。
+
 创建/轮换/清除/检查及每个配置重绑定的共享AuditLog与ConfigurationChange原子写入，仅资源ID/字段名/版本/操作者/关联ID和安全状态，不记录ref旧值/实际secret/request body。审计或变更插入失败整笔503回滚。权限撤销/角色停用对同JWT下一请求即时生效，菜单/CORS/自报permission/workspace不授予权限。
 
 ### AF-037 SecretRef 管理页面

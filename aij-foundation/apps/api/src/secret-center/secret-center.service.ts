@@ -7,16 +7,19 @@ import { PrismaService } from "../prisma/prisma.service";
 import { ManagementAccessService } from "../rbac/management-access.service";
 import { PluginRuntimeAccessService } from "../plugin-runtime/plugin-runtime-access.service";
 import { AdminListDto } from "../admin/dto";
-import { CreateSecretReferenceDto, RotateSecretReferenceDto, SecretVersionDto } from "./dto";
+import { CreateSecretReferenceDto, RotateSecretReferenceDto, SaveSecretValueDto, SecretVersionDto } from "./dto";
 import { EnvSecretAdapter, LocalSecretStoreAdapter, SecretAdapter } from "./secret-adapter";
+import { LocalSecretStoreWriter } from "./secret-store-writer";
 import { assertOwnedRef, prefixes, SecretIdentity, SecretRefPort } from "./secret-ref";
 @Injectable()
 export class SecretCenterService implements SecretRefPort {
   private readonly identity: SecretIdentity;
   private readonly adapters: Record<"env" | "local", SecretAdapter>;
+  private readonly writer: LocalSecretStoreWriter;
   constructor(private readonly prisma: PrismaService, private readonly access: ManagementAccessService, private readonly pluginAccess: PluginRuntimeAccessService, runtime: ConfigService) {
     this.identity = { projectId: runtime.getOrThrow<string>("projectId"), environment: runtime.getOrThrow<string>("environment"), namespace: runtime.getOrThrow<string>("namespace"), repositoryRoot: runtime.getOrThrow<string>("repositoryRoot") };
     this.adapters = { env: new EnvSecretAdapter(), local: new LocalSecretStoreAdapter(this.identity) };
+    this.writer = new LocalSecretStoreWriter(this.identity);
   }
   private ownedWhere() { return { deletedAt: null, OR: Object.values(prefixes(this.identity)).map(prefix => ({ ref: { startsWith: prefix } })) }; }
   private async context(tx: Prisma.TransactionClient) {
@@ -90,6 +93,23 @@ export class SecretCenterService implements SecretRefPort {
     return this.access.write(operator, [SECRET_PERMISSION], async (tx, actor) => {
       await this.context(tx); const row = await tx.secretReference.create({ data: { ref: parsed.ref, provider: parsed.provider } });
       await this.record(tx, actor.id, row, "secret_reference_created", correlationId); return this.safe(row);
+    });
+  }
+  /** Encrypts a plaintext value into the owned local store, then registers or reactivates its reference. */
+  saveValue(dto: SaveSecretValueDto, operator: string, correlationId?: string) {
+    const ref = "local://" + this.identity.projectId + "/" + this.identity.environment + "/" + dto.name;
+    assertOwnedRef(ref, this.identity);
+    return this.access.write(operator, [SECRET_PERMISSION], async (tx, actor) => {
+      await this.context(tx);
+      // The file is written first so a registered reference is never observable without a value.
+      await this.writer.write(dto.name, dto.value);
+      const existing = await tx.secretReference.findUnique({ where: { ref } });
+      const row = existing
+        ? await tx.secretReference.update({ where: { id: existing.id }, data: { provider: "local", status: "active", deletedAt: null,
+          lastCheckedAt: null, lastCheckStatus: null, updatedAt: new Date(Math.max(Date.now(), existing.updatedAt.getTime() + 1)) } })
+        : await tx.secretReference.create({ data: { ref, provider: "local" } });
+      await this.record(tx, actor.id, row, "secret_value_saved", correlationId);
+      return this.safe(row);
     });
   }
   rotate(id: string, dto: RotateSecretReferenceDto, operator: string, correlationId?: string) {

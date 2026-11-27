@@ -34,6 +34,8 @@ import { LAUNCH_PLUGIN_CODES, assertLaunchPlugins, assertLaunchRegistryAlignment
 const CONFIG = "admin.config.manage", SECRET = "admin.secret.manage", PLUGIN = "admin.plugin.manage";
 const runtime = { getOrThrow(key: string) { const values: Record<string, string> = { projectId: "mbti-foundation", environment: "test", namespace: "mbti-test" }; return values[key]; } } as ConfigService;
 const content = (headline: string) => ({ headline, accent: "当前阶段", sub: "了解自己", cta: "开始", moments: "生活", avatar: "形象", meet: "相遇", caption: "记录" });
+const paymentEntry = () => ({ enabled: false, mode: "mock" as const, merchantLabel: "", appId: "", appSecretRef: "", mchId: "", serialNo: "", publicKeyId: "", notifyUrl: "", refundNotifyUrl: "", privateKeyRef: "", apiV3KeyRef: "", platformPublicKeyRef: "" });
+const paymentChannels = () => Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, paymentEntry()]));
 type Query = { where?: Record<string, unknown>; data?: Record<string, unknown>; take?: number };
 function matches(row: object, query: Record<string, unknown> = {}): boolean {
   const values = row as Record<string, unknown>;
@@ -127,13 +129,13 @@ test("existing lifecycle is project/environment scoped and repeated install/enab
   await assert.rejects(f.service.readView("root", "published"), status(503));
 });
 
-test("exactly 11 unique categories, prototype candidates validate and unknown/secret fields are rejected without reflecting inputs", () => {
-  assert.equal(MBTI_CATEGORIES.length, 11); assert.equal(new Set(MBTI_CATEGORIES).size, 11); assert.ok(!MBTI_CATEGORIES.includes("release" as never));
+test("exactly 12 unique categories, prototype candidates validate and unknown/secret fields are rejected without reflecting inputs", () => {
+  assert.equal(MBTI_CATEGORIES.length, 12); assert.equal(new Set(MBTI_CATEGORIES).size, 12); assert.ok(!MBTI_CATEGORIES.includes("release" as never));
   const b3 = JSON.parse(readFileSync(resolve(__dirname, "../../../../admin/src/config-fixture.json"), "utf8"));
   const values = { ...emptySnapshot(), content: b3.content, channels: b3.channels, catalog: { shop: b3.shop, styles: b3.styles },
     assessment: { ...b3.quiz, questions: b3.quiz.questions.map((q: object) => ({ ...q, reverse: false })) }, personas: b3.personas,
     imageRecipes: { recipe: "balanced" }, retention: { tags: ["日常生活"], days: [30, 90] }, discovery: { order: "recommend", daily: 8, radar: true, radius: 500, minimum: 10 },
-    aiRuntime: { mode: "UNCONFIGURED", size: "960*1280", timeout: 90 }, payments: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(c => [c, { enabled: false, mode: "UNCONFIGURED", merchantLabel: "MBTI搭子体验店" }])), trade: { ttl: 30, redeem: true, selfRefund: "self", refundDays: 7 } };
+    aiRuntime: { mode: "UNCONFIGURED", size: "960*1280", timeout: 90 }, payments: paymentChannels(), trade: { ttl: 30, redeem: true, selfRefund: "self", refundDays: 7 } };
   assert.deepEqual(validateSnapshot(values), values);
   assert.throws(() => validateSnapshot({ ...values, release: {} }));
   assert.throws(() => validateCategory("content", { ...content("内容"), credential: "invalid-reference" }));
@@ -199,7 +201,7 @@ test("projection uses current permissions; system refs require owned metadata an
   assert.equal(JSON.stringify(saved).includes(ref), false);
   const audit = projectAudit(f.state().audits.at(-1)!); assert.equal(audit.action, "mbti_draft_saved"); assert.equal(JSON.stringify(audit).includes(ref), false); assert.equal(JSON.stringify(f.state().audits).includes(ref), false); assert.equal(JSON.stringify(f.state().changes).includes(ref), false);
   const editor = await f.service.readView("editor", "draft"); for (const k of ["aiRuntime", "payments", "trade"]) assert.equal(Object.hasOwn(editor.categories, k), false);
-  assert.deepEqual(editor.diff, []); assert.equal(Object.keys(editor.categories).length, 8);
+  assert.deepEqual(editor.diff, []); assert.equal(Object.keys(editor.categories).length, 9);
   await f.service.saveDraft("root", "aiRuntime", { value: { mode: "UNCONFIGURED", size: "960*1280", timeout: 91 }, expectedDraftVersion: 1 });
   assert.equal(JSON.parse(f.state().configs.find(r => r.configKey === "release.draft")!.configValue).aiRuntime.credentialRef, ref);
   await f.service.publish("root", { expectedVersion: 0, expectedDraftVersion: 2 });
@@ -222,9 +224,9 @@ test("permission matrix covers every category family for denied/editor/publisher
   const NORMAL = MBTI_CATEGORIES.filter(key => !(SYSTEM as readonly string[]).includes(key));
   const systemValues = {
     aiRuntime: { mode: "UNCONFIGURED", size: "960*1280", timeout: 90 },
-    payments: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, { enabled: false, mode: "UNCONFIGURED", merchantLabel: "MBTI搭子体验店" }])),
+    payments: paymentChannels(),
     trade: { ttl: 30, redeem: false, selfRefund: "support", refundDays: 7 },
-  } as const;
+  };
   const normalValues = {
     content: content("矩阵"),
     channels: Object.fromEntries(["wechat", "mp", "douyin", "xhs"].map(channel => [channel, { name: "入口", landing: "home", badge: "标签" }])),
@@ -267,7 +269,7 @@ test("permission matrix covers every category family for denied/editor/publisher
   assert.deepEqual(Object.keys(root.categories).sort(), [...MBTI_CATEGORIES].sort());
   for (const key of SYSTEM) await f.service.saveDraft("root", key, { value: systemValues[key], expectedDraftVersion: draftVersion++ });
   assert.equal(MBTI_PUBLIC_APPROVED, true);
-  assert.deepEqual([...MBTI_PUBLIC_CATEGORIES].sort(), ["assessment", "catalog", "channels", "content", "discovery", "imageRecipes", "personas", "retention"]);
+  assert.deepEqual([...MBTI_PUBLIC_CATEGORIES].sort(), ["assessment", "catalog", "channels", "content", "copy", "discovery", "imageRecipes", "personas", "retention"]);
   for (const key of SYSTEM) assert.equal((MBTI_PUBLIC_CATEGORIES as readonly string[]).includes(key), false);
   for (const channel of ["wechat", "mp", "douyin", "xhs"] as const) {
     const projected = projectPublicPublished(emptySnapshot(), "project-test", channel, 0);
@@ -351,7 +353,7 @@ test("actual Nest HTTP routes enforce auth, permissions, disabled state and stri
 
 test("C2 internal published projection + approved anonymous path: isolated channels, source revision, CAS and rollback; no retained cache", async () => {
   assert.equal(MBTI_PUBLIC_APPROVED, true);
-  assert.deepEqual(MBTI_PUBLIC_CATEGORIES, ["content", "channels", "catalog", "assessment", "personas", "imageRecipes", "retention", "discovery"]);
+  assert.deepEqual(MBTI_PUBLIC_CATEGORIES, ["content", "channels", "catalog", "assessment", "personas", "imageRecipes", "retention", "discovery", "copy"]);
   const f = fixture(); await f.enable();
   const channels = { wechat: { name: "微信小程序", landing: "home", badge: "微信专用" }, mp: { name: "公众号 H5", landing: "pricing", badge: "公众号专用" }, douyin: { name: "抖音小程序", landing: "home", badge: "抖音专用" }, xhs: { name: "小红书小程序", landing: "discover", badge: "小红书专用" } };
   await f.save("旧发布", 0); await f.service.saveDraft("root", "channels", { value: channels, expectedDraftVersion: 1 });

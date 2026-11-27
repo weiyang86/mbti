@@ -21,6 +21,19 @@
     </view>
 
     <view class="panel">
+      <view class="h3">登录</view>
+      <template v-if="account.session">
+        <view class="p">已登录：{{ account.session.provider === 'wechat' ? '微信身份' : '微信身份（开发）' }}</view>
+        <view class="p fine">登录身份已绑定当前游客数据；换设备后需重新登录。</view>
+        <button class="btn ghost full" @click="confirmLogoutSession">退出登录</button>
+      </template>
+      <template v-else>
+        <view class="p">登录后，当前的测试记录、订单与名片会绑定到一个微信身份。</view>
+        <button class="btn full" @click="goLogin">微信一键登录</button>
+      </template>
+    </view>
+
+    <view class="panel">
       <view class="h3">我的订单与权益</view>
       <view class="p fine">数据来自服务端订单与权益，不会产生真实扣款。</view>
       <view v-for="order in orders" :key="order.id" class="order">
@@ -44,10 +57,7 @@
       <view class="mini-list">
         <button class="btn secondary full" @click="goTab('/pages/card/card')">管理公开范围</button>
         <button class="btn secondary full" @click="go('/pages/buddies/blocked')">管理屏蔽列表</button>
-        <button class="btn ghost full" @click="go('/pages/test-intro/test-intro')">新增阶段记录 · 免费复测</button>
-        <button class="btn ghost full" @click="toastDemo">兑换体验码</button>
-        <button class="btn ghost full" @click="confirmReset">清除本机演示数据</button>
-        <button class="btn ghost full" @click="toastDemo">产品介绍与 SOP ↗</button>
+        <button class="btn ghost full" @click="toastRedeem">兑换体验码</button>
       </view>
     </view>
 
@@ -74,7 +84,7 @@ import { entitledTier, formatMoney, orderStatusLabel } from '@/utils/payment-dis
 import {
   account,
   displayName,
-  logout,
+  logoutSession,
 } from '@/store/account'
 
 const PRODUCT_NAMES: Record<string, string> = {
@@ -121,21 +131,25 @@ function goOrder(orderId: string) {
   uni.navigateTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(orderId)}` })
 }
 
-function confirmReset() {
+function goLogin() {
+  uni.navigateTo({ url: '/pages/login/login' })
+}
+
+function confirmLogoutSession() {
   uni.showModal({
-    title: '清除本机演示数据？',
-    content: '将清除本机保存的演示数据。',
-    confirmText: '清除',
+    title: '退出登录？',
+    content: '本机测试记录、订单与名片仍保留；重新登录可继续使用。',
+    confirmText: '退出',
     success: (res) => {
       if (!res.confirm) return
-      logout()
-      uni.showToast({ title: '已清除', icon: 'none' })
+      logoutSession()
+      uni.showToast({ title: '已退出登录', icon: 'none' })
     },
   })
 }
 
-function toastDemo() {
-  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
+function toastRedeem() {
+  uni.showToast({ title: '兑换功能即将开放', icon: 'none' })
 }
 
 function goTab(url: string) {

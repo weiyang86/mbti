@@ -2,7 +2,7 @@
   <view>
     <proto-nav />
     <view class="page">
-      <view v-if="loading" class="state"><text class="state-text">正在准备预览…</text></view>
+      <StateView v-if="loading" state="loading" title="正在准备预览…" />
 
       <template v-else-if="!result">
         <view class="page-intro">
@@ -104,9 +104,9 @@
             <text class="textbtn" @click="openDrafts">查看草稿</text>
           </template>
           <button v-if="platform === 'douyin'" class="btn ghost" @click="goVideo">
-            预览 15 秒分镜（模拟）
+            预览 15 秒分镜
           </button>
-          <text class="textbtn" @click="nativeShare">预览平台分享卡片（模拟）</text>
+          <text class="textbtn" @click="nativeShare">预览平台分享卡片</text>
         </view>
 
         <view class="notice mt">
@@ -114,7 +114,7 @@
         </view>
 
         <view class="action-dock">
-          <button class="btn full" :disabled="previewStatus !== 'ready'" @click="onDockAction">
+          <button class="btn full" :disabled="previewStatus !== 'ready' || saving" @click="onDockAction">
             <AppIcon name="download" :size="20" color="#ffffff" />
             <text>{{ dockLabel }}</text>
           </button>
@@ -127,6 +127,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, onMounted, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'
@@ -182,6 +183,7 @@ const previewUrl = ref('')
 const previewStatus = ref<'idle' | 'loading' | 'ready' | 'error'>('idle')
 const previewError = ref('')
 const imageLoaded = ref(false)
+const saving = ref(false)
 const platform = ref<PlatformKey>('wechat')
 const format = ref<FormatKey>('portrait')
 const captions = ref<Partial<Record<PlatformKey, string>>>({})
@@ -216,16 +218,12 @@ async function loadResult() {
     if (!noteTitle.value) {
       noteTitle.value = `同样是 ${result.value.type_code}，我也有自己的主角感`
     }
-    await requestPreview()
+    void requestPreview()
   } catch {
     result.value = null
   } finally {
     loading.value = false
   }
-}
-
-function demoState() {
-  uni.showToast({ title: 'Mock 演示状态，不产生费用', icon: 'none' })
 }
 
 const typeName = computed(() => TYPE_NAMES[result.value?.type_code || ''] || 'MBTI')
@@ -265,29 +263,64 @@ function switchFormat(key: FormatKey) {
 }
 
 const dockLabel = computed(() => {
-  if (previewStatus.value === 'ready') return '预览成图，保存图片'
+  if (saving.value) return '正在保存图片…'
+  if (previewStatus.value === 'ready') return '保存图片'
   if (previewStatus.value === 'error') return '重新生成分享图'
   return '正在生成分享图…'
 })
 
-function onDockAction() {
+async function onDockAction() {
   if (previewStatus.value === 'error') {
-    requestPreview()
+    await requestPreview()
     return
   }
-  previewImage()
+  await saveImage()
+}
+
+const PREVIEW_TIMEOUT_MS = 15000
+let previewToken = 0
+let imageTimer: ReturnType<typeof setTimeout> | undefined
+
+function clearImageTimer() {
+  if (imageTimer) clearTimeout(imageTimer)
+  imageTimer = undefined
+}
+
+function withTimeout<T>(task: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('分享图生成超时，请重试')), ms)
+    task.then(
+      (value) => { clearTimeout(timer); resolve(value) },
+      (error) => { clearTimeout(timer); reject(error) },
+    )
+  })
 }
 
 /** F2：同步读取 POST /share/preview 的 ready 结果，用返回的绝对地址加载图片 */
 async function requestPreview() {
-  if (!resultId.value) return
+  if (!resultId.value || previewStatus.value === 'loading') return
+  const token = ++previewToken
+  clearImageTimer()
   previewStatus.value = 'loading'
   previewError.value = ''
   imageLoaded.value = false
+  previewUrl.value = ''
   try {
-    const preview = await createSharePreview({ result_id: resultId.value, scene: 'moments' })
+    const preview = await withTimeout(
+      createSharePreview({ result_id: resultId.value, scene: 'moments' }),
+      PREVIEW_TIMEOUT_MS,
+    )
+    if (token !== previewToken) return
     previewUrl.value = preview.preview_url
+    // The image element drives the final state; guard against a silently stalled load.
+    imageTimer = setTimeout(() => {
+      if (token !== previewToken || imageLoaded.value) return
+      previewUrl.value = ''
+      previewStatus.value = 'error'
+      previewError.value = '图片加载超时，请重试'
+    }, PREVIEW_TIMEOUT_MS)
   } catch (e) {
+    if (token !== previewToken) return
     previewUrl.value = ''
     previewStatus.value = 'error'
     previewError.value = requestErrorMessage(e, '分享图生成失败，请重试')
@@ -295,14 +328,77 @@ async function requestPreview() {
 }
 
 function onImageLoad() {
+  clearImageTimer()
   imageLoaded.value = true
   previewStatus.value = 'ready'
 }
 
 function onImageError() {
+  clearImageTimer()
   previewUrl.value = ''
   previewStatus.value = 'error'
   previewError.value = '分享图加载失败，请重试'
+}
+
+/** H5 走同源代理下载；其他端保存到相册，失败时回退到预览（可长按保存）。 */
+async function saveImage() {
+  if (!previewUrl.value || saving.value) return
+  saving.value = true
+  try {
+    if (typeof document !== 'undefined') {
+      const path = proxyAssetPath(previewUrl.value)
+      const response = await fetch(path)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const blob = await response.blob()
+      const objectUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = objectUrl
+      link.download = `mbti-${result.value?.type_code || 'card'}.svg`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(objectUrl)
+      uni.showToast({ title: '图片已开始下载', icon: 'none' })
+      return
+    }
+    const tempFilePath = await downloadFile(previewUrl.value)
+    await saveImageToAlbum(tempFilePath)
+    uni.showToast({ title: '已保存到相册', icon: 'none' })
+  } catch {
+    uni.showToast({ title: '保存失败，已打开图片，可长按保存', icon: 'none' })
+    previewImage()
+  } finally {
+    saving.value = false
+  }
+}
+
+/** 绝对成图地址改走同源 /api 路径，避免 H5 下载被跨域拦截。 */
+function proxyAssetPath(url: string) {
+  try {
+    const parsed = new URL(url)
+    return parsed.pathname.startsWith('/api/v1/') ? parsed.pathname : url
+  } catch {
+    return url
+  }
+}
+
+function downloadFile(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    uni.downloadFile({
+      url,
+      success: (res) => {
+        if (res.statusCode === 200 && res.tempFilePath) resolve(res.tempFilePath)
+        else reject(new Error(`download ${res.statusCode}`))
+      },
+      fail: reject,
+    })
+  })
+}
+
+function saveImageToAlbum(filePath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    uni.saveImageToPhotosAlbum({ filePath, success: () => resolve(), fail: reject })
+  })
 }
 
 function copyPreviewUrl() {
@@ -413,16 +509,6 @@ function persistDrafts() {
 </script>
 
 <style scoped lang="scss">
-.state {
-  padding-top: 220px;
-  text-align: center;
-}
-.state-text {
-  display: block;
-  font-size: 13px;
-  color: #77727e;
-}
-
 .line {
   display: block;
   border-top: 0;

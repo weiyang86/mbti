@@ -27,6 +27,44 @@ export function orderPath(input: string): string {
   return `/admin/mbti/orders/${encodeURIComponent(normalizeOrderId(input))}`
 }
 
+export interface OpsOrderUser {
+  order_id: string
+  logged_in: boolean
+  provider: 'wechat' | 'mock' | null
+  open_id_masked: string | null
+  union_id_masked: string | null
+  nickname: string | null
+  type_code: string | null
+  identity_created_at?: string
+  last_login_at?: string
+}
+
+export function projectOrderUser(value: unknown, expectedId: string): OpsOrderUser {
+  const invalid = () => { throw new Error('用户身份响应格式不正确。') }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return invalid()
+  const row = value as Record<string, unknown>
+  const nullableString = (v: unknown, max: number) => v === null || (typeof v === 'string' && v.length <= max)
+  const timestamp = (v: unknown): v is string => typeof v === 'string' && Number.isFinite(Date.parse(v)) && new Date(v).toISOString() === v
+  if (row.order_id !== expectedId || typeof row.logged_in !== 'boolean' ||
+    (row.provider !== null && row.provider !== 'wechat' && row.provider !== 'mock') ||
+    !nullableString(row.open_id_masked, 40) || !nullableString(row.union_id_masked, 40) ||
+    !nullableString(row.nickname, 40) || !nullableString(row.type_code, 4) ||
+    (row.identity_created_at !== undefined && !timestamp(row.identity_created_at)) ||
+    (row.last_login_at !== undefined && !timestamp(row.last_login_at))) return invalid()
+  if (!row.logged_in && (row.provider !== null || row.open_id_masked !== null)) return invalid()
+  return {
+    order_id: row.order_id,
+    logged_in: row.logged_in,
+    provider: row.provider as OpsOrderUser['provider'],
+    open_id_masked: row.open_id_masked as string | null,
+    union_id_masked: row.union_id_masked as string | null,
+    nickname: row.nickname as string | null,
+    type_code: row.type_code as string | null,
+    ...(row.identity_created_at === undefined ? {} : { identity_created_at: row.identity_created_at as string }),
+    ...(row.last_login_at === undefined ? {} : { last_login_at: row.last_login_at as string }),
+  }
+}
+
 export function projectOrder(value: unknown, expectedId: string): OpsOrder {
   const invalid = () => { throw new Error('订单响应格式不正确，请重试或联系维护人员。') }
   if (!value || typeof value !== 'object' || Array.isArray(value)) return invalid()

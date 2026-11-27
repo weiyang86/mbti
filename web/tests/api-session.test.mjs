@@ -3,7 +3,6 @@ import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import vm from 'node:vm'
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import { buildSync } from 'esbuild'
 
 const api = 'http://test.invalid/api/v1'
@@ -647,7 +646,7 @@ function publicCandidate(channel = 'mp', version = 1) {
 }
 test('C2 read-only published preview rejects draft/system/wrong-channel payloads and never changes checkout prices or quiz snapshots', () => {
   const c = browser().load(publishedConfigCode), candidate = publicCandidate(), preview = c.publishedPreview(candidate, 'mp')
-  assert.equal(preview.content.headline, '已发布'); assert.equal(preview.products[0].title, '展示商品'); assert.equal(preview.products[0].cents, undefined); assert.equal(preview.assessment, undefined); assert.equal(preview.personas, undefined)
+  assert.equal(preview.content.headline, '已发布'); assert.equal(preview.products[0].title, '展示商品'); assert.equal(preview.products[0].cents, undefined); assert.equal(preview.assessment, undefined); assert.equal(preview.personas, null)
   for (const value of [{ ...candidate, view: 'draft' }, publicCandidate('wechat'), { ...candidate, cacheIdentity: 'spoof' }, { ...candidate, publishedVersion: 0 }, { ...candidate, categories: { ...candidate.categories, payments: {} } }, { ...candidate, categories: { ...candidate.categories, channels: { ...candidate.categories.channels, wechat: { badge: 'other' } } } }]) assert.equal(c.publishedPreview(value, 'mp'), null)
   for (const name of ['quiz.ts', 'payment.ts', 'results.ts']) assert.doesNotMatch(readFileSync(new URL(`../src/api/${name}`, import.meta.url), 'utf8'), /published-config|config\/published/)
 })

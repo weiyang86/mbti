@@ -22,6 +22,9 @@ export class LocalStorageAdapter implements StorageAdapter {
   private readonly projectRoot: string;
   private readonly projectId: string;
   private readonly environment: string;
+  // Windows does not expose POSIX permission bits (chmod only toggles read-only), so
+  // enforcing the private-mode mask there rejects every valid local object.
+  private readonly enforcePosixMode = process.platform !== "win32";
 
   constructor(config: ConfigService) {
     this.projectId = config.getOrThrow<string>("projectId");
@@ -91,7 +94,7 @@ export class LocalStorageAdapter implements StorageAdapter {
         catch { throw new LocalStorageError("STORAGE_PATH_UNSAFE"); }
       }
       if (stat.isSymbolicLink() || !stat.isDirectory()) throw new LocalStorageError("STORAGE_PATH_UNSAFE");
-      if ((stat.mode & PRIVATE_MODE) !== 0) throw new LocalStorageError("STORAGE_ROOT_PERMISSIONS");
+      if (this.enforcePosixMode && (stat.mode & PRIVATE_MODE) !== 0) throw new LocalStorageError("STORAGE_ROOT_PERMISSIONS");
     }
   }
 
@@ -122,11 +125,11 @@ export class LocalStorageAdapter implements StorageAdapter {
       await handle.writeFile(bytes);
       await handle.sync();
       const stat = await handle.stat();
-      if (!stat.isFile() || (stat.mode & PRIVATE_MODE) !== 0 || stat.size !== bytes.byteLength) throw new LocalStorageError("STORAGE_WRITE_FAILED");
+      if (!stat.isFile() || (this.enforcePosixMode && (stat.mode & PRIVATE_MODE) !== 0) || stat.size !== bytes.byteLength) throw new LocalStorageError("STORAGE_WRITE_FAILED");
       await handle.close(); handle = undefined;
       await this.assertNoSymlinks(target);
       const finalStat = await lstat(target);
-      if (finalStat.isSymbolicLink() || !finalStat.isFile() || (finalStat.mode & PRIVATE_MODE) !== 0 || finalStat.size !== bytes.byteLength) {
+      if (finalStat.isSymbolicLink() || !finalStat.isFile() || (this.enforcePosixMode && (finalStat.mode & PRIVATE_MODE) !== 0) || finalStat.size !== bytes.byteLength) {
         throw new LocalStorageError("STORAGE_WRITE_FAILED");
       }
       return { path: this.relativePath(objectKey), size: bytes.byteLength };
@@ -148,7 +151,7 @@ export class LocalStorageAdapter implements StorageAdapter {
     try {
       handle = await open(path, constants.O_RDONLY | NOFOLLOW);
       const stat = await handle.stat();
-      if (!stat.isFile() || (stat.mode & PRIVATE_MODE) !== 0) throw new LocalStorageError("OBJECT_INVALID");
+      if (!stat.isFile() || (this.enforcePosixMode && (stat.mode & PRIVATE_MODE) !== 0)) throw new LocalStorageError("OBJECT_INVALID");
       return await handle.readFile();
     } catch (error) {
       if (error instanceof LocalStorageError) throw error;

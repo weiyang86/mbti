@@ -17,12 +17,11 @@
       <text>默认仅自己可见 · 本机保存</text>
     </view>
 
-    <view v-if="loading" class="notice mt">正在读取记录…</view>
+    <StateView v-if="loading" state="loading" title="正在读取记录…" />
 
-    <view v-else-if="loadError" class="notice warn mt">
-      <view>轨迹读取失败</view>
-      <view class="btn secondary small mt" @click="load">重试</view>
-    </view>
+    <StateView v-else-if="loadError" state="error" title="轨迹读取失败" description="请检查网络后重试，已有记录不会被删除。">
+      <button class="btn secondary small" @click="load">重试</button>
+    </StateView>
 
     <template v-else>
       <template v-if="rows.length">
@@ -153,7 +152,6 @@
           <text class="title-line">重测不覆盖过去，也不扣费。</text>
         </view>
         <view class="btn full" @click="goQuiz">建立我的第一份记录</view>
-        <button class="textbtn full mt" @click="showHistoryDemo">先看三个阶段的示例 →</button>
       </view>
 
       <view v-if="rows.length" class="btn full mt" @click="goQuiz">
@@ -221,6 +219,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import type {
@@ -414,10 +413,6 @@ function pad(n: number) {
   return String(n).padStart(2, '0')
 }
 
-function toastDemo() {
-  uni.showToast({ title: '当前为 Mock 演示状态', icon: 'none' })
-}
-
 function openRecord(item: TimelineRow) {
   uni.navigateTo({ url: `/pages/history/detail?id=${item.id}` })
 }
@@ -431,10 +426,6 @@ function goCompare() {
 
 function goQuiz() {
   uni.reLaunch({ url: '/pages/index/index' })
-}
-
-function showHistoryDemo() {
-  uni.showToast({ title: '示例轨迹为演示数据', icon: 'none' })
 }
 
 function dateToStr(date: Date) {

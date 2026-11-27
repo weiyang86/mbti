@@ -1,8 +1,6 @@
 <template>
   <view v-if="visible" class="app-footer">
     <text class="span">MBTI搭子 · 原创趣味版 · 非官方测评</text>
-    <text class="footer-link" @click="toast">演示中心</text>
-    <text class="footer-link" @click="toast">产品 SOP ↗</text>
   </view>
 </template>
 
@@ -20,9 +18,6 @@ onShow(() => {
   if (current?.route) route.value = String(current.route)
 })
 
-function toast() {
-  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
-}
 </script>
 
 <style scoped>

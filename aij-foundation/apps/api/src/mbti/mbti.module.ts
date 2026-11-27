@@ -7,6 +7,9 @@ import { MbtiController } from "./mbti.controller";
 import { MbtiGuestGuard } from "./mbti.http";
 import { MbtiService } from "./mbti.service";
 import { MbtiShareService } from "./mbti-share.service";
+import { MbtiWechatAuthService } from "./mbti-wechat-auth.service";
+import { MbtiWechatPayService } from "./mbti-wechat-pay.service";
+import { MbtiWechatPayController } from "./mbti-wechat-pay.controller";
 import { MbtiOrdersService } from "./mbti-orders.service";
 import { MbtiOpsOrdersService } from "./mbti-ops-orders.service";
 import { MbtiOpsRefundService } from "./mbti-ops-refund.service";
@@ -21,6 +24,9 @@ import { MbtiOpsGrowthController } from "./mbti-ops-growth.controller";
 import { MbtiOpsRetentionService } from "./mbti-ops-retention.service";
 import { MbtiOpsRetentionController } from "./mbti-ops-retention.controller";
 import { MbtiOrdersAdminController, MbtiOrdersController } from "./mbti-orders.controller";
+import { MbtiAiAdminController } from "./mbti-ai-image.controller";
+import { MbtiAiImageService } from "./mbti-ai-image.service";
+import { ConfigurationModule } from "../configuration/configuration.module";
 
 import { MbtiSocialController } from "./mbti-social.controller";
 import { MbtiSocialService } from "./mbti-social.service";
@@ -38,6 +44,7 @@ import { PaymentService } from "../plugins/aij-payment/payment.service";
 import { PaymentCallbackService } from "../plugins/aij-payment/payment-callback.service";
 import { PluginRuntimeAccessModule } from "../plugin-runtime/plugin-runtime-access.module";
 import { MbtiConfigModule } from "../plugins/mbti-config/mbti-config.module";
+import { SecretCenterModule } from "../secret-center/secret-center.module";
 
 class MbtiControlledTestProvider extends SyntheticTestPaymentProvider {
   override createPayment(request: PaymentProviderRequest, _credential: string) { return super.createPayment(request, "synthetic-only-no-provider-secret"); }
@@ -52,14 +59,14 @@ export class MbtiModule {
       throw new Error("MBTI controlled payments require explicit isolated test runtime, administrator auth and a local random secret");
     }
     return { module: MbtiModule,
-      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule] : [])],
-      controllers: [MbtiController, MbtiOrdersController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.nodeEnv === "development" && runtime.environment === "development" ? [MbtiDevPaymentController] : []), ...(runtime.capabilities.auth ? [
-        MbtiOrdersAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
+      imports: [...(runtime.capabilities.auth ? [AuthModule, RbacModule, PluginRuntimeAccessModule, MbtiConfigModule, ConfigurationModule, SecretCenterModule] : [])],
+      controllers: [MbtiController, MbtiOrdersController, MbtiWechatPayController, MbtiSocialController, MbtiContactsController, MbtiRadarController, ...(runtime.nodeEnv === "development" && runtime.environment === "development" ? [MbtiDevPaymentController] : []), ...(runtime.capabilities.auth ? [
+        MbtiOrdersAdminController, MbtiAiAdminController, MbtiOpsController, MbtiOpsRedeemController, MbtiOpsGenerationController,
         MbtiOpsModerationController, MbtiOpsGrowthController, MbtiOpsRetentionController,
       ] : []),
         ...(secret ? [MbtiTestPaymentAdminController, MbtiTestCallbackController] : [])],
-      providers: [MbtiService, MbtiShareService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
-        MbtiOpsRefundService, MbtiOpsRedeemService, MbtiOpsGenerationService, MbtiOpsModerationService,
+      providers: [MbtiService, MbtiShareService, MbtiWechatAuthService, MbtiWechatPayService, MbtiGuestGuard, MbtiOrdersService, MbtiOpsOrdersService, ...(runtime.capabilities.auth ? [
+        MbtiAiImageService, MbtiOpsRefundService, MbtiOpsRedeemService, MbtiOpsGenerationService, MbtiOpsModerationService,
         MbtiOpsGrowthService, MbtiOpsRetentionService,
       ] : []), MbtiSocialService, MbtiContactsService, MbtiContactStorage, MbtiRadarService, ...(secret ? [
         MbtiTestPayableSource, { provide: PAYMENT_PAYABLE_SOURCE, useExisting: MbtiTestPayableSource },

@@ -5,7 +5,7 @@
 
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
-    <view v-if="loading" class="notice">正在读取收发记录…</view>
+    <StateView v-if="loading" state="loading" title="正在读取收发记录…" />
 
     <view class="page-intro">
       <view class="eyebrow">CARD WALLET / 名片夹</view>
@@ -58,6 +58,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { listCardExchanges, respondCardExchange, revokeCardExchange } from '@/api/card-exchanges'
@@ -86,7 +87,6 @@ async function act(operation: () => Promise<unknown>) {
 }
 function respond(item: CardExchange, action: 'accept' | 'decline') { if (canRespond(item)) act(() => respondCardExchange(item.id, action)) }
 function revoke(item: CardExchange) { if (canRevoke(item)) act(() => revokeCardExchange(item.id)) }
-function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 function go(url: string) { uni.navigateTo({ url }) }
 function goTab(url: string) { uni.switchTab({ url, fail: () => uni.reLaunch({ url }) }) }
 </script>

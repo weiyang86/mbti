@@ -1,7 +1,7 @@
 <template>
   <view class="page">
     <proto-nav />
-    <view v-if="loading && !latestType" class="notice">正在读取你的类型…</view>
+    <StateView v-if="loading && !latestType" state="loading" title="正在读取你的类型…" />
 
     <template v-else-if="loadError">
       <view class="page-intro">
@@ -108,6 +108,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import AppIcon from '@/components/AppIcon.vue'
@@ -204,10 +205,6 @@ function generate() {
   }
   saveStudio()
   uni.navigateTo({ url: '/pages/generating/generating' })
-}
-
-function demoInfo() {
-  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
 }
 
 </script>

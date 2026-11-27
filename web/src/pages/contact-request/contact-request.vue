@@ -12,7 +12,7 @@
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <text v-if="actionError" class="error" role="alert">{{ actionError }}</text>
     <text v-if="message" class="success" role="status">{{ message }}</text>
-    <text v-if="loading" class="notice" role="status">正在读取当前身份的请求…</text>
+    <StateView v-if="loading" state="loading" title="正在读取当前身份的请求…" />
 
     <template v-if="emptyState">
       <view class="page-intro">
@@ -25,7 +25,7 @@
 
     <template v-else-if="buddyId && loaded">
       <template v-if="currentRequest && currentRequest.status === 'accepted'">
-        <view class="notice green">双方已确认（模拟） · 仅授权本次所选渠道</view>
+        <view class="notice green">双方已确认 · 仅授权本次所选渠道</view>
         <view class="contact-granted">
           <view v-for="channel in activeChannels" :key="channel">
             <text class="span">对方的{{ channelLabel(channel) }}</text>
@@ -46,7 +46,6 @@
         </view>
         <view class="fine mt">本次愿意交换：{{ channelList(currentRequest.channels) }}</view>
         <view v-if="currentRequest.direction === 'incoming'" class="demo-reply">
-          <view class="span">仅供演示：模拟本人操作</view>
           <view>
             <button class="btn secondary" @click="respond(currentRequest, 'accept')">同意交换</button>
             <button class="btn ghost" @click="respond(currentRequest, 'decline')">拒绝</button>
@@ -59,7 +58,7 @@
 
       <template v-else>
         <view v-if="currentRequest && currentRequest.status === 'declined'" class="notice">
-          对方已拒绝本次模拟申请，联系方式未展示。
+          对方已拒绝本次申请，联系方式未展示。
         </view>
         <view v-if="currentRequest && currentRequest.status === 'revoked'" class="notice">
           本次申请已撤回或失效，可重新选择渠道发起申请。
@@ -86,7 +85,7 @@
         </view>
 
         <button class="btn full mt" :disabled="busy || loading || !selected.length" @click="create">
-          {{ busy ? '正在提交…' : '提交本次交换申请（模拟）' }}
+          {{ busy ? '正在提交…' : '提交本次交换申请' }}
         </button>
       </template>
     </template>
@@ -137,6 +136,7 @@
 </template>
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { computed, ref } from 'vue'
 import { onHide, onLoad, onShow, onUnload } from '@dcloudio/uni-app'
 import { getBuddy } from '@/api/buddies'
@@ -213,7 +213,6 @@ function revoke(item: ContactRequest) {
   if (canRevokeContact(item)) act(() => revokeContactRequest(item.id), '本次请求或授权已撤回，不可再读取；无法收回已经复制或截图的内容。')
 }
 function readGranted(item: ContactRequest) { go(`/pages/contact-request/granted?id=${encodeURIComponent(item.id)}`) }
-function demoState() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 function goDiscover() { uni.switchTab({ url: '/pages/discover/discover', fail: () => uni.reLaunch({ url: '/pages/discover/discover' }) }) }
 function go(url: string) { uni.navigateTo({ url }) }
 </script>

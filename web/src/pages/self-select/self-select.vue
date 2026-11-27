@@ -106,10 +106,6 @@ const selectedName = computed(
     'MBTI',
 )
 
-function demoState() {
-  uni.showToast({ title: 'Mock 演示状态，不产生费用', icon: 'none' })
-}
-
 function choose(code: string) {
   selected.value = code
   pickerOpen.value = false

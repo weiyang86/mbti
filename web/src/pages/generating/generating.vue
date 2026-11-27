@@ -68,9 +68,6 @@ function cancel() {
   uni.navigateBack()
 }
 
-function demoInfo() {
-  uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' })
-}
 </script>
 
 <style scoped lang="scss">

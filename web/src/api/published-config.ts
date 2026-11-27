@@ -16,6 +16,7 @@ export interface PublishedCopy {
   interests: string[]
   maxInterests: number
   compare: { title: string; accent: string; description: string; emptyTitle: string; emptyAccent: string; emptyDescription: string }
+  pages?: Record<string, string>
 }
 export interface PublishedPreview {
   projectId: string
@@ -84,7 +85,7 @@ export function publishedPreview(value: unknown, channel: PublicChannel): Publis
     discovery = { order: rawDiscovery.order as 'same' | 'recommend', daily: Number(rawDiscovery.daily), radar: rawDiscovery.radar,
       radius: Number(rawDiscovery.radius), minimum: Number(rawDiscovery.minimum) }
   }
-  const rawCopy = c.copy
+  const rawCopy = c.copy ?? null
   let copy: PublishedPreview['copy'] = null
   if (rawCopy !== null) {
     const list = (value: unknown): value is string[] => Array.isArray(value) && value.length > 0 && value.every(text)
@@ -92,10 +93,17 @@ export function publishedPreview(value: unknown, channel: PublicChannel): Publis
     if (!record(rawCopy) || !list(rawCopy.stages) || !list(rawCopy.recentStatuses) || !list(rawCopy.interests) ||
         !Number.isSafeInteger(rawCopy.maxInterests) || Number(rawCopy.maxInterests) < 1 || Number(rawCopy.maxInterests) > 10 ||
         !record(compare) || !['title', 'accent', 'description', 'emptyTitle', 'emptyAccent', 'emptyDescription'].every(key => text(compare[key]))) return null
+    const pages: Record<string, string> = {}
+    const rawPages = record(rawCopy) ? rawCopy.pages : undefined
+    if (rawPages !== undefined && rawPages !== null) {
+      if (!record(rawPages)) return null
+      for (const [route, title] of Object.entries(rawPages)) if (text(title)) pages[route] = title
+    }
     copy = { stages: rawCopy.stages, recentStatuses: rawCopy.recentStatuses, interests: rawCopy.interests,
       maxInterests: Number(rawCopy.maxInterests),
       compare: { title: compare.title as string, accent: compare.accent as string, description: compare.description as string,
-        emptyTitle: compare.emptyTitle as string, emptyAccent: compare.emptyAccent as string, emptyDescription: compare.emptyDescription as string } }
+        emptyTitle: compare.emptyTitle as string, emptyAccent: compare.emptyAccent as string, emptyDescription: compare.emptyDescription as string },
+      ...(Object.keys(pages).length ? { pages } : {}) }
   }
   // Copy only compatible display fields. Candidate prices/questions cannot overwrite business snapshots.
   return { projectId: value.projectId, channel, publishedVersion: Number(value.publishedVersion), cacheIdentity: value.cacheIdentity as string,

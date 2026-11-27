@@ -5,11 +5,14 @@
 
     <view class="panel">
       <view class="h3">我的订单</view>
-      <view class="p fine">不会产生真实扣款；刷新后可看到最新状态。</view>
+      <view class="p fine">刷新后可看到最新状态。</view>
       <text class="textbtn order-refresh" @click="refresh">刷新记录 →</text>
 
-      <view v-if="ordersLoading && !orders.length" class="notice mt">正在读取订单…</view>
-      <view v-if="ordersError" class="notice warn mt">{{ ordersError }}</view>
+      <StateView v-if="ordersLoading && !orders.length" state="loading" title="正在读取订单…" />
+      <StateView v-else-if="ordersError && !orders.length" state="error" title="订单读取失败" :description="ordersError">
+        <button class="btn secondary full" @click="loadOrders(true)">重新加载</button>
+      </StateView>
+      <text v-else-if="ordersError" class="error" role="alert">{{ ordersError }}（下方为上次读取结果）</text>
 
       <view v-for="order in orders" :key="order.id" class="order">
         <view class="order-info">
@@ -20,10 +23,9 @@
         <text class="textbtn" @click="openOrder(order.id)">查看 →</text>
       </view>
 
-      <view v-if="ordersLoaded && !orders.length" class="order-empty">
-        <view class="p">暂无模拟订单。</view>
-        <text class="textbtn" @click="goCatalog">看看我的 MBTI 晒图套装 →</text>
-      </view>
+      <StateView v-if="ordersLoaded && !orders.length && !ordersError" state="empty" title="暂无订单" description="完成一次 MBTI 测试后，可以在这里查看可购买的商品。">
+        <button class="btn full" @click="goCatalog">看看我的 MBTI 晒图套装</button>
+      </StateView>
 
       <button v-if="nextCursor" class="btn secondary full mt" :disabled="ordersLoading" @click="loadOrders(false)">加载更多订单</button>
     </view>
@@ -32,8 +34,10 @@
       <view class="h3">我的权益</view>
       <view class="p fine">待支付订单不会授予权益。</view>
 
-      <view v-if="entitlementsLoading" class="notice mt">正在读取权益…</view>
-      <view v-if="entitlementsError" class="notice warn mt">{{ entitlementsError }}</view>
+      <StateView v-if="entitlementsLoading" state="loading" title="正在读取权益…" />
+      <StateView v-else-if="entitlementsError" state="error" title="权益读取失败" :description="entitlementsError">
+        <button class="btn secondary full" @click="loadEntitlements">重新加载</button>
+      </StateView>
 
       <view v-for="item in entitlements" :key="item.id" class="order">
         <view class="order-info">
@@ -42,9 +46,7 @@
         </view>
       </view>
 
-      <view v-if="entitlementsLoaded && !entitlements.length" class="order-empty">
-        <view class="p">暂无服务端权益。</view>
-      </view>
+      <StateView v-if="entitlementsLoaded && !entitlements.length" state="empty" title="暂无服务端权益" description="支付成功后可在此查看已解锁的权益。" />
     </view>
 
     <view class="mini-list">
@@ -57,6 +59,7 @@
 
 <script setup lang="ts">
 import DemoStrip from '@/components/demo-strip.vue'
+import StateView from '@/components/state-view.vue'
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { getMyEntitlements, listOrders, type Entitlement, type Order } from '@/api/payment'
@@ -119,7 +122,6 @@ async function loadEntitlements() {
 function openOrder(id: string) { uni.navigateTo({ url: `/pages/order-status/order-status?order_id=${encodeURIComponent(id)}` }) }
 function goCatalog() { uni.navigateTo({ url: '/pages/pricing/pricing' }) }
 function goHome() { uni.reLaunch({ url: '/pages/index/index' }) }
-function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操作', icon: 'none' }) }
 </script>
 
 <style scoped lang="scss">
@@ -149,6 +151,13 @@ function toastDemo() { uni.showToast({ title: '演示模式，未产生真实操
 }
 .order-empty .p {
   margin: 0 0 13px;
+}
+.error {
+  display: block;
+  margin: 10px 0;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #a43b3b;
 }
 .mini-list {
   width: 100%;

@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import { readPublishedPreview, type PublishedContent, type PublishedCopy, type PublishedDiscovery, type PublishedPersona, type PublishedStyle } from '@/api/published-config'
 import { DECLARATIONS, TYPE_NAMES } from '@/constants/types'
-import { LIMITS } from '@/constants/copy'
+import { LIMITS, PAGE_TITLES } from '@/constants/copy'
 import { INTERESTS, RECENT_STATES, STAGES } from '@/store/profile'
 import { PLAN_NAMES, STUDIO_STYLES } from '@/store/studio'
 
@@ -36,6 +36,11 @@ export function ensurePublishedConfig(force = false): Promise<void> {
         replace(RECENT_STATES, preview.copy.recentStatuses)
         replace(INTERESTS, preview.copy.interests)
         LIMITS.interests = preview.copy.maxInterests
+        if (preview.copy.pages) {
+          for (const [route, title] of Object.entries(preview.copy.pages)) {
+            if (Object.hasOwn(PAGE_TITLES, route)) PAGE_TITLES[route] = title
+          }
+        }
       }
       if (preview.personas) {
         for (const [code, item] of Object.entries(preview.personas)) {

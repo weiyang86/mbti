@@ -1,7 +1,7 @@
 // Internal F3 integration candidate; see F3-INTEGRATION.md, not a published contract.
 import { baseURL, ensureGuestSession, request, useMock } from './client'
 
-export type OrderStatusValue = 'pending' | 'paid' | 'failed'
+export type OrderStatusValue = 'pending' | 'paid' | 'failed' | 'refunded'
 export type PaymentAvailability = 'unconfigured' | 'controlled_test'
 
 export interface PaymentProduct {
@@ -65,7 +65,7 @@ interface PurchaseIntent extends CreateOrderBody {
 const intentStorageKey = `mbti_purchase_intent_v1:${baseURL}`
 
 function requireOnline() {
-  if (useMock()) throw new Error('商品、订单和权益需要在线服务，请关闭 Mock 后使用')
+  if (useMock()) throw new Error('商品、订单和权益需要在线服务，请切换为在线服务后使用')
 }
 
 function newIntentKey(): string {
@@ -116,9 +116,73 @@ export function getOrderStatus(orderId: string): Promise<OrderStatus> {
 /** Local-development only: the backend route exists only when NODE_ENV and APP_ENV are development. */
 export const devPaymentAvailable = import.meta.env.DEV
 
+export interface WechatPayParams {
+  appId: string
+  timeStamp: string
+  nonceStr: string
+  package: string
+  signType: 'RSA'
+  paySign: string
+}
+
+export type WechatPayChannel = 'wechat' | 'mp'
+
+/** Mini program pays with its own AppID; WeChat-browser H5 pays with the official-account AppID. */
+export function payChannel(): WechatPayChannel {
+  // #ifdef MP-WEIXIN
+  return 'wechat'
+  // #endif
+  // #ifdef H5
+  return 'mp'
+  // #endif
+  return 'wechat'
+}
+
+/** Real WeChat JSAPI payment. Returns 503 until the channel's admin parameters are complete. */
+export function requestWechatPay(orderId: string, channel: WechatPayChannel = payChannel()) {
+  requireOnline()
+  return request<{ payment_availability: 'wechat_jsapi'; channel: WechatPayChannel; pay_params: WechatPayParams }>(
+    `/orders/${encodeURIComponent(orderId)}/pay`,
+    { method: 'POST', header: { 'X-MBTI-Pay-Channel': channel } },
+  )
+}
+
+/** WeChat-browser JSAPI invocation for the official-account channel. */
+export function requestWechatH5Pay(params: WechatPayParams): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') { reject(new Error('请在微信中打开后支付')); return }
+    const bridge = (window as unknown as { WeixinJSBridge?: { invoke(name: string, params: Record<string, string>, done: (result: { err_msg?: string }) => void): void } }).WeixinJSBridge
+    if (!bridge) { reject(new Error('请在微信中打开后支付')); return }
+    bridge.invoke('getBrandWCPayRequest', {
+      appId: params.appId,
+      timeStamp: params.timeStamp,
+      nonceStr: params.nonceStr,
+      package: params.package,
+      signType: params.signType,
+      paySign: params.paySign,
+    }, (result) => {
+      const message = String(result?.err_msg || '')
+      if (message === 'get_brand_wcpay_request:ok') resolve()
+      else reject(new Error(/cancel/i.test(message) ? '已取消支付' : '支付未完成，请稍后重试'))
+    })
+  })
+}
+
 export function devMarkOrderPaid(orderId: string): Promise<Order> {
   requireOnline()
   return request<Order>(`/orders/${encodeURIComponent(orderId)}/dev-pay`, { method: 'POST' })
+}
+
+/** Local-development only: close a pending order as failed. */
+export function devMarkOrderFailed(orderId: string): Promise<Order> {
+  requireOnline()
+  return request<Order>(`/orders/${encodeURIComponent(orderId)}/dev-fail`, { method: 'POST' })
+}
+
+/** Local-development only: refund a paid order and revoke its entitlement. */
+export function devRefundOrder(orderId: string): Promise<Order> {
+  requireOnline()
+  return request<Order>(`/orders/${encodeURIComponent(orderId)}/dev-refund`, { method: 'POST' })
 }
 
 export function listProducts(): Promise<{ items: PaymentProduct[] }> {

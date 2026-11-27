@@ -80,6 +80,11 @@ export async function createApplication(options: { testBrowserOrigin?: string; p
     if (/^\/api\/client\/document-exports(?:[/?]|$)/i.test(request.url ?? "")) personalDocumentJsonVerify(buffer);
   } };
   const httpAdapter = app.getHttpAdapter() as ExpressAdapter;
+  // Admin-only AI image trial accepts two compressed data URLs; all other JSON stays at 512kb.
+  httpAdapter.useBodyParser("json", false, { limit: "24mb", type(request) {
+    return /^\/api\/admin\/mbti\/ai\/image(?:[/?]|$)/i.test(request.url ?? "") &&
+      /^application\/json(?:\s*;|$)/i.test(request.headers["content-type"] ?? "");
+  } });
   // Only this document prefix accepts escaped 64KiB text beyond the host's 100KiB wire limit.
   httpAdapter.useBodyParser("json", false, { limit: "512kb", type(request) {
     return /^\/api\/client\/documents(?:[/?]|$)/i.test(request.url ?? "") &&

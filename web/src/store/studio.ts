@@ -187,7 +187,7 @@ export function redeemCode(input: string) {
       ? 2
       : 0
   if (!tier) return { ok: false, message: '体验码无效，请检查后再试' }
-  if (studio.redeemed.includes(code)) return { ok: false, message: '这个演示码已在本机使用' }
+  if (studio.redeemed.includes(code)) return { ok: false, message: '这个兑换码已在本机使用' }
   if (studio.tier >= tier) return { ok: false, message: '已拥有该套装，无需重复兑换' }
   studio.redeemed.push(code)
   studio.orders.push({
@@ -199,7 +199,7 @@ export function redeemCode(input: string) {
   })
   studio.tier = tier
   saveStudio()
-  return { ok: true, message: '模拟兑换成功' }
+  return { ok: true, message: '兑换成功' }
 }
 
 export function markCardReady() {
